@@ -26,3 +26,7 @@ services:
     # l'implémentation d'infrastructure.
     App\Domain\Authorization\RoleRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineRoleRepository'
     App\Domain\Authorization\SecurityAuditLogger: '@App\Infrastructure\Authorization\MonologSecurityAuditLogger'
+
+    # Ports analytiques (US-005, ADR-9) : flux d'événements et projecteur.
+    App\Domain\Analytics\EventStore: '@App\Infrastructure\Persistence\Doctrine\DoctrineEventStore'
+    App\Domain\Analytics\AnalyticsProjector: '@App\Infrastructure\Analytics\DoctrineAnalyticsProjector'
