@@ -31,8 +31,8 @@ Ce sprint solidifie la charpente posée au Sprint 1 **avant** d'y greffer la val
 |----|-------|--------|---------|--------|
 | TECH-1 | Migrations Doctrine + durcissement analytique versionné (RLS + trigger) | 5 | Rétro S1 · Action 1 | ✅ Done |
 | TECH-2 | RLS active au runtime par requête (rôle applicatif dédié) — finition US-001 | 5 | Rétro S1 · Action 2 | ✅ Done |
-| US-006 | Exécution FrankenPHP **worker** réelle + état inter-requêtes sûr (`ARC-47..50`) | 5 | Résiduel Sprint 0 (T-006-02) | 🔵 To Do |
-| US-008 | Secrets hors dépôt/rotatifs + observabilité de base (P95, suivi d'erreurs) | 5 | Résiduel Sprint 0 | 🔵 To Do |
+| US-006 | Exécution FrankenPHP **worker** réelle + état inter-requêtes sûr (`ARC-47..50`) | 5 | Résiduel Sprint 0 (T-006-02) | ✅ Done |
+| US-008 | Secrets hors dépôt/rotatifs + observabilité de base (P95, suivi d'erreurs) | 5 | Résiduel Sprint 0 | ✅ Done |
 
 **Total engagé : 20 points** (dans la vélocité cible 20–40 ; marge volontaire, tâches d'infra à risque).
 
