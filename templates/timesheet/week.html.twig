@@ -3,7 +3,7 @@
 {% block title %}Saisie du temps — {{ weekLabel }}{% endblock %}
 
 {% block body %}
-    <main class="container" data-controller="timesheet">
+    <main class="container" data-controller="timesheet" data-timesheet-week-start-value="{{ weekStart }}">
         <h1>Saisie du temps</h1>
 
         <nav class="week-nav">
@@ -52,6 +52,7 @@
             </table>
 
             <div class="timesheet-actions">
+                <button type="button" data-action="timesheet#duplicatePreviousWeek">Dupliquer la semaine précédente</button>
                 <button type="button" data-action="timesheet#saveWeek">Enregistrer la semaine</button>
                 <span class="hint">Entrée = valider et descendre · Tab = cellule suivante · saisie possible sans souris.</span>
             </div>

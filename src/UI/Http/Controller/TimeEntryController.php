@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\UI\Http\Controller;
 
 use App\Application\Timesheet\CellError;
+use App\Application\Timesheet\DuplicatePreviousWeek;
 use App\Application\Timesheet\RecordTimeEntry;
 use App\Application\Timesheet\RecordWeek;
 use App\Application\Timesheet\WeekCell;
@@ -28,6 +29,7 @@ final class TimeEntryController extends AbstractController
     public function __construct(
         private readonly RecordTimeEntry $recordTimeEntry,
         private readonly RecordWeek $recordWeek,
+        private readonly DuplicatePreviousWeek $duplicatePreviousWeek,
     ) {
     }
 
@@ -102,5 +104,24 @@ final class TimeEntryController extends AbstractController
                 $errors,
             ),
         ]);
+    }
+
+    /**
+     * US-051 — duplique la semaine précédente dans la semaine cible (levier ≤ 2 min).
+     */
+    #[Route('/api/time-entries/duplicate-week', name: 'api_time_entry_duplicate_week', methods: ['POST'])]
+    public function duplicateWeek(#[CurrentUser] User $user, Request $request): JsonResponse
+    {
+        /** @var array<string, mixed> $payload */
+        $payload = json_decode($request->getContent(), true, flags: \JSON_THROW_ON_ERROR);
+        $weekStart = DateTimeImmutable::createFromFormat('!Y-m-d', is_string($payload['weekStart'] ?? null) ? $payload['weekStart'] : '');
+        if (false === $weekStart) {
+            return new JsonResponse(['error' => 'Champ requis : weekStart (YYYY-MM-DD, lundi de la semaine cible).'], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        $monday = $weekStart->modify('monday this week');
+        $errors = $this->duplicatePreviousWeek->into($user->tenantId(), $user->id(), $monday);
+
+        return new JsonResponse(['errors' => count($errors)]);
     }
 }

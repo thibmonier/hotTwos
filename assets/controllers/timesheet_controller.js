@@ -7,6 +7,7 @@ import { Controller } from '@hotwired/stimulus';
  */
 export default class extends Controller {
     static targets = ['cell', 'status', 'grid'];
+    static values = { weekStart: String };
 
     connect() {
         this.element.addEventListener('keydown', (event) => this.#onKeydown(event));
@@ -36,6 +37,25 @@ export default class extends Controller {
             const body = await response.json().catch(() => ({}));
             const errors = body.errors ?? [];
             this.#status(`Semaine enregistrée : ${body.recorded ?? 0} imputation(s)${errors.length ? `, ${errors.length} refusée(s)` : ''}.`);
+        } catch {
+            this.#status('Erreur réseau : réessayez.');
+        }
+    }
+
+    // Reporte la semaine précédente dans la semaine affichée (US-051, ≤ 2 min), puis recharge.
+    async duplicatePreviousWeek() {
+        try {
+            const response = await fetch('/api/time-entries/duplicate-week', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ weekStart: this.weekStartValue }),
+            });
+            if (response.ok) {
+                this.#status('Semaine précédente dupliquée. Actualisation…');
+                window.location.reload();
+            } else {
+                this.#status('Duplication refusée par le serveur.');
+            }
         } catch {
             this.#status('Erreur réseau : réessayez.');
         }
