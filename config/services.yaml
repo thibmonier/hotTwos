@@ -45,3 +45,7 @@ services:
     App\Domain\Analytics\AnalyticsProjector: '@App\Infrastructure\Analytics\DoctrineAnalyticsProjector'
     App\Domain\Analytics\DivergenceChecker: '@App\Infrastructure\Analytics\SqlDivergenceChecker'
     App\Domain\Analytics\AnalyticsSchemaGuard: '@App\Infrastructure\Analytics\AnalyticsSchemaHardener'
+
+    # Observabilité (US-008) : le registre de métriques est un singleton persistant entre
+    # requêtes worker (NON taggé kernel.reset) pour agréger l'histogramme des latences.
+    App\Application\Observability\MetricsRegistry: '@App\Infrastructure\Observability\MetricsCollector'
