@@ -24,7 +24,7 @@ final class TenantFilterConfiguratorTest extends TestCase
 {
     public function testDoesNothingWithoutTenant(): void
     {
-        $context = $this->createMock(TenantContext::class);
+        $context = $this->createStub(TenantContext::class);
         $context->method('hasTenant')->willReturn(false);
 
         $entityManager = $this->createMock(EntityManagerInterface::class);
@@ -49,7 +49,7 @@ final class TenantFilterConfiguratorTest extends TestCase
     private function event(int $requestType): RequestEvent
     {
         return new RequestEvent(
-            $this->createMock(HttpKernelInterface::class),
+            $this->createStub(HttpKernelInterface::class),
             new Request(),
             $requestType,
         );

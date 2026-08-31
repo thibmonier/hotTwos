@@ -19,9 +19,16 @@ security:
         main:
             lazy: true
             provider: app_users
-            # Authenticator (login) à ajouter dans la tranche suivante d'US-002.
+            json_login:
+                check_path: api_login
+                username_path: email
+                password_path: password
+            logout:
+                path: api_logout
 
-    access_control: []
+    access_control:
+        # /api/me exige un utilisateur authentifié (dont le tenant est alors résolu).
+        - { path: ^/api/me, roles: ROLE_USER }
 
 when@test:
     security:

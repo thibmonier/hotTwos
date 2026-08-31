@@ -11,6 +11,8 @@ api_platform:
         jsonld: ['application/ld+json']
         json: ['application/json']
     defaults:
-        stateless: true
+        # Firewall unique à session (json_login) au Sprint 1 : les opérations ne sont pas
+        # stateless. Une API stateless dédiée (token) relèvera d'un firewall séparé ultérieur.
+        stateless: false
         cache_headers:
             vary: ['Content-Type', 'Authorization', 'Origin']
