@@ -69,7 +69,11 @@ jobs:
       - name: Audit des dépendances (CVE)
         run: composer audit
 
-      # (4) Tests + couverture
+      # Base de test (les tests d'intégration créent leur schéma à la volée).
+      - name: Préparer la base de test
+        run: php bin/console doctrine:database:create --env=test --if-not-exists
+
+      # (4) Tests + couverture (unitaires + intégration multi-tenant)
       - name: Tests (PHPUnit) + couverture
         run: php bin/phpunit --coverage-text --coverage-clover=coverage.xml
       # NOTE : le gate « couverture ≥ 80 % sur règles critiques » (ENF-MAINT-1)
