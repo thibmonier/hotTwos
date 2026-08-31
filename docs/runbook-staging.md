@@ -46,6 +46,38 @@ railway up --detach   # sans streamer les logs
 - La commande `app:fixtures:load` **refuse de s'exécuter en production sans `--force`** (garde anti-données).
 - Ne jamais importer de dump de production dans le staging.
 
+## Bascule RLS en production (TECH-3)
+
+Objectif : faire tourner l'application sous le rôle **non-superutilisateur** `hotones_app`
+pour que les politiques RLS (ARC-34) s'appliquent réellement (aujourd'hui inertes car le
+rôle Railway par défaut est superutilisateur → RLS contournée).
+
+**Prérequis** : la migration `Version20260831183000` a donné `LOGIN` à `hotones_app` (au
+déploiement). Le rôle a déjà les privilèges DML (migration Sprint 2).
+
+**Procédure (variables Railway, hors dépôt — ARC-88) :**
+
+1. **Mot de passe du rôle applicatif** (une fois, via la console PostgreSQL Railway) :
+   ```sql
+   ALTER ROLE hotones_app PASSWORD '<mot_de_passe_fort>';
+   ```
+2. **Variables du service** :
+   - `MIGRATION_DATABASE_URL` = l'URL **privilégiée actuelle** (rôle par défaut) — les
+     migrations continuent via ce rôle (DDL + gestion des rôles).
+   - `DATABASE_URL` = même hôte/base mais avec `hotones_app:<mot_de_passe>` — l'**application**
+     s'exécute désormais sous ce rôle (RLS active).
+3. **Redéployer** (`railway up`). `docker/start.sh` migre via `MIGRATION_DATABASE_URL`, puis
+   sert via `DATABASE_URL` (hotones_app).
+4. **Vérifier** : `make smoke URL=https://hottwos-production.up.railway.app` (endpoints OK) ;
+   un utilisateur authentifié voit ses données (RLS + `app.current_tenant` posé par requête).
+
+**Rollback** : remettre `DATABASE_URL` sur l'URL privilégiée (supprimer/renseigner l'ancienne
+valeur) et redéployer. L'application repasse superutilisateur (RLS inerte, filtre ORM actif).
+
+**Périmètre RLS actif** : `protected_record`, `dim_period`, `fact_project_revenue`. L'extension
+aux tables métier (`project`, `time_entry`, `auth_role`) est à instruire et à tester sous
+`hotones_app` sur la staging avant activation (voir `walking-skeleton-debt.md`, DBT-SEC-1).
+
 ## Opérations courantes
 
 ```bash

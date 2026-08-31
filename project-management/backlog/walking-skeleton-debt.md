@@ -32,4 +32,5 @@
 | Réf | Dette | Posé au | À solder |
 |-----|-------|---------|----------|
 | DBT-RUN-1 | **Runtime FrankenPHP worker réel** + preuve d'absence de fuite d'état inter-requêtes. | S0 · US-006 | S2 · US-006 (en cours) |
-| DBT-RUN-2 | **DATABASE_URL de production via `hotones_app`** (rôle non-superutilisateur créé par migration `Version20260831170000`) — condition pour que la RLS soit réellement active en prod ; dev/CI restent superutilisateur (RLS inerte, filtre ORM opérant). | S2 · TECH-2 | Configuration de déploiement (US-008) |
+| DBT-RUN-2 | **DATABASE_URL de production via `hotones_app`** pour activer la RLS runtime. **Préparé (TECH-3)** : `hotones_app` a LOGIN (migration `Version20260831183000`), l'entrypoint sépare l'URL migrations (privilégié) de l'URL app (`MIGRATION_DATABASE_URL`), procédure de bascule + rollback dans le runbook. **Reste** : poser le mot de passe du rôle + basculer `DATABASE_URL` sur Railway (action ops), puis vérifier. | S2 · TECH-2 → S3 · TECH-3 | Bascule Railway (ops) |
+| DBT-SEC-1 (suite) | **Étendre la RLS aux tables métier** `project`/`time_entry`/`auth_role` (aujourd'hui : ORM filter seul). À tester sous `hotones_app` sur la staging avant activation (écritures en contexte requête → WITH CHECK). | S3 | Après bascule DBT-RUN-2 |
