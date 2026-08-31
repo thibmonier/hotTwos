@@ -7,6 +7,7 @@ namespace App\Infrastructure\Tenant;
 use App\Application\Tenant\TenantContext;
 use App\Application\Tenant\TenantSwitcher;
 use App\Domain\Tenant\TenantId;
+use LogicException;
 
 /**
  * Porteur du tenant courant pour la durée d'une requête (ARC-61).
@@ -31,7 +32,7 @@ final class RequestTenantContext implements TenantContext, TenantSwitcher
     public function current(): TenantId
     {
         if (null === $this->current) {
-            throw new \LogicException('Aucun tenant positionné pour la requête courante.');
+            throw new LogicException('Aucun tenant positionné pour la requête courante.');
         }
 
         return $this->current;

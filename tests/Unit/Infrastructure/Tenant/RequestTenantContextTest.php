@@ -7,6 +7,7 @@ namespace App\Tests\Unit\Infrastructure\Tenant;
 use App\Domain\Tenant\TenantId;
 use App\Infrastructure\Tenant\RequestTenantContext;
 use PHPUnit\Framework\TestCase;
+use LogicException;
 
 /**
  * US-001 — le contexte de tenant est positionné puis effacé par requête (ARC-61),
@@ -39,7 +40,7 @@ final class RequestTenantContextTest extends TestCase
     {
         $context = new RequestTenantContext();
 
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $context->current();
     }
 }

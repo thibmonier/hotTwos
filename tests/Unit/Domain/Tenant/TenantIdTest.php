@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Domain\Tenant;
 
 use App\Domain\Tenant\TenantId;
 use PHPUnit\Framework\TestCase;
+use InvalidArgumentException;
 
 /**
  * US-001 — identifiant de tenant (INV-1). Value object immuable adossé à un UUID.
@@ -35,7 +36,7 @@ final class TenantIdTest extends TestCase
 
     public function testRejectsAMalformedIdentifier(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         TenantId::fromString('not-a-uuid');
     }

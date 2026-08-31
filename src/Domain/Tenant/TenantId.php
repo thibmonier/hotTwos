@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\Tenant;
 
 use Symfony\Component\Uid\Uuid;
+use InvalidArgumentException;
 
 /**
  * Identifiant de tenant (INV-1) — value object immuable adossé à un UUID v7.
@@ -25,7 +26,7 @@ final readonly class TenantId
     public static function fromString(string $value): self
     {
         if (!Uuid::isValid($value)) {
-            throw new \InvalidArgumentException(sprintf('Identifiant de tenant invalide : "%s".', $value));
+            throw new InvalidArgumentException(sprintf('Identifiant de tenant invalide : "%s".', $value));
         }
 
         return new self($value);
