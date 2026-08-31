@@ -105,8 +105,10 @@ reusable_assets:
       committed_points: 28
       stories: [US-006, US-007, US-004, US-008, US-009]
       path: project-management/sprints/sprint-000-fondations/
-      status: decomposed
+      status: in_progress
       tasks: "45 tâches / ~101h (tasks/ + task-board.md)"
+      progress: "US-006 (squelette+API DTO+Twig), US-007 (PostgreSQL/pgvector), US-009 (PHPStan max, Rector, hook, conventions) — 4 tests verts, PHPStan max 0, Deptrac 0. Reste US-004 (CI) et US-008 (staging externe)."
+      branch: feature/sprint-0-fondations
       note: "Volet outillage du Lot 0. Sans valeur métier — capacité de construire. AUD-1/AUD-2 en parallèle (hors backlog dev)."
     next_sprint:
       id: 1
