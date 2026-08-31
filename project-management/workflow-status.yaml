@@ -1,0 +1,125 @@
+# Suivi du workflow de développement — HotOnes
+project: HotOnes
+track: enterprise
+initialized_at: 2026-08-31T00:00:00Z
+current_phase: implementation
+
+# Source du besoin : cahier des charges fonctionnel complet
+source_of_truth: project-management/cdc/
+
+# Évaluation de complexité (score 18/18 → Enterprise)
+complexity:
+  files_impacted: "50+ (refonte ERP, 9 modules)"      # Enterprise
+  new_entities: "4+ (modèle conceptuel, INV-1..8, multi-tenant)"  # Enterprise
+  integrations: 6                                       # Enterprise
+  user_stories_estimees: "15+ (248 exigences fonctionnelles)"  # Enterprise
+  teams: "1 au démarrage / 4,5 ETP cible"               # multi-rôles
+  security: "Élevé (multi-tenant, RGPD, RSSI/DPO)"      # Enterprise
+  score: 18
+  track_reason: >
+    248 EF + 91 ENF, 16 ADR, 9 modules métier, multi-tenant SaaS,
+    IA intégrée, 6 intégrations, horizon 18-22 mois. Complexité
+    intrinsèque maximale nécessitant le workflow Enterprise complet.
+
+# Arbitrage ARB-20 — décision utilisateur du 2026-08-31
+scope_decision:
+  ref: ARB-20
+  decision: "Périmètre complet retenu (équipe cible ~4,5 ETP supposée constituée)"
+  scope: "6 lots / 248 EF — CDC intégral engageable"
+  decided_at: 2026-08-31
+  note: >
+    L'écart HYP-15 (1 personne) reste un risque projet à surveiller
+    (voir RSQ / cdc/09), mais le périmètre de planification couvre
+    l'intégralité du CDC.
+
+phases:
+  analysis:
+    status: done
+    completed_at: 2026-08-31
+    reason: "Track Enterprise — recherche, contraintes, risques (synthèse du CDC)"
+    artifacts:
+      research_summary: project-management/analysis/research-summary.md
+      constraints: project-management/analysis/constraints.md
+      risks_opportunities: project-management/analysis/risks-opportunities.md
+      technical_options: project-management/analysis/technical-options.md
+    open_items:
+      - "AUD-1/AUD-2 (audit de l'existant) à réaliser avant lot 1 — CDR-5"
+      - "AUD-3/ARB-2 (mesure des situations de référence OBJ-1..7) à programmer immédiatement"
+      - "CTR-3/ARB-14 (qualification AI Act) avant conception RH/REC"
+  planning:
+    status: done
+    completed_at: 2026-08-31
+    artifacts:
+      prd: project-management/prd.md
+      personas: project-management/personas.md
+      definition_of_done: project-management/definition-of-done.md
+      epics: "project-management/backlog/epics/ (12 EPICs)"
+      user_stories: "project-management/backlog/user-stories/ (36 US, lot 1)"
+      dependencies_matrix: project-management/backlog/dependencies-matrix.md
+      index: project-management/backlog/index.md
+    metrics:
+      epics: 12
+      user_stories_detaillees: 36
+      story_points_lot1: 183
+      scope: "Lot 1 détaillé (REF+PRJ+TMP+socle) ; lots 2-5 au niveau EPIC"
+    open_items:
+      - "Rééquilibrage des sprints : le tag Sprint 1 par défaut totalise 79 pts (>vélocité 20-40) — arbitrer en /workflow:start"
+      - "Détailler les EPIC-004..011 en US lot par lot (affinage progressif)"
+  design:
+    status: done
+    completed_at: 2026-08-31
+    artifacts:
+      tech_spec: project-management/tech-spec.md
+      c4_context: project-management/architecture/c4-context.md
+      c4_container: project-management/architecture/c4-container.md
+      c4_component: project-management/architecture/c4-component.md
+      erd: project-management/architecture/erd.md
+      api: project-management/architecture/api.md
+      security: project-management/architecture/security.md
+      adr_index: docs/adr/README.md
+    metrics:
+      tech_spec_sections: 14
+      api_endpoints_lot1: 83
+      adr_traces: 16
+    open_items:
+      - "ARB-25 : hébergement de production UE (services gérés) à instruire au lot 2"
+      - "ARB-3/CTR-5 : choix du fournisseur d'inférence IA UE (souveraineté)"
+      - "Divergence de modélisation à valider : séparation physique COUT_REVIENT/TAUX (HAB-1 par permission plutôt que masquage) vs note US-011"
+      - "Nommage définitif des DTO API et détail RBAC (porté par US-003) à figer en revue technique"
+
+# Actif réutilisable évalué (scénario C / CDR-2)
+reusable_assets:
+  skote_theme:
+    path: project-management/Skote_Symfony_v2.2.0/ (gitignored)
+    evaluation: project-management/analysis/existing-assets.md
+    verdict: "Accélérateur d'ossature UI en lot 0 (stock de composants candidats), jamais socle"
+    blocking_prereq: "Vérifier la licence ThemeForest pour usage SaaS multi-tenant AVANT toute intégration au produit"
+    misalignments: "Symfony 7.1 (cible 8.1), Webpack Encore (cible Reprise+Vite ADR-5), Bootstrap générique (design system cdc/11 prime), Turbo absent"
+  implementation:
+    status: in_progress
+    current_sprint:
+      id: 0
+      name: sprint-000-fondations
+      goal: "Installer le socle : squelette Symfony 8 worker + archi, env conteneurisé, staging, outillage qualité/sécurité"
+      period: "2026-08-18 → 2026-08-29"
+      committed_points: 28
+      stories: [US-006, US-007, US-004, US-008, US-009]
+      path: project-management/sprints/sprint-000-fondations/
+      status: planned
+      note: "Volet outillage du Lot 0. Sans valeur métier — capacité de construire. AUD-1/AUD-2 en parallèle (hors backlog dev)."
+    next_sprint:
+      id: 1
+      name: sprint-001-walking_skeleton
+      goal: "Charpente applicative : multi-tenant isolé (testé), auth/RBAC, modèle analytique reconstructible"
+      committed_points: 29
+      stories: [US-001, US-002, US-003, US-005]
+      path: project-management/sprints/sprint-001-walking_skeleton/
+      note: "Première valeur métier (saisie de temps) engagée pour le Sprint 2"
+    quality_gates:
+      prd: "95% ✅"
+      tech_spec: "96% ✅"
+      backlog: "6/6 ✅"
+      report: project-management/quality-gates-report.md
+
+next_action: "Décomposer le Sprint 0 en tâches, puis installer le socle (US-006) en TDD/BDD"
+next_command: "/project:decompose-tasks 000  (puis /sprint:dev US-006)"

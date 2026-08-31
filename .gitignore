@@ -1,0 +1,30 @@
+# Thème de référence propriétaire (ThemeForest) — NE PAS versionner dans le produit
+# 327 Mo, licence proprietary. Conservé en local comme référence visuelle uniquement.
+# Voir project-management/analysis/existing-assets.md
+project-management/Skote_Symfony_v2.2.0/
+
+# Préférences personnelles (non partagées)
+CLAUDE.local.md
+
+# OS / IDE
+.DS_Store
+*.swp
+*.swo
+.idea/
+.idea/*
+.vscode/
+
+# Symfony / PHP (pour la phase d'implémentation)
+/vendor/
+/var/
+/.env.local
+/.env.local.php
+/.env.*.local
+/public/bundles/
+
+# Node / assets
+/node_modules/
+/public/build/
+/public/assets/
+npm-debug.log
+yarn-error.log
