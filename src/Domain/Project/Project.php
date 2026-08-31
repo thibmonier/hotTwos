@@ -36,9 +36,16 @@ class Project implements TenantOwned
     #[ORM\Column(length: 255)]
     private string $name;
 
-    public function __construct(TenantId $tenantId, string $code, string $name, #[ORM\Column(type: 'boolean')]
-        private bool $active = true)
-    {
+    public function __construct(
+        TenantId $tenantId,
+        string $code,
+        string $name,
+        #[ORM\Column(type: 'boolean')]
+        private bool $active = true,
+        /** Chef de projet responsable (US-055) : le seul habilité à valider les temps du projet. */
+        #[ORM\Column(name: 'responsible_user_id', type: 'guid', nullable: true)]
+        private ?string $responsibleUserId = null,
+    ) {
         if ('' === $code) {
             throw new InvalidArgumentException('Le code projet ne peut pas être vide.');
         }
@@ -75,5 +82,15 @@ class Project implements TenantOwned
     public function isActive(): bool
     {
         return $this->active;
+    }
+
+    public function responsibleUserId(): ?string
+    {
+        return $this->responsibleUserId;
+    }
+
+    public function isResponsible(string $userId): bool
+    {
+        return null !== $this->responsibleUserId && $this->responsibleUserId === $userId;
     }
 }

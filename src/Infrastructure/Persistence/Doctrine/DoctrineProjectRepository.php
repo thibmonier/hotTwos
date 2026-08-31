@@ -33,12 +33,39 @@ final readonly class DoctrineProjectRepository implements ProjectRepository
         return $project;
     }
 
+    public function find(TenantId $tenant, string $projectId): ?Project
+    {
+        /** @var Project|null $project */
+        $project = $this->entityManager->createQuery(
+            'SELECT p FROM '.Project::class.' p WHERE p.id = :id AND p.tenantId = :tenant',
+        )
+            ->setParameter('id', $projectId)
+            ->setParameter('tenant', $tenant->toString())
+            ->setMaxResults(1)
+            ->getOneOrNullResult();
+
+        return $project;
+    }
+
     public function findAllActive(TenantId $tenant): array
     {
         /** @var list<Project> $projects */
         $projects = $this->entityManager->createQuery(
             'SELECT p FROM '.Project::class.' p WHERE p.tenantId = :tenant AND p.active = true ORDER BY p.code ASC',
         )->setParameter('tenant', $tenant->toString())->getResult();
+
+        return $projects;
+    }
+
+    public function findByResponsible(TenantId $tenant, string $responsibleUserId): array
+    {
+        /** @var list<Project> $projects */
+        $projects = $this->entityManager->createQuery(
+            'SELECT p FROM '.Project::class.' p WHERE p.tenantId = :tenant AND p.responsibleUserId = :responsible ORDER BY p.code ASC',
+        )
+            ->setParameter('tenant', $tenant->toString())
+            ->setParameter('responsible', $responsibleUserId)
+            ->getResult();
 
         return $projects;
     }

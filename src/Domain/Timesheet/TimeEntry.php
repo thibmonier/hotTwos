@@ -41,6 +41,18 @@ class TimeEntry implements TenantOwned
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $comment;
 
+    #[ORM\Column(name: 'status', length: 20, enumType: ValidationStatus::class)]
+    private ValidationStatus $status;
+
+    #[ORM\Column(name: 'rejection_reason', type: 'text', nullable: true)]
+    private ?string $rejectionReason = null;
+
+    #[ORM\Column(name: 'validated_by', type: 'guid', nullable: true)]
+    private ?string $validatedBy = null;
+
+    #[ORM\Column(name: 'decided_at', type: 'datetime_immutable', nullable: true)]
+    private ?DateTimeImmutable $decidedAt = null;
+
     public function __construct(
         TenantId $tenantId,
         #[ORM\Column(name: 'user_id', type: 'guid')]
@@ -58,6 +70,12 @@ class TimeEntry implements TenantOwned
         $this->tenantId = $tenantId->toString();
         $this->minutes = $minutes;
         $this->comment = $this->normalizeComment($comment);
+        $this->status = ValidationStatus::PENDING;
+    }
+
+    public function id(): string
+    {
+        return $this->id;
     }
 
     public function tenantId(): TenantId
@@ -98,6 +116,42 @@ class TimeEntry implements TenantOwned
         $this->guardMinutes($minutes);
         $this->minutes = $minutes;
         $this->comment = $this->normalizeComment($comment);
+        // Une imputation re-saisie repart en soumission (une validation antérieure ne vaut plus).
+        $this->status = ValidationStatus::PENDING;
+        $this->rejectionReason = null;
+        $this->validatedBy = null;
+        $this->decidedAt = null;
+    }
+
+    public function validate(string $validatorId, DateTimeImmutable $at): void
+    {
+        $this->status = ValidationStatus::VALIDATED;
+        $this->rejectionReason = null;
+        $this->validatedBy = $validatorId;
+        $this->decidedAt = $at;
+    }
+
+    public function reject(string $validatorId, string $reason, DateTimeImmutable $at): void
+    {
+        $trimmed = trim($reason);
+        if ('' === $trimmed) {
+            throw new InvalidArgumentException('Un motif est obligatoire pour refuser une imputation.');
+        }
+
+        $this->status = ValidationStatus::REJECTED;
+        $this->rejectionReason = $trimmed;
+        $this->validatedBy = $validatorId;
+        $this->decidedAt = $at;
+    }
+
+    public function status(): ValidationStatus
+    {
+        return $this->status;
+    }
+
+    public function rejectionReason(): ?string
+    {
+        return $this->rejectionReason;
     }
 
     private function guardMinutes(int $minutes): void

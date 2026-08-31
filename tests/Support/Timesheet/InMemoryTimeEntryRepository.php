@@ -7,6 +7,7 @@ namespace App\Tests\Support\Timesheet;
 use App\Domain\Tenant\TenantId;
 use App\Domain\Timesheet\TimeEntry;
 use App\Domain\Timesheet\TimeEntryRepository;
+use App\Domain\Timesheet\ValidationStatus;
 use DateTimeImmutable;
 
 final class InMemoryTimeEntryRepository implements TimeEntryRepository
@@ -47,6 +48,24 @@ final class InMemoryTimeEntryRepository implements TimeEntryRepository
 
             return $entry->tenantId()->equals($tenant) && $entry->userId() === $userId && $day >= $fromKey && $day <= $toKey;
         }));
+    }
+
+    public function findByIds(TenantId $tenant, array $ids): array
+    {
+        return array_values(array_filter(
+            $this->entries,
+            static fn (TimeEntry $entry): bool => $entry->tenantId()->equals($tenant) && in_array($entry->id(), $ids, true),
+        ));
+    }
+
+    public function findPendingForProjects(TenantId $tenant, array $projectIds): array
+    {
+        return array_values(array_filter(
+            $this->entries,
+            static fn (TimeEntry $entry): bool => $entry->tenantId()->equals($tenant)
+                && in_array($entry->projectId(), $projectIds, true)
+                && ValidationStatus::PENDING === $entry->status(),
+        ));
     }
 
     public function save(TimeEntry $entry): void

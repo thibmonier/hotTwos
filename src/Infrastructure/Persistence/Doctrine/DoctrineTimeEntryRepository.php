@@ -7,6 +7,7 @@ namespace App\Infrastructure\Persistence\Doctrine;
 use App\Domain\Tenant\TenantId;
 use App\Domain\Timesheet\TimeEntry;
 use App\Domain\Timesheet\TimeEntryRepository;
+use App\Domain\Timesheet\ValidationStatus;
 use Doctrine\ORM\EntityManagerInterface;
 use DateTimeImmutable;
 
@@ -68,6 +69,43 @@ final readonly class DoctrineTimeEntryRepository implements TimeEntryRepository
             ->setParameter('user', $userId)
             ->setParameter('from', $from, 'date_immutable')
             ->setParameter('to', $to, 'date_immutable')
+            ->getResult();
+
+        return $entries;
+    }
+
+    public function findByIds(TenantId $tenant, array $ids): array
+    {
+        if ([] === $ids) {
+            return [];
+        }
+
+        /** @var list<TimeEntry> $entries */
+        $entries = $this->entityManager->createQuery(
+            'SELECT e FROM '.TimeEntry::class.' e WHERE e.tenantId = :tenant AND e.id IN (:ids)',
+        )
+            ->setParameter('tenant', $tenant->toString())
+            ->setParameter('ids', $ids)
+            ->getResult();
+
+        return $entries;
+    }
+
+    public function findPendingForProjects(TenantId $tenant, array $projectIds): array
+    {
+        if ([] === $projectIds) {
+            return [];
+        }
+
+        /** @var list<TimeEntry> $entries */
+        $entries = $this->entityManager->createQuery(
+            'SELECT e FROM '.TimeEntry::class.' e'
+            .' WHERE e.tenantId = :tenant AND e.projectId IN (:projects) AND e.status = :pending'
+            .' ORDER BY e.workDate ASC',
+        )
+            ->setParameter('tenant', $tenant->toString())
+            ->setParameter('projects', $projectIds)
+            ->setParameter('pending', ValidationStatus::PENDING->value)
             ->getResult();
 
         return $entries;

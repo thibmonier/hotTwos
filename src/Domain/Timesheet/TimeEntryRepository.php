@@ -28,5 +28,23 @@ interface TimeEntryRepository
      */
     public function findForUserInRange(TenantId $tenant, string $userId, DateTimeImmutable $from, DateTimeImmutable $to): array;
 
+    /**
+     * Charge un lot d'imputations par identifiants (validation par lot — US-055).
+     *
+     * @param list<string> $ids
+     *
+     * @return list<TimeEntry>
+     */
+    public function findByIds(TenantId $tenant, array $ids): array;
+
+    /**
+     * Imputations en attente de validation sur un ensemble de projets (US-055).
+     *
+     * @param list<string> $projectIds
+     *
+     * @return list<TimeEntry>
+     */
+    public function findPendingForProjects(TenantId $tenant, array $projectIds): array;
+
     public function save(TimeEntry $entry): void;
 }
