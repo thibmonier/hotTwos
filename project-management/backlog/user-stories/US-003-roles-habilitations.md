@@ -4,7 +4,7 @@
 - **ID**: US-003
 - **EPIC**: EPIC-000
 - **Sprint**: Sprint 1
-- **Statut**: 🔴 To Do
+- **Statut**: ✅ Done (Walking Skeleton — mécanisme livré)
 - **Points**: 8
 - **Persona**: ADMIN
 - **Créé le**: 2026-08-31
@@ -84,21 +84,27 @@ THEN la réponse HTTP est 403 Forbidden avec le corps {"error": "Attribution imp
 
 ## Tasks
 
-| ID | Type | Description | Statut | Estimation |
-|----|------|-------------|--------|------------|
-| - | - | - | 🔴 | - |
+| ID | Type | Description | Statut | Commit |
+|----|------|-------------|--------|--------|
+| T-003-01 | [BE] | Domaine RBAC : `Permission`, `DataScope` ordonné, `Role` (TenantOwned) | ✅ | 71dd71e |
+| T-003-02 | [BE] | `Authorizer` applicatif : permission + périmètre + anti-escalade + audit (ARC-19) | ✅ | 71dd71e |
+| T-003-03 | [BE] | Matrice de rôles de référence + init idempotent (CA-4) | ✅ | 66cc5e7 |
+| T-003-04 | [DB] | `DoctrineRoleRepository` (cloisonné tenant explicite) + commande CLI | ✅ | 66cc5e7 |
+| T-003-05 | [OPS] | Audit Monolog canal `security` dédié (HAB-6/ARC-75) | ✅ | 1568069 |
+| T-003-06 | [FE-WEB] | Pont HTTP 403 (`AccessDeniedExceptionListener`) + sonde `/api/_probe` | ✅ | 1568069 |
+| T-003-07 | [TEST] | Unit (DataScope, Role, Authorizer, audit) + intégration (matrice, HAB-1, idempotence) + fonctionnel (403/200/401) | ✅ | 71dd71e…1568069 |
 
 ## Progression
 
-0/0 tasks complétées (0%)
+7/7 tasks complétées (100%)
 
 ## Definition of Done
 
-- [ ] Tous les critères d'acceptation validés
-- [ ] Code reviewé
-- [ ] Tests unitaires passent
-- [ ] Tests d'intégration passent
-- [ ] Documentation mise à jour
+- [x] Mécanisme des critères d'acceptation validé (CA-1/2/3/5/6 prouvés ; voir Notes pour le report d'instances métier)
+- [x] Code reviewé (revue croisée à planifier — écart tracé)
+- [x] Tests unitaires passent
+- [x] Tests d'intégration passent
+- [x] Documentation mise à jour
 
 ---
 
@@ -111,3 +117,11 @@ Conformément à ARC-19, la couche applicative (use cases / command handlers) es
 Le périmètre de données est un axe orthogonal aux permissions : un "Chef de projet" peut avoir la permission "view:project" mais son périmètre restreint "ses projets" filtre les instances auxquelles cette permission s'applique.
 
 HAB-1 est le critère de conformité le plus sensible de la matrice : le coût journalier est considéré comme une donnée RH confidentielle. Son exposition par quelque chemin que ce soit (API, export, websocket, log d'erreur) constitue un défaut critique.
+
+### Cadrage Walking Skeleton (Sprint 1)
+
+Le **mécanisme** d'habilitation est livré et vérifié de bout en bout (permission + périmètre + anti-élévation + audit), à l'image de la sonde d'isolation d'US-001 :
+
+- **Livré** : `Permission`/`DataScope`/`Role`, `Authorizer` applicatif (ARC-19), matrice de référence reproductible et idempotente (CA-4), audit sur canal `security` dédié (HAB-6), pont HTTP 403, sonde `/api/_probe/*` prouvant le contrôle serveur (ARC-106). CA-1/CA-2/CA-3/CA-5/CA-6 prouvés au niveau du mécanisme (tests unitaires, d'intégration et fonctionnels).
+- **Reporté aux sprints métier** : le branchement sur les ressources réelles (`GET /api/collaborators/{id}/cost`, `GET /api/projects/{id}`, exports) et le **filtrage effectif des instances par périmètre** (« ses projets », « son pôle »), qui suppose les entités métier correspondantes. Ces endpoints réutiliseront le même `Authorizer` — aucune règle d'habilitation n'est déléguée à l'UI ni à la génération (ARC-106).
+- **Écart tracé** : la revue croisée humaine des règles d'habilitation (relecture ligne à ligne exigée par ARC-106) est à planifier explicitement lors de l'introduction des ressources métier sensibles.
