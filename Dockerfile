@@ -1,28 +1,33 @@
-# Amorce ADR-2 — FrankenPHP en mode worker. Image finalisée et testée en US-007 (conteneurs).
-# La même image sert au développement et à la production (parité worker, ARC-86).
+# US-008 / ADR-2 — image FrankenPHP. Sert de base au dev (US-007) et au staging (Railway).
 FROM dunglas/frankenphp:1-php8.4 AS base
 
 ENV SERVER_NAME=:8080
+ENV APP_ENV=prod
+ENV APP_DEBUG=0
+# Le build tourne en root : autoriser Composer à exécuter les plugins (symfony/runtime, flex),
+# sans quoi vendor/autoload_runtime.php n'est pas généré.
+ENV COMPOSER_ALLOW_SUPERUSER=1
 WORKDIR /app
 
-# Extensions PHP requises (PostgreSQL + pgvector, intl, opcache…)
-RUN install-php-extensions \
-    pdo_pgsql \
-    intl \
-    opcache \
-    zip
+# Extensions PHP (PostgreSQL, intl, opcache) + Composer.
+RUN install-php-extensions pdo_pgsql intl opcache zip @composer
 
-# Dépendances (couche cache)
-COPY composer.json composer.lock symfony.lock ./
-RUN composer install --no-dev --no-scripts --no-interaction --prefer-dist || true
+# Caddyfile custom (désactive h2c — évite la corruption de méthode HTTP derrière un proxy).
+COPY frankenphp/Caddyfile /etc/frankenphp/Caddyfile
 
-# Code applicatif
+# Code applicatif.
 COPY . .
 
-# Mode worker (ADR-2) : boucle l'application en mémoire entre les requêtes.
-# Nécessite le bridge runtime/frankenphp-symfony (APP_RUNTIME=Runtime\FrankenPhpSymfony\Runtime)
-# dont la version compatible Symfony 8.1 reste à résoudre (T-006-02). En attendant, l'image
-# sert l'app en php_server classique (Caddyfile). Activer le worker en décommentant :
+# Dépendances de prod sans les auto-scripts (symfony-cmd indisponible au build),
+# puis génération de l'autoload optimisé + de vendor/autoload_runtime.php (plugin symfony/runtime).
+RUN composer install --no-dev --no-scripts --no-interaction --prefer-dist --optimize-autoloader \
+ && composer dump-autoload --no-dev --optimize \
+ && mkdir -p var/cache var/log \
+ && php bin/console importmap:install \
+ && php bin/console asset-map:compile \
+ && php bin/console cache:clear
+
+# Mode worker (ADR-2) : à activer une fois le bridge runtime résolu (T-006-02).
 # ENV FRANKENPHP_CONFIG="worker ./public/index.php"
 
 EXPOSE 8080
