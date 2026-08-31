@@ -6,6 +6,7 @@ namespace App\Infrastructure\Authorization;
 
 use App\Domain\Authorization\SecurityAuditLogger;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use DateTimeImmutable;
 use DateTimeInterface;
 
@@ -18,8 +19,10 @@ use DateTimeInterface;
  */
 final readonly class MonologSecurityAuditLogger implements SecurityAuditLogger
 {
-    public function __construct(private LoggerInterface $securityLogger)
-    {
+    public function __construct(
+        #[Autowire(service: 'monolog.logger.security')]
+        private LoggerInterface $securityLogger,
+    ) {
     }
 
     public function record(string $event, string $tenantId, ?string $actorId, array $context = []): void
