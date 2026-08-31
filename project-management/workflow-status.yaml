@@ -105,7 +105,8 @@ reusable_assets:
       committed_points: 28
       stories: [US-006, US-007, US-004, US-008, US-009]
       path: project-management/sprints/sprint-000-fondations/
-      status: planned
+      status: decomposed
+      tasks: "45 tâches / ~101h (tasks/ + task-board.md)"
       note: "Volet outillage du Lot 0. Sans valeur métier — capacité de construire. AUD-1/AUD-2 en parallèle (hors backlog dev)."
     next_sprint:
       id: 1
@@ -121,5 +122,5 @@ reusable_assets:
       backlog: "6/6 ✅"
       report: project-management/quality-gates-report.md
 
-next_action: "Décomposer le Sprint 0 en tâches, puis installer le socle (US-006) en TDD/BDD"
-next_command: "/project:decompose-tasks 000  (puis /sprint:dev US-006)"
+next_action: "Développer le socle : démarrer par le squelette Symfony 8 (US-006, tâche T-006-01) en TDD/BDD"
+next_command: "/sprint:dev US-006"
