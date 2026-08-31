@@ -12,10 +12,10 @@ use Symfony\Component\Routing\Attribute\Route;
  * Adaptateur HTTP mince : traduit la requête en appel de cas d'usage et sérialise la réponse.
  * Aucune logique métier ici (ARC-15). Le cas d'usage {@see HealthCheck} porte le comportement.
  */
-final class HealthController
+final readonly class HealthController
 {
     public function __construct(
-        private readonly HealthCheck $healthCheck,
+        private HealthCheck $healthCheck,
     ) {
     }
 

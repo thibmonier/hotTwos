@@ -3,7 +3,7 @@
 .DEFAULT_GOAL := help
 DC := docker compose
 
-.PHONY: help up down build logs sh db-shell migrate fixtures test analyse deptrac lint secrets
+.PHONY: help up down build logs sh db-shell migrate fixtures test analyse deptrac rector rector-fix secrets audit ci
 
 help: ## Affiche cette aide
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
@@ -38,8 +38,20 @@ test: ## Lance la suite de tests
 deptrac: ## Vérifie les frontières d'architecture
 	php vendor/bin/deptrac analyse
 
-analyse: ## Analyse statique (à activer en US-009 : PHPStan max)
-	@echo "PHPStan configuré en US-009"
+analyse: ## Analyse statique PHPStan niveau max
+	php vendor/bin/phpstan analyse --memory-limit=1G
+
+rector: ## Détecte les modernisations/dépréciations (dry-run)
+	php vendor/bin/rector process --dry-run
+
+rector-fix: ## Applique les modernisations Rector
+	php vendor/bin/rector process
+
+audit: ## Audit des vulnérabilités des dépendances (ENF-SEC-11)
+	composer audit
 
 secrets: ## Détecte les secrets commités (gitleaks, US-007/US-009)
 	gitleaks detect --source . --no-banner || true
+
+ci: analyse deptrac test ## Enchaîne les vérifications bloquantes en local (miroir CI)
+	@echo "✅ Vérifications locales OK"

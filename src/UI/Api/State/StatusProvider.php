@@ -14,10 +14,10 @@ use App\UI\Api\Resource\StatusResource;
  *
  * @implements ProviderInterface<StatusResource>
  */
-final class StatusProvider implements ProviderInterface
+final readonly class StatusProvider implements ProviderInterface
 {
     public function __construct(
-        private readonly HealthCheck $healthCheck,
+        private HealthCheck $healthCheck,
     ) {
     }
 

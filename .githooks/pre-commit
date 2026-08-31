@@ -1,0 +1,22 @@
+#!/usr/bin/env sh
+# US-009 (T-009-05) / ADR-16 — garde-fou pré-commit.
+# Active-le une fois : git config core.hooksPath .githooks
+# Rejoue en local les vérifications bloquantes de la CI (US-004).
+set -e
+
+echo "▶ PHPStan (niveau max)…"
+php vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+
+echo "▶ Deptrac (frontières d'architecture)…"
+php vendor/bin/deptrac analyse --no-progress
+
+echo "▶ Tests…"
+php bin/phpunit
+
+# Détection de secrets si gitleaks est installé (ARC-88).
+if command -v gitleaks >/dev/null 2>&1; then
+  echo "▶ gitleaks (secrets)…"
+  gitleaks protect --staged --no-banner
+fi
+
+echo "✅ pre-commit OK"

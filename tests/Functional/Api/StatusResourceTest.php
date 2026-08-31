@@ -15,12 +15,13 @@ final class StatusResourceTest extends WebTestCase
 {
     public function testStatusResourceReturnsHealthPayload(): void
     {
-        $client = static::createClient();
+        $client = self::createClient();
         $client->request('GET', '/api/status', server: ['HTTP_ACCEPT' => 'application/json']);
 
         self::assertResponseIsSuccessful();
 
         $payload = json_decode((string) $client->getResponse()->getContent(), true, flags: JSON_THROW_ON_ERROR);
+        self::assertIsArray($payload);
         self::assertSame('ok', $payload['status'] ?? null);
         self::assertSame('HotOnes', $payload['app'] ?? null);
     }

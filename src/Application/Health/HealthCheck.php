@@ -10,10 +10,10 @@ namespace App\Application\Health;
  * Volontairement indépendant du transport (HTTP/CLI) — ADR-1 (cœur API-first),
  * ARC-17 (tout cas d'usage invocable sans HTTP). Consommé par un adaptateur.
  */
-final class HealthCheck
+final readonly class HealthCheck
 {
     public function __construct(
-        private readonly string $appName = 'HotOnes',
+        private string $appName = 'HotOnes',
     ) {
     }
 

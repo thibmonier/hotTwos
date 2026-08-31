@@ -13,8 +13,8 @@ final class HomePageTest extends WebTestCase
 {
     public function testHomePageRendersServerSide(): void
     {
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/');
+        $client = self::createClient();
+        $client->request('GET', '/');
 
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('h1', 'HotOnes');

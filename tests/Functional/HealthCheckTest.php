@@ -14,13 +14,14 @@ final class HealthCheckTest extends WebTestCase
 {
     public function testHealthEndpointReturnsOkStatus(): void
     {
-        $client = static::createClient();
+        $client = self::createClient();
         $client->request('GET', '/health');
 
         self::assertResponseIsSuccessful();
         self::assertResponseHeaderSame('Content-Type', 'application/json');
 
         $payload = json_decode((string) $client->getResponse()->getContent(), true, flags: JSON_THROW_ON_ERROR);
+        self::assertIsArray($payload);
         self::assertSame('ok', $payload['status'] ?? null);
         self::assertArrayHasKey('app', $payload);
     }
