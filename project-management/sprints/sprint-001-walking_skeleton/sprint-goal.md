@@ -48,7 +48,7 @@ Le périmètre complet a été retenu en supposant l'équipe cible (~4,5 ETP) co
 | ID | Titre | Points | Statut | Dépend de |
 |----|-------|--------|--------|-----------|
 | US-001 | Fondation multi-tenant et isolation des données | 8 | 🔵 To Do | Sprint 0 |
-| US-002 | Authentification et cycle de vie des utilisateurs | 5 | 🔵 To Do | Sprint 0 |
+| US-002 | Authentification et cycle de vie des utilisateurs | 5 | ✅ Done | Sprint 0 |
 | US-003 | Rôles et habilitations (RBAC + périmètre) | 8 | 🔵 To Do | US-001 |
 | US-005 | Modèle analytique en étoile et non-divergence | 8 | 🔵 To Do | US-001 |
 

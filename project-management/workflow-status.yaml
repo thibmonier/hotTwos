@@ -116,7 +116,7 @@ reusable_assets:
       staging_url: "https://hottwos-production.up.railway.app (EU West, PHP 8.5, /health /api/status / /api → 200 en GET)"
       ci_status: "✅ verte sur GitHub (Qualité & tests + Détection de secrets) — facturation débloquée le 2026-08-31"
       branch_protection: "✅ active sur main : CI verte requise (strict), force-push/suppression interdits (ARC-89)"
-      sprint_1_progress: "US-001 (multi-tenant) cœur LIVRÉ : isolation effective testée en CI (ENF-SEC-4). Reste US-002 (auth), US-003 (RBAC), US-005 (analytique) + finitions US-001 (middleware HTTP, activation runtime RLS)."
+      sprint_1_progress: "US-001 (multi-tenant) cœur LIVRÉ : isolation testée en CI (ENF-SEC-4). US-002 (auth) LIVRÉ : login JSON (json_login), hachage Argon2id, résolution du tenant depuis l'utilisateur authentifié (AuthenticatedTenantResolver, ENF-SEC-4/ARC-61), /api/login /api/logout /api/me. Reste US-003 (RBAC), US-005 (analytique) + finitions US-001 (activation runtime RLS SET LOCAL)."
       remaining:
         - "US-006 : runtime FrankenPHP worker réel (T-006-02), écart ADR-5 (AssetMapper vs Reprise)"
         - "US-007 : fixtures effectives (dépend du modèle de données US-001)"
