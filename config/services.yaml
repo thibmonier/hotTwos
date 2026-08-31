@@ -31,3 +31,4 @@ services:
     App\Domain\Analytics\EventStore: '@App\Infrastructure\Persistence\Doctrine\DoctrineEventStore'
     App\Domain\Analytics\AnalyticsProjector: '@App\Infrastructure\Analytics\DoctrineAnalyticsProjector'
     App\Domain\Analytics\DivergenceChecker: '@App\Infrastructure\Analytics\SqlDivergenceChecker'
+    App\Domain\Analytics\AnalyticsSchemaGuard: '@App\Infrastructure\Analytics\AnalyticsSchemaHardener'

@@ -38,7 +38,11 @@ final readonly class DoctrineAnalyticsProjector implements AnalyticsProjector
         $connection->beginTransaction();
 
         try {
+            // Contexte d'écriture : `projector_active` lève la protection anti-écriture
+            // directe (CA-6) ; `current_tenant` satisfait la barrière RLS (WITH CHECK) en
+            // production où le rôle applicatif n'est pas superutilisateur (CA-4).
             $connection->executeStatement("SET LOCAL app.projector_active = 'on'");
+            $connection->executeStatement(sprintf("SET LOCAL app.current_tenant = '%s'", $tenant->toString()));
 
             $this->purge($tenant);
             $this->replay($tenant);
