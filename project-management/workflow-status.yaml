@@ -113,7 +113,7 @@ reusable_assets:
         US-004 (CI GitHub Actions 11 étapes), US-008 (staging Railway déployé et fonctionnel).
         Base : 4 tests verts, PHPStan max 0, Deptrac 0, make ci vert.
       branch: feature/sprint-0-fondations
-      staging_url: "https://hottwos-production.up.railway.app (EU West, PHP 8.5, /health /api/status / /api → 200 en GET)"
+      staging_url: "https://hottwos-production.up.railway.app (EU West, PHP 8.5, MODE WORKER FrankenPHP actif — Sprint 2). Migrations appliquées au démarrage du conteneur (4 migrations OK sur Postgres Railway) ; /health /api/status / /api → 200 ; auth opérationnelle (login mauvais identifiants → 401)."
       ci_status: "✅ verte sur GitHub (Qualité & tests + Détection de secrets) — facturation débloquée le 2026-08-31"
       branch_protection: "✅ active sur main : CI verte requise (strict), force-push/suppression interdits (ARC-89)"
       sprint_1_progress: "Sprint 1 (Walking Skeleton) COMPLET. US-001 multi-tenant (isolation testée ENF-SEC-4). US-002 auth (login JSON, Argon2id, résolution tenant ARC-61). US-003 RBAC (Authorizer applicatif ARC-19, matrice reproductible idempotente, audit canal security HAB-6, anti-élévation CA-6, HAB-1 bout-en-bout). US-005 analytique tranche S1 (event-sourcing→projection→étoile, reconstruction idempotente par tenant CA-1/CA-5, non-divergence bloquante CI CA-2, double barrière RLS FORCE CA-4, anti-écriture directe des faits CA-6). Reportés Sprint 2 : réconciliation périodique+alerte (CA-3), swap atomique, faits métier réels ; + finitions RLS runtime US-001 et migration Doctrine du DDL de durcissement."
@@ -133,16 +133,19 @@ reusable_assets:
       pr: "https://github.com/thibmonier/hotTwos/pull/2 (verte, MERGEABLE/CLEAN, à merger)"
       ceremonies: "Review + Rétro (Starfish) rédigées"
       path: project-management/sprints/sprint-001-walking_skeleton/
-    next_sprint:
+    current_sprint:
       id: 2
       name: sprint-002-consolidation_technique
       goal: "Socle durci et reproductible : schéma versionné (migrations), RLS runtime active, worker éprouvé, observabilité opérationnelle"
       committed_points: 20
+      delivered_points: 20
       stories: [TECH-1, TECH-2, US-006, US-008]
+      status: "développement terminé (20/20) — branche feature/sprint-2-consolidation, CI verte ; Review/Rétro à faire, PR à ouvrir"
       decision_po: "Consolidation technique choisie (dette rétro d'abord) ; valeur métier (saisie de temps) décalée au Sprint 3 — RSQ-17 surveillé"
-      blocker: "Merge PR #2 (Sprint 1) puis brancher Sprint 2 sur main à jour"
+      delivered: "TECH-1 migrations Doctrine (schéma + durcissement versionné, étape CI, ADR-0017) ; TECH-2 RLS runtime (rôle hotones_app + TenantSessionConfigurator, prouvée sous rôle non-superutilisateur) ; US-006 worker FrankenPHP réel (bridge Symfony 8, reset kernel.reset, VALIDÉ en prod) ; US-008 /metrics Prometheus (live) + Sentry UE + validation variables + garde ADR-13 + runbook. Migrations appliquées au démarrage du conteneur (docker/start.sh)."
+      reserve: "RLS runtime inactive en prod tant que DATABASE_URL n'utilise pas hotones_app (DBT-RUN-2) ; isolation prod portée par le filtre ORM. Réconciliation analytique périodique + faits métier restent Sprint 3+."
       path: project-management/sprints/sprint-002-consolidation_technique/
-      note: "Première valeur métier (saisie de temps) désormais engagée pour le Sprint 3"
+      note: "Première valeur métier (saisie de temps) engagée pour le Sprint 3"
     quality_gates:
       prd: "95% ✅"
       tech_spec: "96% ✅"

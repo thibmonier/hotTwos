@@ -5,6 +5,9 @@ builder = "dockerfile"
 dockerfilePath = "Dockerfile"
 
 [deploy]
+# Applique les migrations avant que le nouveau déploiement ne serve du trafic (US-008 /
+# TECH-1). Idempotent ; --allow-no-migration évite l'échec quand rien n'est en attente.
+preDeployCommand = "php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration"
 healthcheckPath = "/health"
 healthcheckTimeout = 120
 restartPolicyType = "on_failure"

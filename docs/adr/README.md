@@ -30,6 +30,7 @@
 | [ADR-0014](#adr-0014) | ADR-14 | Observabilité Ember + suivi d'erreurs UE + Prometheus/Grafana | Adopté |
 | [ADR-0015](#adr-0015) | ADR-15 | Sécurité automatisée : 8 couches outillées + test d'intrusion annuel externe | Adopté |
 | [ADR-0016](#adr-0016) | ADR-16 | Développement assisté par agent (claude-craft), TDD imposé, périmètre de sécurité non délégué | Adopté |
+| [ADR-0017](./0017-migrations-source-du-schema.md) | — (réalisation) | Migrations Doctrine = source du schéma de production ; durcissement RLS/trigger versionné ; CI valide migrations ↔ mapping | Adopté |
 
 ---
 

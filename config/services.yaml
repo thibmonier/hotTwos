@@ -22,6 +22,19 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
+    # US-006 / ARC-47 (RSQ-15) — le contexte de tenant porté par requête est réinitialisé
+    # à chaque frontière de requête (worker FrankenPHP) : aucune fuite d'état d'une requête
+    # à l'autre. Le tag `kernel.reset` fait appeler clear() par Symfony entre deux requêtes.
+    App\Infrastructure\Tenant\RequestTenantContext:
+        tags:
+            - { name: kernel.reset, method: clear }
+
+    # Exposé pour le bridge worker FrankenPHP (public/index.php) : réinitialise les
+    # services taggés kernel.reset entre deux requêtes servies par le même worker.
+    app.services_resetter:
+        alias: services_resetter
+        public: true
+
     # Ports d'autorisation (US-003, DIP/ARC-18) : l'interface du domaine résout vers
     # l'implémentation d'infrastructure.
     App\Domain\Authorization\RoleRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineRoleRepository'
@@ -32,3 +45,7 @@ services:
     App\Domain\Analytics\AnalyticsProjector: '@App\Infrastructure\Analytics\DoctrineAnalyticsProjector'
     App\Domain\Analytics\DivergenceChecker: '@App\Infrastructure\Analytics\SqlDivergenceChecker'
     App\Domain\Analytics\AnalyticsSchemaGuard: '@App\Infrastructure\Analytics\AnalyticsSchemaHardener'
+
+    # Observabilité (US-008) : le registre de métriques est un singleton persistant entre
+    # requêtes worker (NON taggé kernel.reset) pour agréger l'histogramme des latences.
+    App\Application\Observability\MetricsRegistry: '@App\Infrastructure\Observability\MetricsCollector'

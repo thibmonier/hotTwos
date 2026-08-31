@@ -15,6 +15,10 @@ RUN install-php-extensions pdo_pgsql intl opcache zip @composer
 # Caddyfile custom (désactive h2c — évite la corruption de méthode HTTP derrière un proxy).
 COPY frankenphp/Caddyfile /etc/frankenphp/Caddyfile
 
+# Entrypoint applicatif : migrations puis serveur (US-008 / TECH-1).
+COPY docker/start.sh /usr/local/bin/start.sh
+RUN chmod +x /usr/local/bin/start.sh
+
 # Code applicatif.
 COPY . .
 
@@ -27,7 +31,11 @@ RUN composer install --no-dev --no-scripts --no-interaction --prefer-dist --opti
  && php bin/console asset-map:compile \
  && php bin/console cache:clear
 
-# Mode worker (ADR-2) : à activer une fois le bridge runtime résolu (T-006-02).
-# ENV FRANKENPHP_CONFIG="worker ./public/index.php"
+# Mode worker (ADR-2) activé via frankenphp/Caddyfile (bridge manuel dans public/index.php,
+# compatible Symfony 8). L'état inter-requêtes est réinitialisé entre deux requêtes
+# (services kernel.reset — RSQ-15/ARC-47).
 
 EXPOSE 8080
+
+# Migrations au démarrage, puis serveur worker. (docker-php-entrypoint exécute ce script.)
+CMD ["/usr/local/bin/start.sh"]

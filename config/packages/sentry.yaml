@@ -1,0 +1,18 @@
+# US-008 / ADR-14 — suivi d'erreurs (Sentry, région UE).
+# Désactivé automatiquement quand SENTRY_DSN est vide (dev, CI, local) : aucun envoi.
+# En staging/production, définir SENTRY_DSN dans les variables Railway (hors dépôt — ARC-88).
+sentry:
+    dsn: '%env(default::SENTRY_DSN)%'
+    register_error_listener: true
+    register_error_handler: true
+    options:
+        environment: '%env(default::APP_ENV)%'
+        # Aucune donnée personnelle transmise par défaut (RGPD, ENF-SEC).
+        send_default_pii: false
+        # Échantillonnage des traces désactivé (métriques de perf via /metrics — Prometheus).
+        traces_sample_rate: 0.0
+
+when@test:
+    sentry:
+        # Jamais d'envoi pendant les tests, quelle que soit la configuration d'environnement.
+        dsn: ~

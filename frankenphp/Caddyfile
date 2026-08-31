@@ -1,8 +1,12 @@
 # FrankenPHP/Caddy — configuration de service (ADR-2).
 {
-	frankenphp
-	# Mode worker (ADR-2) : à activer une fois le bridge runtime résolu (T-006-02).
-	# frankenphp { worker ./public/index.php }
+	frankenphp {
+		# Mode worker (ADR-2) : le kernel Symfony est chargé une fois et réutilisé entre
+		# requêtes (bridge manuel dans public/index.php, compatible Symfony 8 — le paquet
+		# runtime/frankenphp-symfony ne supporte pas encore Symfony 8). Nombre de workers
+		# piloté par la variable FRANKENPHP_NUM_THREADS de l'hôte si besoin.
+		worker ./public/index.php
+	}
 }
 
 {$SERVER_NAME:-:8080} {
