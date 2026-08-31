@@ -18,7 +18,7 @@
 | US-001 | Fondation multi-tenant et isolation | 8 | Admin/RSSI | `ENF-SEC-4` (test d'intrusion) | 🔵 To Do |
 | US-002 | Authentification et cycle de vie utilisateurs | 5 | Admin | `ENF-SEC-1/3` | ✅ Done |
 | US-003 | Rôles et habilitations (RBAC + périmètre) | 8 | Admin | `HAB-1..6`, `ARC-106` | ✅ Done |
-| US-005 | Modèle analytique en étoile et non-divergence | 8 | Équipe technique | `ARC-113` | 🔵 To Do |
+| US-005 | Modèle analytique en étoile et non-divergence | 8 | Équipe technique | `ARC-113` | ✅ Done (tranche S1) |
 
 **Total engagé : 29 points · Livrés : 0 · Vélocité : 0 %**
 _(US-004 déplacée au Sprint 0.)_
