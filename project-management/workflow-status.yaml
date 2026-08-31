@@ -114,9 +114,9 @@ reusable_assets:
         Base : 4 tests verts, PHPStan max 0, Deptrac 0, make ci vert.
       branch: feature/sprint-0-fondations
       staging_url: "https://hottwos-production.up.railway.app (EU West, /health /api/status / → 200)"
-      blockers:
-        - "CI GitHub Actions bloquée par la facturation du compte (spending limit) — à régler côté GitHub."
-        - "Déploiement Railway fait via `railway up` local ; l'auto-deploy GitHub attend la CI (bloquée)."
+      ci_status: "✅ verte sur GitHub (Qualité & tests + Détection de secrets) — facturation débloquée le 2026-08-31"
+      branch_protection: "✅ active sur main : CI verte requise (strict), force-push/suppression interdits (ARC-89)"
+      sprint_1_progress: "US-001 (multi-tenant) cœur LIVRÉ : isolation effective testée en CI (ENF-SEC-4). Reste US-002 (auth), US-003 (RBAC), US-005 (analytique) + finitions US-001 (middleware HTTP, activation runtime RLS)."
       remaining:
         - "US-006 : runtime FrankenPHP worker réel (T-006-02), écart ADR-5 (AssetMapper vs Reprise)"
         - "US-007 : fixtures effectives (dépend du modèle de données US-001)"
