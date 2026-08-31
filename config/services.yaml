@@ -49,3 +49,7 @@ services:
     # Observabilité (US-008) : le registre de métriques est un singleton persistant entre
     # requêtes worker (NON taggé kernel.reset) pour agréger l'histogramme des latences.
     App\Application\Observability\MetricsRegistry: '@App\Infrastructure\Observability\MetricsCollector'
+
+    # Ports de saisie de temps (US-050, DIP).
+    App\Domain\Project\ProjectRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineProjectRepository'
+    App\Domain\Timesheet\TimeEntryRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineTimeEntryRepository'

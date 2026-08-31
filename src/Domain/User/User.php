@@ -50,6 +50,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TenantO
         $this->email = $email;
     }
 
+    public function id(): string
+    {
+        return $this->id;
+    }
+
     public function tenantId(): TenantId
     {
         return TenantId::fromString($this->tenantId);
