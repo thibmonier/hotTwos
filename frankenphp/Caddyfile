@@ -1,12 +1,6 @@
 # FrankenPHP/Caddy — configuration de service (ADR-2).
 {
 	frankenphp
-	# Le proxy Railway parle HTTP/2 cleartext (h2c) au conteneur, ce que FrankenPHP/Caddy
-	# traduit en corrompant la méthode HTTP (GET vu comme POST). On force HTTP/1.1 uniquement
-	# sur le port cleartext ; le TLS/HTTP-2 est terminé en amont par le proxy Railway.
-	servers {
-		protocols h1
-	}
 	# Mode worker (ADR-2) : à activer une fois le bridge runtime résolu (T-006-02).
 	# frankenphp { worker ./public/index.php }
 }
