@@ -36,3 +36,8 @@ yarn-error.log
 
 # Deptrac (cache d'analyse des frontières)
 /.deptrac.cache
+
+###> symfony/asset-mapper ###
+/public/assets/
+/assets/vendor/
+###< symfony/asset-mapper ###
