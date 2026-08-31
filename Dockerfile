@@ -19,9 +19,10 @@ RUN composer install --no-dev --no-scripts --no-interaction --prefer-dist || tru
 # Code applicatif
 COPY . .
 
-# Mode worker : boucle l'application en mémoire entre les requêtes (ADR-2).
-# APP_RUNTIME=Runtime\FrankenPhpSymfony\Runtime + FRANKENPHP_CONFIG "worker ./public/index.php"
-# à activer en US-007 avec runtime/frankenphp-symfony (installer avec -W).
-ENV FRANKENPHP_CONFIG="worker ./public/index.php"
+# Mode worker (ADR-2) : boucle l'application en mémoire entre les requêtes.
+# Nécessite le bridge runtime/frankenphp-symfony (APP_RUNTIME=Runtime\FrankenPhpSymfony\Runtime)
+# dont la version compatible Symfony 8.1 reste à résoudre (T-006-02). En attendant, l'image
+# sert l'app en php_server classique (Caddyfile). Activer le worker en décommentant :
+# ENV FRANKENPHP_CONFIG="worker ./public/index.php"
 
 EXPOSE 8080

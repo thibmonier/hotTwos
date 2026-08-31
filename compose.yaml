@@ -1,0 +1,41 @@
+# US-007 — Environnement de développement conteneurisé (ADR-11).
+# Même image que la production (parité worker, ARC-86). Démarrage : `make up`.
+services:
+  database:
+    # pgvector embarqué pour les vecteurs sémantiques du socle IA (ADR-6/ADR-10).
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-app}
+    ports:
+      - "5432:5432"
+    volumes:
+      - database_data:/var/lib/postgresql/data
+      # Active l'extension pgvector à la création de la base (idempotent).
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-app} -d ${POSTGRES_DB:-app}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      target: base
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      # L'app se connecte au service `database` (réseau compose).
+      DATABASE_URL: "postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-app}@database:5432/${POSTGRES_DB:-app}?serverVersion=16&charset=utf8"
+      APP_ENV: "${APP_ENV:-dev}"
+    ports:
+      - "8080:8080"
+    volumes:
+      # Montage du code en dev (la prod copie le code dans l'image).
+      - .:/app
+
+volumes:
+  database_data:
