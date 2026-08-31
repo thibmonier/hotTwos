@@ -1,0 +1,37 @@
+# Frontières d'architecture — ADR-8 (Clean Architecture + DDD), ARC-63 (vérifiées en CI).
+# Règle du sens des dépendances (Clean Architecture) :
+#   Domain ne dépend de rien · Application → Domain
+#   UI → Application, Domain · Infrastructure → Application, Domain
+# Toute violation fait échouer la CI (US-004).
+deptrac:
+  paths:
+    - ./src
+
+  layers:
+    - name: Domain
+      collectors:
+        - type: directory
+          value: src/Domain/.*
+    - name: Application
+      collectors:
+        - type: directory
+          value: src/Application/.*
+    - name: Infrastructure
+      collectors:
+        - type: directory
+          value: src/Infrastructure/.*
+    - name: UI
+      collectors:
+        - type: directory
+          value: src/UI/.*
+
+  ruleset:
+    Domain: ~
+    Application:
+      - Domain
+    Infrastructure:
+      - Domain
+      - Application
+    UI:
+      - Domain
+      - Application

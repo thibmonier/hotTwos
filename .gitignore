@@ -28,3 +28,11 @@ CLAUDE.local.md
 /public/assets/
 npm-debug.log
 yarn-error.log
+
+###> phpunit/phpunit ###
+/phpunit.xml
+/.phpunit.cache/
+###< phpunit/phpunit ###
+
+# Deptrac (cache d'analyse des frontières)
+/.deptrac.cache
