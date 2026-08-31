@@ -113,7 +113,7 @@ reusable_assets:
         US-004 (CI GitHub Actions 11 étapes), US-008 (staging Railway déployé et fonctionnel).
         Base : 4 tests verts, PHPStan max 0, Deptrac 0, make ci vert.
       branch: feature/sprint-0-fondations
-      staging_url: "https://hottwos-production.up.railway.app (EU West, /health /api/status / → 200)"
+      staging_url: "https://hottwos-production.up.railway.app (EU West, PHP 8.5, /health /api/status / /api → 200 en GET)"
       ci_status: "✅ verte sur GitHub (Qualité & tests + Détection de secrets) — facturation débloquée le 2026-08-31"
       branch_protection: "✅ active sur main : CI verte requise (strict), force-push/suppression interdits (ARC-89)"
       sprint_1_progress: "US-001 (multi-tenant) cœur LIVRÉ : isolation effective testée en CI (ENF-SEC-4). Reste US-002 (auth), US-003 (RBAC), US-005 (analytique) + finitions US-001 (middleware HTTP, activation runtime RLS)."
