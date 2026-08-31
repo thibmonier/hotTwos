@@ -1,5 +1,5 @@
 # US-008 / ADR-2 — image FrankenPHP. Sert de base au dev (US-007) et au staging (Railway).
-FROM dunglas/frankenphp:1-php8.4 AS base
+FROM dunglas/frankenphp:1-php8.5 AS base
 
 ENV SERVER_NAME=:8080
 ENV APP_ENV=prod
