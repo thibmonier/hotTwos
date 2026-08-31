@@ -25,3 +25,4 @@ services:
     # Ports d'autorisation (US-003, DIP/ARC-18) : l'interface du domaine résout vers
     # l'implémentation d'infrastructure.
     App\Domain\Authorization\RoleRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineRoleRepository'
+    App\Domain\Authorization\SecurityAuditLogger: '@App\Infrastructure\Authorization\MonologSecurityAuditLogger'

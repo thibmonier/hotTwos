@@ -29,6 +29,9 @@ security:
     access_control:
         # /api/me exige un utilisateur authentifié (dont le tenant est alors résolu).
         - { path: ^/api/me, roles: ROLE_USER }
+        # Sonde d'habilitation US-003 : authentification requise ; le contrôle fin
+        # (permission + périmètre) est fait dans la couche applicative (ARC-19).
+        - { path: ^/api/_probe, roles: ROLE_USER }
 
 when@test:
     security:
