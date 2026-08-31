@@ -18,6 +18,7 @@ use Symfony\Component\Uid\Uuid;
  */
 #[ORM\Entity]
 #[ORM\Table(name: 'protected_record')]
+#[ORM\Index(name: 'idx_protected_record_tenant', columns: ['tenant_id'])]
 class ProtectedRecord implements TenantOwned
 {
     #[ORM\Id]

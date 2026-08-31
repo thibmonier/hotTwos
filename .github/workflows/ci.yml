@@ -73,6 +73,18 @@ jobs:
       - name: Préparer la base de test
         run: php bin/console doctrine:database:create --env=test --if-not-exists
 
+      # (TECH-1) Les migrations construisent le schéma en production ; on vérifie ici,
+      # sur une base dédiée, qu'elles s'appliquent et que le schéma reste en phase avec
+      # le mapping ORM (aucune dérive). Base séparée pour ne pas gêner le SchemaTool des tests.
+      - name: Vérifier les migrations (schéma = mapping)
+        env:
+          APP_ENV: dev
+          DATABASE_URL: "postgresql://app:app@127.0.0.1:5432/app_migrations?serverVersion=16&charset=utf8"
+        run: |
+          php bin/console doctrine:database:create --if-not-exists
+          php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
+          php bin/console doctrine:schema:validate
+
       # (4) Tests + couverture (unitaires + intégration multi-tenant)
       - name: Tests (PHPUnit) + couverture
         run: php bin/phpunit --coverage-text --coverage-clover=coverage.xml
