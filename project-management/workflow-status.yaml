@@ -122,19 +122,32 @@ reusable_assets:
         - "US-007 : fixtures effectives (dépend du modèle de données US-001)"
         - "US-004 : branch protection (après déblocage billing) ; étapes isolation/worker/E2E/perf (avec US-001)"
       note: "Volet outillage du Lot 0. AUD-1/AUD-2 en parallèle (hors backlog dev)."
-    next_sprint:
+    sprint_1:
       id: 1
       name: sprint-001-walking_skeleton
       goal: "Charpente applicative : multi-tenant isolé (testé), auth/RBAC, modèle analytique reconstructible"
       committed_points: 29
+      delivered_points: 29
       stories: [US-001, US-002, US-003, US-005]
+      status: done
+      pr: "https://github.com/thibmonier/hotTwos/pull/2 (verte, MERGEABLE/CLEAN, à merger)"
+      ceremonies: "Review + Rétro (Starfish) rédigées"
       path: project-management/sprints/sprint-001-walking_skeleton/
-      note: "Première valeur métier (saisie de temps) engagée pour le Sprint 2"
+    next_sprint:
+      id: 2
+      name: sprint-002-consolidation_technique
+      goal: "Socle durci et reproductible : schéma versionné (migrations), RLS runtime active, worker éprouvé, observabilité opérationnelle"
+      committed_points: 20
+      stories: [TECH-1, TECH-2, US-006, US-008]
+      decision_po: "Consolidation technique choisie (dette rétro d'abord) ; valeur métier (saisie de temps) décalée au Sprint 3 — RSQ-17 surveillé"
+      blocker: "Merge PR #2 (Sprint 1) puis brancher Sprint 2 sur main à jour"
+      path: project-management/sprints/sprint-002-consolidation_technique/
+      note: "Première valeur métier (saisie de temps) désormais engagée pour le Sprint 3"
     quality_gates:
       prd: "95% ✅"
       tech_spec: "96% ✅"
       backlog: "6/6 ✅"
       report: project-management/quality-gates-report.md
 
-next_action: "Développer le socle : démarrer par le squelette Symfony 8 (US-006, tâche T-006-01) en TDD/BDD"
+next_action: "Merger la PR #2 (Sprint 1), brancher Sprint 2 sur main, puis décomposer le Sprint 2 (/project:decompose-tasks 002) — démarrer par TECH-1 (migrations Doctrine) en TDD"
 next_command: "/sprint:dev US-006"
