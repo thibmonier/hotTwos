@@ -59,5 +59,5 @@ audit: ## Audit des vulnérabilités des dépendances (ENF-SEC-11)
 secrets: ## Détecte les secrets commités (gitleaks, US-007/US-009)
 	gitleaks detect --source . --no-banner || true
 
-ci: cs analyse deptrac test ## Enchaîne les vérifications bloquantes en local (miroir CI)
+ci: cs rector analyse deptrac test ## Enchaîne les vérifications bloquantes en local (miroir CI)
 	@echo "✅ Vérifications locales OK"

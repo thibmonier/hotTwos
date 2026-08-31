@@ -1,0 +1,43 @@
+security:
+    # Hachage des mots de passe : Argon2id explicite (ENF-SEC-3 / rules/11-security) —
+    # jamais bcrypt/MD5/SHA1. `sodium` = Argon2id via libsodium.
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+            algorithm: sodium
+
+    # L'utilisateur est chargé depuis la base (isolé par tenant via le filtre — US-001).
+    providers:
+        app_users:
+            entity:
+                class: App\Domain\User\User
+                property: email
+
+    firewalls:
+        dev:
+            pattern: ^/(_profiler|_wdt|assets|build)/
+            security: false
+        main:
+            lazy: true
+            provider: app_users
+            json_login:
+                check_path: api_login
+                username_path: email
+                password_path: password
+            logout:
+                path: api_logout
+
+    access_control:
+        # /api/me exige un utilisateur authentifié (dont le tenant est alors résolu).
+        - { path: ^/api/me, roles: ROLE_USER }
+        # Sonde d'habilitation US-003 : authentification requise ; le contrôle fin
+        # (permission + périmètre) est fait dans la couche applicative (ARC-19).
+        - { path: ^/api/_probe, roles: ROLE_USER }
+
+when@test:
+    security:
+        password_hashers:
+            # Coût réduit en test (l'algorithme reste Argon2id).
+            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+                algorithm: sodium
+                memory_cost: 10240
+                time_cost: 3

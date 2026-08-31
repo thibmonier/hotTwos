@@ -1,0 +1,14 @@
+# Contexte de build minimal (US-008) — n'envoie pas les artefacts locaux à Railway.
+.git/
+vendor/
+var/
+node_modules/
+public/assets/
+public/build/
+assets/vendor/
+.env.local
+.env.*.local
+.deptrac.cache
+.php-cs-fixer.cache
+project-management/Skote_Symfony_v2.2.0/
+tests/

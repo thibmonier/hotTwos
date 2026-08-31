@@ -1,0 +1,17 @@
+# US-008 / ADR-13 — déploiement staging (Railway, zone UE, sans données réelles).
+# Build via le Dockerfile (image FrankenPHP), healthcheck sur /health.
+[build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 120
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 5
+
+# Variables à définir dans le service Railway (jamais commitées — ARC-88) :
+#   APP_ENV=staging
+#   APP_SECRET=<généré>
+#   DATABASE_URL=<référence au service PostgreSQL Railway>
+#   SERVER_NAME=:${PORT}    # FrankenPHP écoute sur le port fourni par Railway

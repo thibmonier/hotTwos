@@ -17,9 +17,14 @@ doctrine:
             App:
                 type: attribute
                 is_bundle: false
-                dir: '%kernel.project_dir%/src/Entity'
-                prefix: 'App\Entity'
+                dir: '%kernel.project_dir%/src/Domain'
+                prefix: 'App\Domain'
                 alias: App
+        # Isolation multi-tenant (ARC-33) — activé par requête via TenantFilterConfigurator (ARC-61).
+        filters:
+            tenant:
+                class: App\Infrastructure\Persistence\Doctrine\Filter\TenantFilter
+                enabled: false
 
 when@test:
     doctrine:

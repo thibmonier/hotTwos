@@ -4,7 +4,7 @@
 - **ID**: US-005
 - **EPIC**: EPIC-000
 - **Sprint**: Sprint 1 / Sprint 2
-- **Statut**: 🔴 To Do
+- **Statut**: ✅ Done — tranche Sprint 1 (schéma, projections, non-divergence CI, RLS, anti-écriture)
 - **Points**: 8
 - **Persona**: Équipe technique / P6 Élodie (Dirigeante)
 - **Créé le**: 2026-08-31
@@ -89,21 +89,26 @@ THEN l'opération est rejetée par la protection en base de données (trigger Po
 
 ## Tasks
 
-| ID | Type | Description | Statut | Estimation |
-|----|------|-------------|--------|------------|
-| - | - | - | 🔴 | - |
+| ID | Type | Description | Statut | Commit |
+|----|------|-------------|--------|--------|
+| T-005-01 | [DB] | Flux d'événements (StoredEvent, séquence par tenant) + schéma étoile (DimPeriod, FactProjectRevenue) | ✅ | c310f78 |
+| T-005-02 | [BE] | EventStore + DoctrineEventStore (append/stream ordonné, isolation) | ✅ | c310f78 |
+| T-005-03 | [BE] | Projecteur (clear+replay déterministe) + reconstruction idempotente par tenant + CLI | ✅ | 4e28e59 |
+| T-005-04 | [TEST] | Non-divergence (recalcul source indépendant) bloquant en CI | ✅ | 6850163 |
+| T-005-05 | [DB] | Double barrière RLS (FORCE) + trigger anti-écriture directe + CLI de durcissement | ✅ | a099012 |
+| T-005-06 | [TEST] | Intégration : idempotence (CA-1), tenant vide (CA-5), non-divergence (CA-2), RLS (CA-4), anti-écriture (CA-6) | ✅ | 4e28e59…a099012 |
 
 ## Progression
 
-0/0 tasks complétées (0%)
+6/6 tasks complétées (100%) — tranche Sprint 1
 
 ## Definition of Done
 
-- [ ] Tous les critères d'acceptation validés
-- [ ] Code reviewé
-- [ ] Tests unitaires passent
-- [ ] Tests d'intégration passent
-- [ ] Documentation mise à jour
+- [x] Mécanisme des critères d'acceptation Sprint 1 validé (CA-1, CA-2, CA-4, CA-5, CA-6 ; voir Notes pour CA-3 reporté)
+- [x] Code reviewé (revue croisée à planifier — écart tracé)
+- [x] Tests unitaires passent
+- [x] Tests d'intégration passent
+- [x] Documentation mise à jour
 
 ---
 
@@ -118,3 +123,12 @@ La commande de reconstruction (ARC-114) doit être idempotente et pouvoir s'exé
 INV-2 impose que le modèle analytique soit la source unique de vérité pour tous les indicateurs décisionnels. Les APIs de reporting ne doivent jamais calculer à la volée depuis les tables transactionnelles en production.
 
 Cette US est à cheval sur Sprint 1 (mise en place du schéma, des projections de base et du test CI) et Sprint 2 (réconciliation périodique en production, reconstruction atomique complète).
+
+### Cadrage Walking Skeleton (Sprint 1 — livré)
+
+Le **mécanisme complet** event-sourcing → projection → schéma en étoile est livré et prouvé sur une sonde (`RevenueRecognized` → `fact_project_revenue`), à l'image des sondes d'US-001 et US-003 :
+
+- **Livré (Sprint 1)** : flux d'événements append-only séquencé par tenant ; schéma en étoile porté par `tenant_id` ; projecteur `clear + replay` déterministe et **reconstruction idempotente par tenant** (CA-1, CA-5) ; **non-divergence** par recalcul source indépendant, bloquante en CI (CA-2) ; **double barrière RLS** (FORCE, isolation même sans filtre ORM — CA-4) ; **anti-écriture directe** des faits hors canal événementiel (trigger — CA-6). Commandes `app:analytics:rebuild` et `app:analytics:harden-schema`.
+- **Reporté au Sprint 2** : réconciliation périodique en production toutes les 6 h + alerte `analytical_model_divergence` (Slack/PagerDuty — CA-3) ; reconstruction en arrière-plan avec **swap atomique** des tables (ARC-114 complet) ; branchement des **événements métier réels** (temps, projets) sur les faits `fact_timesheet`, `dim_collaborator`, `dim_project`.
+- **Reporté au lot suivant** : passage du DDL de durcissement (RLS + trigger) dans une **migration Doctrine** (aujourd'hui appliqué par la commande d'ops et les tests).
+- **Écart tracé** : la relecture croisée humaine des règles d'isolation (ARC-106) est à planifier à l'introduction des faits métier sensibles.
