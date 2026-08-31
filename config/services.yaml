@@ -21,3 +21,7 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    # Ports d'autorisation (US-003, DIP/ARC-18) : l'interface du domaine résout vers
+    # l'implémentation d'infrastructure.
+    App\Domain\Authorization\RoleRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineRoleRepository'
