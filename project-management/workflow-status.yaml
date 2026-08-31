@@ -107,9 +107,21 @@ reusable_assets:
       path: project-management/sprints/sprint-000-fondations/
       status: in_progress
       tasks: "45 tâches / ~101h (tasks/ + task-board.md)"
-      progress: "US-006 (squelette+API DTO+Twig), US-007 (PostgreSQL/pgvector), US-009 (PHPStan max, Rector, hook, conventions) — 4 tests verts, PHPStan max 0, Deptrac 0. Reste US-004 (CI) et US-008 (staging externe)."
+      progress: >
+        US-006 (squelette + API Platform DTO + Twig/Turbo), US-007 (PostgreSQL 16 + pgvector),
+        US-009 (PHPStan max, Rector, php-cs-fixer, hook pré-commit, conventions),
+        US-004 (CI GitHub Actions 11 étapes), US-008 (staging Railway déployé et fonctionnel).
+        Base : 4 tests verts, PHPStan max 0, Deptrac 0, make ci vert.
       branch: feature/sprint-0-fondations
-      note: "Volet outillage du Lot 0. Sans valeur métier — capacité de construire. AUD-1/AUD-2 en parallèle (hors backlog dev)."
+      staging_url: "https://hottwos-production.up.railway.app (EU West, /health /api/status / → 200)"
+      blockers:
+        - "CI GitHub Actions bloquée par la facturation du compte (spending limit) — à régler côté GitHub."
+        - "Déploiement Railway fait via `railway up` local ; l'auto-deploy GitHub attend la CI (bloquée)."
+      remaining:
+        - "US-006 : runtime FrankenPHP worker réel (T-006-02), écart ADR-5 (AssetMapper vs Reprise)"
+        - "US-007 : fixtures effectives (dépend du modèle de données US-001)"
+        - "US-004 : branch protection (après déblocage billing) ; étapes isolation/worker/E2E/perf (avec US-001)"
+      note: "Volet outillage du Lot 0. AUD-1/AUD-2 en parallèle (hors backlog dev)."
     next_sprint:
       id: 1
       name: sprint-001-walking_skeleton
