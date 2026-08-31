@@ -1,0 +1,17 @@
+# US-007 (T-007-06) / ADR-15 — détection de secrets commités.
+# Étend le jeu de règles par défaut de gitleaks. Exécuté en local (`make secrets`)
+# et en CI (US-004, étape « détection de secrets » — ARC-88).
+title = "HotOnes gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Faux positifs connus"
+paths = [
+    '''\.env$''',          # variables non sensibles (les vrais secrets vont dans .env.local, gitignoré)
+    '''\.env\.dev$''',
+    '''\.env\.test$''',
+    '''symfony\.lock$''',
+    '''composer\.lock$''',
+]

@@ -24,9 +24,18 @@
 
 **Total engagé : 28 · Livrés : 0 · Vélocité : 0 %**
 
-## Décomposition en tâches
+## Décomposition en tâches ✅
 
-> À produire via `/project:decompose-tasks 000` (tâches en heures : [OPS], [BE], [DB], [TEST], [DOC], [REV]).
+**45 tâches · ~101h** — détail dans `tasks/` (`README.md`, `US-*-tasks.md`, `technical-tasks.md`) et board `task-board.md`.
+
+| US | Tâches | Heures |
+|----|--------|--------|
+| US-006 Squelette | 10 | 29h |
+| US-007 Conteneurs | 8 | 18h |
+| US-004 CI/CD | 10 | 18h |
+| US-008 Staging | 8 | 19h |
+| US-009 Outillage | 9 | 17h |
+| **Total** | **45** | **101h** |
 
 ## Burndown
 

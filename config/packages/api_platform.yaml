@@ -1,0 +1,16 @@
+api_platform:
+    title: HotOnes API
+    version: 0.1.0
+    # Mode DTO strict (ADR-4 / ARC-18) : les ressources sont des DTO de la couche UI,
+    # jamais des entités de persistance. API Platform ne scanne QUE ce répertoire.
+    mapping:
+        paths:
+            - '%kernel.project_dir%/src/UI/Api/Resource'
+    # JSON pour l'API interne (sert l'UI et les intégrations — ARC-7) ; JSON-LD conservé.
+    formats:
+        jsonld: ['application/ld+json']
+        json: ['application/json']
+    defaults:
+        stateless: true
+        cache_headers:
+            vary: ['Content-Type', 'Authorization', 'Origin']

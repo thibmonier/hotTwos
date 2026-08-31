@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=../vendor/symfony/routing/Loader/schema/routing.schema.json
+
+# Point d'entrée du routage. Les contrôleurs (adaptateurs HTTP) vivent dans la couche UI.
+# Les méthodes portant l'attribut #[Route] y sont importées automatiquement.
+# Lister les routes : bin/console debug:router
+
+controllers:
+    resource:
+        path: ../src/UI/Http/Controller/
+        namespace: App\UI\Http\Controller
+    type: attribute

@@ -1,0 +1,16 @@
+# FrankenPHP/Caddy — configuration de service (ADR-2).
+# Exercée via docker-compose en US-007. Le mode worker (ADR-2) est prêt à activer
+# une fois le bridge runtime/frankenphp-symfony résolu (T-006-02) : décommenter le bloc worker.
+{
+	frankenphp {
+		# worker ./public/index.php   # ADR-2 — charge l'app en mémoire entre les requêtes
+		# L'état inter-requêtes devra être remis à zéro à chaque requête (ARC-47/61),
+		# vérifié par les tests en mode worker de la CI (US-004, ARC-50).
+	}
+}
+
+:8080 {
+	root * public/
+	encode zstd br gzip
+	php_server
+}

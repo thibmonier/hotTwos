@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ appName }} — Socle{% endblock %}
+
+{% block body %}
+    <main class="container">
+        <h1>{{ appName }}</h1>
+        <p>Socle applicatif opérationnel — rendu serveur (Twig + Turbo + Stimulus).</p>
+        <ul>
+            <li>Santé API (DTO) : <a href="/api/status">/api/status</a></li>
+            <li>Santé applicative : <a href="/health">/health</a></li>
+        </ul>
+    </main>
+{% endblock %}
