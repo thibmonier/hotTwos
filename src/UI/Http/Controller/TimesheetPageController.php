@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\UI\Http\Controller;
 
+use App\Application\Timesheet\EnsureAbsenceProject;
 use App\Domain\Project\Project;
 use App\Domain\Project\ProjectRepository;
 use App\Domain\Timesheet\TimeEntryRepository;
@@ -26,6 +27,7 @@ final class TimesheetPageController extends AbstractController
     public function __construct(
         private readonly ProjectRepository $projects,
         private readonly TimeEntryRepository $entries,
+        private readonly EnsureAbsenceProject $ensureAbsenceProject,
     ) {
     }
 
@@ -42,6 +44,9 @@ final class TimesheetPageController extends AbstractController
             $days[] = ['date' => $day->format('Y-m-d'), 'label' => $day->format('D d/m')];
         }
         $sunday = $monday->modify('+6 day');
+
+        // Ligne « Absence » disponible dans la grille (US-051).
+        $this->ensureAbsenceProject->forTenant($user->tenantId());
 
         $recorded = $this->entries->findForUserInRange($user->tenantId(), $user->id(), $monday, $sunday);
 

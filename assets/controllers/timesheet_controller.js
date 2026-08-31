@@ -6,7 +6,40 @@ import { Controller } from '@hotwired/stimulus';
  * la validation (projet actif, plafond) est faite côté serveur, la réponse est reflétée.
  */
 export default class extends Controller {
-    static targets = ['cell', 'status'];
+    static targets = ['cell', 'status', 'grid'];
+
+    connect() {
+        this.element.addEventListener('keydown', (event) => this.#onKeydown(event));
+    }
+
+    // Enregistre toute la semaine en une requête (US-051, ≤ 2 min).
+    async saveWeek() {
+        const entries = this.cellTargets
+            .map((cell) => ({
+                projectId: cell.dataset.projectId,
+                date: cell.dataset.date,
+                minutes: Number.parseInt(cell.value, 10),
+            }))
+            .filter((entry) => Number.isInteger(entry.minutes) && entry.minutes > 0);
+
+        if (entries.length === 0) {
+            this.#status('Rien à enregistrer.');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/time-entries/week', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ entries }),
+            });
+            const body = await response.json().catch(() => ({}));
+            const errors = body.errors ?? [];
+            this.#status(`Semaine enregistrée : ${body.recorded ?? 0} imputation(s)${errors.length ? `, ${errors.length} refusée(s)` : ''}.`);
+        } catch {
+            this.#status('Erreur réseau : réessayez.');
+        }
+    }
 
     async save(event) {
         const cell = event.target;
@@ -42,6 +75,29 @@ export default class extends Controller {
         } finally {
             cell.removeAttribute('aria-busy');
         }
+    }
+
+    // Navigation « type tableur » : Entrée valide la cellule et descend d'une ligne.
+    #onKeydown(event) {
+        if (event.key !== 'Enter' || event.target.tagName !== 'INPUT') {
+            return;
+        }
+        event.preventDefault();
+        event.target.dispatchEvent(new Event('change', { bubbles: true }));
+
+        const cells = this.cellTargets;
+        const index = cells.indexOf(event.target);
+        const columns = this.#columnCount();
+        const below = cells[index + columns];
+        if (below) {
+            below.focus();
+            below.select();
+        }
+    }
+
+    #columnCount() {
+        const firstRow = this.hasGridTarget ? this.gridTarget.querySelector('tbody tr') : null;
+        return firstRow ? firstRow.querySelectorAll('input').length : 1;
     }
 
     #status(message) {

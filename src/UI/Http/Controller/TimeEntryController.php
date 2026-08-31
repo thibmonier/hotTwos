@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\UI\Http\Controller;
 
+use App\Application\Timesheet\CellError;
 use App\Application\Timesheet\RecordTimeEntry;
+use App\Application\Timesheet\RecordWeek;
+use App\Application\Timesheet\WeekCell;
 use App\Domain\Timesheet\TimesheetException;
 use App\Domain\User\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,8 +25,10 @@ use InvalidArgumentException;
  */
 final class TimeEntryController extends AbstractController
 {
-    public function __construct(private readonly RecordTimeEntry $recordTimeEntry)
-    {
+    public function __construct(
+        private readonly RecordTimeEntry $recordTimeEntry,
+        private readonly RecordWeek $recordWeek,
+    ) {
     }
 
     #[Route('/api/time-entries', name: 'api_time_entry_record', methods: ['POST'])]
@@ -53,5 +58,49 @@ final class TimeEntryController extends AbstractController
         }
 
         return new JsonResponse(['recorded' => true], JsonResponse::HTTP_CREATED);
+    }
+
+    /**
+     * US-051 — enregistrement d'une semaine complète en une requête (≤ 2 min). Best-effort :
+     * les cellules valides sont enregistrées, les refus sont détaillés cellule par cellule.
+     */
+    #[Route('/api/time-entries/week', name: 'api_time_entry_record_week', methods: ['POST'])]
+    public function recordWeek(#[CurrentUser] User $user, Request $request): JsonResponse
+    {
+        /** @var array<string, mixed> $payload */
+        $payload = json_decode($request->getContent(), true, flags: \JSON_THROW_ON_ERROR);
+        $rawEntries = $payload['entries'] ?? null;
+        if (!is_array($rawEntries)) {
+            return new JsonResponse(['error' => 'Champ requis : entries (liste de {projectId, date, minutes}).'], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        $cells = [];
+        foreach ($rawEntries as $raw) {
+            if (!is_array($raw)) {
+                continue;
+            }
+            $projectId = is_string($raw['projectId'] ?? null) ? $raw['projectId'] : '';
+            $minutes = filter_var($raw['minutes'] ?? null, \FILTER_VALIDATE_INT);
+            $date = DateTimeImmutable::createFromFormat('!Y-m-d', is_string($raw['date'] ?? null) ? $raw['date'] : '');
+            $comment = is_string($raw['comment'] ?? null) ? $raw['comment'] : null;
+            if ('' === $projectId || false === $minutes || false === $date) {
+                continue;
+            }
+            $cells[] = new WeekCell($projectId, $date, $minutes, $comment);
+        }
+
+        $errors = $this->recordWeek->record($user->tenantId(), $user->id(), $cells);
+
+        return new JsonResponse([
+            'recorded' => count($cells) - count($errors),
+            'errors' => array_map(
+                static fn (CellError $error): array => [
+                    'projectId' => $error->projectId,
+                    'date' => $error->date,
+                    'message' => $error->message,
+                ],
+                $errors,
+            ),
+        ]);
     }
 }

@@ -15,7 +15,7 @@
         {% if projects is empty %}
             <p>Aucun projet actif : demandez à un administrateur d'en créer un pour saisir votre temps.</p>
         {% else %}
-            <table class="timesheet">
+            <table class="timesheet" data-timesheet-target="grid">
                 <thead>
                     <tr>
                         <th scope="col">Projet</th>
@@ -51,8 +51,13 @@
                 </tbody>
             </table>
 
+            <div class="timesheet-actions">
+                <button type="button" data-action="timesheet#saveWeek">Enregistrer la semaine</button>
+                <span class="hint">Entrée = valider et descendre · Tab = cellule suivante · saisie possible sans souris.</span>
+            </div>
+
             <p class="hint" aria-live="polite" data-timesheet-target="status">
-                Saisissez les minutes par projet et par jour. L'enregistrement est automatique.
+                Saisissez les minutes par projet et par jour. L'enregistrement est automatique ; « Enregistrer la semaine » soumet tout en une fois.
             </p>
         {% endif %}
     </main>
