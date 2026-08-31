@@ -30,3 +30,4 @@ services:
     # Ports analytiques (US-005, ADR-9) : flux d'événements et projecteur.
     App\Domain\Analytics\EventStore: '@App\Infrastructure\Persistence\Doctrine\DoctrineEventStore'
     App\Domain\Analytics\AnalyticsProjector: '@App\Infrastructure\Analytics\DoctrineAnalyticsProjector'
+    App\Domain\Analytics\DivergenceChecker: '@App\Infrastructure\Analytics\SqlDivergenceChecker'
