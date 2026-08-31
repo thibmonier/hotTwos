@@ -21,5 +21,12 @@ interface TimeEntryRepository
      */
     public function minutesLoggedForDay(TenantId $tenant, string $userId, DateTimeImmutable $workDate, ?string $exceptProjectId = null): int;
 
+    /**
+     * Imputations d'un utilisateur sur une plage de jours (bornes incluses).
+     *
+     * @return list<TimeEntry>
+     */
+    public function findForUserInRange(TenantId $tenant, string $userId, DateTimeImmutable $from, DateTimeImmutable $to): array;
+
     public function save(TimeEntry $entry): void;
 }

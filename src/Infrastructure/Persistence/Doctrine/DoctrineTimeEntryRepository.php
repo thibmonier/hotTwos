@@ -56,6 +56,23 @@ final readonly class DoctrineTimeEntryRepository implements TimeEntryRepository
         return (int) $query->getSingleScalarResult();
     }
 
+    public function findForUserInRange(TenantId $tenant, string $userId, DateTimeImmutable $from, DateTimeImmutable $to): array
+    {
+        /** @var list<TimeEntry> $entries */
+        $entries = $this->entityManager->createQuery(
+            'SELECT e FROM '.TimeEntry::class.' e'
+            .' WHERE e.tenantId = :tenant AND e.userId = :user AND e.workDate BETWEEN :from AND :to'
+            .' ORDER BY e.workDate ASC',
+        )
+            ->setParameter('tenant', $tenant->toString())
+            ->setParameter('user', $userId)
+            ->setParameter('from', $from, 'date_immutable')
+            ->setParameter('to', $to, 'date_immutable')
+            ->getResult();
+
+        return $entries;
+    }
+
     public function save(TimeEntry $entry): void
     {
         $this->entityManager->persist($entry);

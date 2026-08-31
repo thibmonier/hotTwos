@@ -24,6 +24,17 @@ final class InMemoryProjectRepository implements ProjectRepository
         return null;
     }
 
+    public function findAllActive(TenantId $tenant): array
+    {
+        $active = array_values(array_filter(
+            $this->projects,
+            static fn (Project $project): bool => $project->tenantId()->equals($tenant) && $project->isActive(),
+        ));
+        usort($active, static fn (Project $a, Project $b): int => $a->code() <=> $b->code());
+
+        return $active;
+    }
+
     public function save(Project $project): void
     {
         $this->projects[] = $project;

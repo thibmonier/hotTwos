@@ -37,6 +37,18 @@ final class InMemoryTimeEntryRepository implements TimeEntryRepository
         return $total;
     }
 
+    public function findForUserInRange(TenantId $tenant, string $userId, DateTimeImmutable $from, DateTimeImmutable $to): array
+    {
+        $fromKey = $from->format('Y-m-d');
+        $toKey = $to->format('Y-m-d');
+
+        return array_values(array_filter($this->entries, static function (TimeEntry $entry) use ($tenant, $userId, $fromKey, $toKey): bool {
+            $day = $entry->workDate()->format('Y-m-d');
+
+            return $entry->tenantId()->equals($tenant) && $entry->userId() === $userId && $day >= $fromKey && $day <= $toKey;
+        }));
+    }
+
     public function save(TimeEntry $entry): void
     {
         foreach ($this->entries as $existing) {

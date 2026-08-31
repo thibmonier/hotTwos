@@ -14,5 +14,10 @@ interface ProjectRepository
 {
     public function findActive(TenantId $tenant, string $projectId): ?Project;
 
+    /**
+     * @return list<Project> projets actifs du tenant, triés par code
+     */
+    public function findAllActive(TenantId $tenant): array;
+
     public function save(Project $project): void;
 }
