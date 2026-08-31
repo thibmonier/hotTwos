@@ -29,10 +29,10 @@
 
 | ID | Titre | Points | Persona | Statut |
 |----|-------|--------|---------|--------|
-| US-050 | Saisie d'imputation hebdomadaire et quotidienne (+ référentiel Projet minimal) | 5 | P1 Camille (collaborateur) | 🔵 To Do |
-| US-051 | Saisie d'une semaine nominale en ≤ 2 minutes (**critère bloquant** — `RSQ-1`) | 8 | P1 Camille | 🔵 To Do |
-| US-055 | Validation des temps par lot | 5 | P2 Marc (chef de projet) | 🔵 To Do |
-| TECH-3 | Activer la RLS en production (DBT-RUN-2) + smoke de déploiement automatisé | 5 | Équipe technique | 🔵 To Do |
+| US-050 | Saisie hebdomadaire (+ Projet minimal) | 5 | P1 Camille | ✅ Done |
+| US-051 | Semaine ≤ 2 min (bloquant RSQ-1) | 8 | P1 Camille | 🔄 cœur livré (reste duplication + E2E chrono) |
+| US-055 | Validation par lot | 5 | P2 Marc | ✅ Done |
+| TECH-3 | Activer la RLS en production (DBT-RUN-2) + smoke de déploiement automatisé | 5 | Équipe technique | 🔄 code + smoke livrés ; bascule ops (mot de passe + DATABASE_URL) en attente |
 
 **Total engagé : 23 points** (dans la vélocité cible 20–40).
 
