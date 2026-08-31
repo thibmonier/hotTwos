@@ -1,0 +1,97 @@
+# US-004 / ADR-12 — Intégration continue à étapes bloquantes.
+# Aucune fusion sans chaîne verte (ARC-89 — à imposer via branch protection).
+name: CI
+
+on:
+  push:
+    branches: [main, 'feature/**', 'fix/**']
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Qualité & tests
+    runs-on: ubuntu-latest
+    services:
+      database:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_DB: app
+          POSTGRES_USER: app
+          POSTGRES_PASSWORD: app
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U app -d app"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      DATABASE_URL: "postgresql://app:app@127.0.0.1:5432/app?serverVersion=16&charset=utf8"
+      # Tolérance zéro aux dépréciations (ARC-51) — étape 7.
+      SYMFONY_DEPRECATIONS_HELPER: max
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_pgsql, intl, opcache
+          coverage: pcov
+          tools: composer:v2
+
+      - name: Installer les dépendances
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Préparer le conteneur (phpstan-symfony)
+        run: php bin/console cache:warmup --env=dev
+
+      # (1) Analyse statique
+      - name: PHPStan (niveau max)
+        run: php vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+
+      # (2) Frontières d'architecture
+      - name: Deptrac (frontières)
+        run: php vendor/bin/deptrac analyse --no-progress
+
+      # (3) Style de code
+      - name: php-cs-fixer (dry-run)
+        run: php vendor/bin/php-cs-fixer fix --dry-run --diff
+        env:
+          PHP_CS_FIXER_IGNORE_ENV: 1
+
+      # (7) Tolérance zéro dépréciations (montée de version)
+      - name: Rector (dry-run)
+        run: php vendor/bin/rector process --dry-run --no-progress-bar
+
+      # (8) Audit des dépendances
+      - name: Audit des dépendances (CVE)
+        run: composer audit
+
+      # (4) Tests + couverture
+      - name: Tests (PHPUnit) + couverture
+        run: php bin/phpunit --coverage-text --coverage-clover=coverage.xml
+      # NOTE : le gate « couverture ≥ 80 % sur règles critiques » (ENF-MAINT-1)
+      # s'active dès l'apparition des règles de gestion (US-001+).
+
+      # (5)(6)(10)(11) — étapes prêtes, activées avec le code correspondant :
+      #  (5) tests d'isolation multi-tenant (groupe @multitenant) → US-001
+      #  (6) tests en mode worker (ARC-50) → runtime FrankenPHP worker (T-006-02)
+      #  (10) E2E parcours critiques (Panther/Playwright) → premières features
+      #  (11) tests de performance (k6) → job périodique dédié
+      - name: Étapes à activer (isolation / worker / E2E / perf)
+        run: echo "Étapes 5/6/10/11 activées avec US-001 et le runtime worker (voir ADR-12)."
+
+  # (9) Détection de secrets
+  secrets:
+    name: Détection de secrets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

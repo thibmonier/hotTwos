@@ -3,7 +3,7 @@
 .DEFAULT_GOAL := help
 DC := docker compose
 
-.PHONY: help up down build logs sh db-shell migrate fixtures test analyse deptrac rector rector-fix secrets audit ci
+.PHONY: help up down build logs sh db-shell migrate fixtures test analyse deptrac rector rector-fix cs cs-fix secrets audit ci
 
 help: ## Affiche cette aide
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
@@ -47,11 +47,17 @@ rector: ## Détecte les modernisations/dépréciations (dry-run)
 rector-fix: ## Applique les modernisations Rector
 	php vendor/bin/rector process
 
+cs: ## Vérifie le style de code (dry-run)
+	PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --dry-run --diff
+
+cs-fix: ## Applique le style de code
+	PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix
+
 audit: ## Audit des vulnérabilités des dépendances (ENF-SEC-11)
 	composer audit
 
 secrets: ## Détecte les secrets commités (gitleaks, US-007/US-009)
 	gitleaks detect --source . --no-banner || true
 
-ci: analyse deptrac test ## Enchaîne les vérifications bloquantes en local (miroir CI)
+ci: cs analyse deptrac test ## Enchaîne les vérifications bloquantes en local (miroir CI)
 	@echo "✅ Vérifications locales OK"
