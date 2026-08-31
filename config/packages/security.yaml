@@ -1,39 +1,33 @@
 security:
-    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
+    # Hachage des mots de passe : Argon2id explicite (ENF-SEC-3 / rules/11-security) —
+    # jamais bcrypt/MD5/SHA1. `sodium` = Argon2id via libsodium.
     password_hashers:
-        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+            algorithm: sodium
 
-    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
+    # L'utilisateur est chargé depuis la base (isolé par tenant via le filtre — US-001).
     providers:
-        users_in_memory: { memory: null }
+        app_users:
+            entity:
+                class: App\Domain\User\User
+                property: email
 
     firewalls:
         dev:
-            # Ensure dev tools and static assets are always allowed
             pattern: ^/(_profiler|_wdt|assets|build)/
             security: false
         main:
             lazy: true
-            provider: users_in_memory
+            provider: app_users
+            # Authenticator (login) à ajouter dans la tranche suivante d'US-002.
 
-            # Activate different ways to authenticate:
-            # https://symfony.com/doc/current/security.html#the-firewall
-
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
-
-    # Note: Only the *first* matching rule is applied
-    access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+    access_control: []
 
 when@test:
     security:
         password_hashers:
-            # Password hashers are resource-intensive by design to ensure security.
-            # In tests, it's safe to reduce their cost to improve performance.
+            # Coût réduit en test (l'algorithme reste Argon2id).
             Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
-                algorithm: auto
-                cost: 4 # Lowest possible value for bcrypt
-                time_cost: 3 # Lowest possible value for argon
-                memory_cost: 10 # Lowest possible value for argon
+                algorithm: sodium
+                memory_cost: 10240
+                time_cost: 3
