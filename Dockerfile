@@ -27,7 +27,8 @@ RUN composer install --no-dev --no-scripts --no-interaction --prefer-dist --opti
  && php bin/console asset-map:compile \
  && php bin/console cache:clear
 
-# Mode worker (ADR-2) : à activer une fois le bridge runtime résolu (T-006-02).
-# ENV FRANKENPHP_CONFIG="worker ./public/index.php"
+# Mode worker (ADR-2) activé via frankenphp/Caddyfile (bridge manuel dans public/index.php,
+# compatible Symfony 8). L'état inter-requêtes est réinitialisé entre deux requêtes
+# (services kernel.reset — RSQ-15/ARC-47).
 
 EXPOSE 8080
