@@ -31,7 +31,7 @@ final class RequestTenantContext implements TenantContext, TenantSwitcher
 
     public function current(): TenantId
     {
-        if (null === $this->current) {
+        if (!$this->current instanceof TenantId) {
             throw new LogicException('Aucun tenant positionné pour la requête courante.');
         }
 
@@ -40,6 +40,6 @@ final class RequestTenantContext implements TenantContext, TenantSwitcher
 
     public function hasTenant(): bool
     {
-        return null !== $this->current;
+        return $this->current instanceof TenantId;
     }
 }

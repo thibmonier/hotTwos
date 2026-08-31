@@ -30,7 +30,7 @@ final class TenantFilterConfiguratorTest extends TestCase
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects(self::never())->method('getFilters');
 
-        (new TenantFilterConfigurator($entityManager, $context))
+        new TenantFilterConfigurator($entityManager, $context)
             ->onKernelRequest($this->event(HttpKernelInterface::MAIN_REQUEST));
     }
 
@@ -42,7 +42,7 @@ final class TenantFilterConfiguratorTest extends TestCase
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects(self::never())->method('getFilters');
 
-        (new TenantFilterConfigurator($entityManager, $context))
+        new TenantFilterConfigurator($entityManager, $context)
             ->onKernelRequest($this->event(HttpKernelInterface::SUB_REQUEST));
     }
 
