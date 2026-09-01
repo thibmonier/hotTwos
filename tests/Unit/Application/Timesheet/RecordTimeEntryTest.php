@@ -4,13 +4,22 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Timesheet;
 
+use App\Application\Period\PeriodModificationGuard;
 use App\Application\Timesheet\RecordTimeEntry;
+use App\Domain\Period\AccountingPeriod;
+use App\Domain\Period\PeriodLockedException;
 use App\Domain\Project\Project;
 use App\Domain\Tenant\TenantId;
 use App\Domain\Timesheet\TimesheetException;
+use App\Domain\Absence\AbsenceRequest;
+use App\Tests\Support\Absence\InMemoryAbsenceRequestRepository;
+use App\Tests\Support\Authorization\RecordingSecurityAuditLogger;
+use App\Tests\Support\Period\InMemoryAccountingPeriodRepository;
+use App\Tests\Support\Period\InMemoryReopeningRequestRepository;
 use App\Tests\Support\Timesheet\InMemoryProjectRepository;
 use App\Tests\Support\Timesheet\InMemoryTimeEntryRepository;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Clock\MockClock;
 use DateTimeImmutable;
 
 /**
@@ -23,6 +32,8 @@ final class RecordTimeEntryTest extends TestCase
     private InMemoryProjectRepository $projects;
     private InMemoryTimeEntryRepository $entries;
     private RecordTimeEntry $record;
+    private InMemoryAccountingPeriodRepository $periods;
+    private InMemoryAbsenceRequestRepository $absences;
     private string $projectId;
 
     protected function setUp(): void
@@ -30,11 +41,43 @@ final class RecordTimeEntryTest extends TestCase
         $this->tenant = TenantId::generate();
         $this->projects = new InMemoryProjectRepository();
         $this->entries = new InMemoryTimeEntryRepository();
-        $this->record = new RecordTimeEntry($this->projects, $this->entries);
+        $this->periods = new InMemoryAccountingPeriodRepository();
+        $this->absences = new InMemoryAbsenceRequestRepository();
+        $this->record = new RecordTimeEntry(
+            $this->projects,
+            $this->entries,
+            new PeriodModificationGuard(
+                $this->periods,
+                new InMemoryReopeningRequestRepository(),
+                new RecordingSecurityAuditLogger(),
+                new MockClock(new DateTimeImmutable('2026-10-01 00:00:00')),
+            ),
+            $this->absences,
+        );
 
         $project = new Project($this->tenant, 'PRJ-1', 'Refonte');
         $this->projects->save($project);
         $this->projectId = $project->id();
+    }
+
+    public function testRefusesRecordingOnAClosedPeriod(): void
+    {
+        $closed = new AccountingPeriod($this->tenant, '2026-09');
+        $closed->close('admin', new DateTimeImmutable('2026-10-01 10:00:00'));
+        $this->periods->save($closed);
+
+        $this->expectException(PeriodLockedException::class);
+        $this->record->record($this->tenant, 'camille', $this->projectId, new DateTimeImmutable('2026-09-15'), 240);
+    }
+
+    public function testRefusesProductionOnAValidatedAbsenceDay(): void
+    {
+        $absence = new AbsenceRequest($this->tenant, 'camille', 'type-1', new DateTimeImmutable('2026-09-14'), new DateTimeImmutable('2026-09-18'), true, true, new DateTimeImmutable('2026-08-01'));
+        $absence->validate('marc', new DateTimeImmutable('2026-08-20'));
+        $this->absences->save($absence);
+
+        $this->expectException(TimesheetException::class);
+        $this->record->record($this->tenant, 'camille', $this->projectId, new DateTimeImmutable('2026-09-15'), 240);
     }
 
     public function testRecordsAnEntry(): void

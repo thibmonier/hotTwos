@@ -30,7 +30,7 @@ final class TenantSessionConfiguratorTest extends TestCase
         $connection = $this->createMock(Connection::class);
         $connection->expects(self::once())
             ->method('executeStatement')
-            ->with(self::stringContains($tenant->toString()));
+            ->with(self::stringContains('set_config'), [$tenant->toString()]);
 
         (new TenantSessionConfigurator($connection, $context))($this->event(HttpKernelInterface::MAIN_REQUEST));
     }

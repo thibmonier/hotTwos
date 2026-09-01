@@ -34,9 +34,8 @@ final class TenantContextMiddlewareTest extends TestCase
 
         self::assertSame([self::TENANT], $switcher->switched);
         self::assertSame(1, $switcher->cleared);
-        // Barrière RLS armée côté connexion puis relâchée (parité HTTP).
-        self::assertStringContainsString(self::TENANT, $statements[0] ?? '');
-        self::assertStringStartsWith('SET app.current_tenant', $statements[0] ?? '');
+        // Barrière RLS armée côté connexion (paramètre lié) puis relâchée (parité HTTP).
+        self::assertStringContainsString('set_config', $statements[0] ?? '');
         self::assertSame('RESET app.current_tenant', $statements[1] ?? null);
     }
 

@@ -54,5 +54,11 @@ interface TimeEntryRepository
      */
     public function findValidatedInPeriod(TenantId $tenant, DateTimeImmutable $from, DateTimeImmutable $to): array;
 
+    /**
+     * Nombre d'imputations **non validées** (soumises/refusées) dont le jour appartient à
+     * `[from, to)` — avertissement de clôture (US-057, CA-3). Bornes semi-ouvertes.
+     */
+    public function countUnvalidatedInPeriod(TenantId $tenant, DateTimeImmutable $from, DateTimeImmutable $to): int;
+
     public function save(TimeEntry $entry): void;
 }

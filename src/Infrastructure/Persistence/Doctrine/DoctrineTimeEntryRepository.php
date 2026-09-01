@@ -129,6 +129,20 @@ final readonly class DoctrineTimeEntryRepository implements TimeEntryRepository
         return $entries;
     }
 
+    public function countUnvalidatedInPeriod(TenantId $tenant, DateTimeImmutable $from, DateTimeImmutable $to): int
+    {
+        return (int) $this->entityManager->createQuery(
+            'SELECT COUNT(e.id) FROM '.TimeEntry::class.' e'
+            .' WHERE e.tenantId = :tenant AND e.status <> :validated'
+            .' AND e.workDate >= :from AND e.workDate < :to',
+        )
+            ->setParameter('tenant', $tenant->toString())
+            ->setParameter('validated', ValidationStatus::VALIDATED->value)
+            ->setParameter('from', $from, 'date_immutable')
+            ->setParameter('to', $to, 'date_immutable')
+            ->getSingleScalarResult();
+    }
+
     public function save(TimeEntry $entry): void
     {
         $this->entityManager->persist($entry);

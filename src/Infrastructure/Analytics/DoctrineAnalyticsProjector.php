@@ -43,7 +43,9 @@ final readonly class DoctrineAnalyticsProjector implements AnalyticsProjector
             // directe (CA-6) ; `current_tenant` satisfait la barrière RLS (WITH CHECK) en
             // production où le rôle applicatif n'est pas superutilisateur (CA-4).
             $connection->executeStatement("SET LOCAL app.projector_active = 'on'");
-            $connection->executeStatement(sprintf("SET LOCAL app.current_tenant = '%s'", $tenant->toString()));
+            // Paramètre **lié** via set_config (aucune interpolation) ; `is_local=true` = portée
+            // transaction, équivalent à `SET LOCAL`.
+            $connection->executeStatement("SELECT set_config('app.current_tenant', ?, true)", [$tenant->toString()]);
 
             $this->purge($tenant);
             $this->replay($tenant);

@@ -52,6 +52,21 @@ security:
         # Dashboard financier US-060 : authentifié ; habilitation VIEW_PROJECT_FINANCIALS (et le
         # gating du coût sensible) portés par la couche applicative (ARC-19).
         - { path: ^/valorisation, roles: ROLE_USER }
+        # Administration des périodes US-057 : authentifié ; habilitation MANAGE_PERIODS applicative.
+        - { path: ^/administration/periodes, roles: ROLE_USER }
+        # Absences US-054 : authentifié ; l'habilitation de décision (VALIDATE_ABSENCE) est applicative.
+        - { path: ^/api/absences, roles: ROLE_USER }
+        - { path: ^/absences, roles: ROLE_USER }
+        # Complétude US-058 : authentifié ; le périmètre équipe (VIEW_TEAM_COMPLETENESS) est applicatif.
+        - { path: ^/api/completude, roles: ROLE_USER }
+        - { path: ^/completude, roles: ROLE_USER }
+        # Relances US-056 : authentifié ; l'habilitation de paramétrage (MANAGE_REMINDERS) est
+        # applicative. L'opt-out individuel (^/api/me/reminder-preference) relève déjà de ^/api/me.
+        - { path: ^/api/reminders, roles: ROLE_USER }
+        - { path: ^/relances, roles: ROLE_USER }
+        # Synthèse d'activité US-059 : authentifié ; le cloisonnement strict au collaborateur courant
+        # (403 sur un autre user_id) est porté par la couche applicative (ARC-19).
+        - { path: ^/api/activity-summary, roles: ROLE_USER }
 
 when@test:
     security:

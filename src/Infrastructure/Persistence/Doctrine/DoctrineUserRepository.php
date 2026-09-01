@@ -29,4 +29,14 @@ final readonly class DoctrineUserRepository implements UserRepository
 
         return (int) $count > 0;
     }
+
+    public function findIdsByTenant(TenantId $tenant): array
+    {
+        /** @var list<array{id: string}> $rows */
+        $rows = $this->entityManager->createQuery(
+            'SELECT u.id AS id FROM '.User::class.' u WHERE u.tenantId = :tenant ORDER BY u.email ASC',
+        )->setParameter('tenant', $tenant->toString())->getResult();
+
+        return array_map(static fn (array $row): string => $row['id'], $rows);
+    }
 }

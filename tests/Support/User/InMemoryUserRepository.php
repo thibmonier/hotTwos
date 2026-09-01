@@ -22,6 +22,19 @@ final class InMemoryUserRepository implements UserRepository
         return isset($this->known[$this->key($tenant, $userId)]);
     }
 
+    public function findIdsByTenant(TenantId $tenant): array
+    {
+        $prefix = $tenant->toString().'|';
+        $ids = [];
+        foreach (array_keys($this->known) as $key) {
+            if (str_starts_with((string) $key, $prefix)) {
+                $ids[] = substr((string) $key, strlen($prefix));
+            }
+        }
+
+        return $ids;
+    }
+
     private function key(TenantId $tenant, string $userId): string
     {
         return $tenant->toString().'|'.$userId;

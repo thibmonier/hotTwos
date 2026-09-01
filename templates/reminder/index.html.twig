@@ -1,0 +1,119 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Relances de saisie{% endblock %}
+
+{% block body %}
+    <main class="container" data-controller="reminders">
+        <h1>Relances de saisie</h1>
+        <p>Paramétrage des relances automatiques de retard de saisie, pour l'ensemble du cabinet.</p>
+
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <p class="flash flash-{{ label }}" role="{{ label == 'error' ? 'alert' : 'status' }}">{{ message }}</p>
+            {% endfor %}
+        {% endfor %}
+
+        <section aria-labelledby="config-heading">
+            <h2 id="config-heading">Règle de relance</h2>
+            <form method="post" action="{{ path('reminders_update') }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('configure_reminders') }}">
+
+                <p class="reminder-master-toggle">
+                    <label>
+                        <input type="checkbox" name="active" data-reminders-target="master"
+                               data-action="change->reminders#toggle"{{ rule.active ? ' checked' : '' }}>
+                        Activer les relances automatiques
+                    </label>
+                    <span class="hint" id="active-help">Si désactivé, aucune relance n'est envoyée, quels que soient les autres réglages.</span>
+                </p>
+
+                <fieldset data-reminders-target="dependent">
+                    <legend>Cadence</legend>
+
+                    <label for="initialDelayDays">Délai avant la première relance (jours)</label>
+                    <input type="number" id="initialDelayDays" name="initialDelayDays"
+                           min="0" max="30" step="1" value="{{ rule.initialDelayDays }}"
+                           inputmode="numeric" aria-describedby="delay-help" required>
+                    <span class="hint" id="delay-help">Jours de retard après l'échéance de complétude avant l'envoi de la première relance (0 à 30).</span>
+
+                    <label for="frequencyDays">Fréquence des relances suivantes (jours)</label>
+                    <input type="number" id="frequencyDays" name="frequencyDays"
+                           min="1" max="30" step="1" value="{{ rule.frequencyDays }}"
+                           inputmode="numeric" aria-describedby="frequency-help" required>
+                    <span class="hint" id="frequency-help">Intervalle entre deux relances si le retard persiste (1 à 30). Au plus une relance par jour ouvré.</span>
+                </fieldset>
+
+                <fieldset data-reminders-target="dependent">
+                    <legend>Diffusion</legend>
+
+                    <label for="channel">Canal de relance</label>
+                    <select id="channel" name="channel">
+                        {% for value, label in channelLabels %}
+                            <option value="{{ value }}"{{ rule.channel == value ? ' selected' : '' }}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <label class="reminder-checkbox">
+                        <input type="checkbox" name="escalationEnabled"
+                               aria-describedby="escalation-help"{{ rule.escalationEnabled ? ' checked' : '' }}>
+                        Escalader au responsable (N+1) si le retard persiste
+                    </label>
+                    <span class="hint" id="escalation-help">Le responsable est informé à partir de la troisième relance sans effet.</span>
+                </fieldset>
+
+                <button type="submit">Enregistrer les réglages</button>
+            </form>
+        </section>
+
+        <section aria-labelledby="preview-heading">
+            <h2 id="preview-heading">Qui serait relancé maintenant</h2>
+            {% if not active %}
+                <p>Les relances automatiques sont désactivées. Aucun aperçu n'est calculé.</p>
+            {% elseif preview is empty %}
+                <p>Aucun collaborateur ne serait relancé actuellement avec ces réglages.</p>
+            {% else %}
+                <ul class="reminder-preview">
+                    {% for row in preview %}
+                        <li class="{{ row.escalated ? 'is-escalated' : '' }}">
+                            <code>{{ row.userId[:8] }}</code> — semaine du {{ row.week }} — relance n° {{ row.rank }}
+                            {% if row.escalated %}<span class="badge-escalated">Escaladé N+1</span>{% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </section>
+
+        <section aria-labelledby="history-heading">
+            <h2 id="history-heading">Historique des relances</h2>
+            {% if history is empty %}
+                <p>Aucune relance n'a encore été émise.</p>
+            {% else %}
+                <table class="reminders-history">
+                    <caption class="visually-hidden">Historique des relances de saisie émises, de la plus récente à la plus ancienne.</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Destinataire</th>
+                            <th scope="col">Semaine</th>
+                            <th scope="col">Canal</th>
+                            <th scope="col">Rang</th>
+                            <th scope="col">Escaladé</th>
+                            <th scope="col">Date d'envoi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in history %}
+                            <tr class="{{ row.escalated ? 'is-escalated' : '' }}">
+                                <th scope="row"><code>{{ row.userId[:8] }}</code></th>
+                                <td>{{ row.week }}</td>
+                                <td>{{ row.channel }}</td>
+                                <td>{{ row.rank }}</td>
+                                <td>{{ row.escalated ? 'Oui' : '—' }}</td>
+                                <td>{{ row.sentAt }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </section>
+    </main>
+{% endblock %}

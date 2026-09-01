@@ -3,7 +3,7 @@ project: HotOnes
 track: enterprise
 initialized_at: 2026-08-31T00:00:00Z
 current_phase: implementation
-last_sync: 2026-09-01  # sync backlog ↔ index ↔ fichiers US (Sprint 4)
+last_sync: 2026-09-01  # Sprint 4 mergé (PR #6) + Railway redéployé ; Sprint 5 démarré
 
 # Source du besoin : cahier des charges fonctionnel complet
 source_of_truth: project-management/cdc/
@@ -159,21 +159,36 @@ reusable_assets:
       delivered: "US-050 saisie (Project+TimeEntry, API, écran /saisie) ; US-051 semaine ≤2min (batch, duplication, clavier, absence) ; US-055 validation par lot (permission VALIDATE_TIME + périmètre « ses projets », API + écran /validation) ; TECH-3 RLS ACTIVE EN PROD (app sous hotones_app) + smoke déploiement."
       reserve: "Valorisation (US-060+US-011), E2E chronométré ≤2min, extension RLS aux tables métier (DBT-SEC-1), fixtures démo → Sprint 4."
       path: project-management/sprints/sprint-003-saisie_temps/
-    current_sprint:
+    sprint_4:
       id: 4
       name: sprint-004-valorisation
       goal: "Le temps validé est automatiquement valorisé (coût & vente au tarif en vigueur) et alimente la marge projet dans le modèle analytique"
       committed_points: 21
+      delivered_points: 21
       stories: [US-010, US-011, US-060]
-      decision_po: "Chaîne complète org → taux → valorisation. Historisation à date d'effet (tarifs temporels), valorisation figée à la validation (INV-2/ARC-113). La sonde RevenueRecognized devient réelle."
-      blocker: "aucun (US-001/005/055 livrés)"
+      status: done
+      pr: "https://github.com/thibmonier/hotTwos/pull/6 (MERGED → main, merge commit 3aa199b)"
+      ceremonies: "Review + Rétro (Sailboat) faites"
+      delivered: "US-010 organisation (hiérarchie + rattachements historisés, API + écran, RLS) ; US-011 profils & taux historisés à date d'effet (RateResolver, API, écran /profils, RLS) ; US-060 valorisation auto ≤15min (chaîne validation→valorisation figée→RevenueRecognized réel→fact_project_revenue ; non-divergence par construction ARC-113 ; re-déclenchement CA-4 ; recompute 423 CA-5 ; dashboard /valorisation) ; T-TECH-01 Messenger async ; T-TECH-02 RLS project+time_entry."
+      security: "Vuln [Élevé] isolation multi-tenant chemin worker async détectée en revue et corrigée (TenantContextMiddleware pose SET/RESET app.current_tenant à la consommation) + test d'intrusion via consume. Bénéfice socle."
+      retro_actions: "1) garde de parité RLS pour handlers async (DoD S5) ; 2) lot sprintf→set_config (3 sites) ; 3) tracer dépendance US-057 (stub clôture global)."
+      staging: "Railway redéployé sur main : /health 200, /valorisation & /api/valorisation/recompute & /profils → 401 (déployés + sécurisés)."
       path: project-management/sprints/sprint-004-valorisation/
-      note: "Actions rétro S3 ouvertes (E2E ≤2min, extension RLS métier, fixtures) — intégrées si capacité."
+    current_sprint:
+      id: 5
+      name: sprint-005-completude_cloture
+      goal: "Le cycle de saisie du temps est complet et clôturable : complétude (web+mobile), relances, absences, et clôture de période verrouillante et tracée"
+      committed_points: 22
+      stories: [US-057, US-054, US-058, US-056, US-052, US-059]
+      decision_po: "Finir EPIC-003 (Temps & activité). US-057 prioritaire : lève le stub de clôture global d'US-060 (action rétro S4). Prérequis : tout le code fonctionnel commité + mergé (PR #6) + Railway redéployé — fait."
+      blocker: "aucun (dépendances US-050/051/055/060 livrées)"
+      path: project-management/sprints/sprint-005-completude_cloture/
+      note: "Lot de hardening sprintf→set_config (action rétro S4) à traiter en tech-debt avant US-057. US-053 (préremplissage IA) exclue (dépend EPIC-010)."
     quality_gates:
       prd: "95% ✅"
       tech_spec: "96% ✅"
       backlog: "6/6 ✅"
       report: project-management/quality-gates-report.md
 
-next_action: "Merger la PR #2 (Sprint 1), brancher Sprint 2 sur main, puis décomposer le Sprint 2 (/project:decompose-tasks 002) — démarrer par TECH-1 (migrations Doctrine) en TDD"
-next_command: "/sprint:dev US-006"
+next_action: "Sprint 5 démarré (branche feature/sprint-5-planning). Décomposer en tâches (/project:decompose-tasks 005), puis traiter le lot tech-debt sprintf→set_config avant US-057 (clôture de période)."
+next_command: "/project:decompose-tasks 005"

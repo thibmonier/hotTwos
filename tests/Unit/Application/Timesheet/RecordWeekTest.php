@@ -4,13 +4,19 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Timesheet;
 
+use App\Application\Period\PeriodModificationGuard;
 use App\Application\Timesheet\RecordTimeEntry;
 use App\Application\Timesheet\RecordWeek;
 use App\Application\Timesheet\WeekCell;
 use App\Domain\Project\Project;
 use App\Domain\Tenant\TenantId;
+use App\Tests\Support\Absence\InMemoryAbsenceRequestRepository;
+use App\Tests\Support\Authorization\RecordingSecurityAuditLogger;
+use App\Tests\Support\Period\InMemoryAccountingPeriodRepository;
+use App\Tests\Support\Period\InMemoryReopeningRequestRepository;
 use App\Tests\Support\Timesheet\InMemoryProjectRepository;
 use App\Tests\Support\Timesheet\InMemoryTimeEntryRepository;
+use Symfony\Component\Clock\MockClock;
 use PHPUnit\Framework\TestCase;
 use DateTimeImmutable;
 
@@ -30,7 +36,17 @@ final class RecordWeekTest extends TestCase
         $this->tenant = TenantId::generate();
         $projects = new InMemoryProjectRepository();
         $this->entries = new InMemoryTimeEntryRepository();
-        $this->recordWeek = new RecordWeek(new RecordTimeEntry($projects, $this->entries));
+        $this->recordWeek = new RecordWeek(new RecordTimeEntry(
+            $projects,
+            $this->entries,
+            new PeriodModificationGuard(
+                new InMemoryAccountingPeriodRepository(),
+                new InMemoryReopeningRequestRepository(),
+                new RecordingSecurityAuditLogger(),
+                new MockClock(),
+            ),
+            new InMemoryAbsenceRequestRepository(),
+        ));
 
         $project = new Project($this->tenant, 'PRJ-1', 'Refonte');
         $projects->save($project);

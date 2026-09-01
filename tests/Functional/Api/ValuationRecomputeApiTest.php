@@ -6,12 +6,12 @@ namespace App\Tests\Functional\Api;
 
 use App\Application\Authorization\InitializeDefaultRoles;
 use App\Domain\Authorization\Role;
+use App\Domain\Period\AccountingPeriod;
 use App\Domain\Tenant\Tenant;
 use App\Domain\Tenant\TenantId;
 use App\Domain\Timesheet\TimeEntry;
 use App\Domain\User\User;
 use App\Infrastructure\Persistence\Doctrine\DoctrineRoleRepository;
-use App\Infrastructure\Valuation\ConfiguredPeriodClosure;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -44,6 +44,7 @@ final class ValuationRecomputeApiTest extends WebTestCase
             $this->em->getClassMetadata(User::class),
             $this->em->getClassMetadata(Role::class),
             $this->em->getClassMetadata(TimeEntry::class),
+            $this->em->getClassMetadata(AccountingPeriod::class),
         ];
         $tool = new SchemaTool($this->em);
         $tool->dropSchema($this->schema);
@@ -84,13 +85,12 @@ final class ValuationRecomputeApiTest extends WebTestCase
 
     public function testClosedPeriodIsLocked(): void
     {
-        // Le client reboote le kernel à chaque requête : on le fige pour que l'override de
-        // service survive jusqu'à la requête de recalcul.
-        $this->client->disableReboot();
+        // Clôture réelle (US-057) : une période clôturée en base verrouille le recalcul.
+        $closed = new AccountingPeriod($this->tenant, '2026-08');
+        $closed->close(TenantId::generate()->toString(), new DateTimeImmutable('2026-09-01 10:00:00', new DateTimeZone('UTC')));
+        $this->em->persist($closed);
+        $this->em->flush();
         $this->login('admin@agence.test');
-        // US-057 non implémentée : on force la clôture d'août 2026 via le port stubé. Le
-        // compilateur DI résout l'alias vers l'id concret : c'est celui-ci qu'on remplace.
-        self::getContainer()->set(ConfiguredPeriodClosure::class, new ConfiguredPeriodClosure(['2026-08']));
 
         $this->recompute('2026-08');
 

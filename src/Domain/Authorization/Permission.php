@@ -40,4 +40,19 @@ enum Permission: string
 
     /** Consultation du tableau de bord financier projet — CA, marge, occupation (US-060, T-060-06). */
     case VIEW_PROJECT_FINANCIALS = 'view:project_financials';
+
+    /** Clôture d'une période et approbation des réouvertures (administrateur tenant — US-057). */
+    case MANAGE_PERIODS = 'manage:periods';
+
+    /** Demande de réouverture d'une période clôturée (chef de projet habilité — US-057). */
+    case REQUEST_PERIOD_REOPENING = 'request:period_reopening';
+
+    /** Validation/refus des demandes d'absence (manager N+1 — US-054). */
+    case VALIDATE_ABSENCE = 'validate:absence';
+
+    /** Consultation de la complétude de saisie de l'équipe (chef de projet / BU — US-058). */
+    case VIEW_TEAM_COMPLETENESS = 'view:team_completeness';
+
+    /** Paramétrage des relances de retard de saisie du tenant (chef de projet / admin — US-056). */
+    case MANAGE_REMINDERS = 'manage:reminders';
 }

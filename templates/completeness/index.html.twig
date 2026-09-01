@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Complétude de saisie{% endblock %}
+
+{% set labels = {
+    'submitted': '✅ Complète',
+    'partial': '⚠️ Partielle',
+    'empty_late': '❌ En retard',
+    'in_progress': '⏳ En cours'
+} %}
+
+{% block body %}
+    <main class="container">
+        <h1>Complétude de saisie</h1>
+
+        <p>{{ team ? 'Périmètre équipe' : 'Vos semaines' }} — 4 dernières semaines.
+            <a href="{{ path('api_completeness_export') }}{{ team ? '?scope=team' : '' }}">Exporter en CSV</a>
+        </p>
+
+        <section aria-labelledby="legend-heading">
+            <h2 id="legend-heading" class="visually-hidden">Légende</h2>
+            <ul class="completeness-legend">
+                {% for state, label in labels %}
+                    <li class="state-{{ state }}">{{ label }}</li>
+                {% endfor %}
+            </ul>
+        </section>
+
+        {% if rows is empty %}
+            <p>Aucune donnée de saisie disponible pour votre périmètre. Les premières saisies apparaîtront ici.</p>
+        {% else %}
+            <table class="completeness-grid">
+                <thead>
+                    <tr>
+                        <th scope="col">Collaborateur</th>
+                        {% for week in weeks %}
+                            <th scope="col">Sem. {{ week }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for userId, cells in rows %}
+                        <tr>
+                            <th scope="row"><code>{{ userId[:8] }}</code></th>
+                            {% for week in weeks %}
+                                {% set cell = cells[week] ?? null %}
+                                <td class="{{ cell ? 'state-' ~ cell.state : '' }}">
+                                    {% if cell %}
+                                        <span aria-label="{{ labels[cell.state]|replace({'✅ ': '', '⚠️ ': '', '❌ ': '', '⏳ ': ''}) }} ({{ cell.rate }}%)">
+                                            {{ labels[cell.state] }} <small>{{ cell.rate }}%</small>
+                                        </span>
+                                    {% else %}—{% endif %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </main>
+{% endblock %}

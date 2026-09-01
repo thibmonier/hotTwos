@@ -10,6 +10,8 @@ parameters:
     # US-060 / CA-5 — périodes comptables clôturées (mois `YYYY-MM`), en attendant US-057.
     # Stub par configuration : vide = aucune clôture. Surchargeable en test/déploiement.
     valuation.closed_periods: []
+    # US-054 — droit annuel d'absences acquis par collaborateur (accrual simplifié, paramétrable).
+    absence.acquired_days: 25.0
 
 services:
     # default configuration for services in *this* file
@@ -72,8 +74,28 @@ services:
     # Port valorisation (US-060, DIP).
     App\Domain\Valuation\TimeEntryValuationRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineTimeEntryValuationRepository'
 
-    # Statut de clôture de période (US-060 CA-5) : stub par configuration jusqu'à US-057.
-    App\Domain\Valuation\PeriodClosureStatus: '@App\Infrastructure\Valuation\ConfiguredPeriodClosure'
+    # Statut de clôture de période (US-060 CA-5) : clôture **réelle** par tenant (US-057, T-057-03),
+    # branchée sur l'agrégat AccountingPeriod. Le stub ConfiguredPeriodClosure reste défini
+    # (utilisable en test / configuration) mais n'est plus l'implémentation de production.
+    App\Domain\Valuation\PeriodClosureStatus: '@App\Infrastructure\Valuation\DoctrinePeriodClosure'
     App\Infrastructure\Valuation\ConfiguredPeriodClosure:
         arguments:
             $closedPeriods: '%valuation.closed_periods%'
+
+    # Ports périodes comptables et réouvertures (US-057, DIP).
+    App\Domain\Period\AccountingPeriodRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineAccountingPeriodRepository'
+    App\Domain\Period\ReopeningRequestRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineReopeningRequestRepository'
+
+    # Ports absences (US-054, DIP).
+    App\Domain\Absence\AbsenceTypeRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineAbsenceTypeRepository'
+    App\Domain\Absence\AbsenceRequestRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineAbsenceRequestRepository'
+    App\Application\Absence\AbsenceBalance:
+        arguments:
+            $acquiredDays: '%absence.acquired_days%'
+
+    # Ports relances (US-056, DIP).
+    App\Domain\Reminder\ReminderRuleRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineReminderRuleRepository'
+    App\Domain\Reminder\ReminderPreferenceRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineReminderPreferenceRepository'
+    App\Domain\Reminder\ReminderLogRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineReminderLogRepository'
+    App\Domain\Reminder\ReminderNotifier: '@App\Infrastructure\Reminder\LoggingReminderNotifier'
+    App\Domain\Tenant\TenantRegistry: '@App\Infrastructure\Persistence\Doctrine\DoctrineTenantRegistry'

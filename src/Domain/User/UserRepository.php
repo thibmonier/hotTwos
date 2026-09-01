@@ -13,4 +13,11 @@ use App\Domain\Tenant\TenantId;
 interface UserRepository
 {
     public function existsInTenant(TenantId $tenant, string $userId): bool;
+
+    /**
+     * Identifiants de tous les collaborateurs d'un tenant (périmètre « équipe » du pilotage — US-058).
+     *
+     * @return list<string>
+     */
+    public function findIdsByTenant(TenantId $tenant): array;
 }
