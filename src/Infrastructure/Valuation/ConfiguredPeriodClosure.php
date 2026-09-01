@@ -26,6 +26,8 @@ final readonly class ConfiguredPeriodClosure implements PeriodClosureStatus
 
     public function isClosed(TenantId $tenant, string $period): bool
     {
+        // TEMPORAIRE (US-057) : clôture globale — tous les tenants voient les mêmes périodes.
+        // US-057 persistera les clôtures par tenant et utilisera alors `$tenant`.
         return in_array($period, $this->closedPeriods, true);
     }
 }

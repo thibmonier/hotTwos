@@ -33,12 +33,10 @@ final readonly class RecomputeValuationProcessor implements ProcessorInterface
     {
         $user = $this->currentUser->require();
 
+        // Source unique du paramètre : la query string (spec CA-5 : `?period=YYYY-MM`).
         $period = $this->requestStack->getCurrentRequest()?->query->getString('period') ?? '';
-        if ('' === $period && null !== $data->period) {
-            $period = $data->period;
-        }
         if ('' === $period) {
-            throw new ValuationException('Le paramètre « period » (YYYY-MM) est obligatoire.');
+            throw new ValuationException('Le paramètre « period » (YYYY-MM) en query est obligatoire.');
         }
 
         $count = $this->recompute->forPeriod($user->tenantId(), $user, $period);

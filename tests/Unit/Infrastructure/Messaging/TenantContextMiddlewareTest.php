@@ -8,6 +8,7 @@ use App\Application\Messaging\TenantAwareMessage;
 use App\Application\Tenant\TenantSwitcher;
 use App\Domain\Tenant\TenantId;
 use App\Infrastructure\Messaging\TenantContextMiddleware;
+use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Symfony\Component\Messenger\Envelope;
@@ -25,19 +26,25 @@ final class TenantContextMiddlewareTest extends TestCase
     public function testSetsAndClearsTenantWhenConsumingTenantAwareMessage(): void
     {
         $switcher = new RecordingTenantSwitcher();
-        $middleware = new TenantContextMiddleware($switcher);
+        $statements = [];
+        $middleware = new TenantContextMiddleware($switcher, $this->recordingConnection($statements));
         $envelope = new Envelope(new FakeTenantMessage(TenantId::fromString(self::TENANT)), [new ReceivedStamp('async')]);
 
         $middleware->handle($envelope, new FakeStack(new PassThroughMiddleware()));
 
         self::assertSame([self::TENANT], $switcher->switched);
         self::assertSame(1, $switcher->cleared);
+        // Barrière RLS armée côté connexion puis relâchée (parité HTTP).
+        self::assertStringContainsString(self::TENANT, $statements[0] ?? '');
+        self::assertStringStartsWith('SET app.current_tenant', $statements[0] ?? '');
+        self::assertSame('RESET app.current_tenant', $statements[1] ?? null);
     }
 
     public function testClearsTenantEvenWhenHandlerThrows(): void
     {
         $switcher = new RecordingTenantSwitcher();
-        $middleware = new TenantContextMiddleware($switcher);
+        $statements = [];
+        $middleware = new TenantContextMiddleware($switcher, $this->recordingConnection($statements));
         $envelope = new Envelope(new FakeTenantMessage(TenantId::fromString(self::TENANT)), [new ReceivedStamp('async')]);
 
         try {
@@ -47,16 +54,19 @@ final class TenantContextMiddlewareTest extends TestCase
             self::assertSame('handler failed', $exception->getMessage());
         }
 
-        // RSQ-15 : le tenant est effacé quoi qu'il arrive (bloc finally).
+        // RSQ-15 : le tenant (mémoire + session DB) est effacé quoi qu'il arrive (bloc finally).
         self::assertSame([self::TENANT], $switcher->switched);
         self::assertSame(1, $switcher->cleared);
+        self::assertSame('RESET app.current_tenant', $statements[1] ?? null);
     }
 
     public function testDoesNotTouchTenantWhenDispatching(): void
     {
         // Sans ReceivedStamp : dispatch initial (requête HTTP déjà scopée) — ne pas modifier le contexte.
         $switcher = new RecordingTenantSwitcher();
-        $middleware = new TenantContextMiddleware($switcher);
+        $connection = $this->createMock(Connection::class);
+        $connection->expects(self::never())->method('executeStatement');
+        $middleware = new TenantContextMiddleware($switcher, $connection);
         $envelope = new Envelope(new FakeTenantMessage(TenantId::fromString(self::TENANT)));
 
         $middleware->handle($envelope, new FakeStack(new PassThroughMiddleware()));
@@ -68,13 +78,32 @@ final class TenantContextMiddlewareTest extends TestCase
     public function testIgnoresNonTenantAwareMessageEvenWhenConsuming(): void
     {
         $switcher = new RecordingTenantSwitcher();
-        $middleware = new TenantContextMiddleware($switcher);
+        $connection = $this->createMock(Connection::class);
+        $connection->expects(self::never())->method('executeStatement');
+        $middleware = new TenantContextMiddleware($switcher, $connection);
         $envelope = new Envelope(new PlainMessage(), [new ReceivedStamp('async')]);
 
         $middleware->handle($envelope, new FakeStack(new PassThroughMiddleware()));
 
         self::assertSame([], $switcher->switched);
         self::assertSame(0, $switcher->cleared);
+    }
+
+    /**
+     * @param list<string> $statements capture, dans l'ordre, les SQL exécutés
+     */
+    private function recordingConnection(array &$statements): Connection
+    {
+        $connection = $this->createStub(Connection::class);
+        $connection->method('executeStatement')->willReturnCallback(
+            static function (string $sql) use (&$statements): int {
+                $statements[] = $sql;
+
+                return 0;
+            },
+        );
+
+        return $connection;
     }
 }
 
