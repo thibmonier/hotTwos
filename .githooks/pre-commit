@@ -13,7 +13,7 @@ docker compose run --rm -T app sh -lc '\
   php vendor/bin/deptrac analyse --no-progress'
 
 echo "▶ Tests conteneurisés…"
-docker compose run --rm -T -e APP_ENV=test app php bin/phpunit -c phpunit.dist.xml
+docker compose run --rm -T -e APP_ENV=test app sh -lc 'php bin/console cache:clear --env=test --no-warmup >/dev/null && php bin/phpunit -c phpunit.dist.xml'
 
 echo "▶ gitleaks (secrets, staged)…"
 docker run --rm -v "$(pwd):/repo:ro" zricethezav/gitleaks:v8.18.4 protect --staged --source=/repo --no-banner

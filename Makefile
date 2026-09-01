@@ -61,7 +61,7 @@ console: ## Lance bin/console dans le conteneur (ex. make console c="debug:route
 ## — Qualité (conteneurisé, miroir CI) —
 
 test: ## Lance la suite de tests (config dist, déterministe / miroir CI)
-	$(DC) run --rm -T -e APP_ENV=test app php bin/phpunit -c phpunit.dist.xml
+	$(DC) run --rm -T -e APP_ENV=test app sh -lc 'php bin/console cache:clear --env=test --no-warmup >/dev/null && php bin/phpunit -c phpunit.dist.xml'
 
 deptrac: ## Vérifie les frontières d'architecture
 	$(APP) php vendor/bin/deptrac analyse
