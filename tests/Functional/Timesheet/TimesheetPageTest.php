@@ -55,9 +55,17 @@ final class TimesheetPageTest extends WebTestCase
         $crawler = $client->request('GET', '/saisie');
 
         self::assertResponseIsSuccessful();
-        self::assertStringContainsString('Refonte SI', $client->getResponse()->getContent() ?: '');
+        $body = $client->getResponse()->getContent() ?: '';
+        self::assertStringContainsString('Refonte SI', $body);
         // La cellule du lundi porte la valeur déjà saisie.
         self::assertGreaterThan(0, $crawler->filter('input[value="210"]')->count());
+
+        // US-059 : panneau « Ma synthèse » rendu (SSR) dans la page de saisie, lecture seule.
+        self::assertStringContainsString('Ma synthèse', $body);
+        self::assertStringContainsString('Taux d\'occupation', $body);
+        self::assertStringContainsString('Planning à venir', $body);
+        // CA-5 : le panneau est en lecture seule — aucun champ de formulaire dans le <dialog>.
+        self::assertSame(0, $crawler->filter('dialog.summary-dialog input')->count());
 
         $tool->dropSchema($schema);
         $em->close();

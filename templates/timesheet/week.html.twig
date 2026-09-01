@@ -21,6 +21,59 @@
 
         <p><a href="{{ path('timesheet_day', { date: weekStart }) }}">Vue jour (mobile)</a></p>
 
+        <div data-controller="activity-summary">
+            <button type="button" data-activity-summary-target="trigger" data-action="activity-summary#open">📊 Ma synthèse</button>
+
+            <dialog class="summary-dialog" aria-labelledby="summary-title" data-activity-summary-target="dialog">
+                <div class="summary-header">
+                    <h2 id="summary-title">Ma synthèse</h2>
+                    <button type="button" class="summary-close" data-action="activity-summary#close" aria-label="Fermer la synthèse">✕ Fermer</button>
+                </div>
+                <p class="hint">Période du {{ summary.periodStart }} au {{ summary.periodEnd }}.</p>
+
+                {% if summary.empty %}
+                    <p>Aucune saisie enregistrée sur cette période.</p>
+                {% else %}
+                    <section aria-labelledby="summary-occupation">
+                        <h3 id="summary-occupation">Taux d'occupation : {{ summary.occupationPercent }} %</h3>
+                        <p class="hint">Part du temps de production déclaré sur les jours ouvrés de la période.</p>
+                        <div class="summary-bar"><span class="summary-bar-fill" style="width: {{ summary.occupationPercent > 100 ? 100 : summary.occupationPercent }}%" aria-hidden="true"></span></div>
+                    </section>
+
+                    <section aria-labelledby="summary-type">
+                        <h3 id="summary-type">Répartition par type</h3>
+                        <ul class="summary-list">
+                            <li>Production — {{ summary.productionDuration }} ({{ summary.productionPercent }} %)
+                                <div class="summary-bar"><span class="summary-bar-fill" style="width: {{ summary.productionPercent }}%" aria-hidden="true"></span></div>
+                            </li>
+                            <li>Absence — {{ summary.absenceDuration }} ({{ summary.absencePercent }} %)
+                                <div class="summary-bar"><span class="summary-bar-fill" style="width: {{ summary.absencePercent }}%" aria-hidden="true"></span></div>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <section aria-labelledby="summary-projects">
+                        <h3 id="summary-projects">Répartition par projet</h3>
+                        <ul class="summary-list">
+                            {% for project in summary.projects %}
+                                <li>{{ project.label }} — {{ project.duration }} ({{ project.percent }} %)
+                                    <div class="summary-bar"><span class="summary-bar-fill" style="width: {{ project.percent }}%" aria-hidden="true"></span></div>
+                                </li>
+                            {% endfor %}
+                            {% if summary.othersCount > 0 %}
+                                <li>Autres projets ({{ summary.othersCount }}) — {{ summary.othersDuration }} ({{ summary.othersPercent }} %)</li>
+                            {% endif %}
+                        </ul>
+                    </section>
+                {% endif %}
+
+                <section aria-labelledby="summary-planning" class="summary-planning">
+                    <h3 id="summary-planning">Planning à venir</h3>
+                    <p class="hint">Le module d'affectation n'est pas encore activé — le planning s'affichera ici prochainement.</p>
+                </section>
+            </dialog>
+        </div>
+
         {% if projects is empty %}
             <p>Aucun projet actif : demandez à un administrateur d'en créer un pour saisir votre temps.</p>
         {% else %}

@@ -192,3 +192,61 @@ fieldset:disabled {
         min-width: 220px;
     }
 }
+
+/* US-059 — panneau « Ma synthèse ». Mobile-first : bottom-sheet ; desktop : panneau latéral droit. */
+.summary-dialog {
+    width: 100%;
+    max-width: 100%;
+    max-height: 80vh;
+    margin: auto auto 0; /* ancré en bas (bottom-sheet) */
+    border: 1px solid #ccc;
+    border-radius: 12px 12px 0 0;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+.summary-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.3);
+}
+.summary-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+.summary-close {
+    min-height: 44px;
+    min-width: 44px;
+}
+.summary-list {
+    list-style: none;
+    padding: 0;
+}
+.summary-list li {
+    margin-bottom: 0.6rem;
+}
+/* Piste + remplissage : l'information reste portée par le texte adjacent (jamais la couleur seule). */
+.summary-bar {
+    height: 8px;
+    background: #e6e6e6;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 0.2rem;
+}
+.summary-bar-fill {
+    display: block;
+    height: 100%;
+    background: #0b5fff;
+}
+.summary-planning {
+    margin-top: 1rem;
+    color: #555;
+}
+@media (min-width: 640px) {
+    .summary-dialog {
+        margin: 0 0 0 auto; /* panneau latéral droit, pleine hauteur */
+        width: min(30rem, 92vw);
+        max-height: 100vh;
+        height: 100%;
+        border-radius: 0;
+    }
+}
