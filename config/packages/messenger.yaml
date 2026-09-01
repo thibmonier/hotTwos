@@ -30,8 +30,8 @@ framework:
                     - App\Infrastructure\Messaging\TenantContextMiddleware
 
         routing:
-            # Routé en Sprint 4 par T-060-01 (US-060) :
-            # 'App\Application\Timesheet\Message\TimeEntriesValidated': async
+            # US-060 : la valorisation des temps validés est traitée hors requête (≤ 15 min).
+            'App\Application\Timesheet\Message\TimeEntriesValidated': async
 
 when@test:
     framework:
