@@ -3,6 +3,7 @@ project: HotOnes
 track: enterprise
 initialized_at: 2026-08-31T00:00:00Z
 current_phase: implementation
+last_sync: 2026-09-01  # sync backlog ↔ index ↔ fichiers US (Sprint 4)
 
 # Source du besoin : cahier des charges fonctionnel complet
 source_of_truth: project-management/cdc/
