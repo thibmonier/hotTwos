@@ -32,13 +32,17 @@ final readonly class ProfileRateCollectionProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
         $user = $this->currentUser->require();
-        $this->authorizer->ensureCan($user, Permission::MANAGE_PRICING);
 
         $filters = $context['filters'] ?? [];
         $profileId = is_array($filters) && is_string($filters['profileId'] ?? null) ? $filters['profileId'] : '';
         if ('' === $profileId) {
+            $this->authorizer->ensureCan($user, Permission::MANAGE_PRICING);
+
             return [];
         }
+
+        // HAB-6 : la lecture du coût de revient (donnée sensible) est tracée, comme le coût collaborateur.
+        $this->authorizer->authorizeSensitiveRead($user, Permission::MANAGE_PRICING, 'profile_rate:'.$profileId);
 
         return array_map(
             static fn (ProfileRate $rate): ProfileRateResource => new ProfileRateResource(

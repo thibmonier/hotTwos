@@ -28,6 +28,9 @@ use Symfony\Component\Uid\Uuid;
  */
 final readonly class DefineProfileRate
 {
+    /** Plafond métier des montants (≈ 10 M€) — reste très en deçà de la borne 32 bits de la colonne. */
+    private const int MAX_CENTS = 999_999_999;
+
     public function __construct(
         private Authorizer $authorizer,
         private ProfileRepository $profiles,
@@ -54,15 +57,23 @@ final readonly class DefineProfileRate
         if ($costPriceCents <= 0 || $sellingPriceCents <= 0) {
             throw new PricingException('Le coût de revient et le taux de vente doivent être strictement positifs.');
         }
+        if ($costPriceCents > self::MAX_CENTS || $sellingPriceCents > self::MAX_CENTS) {
+            throw new PricingException('Le coût de revient et le taux de vente dépassent le plafond autorisé.');
+        }
 
         $profile = $this->profiles->find($tenant, $profileId);
         if (!$profile instanceof Profile) {
             throw new PricingException(sprintf('Profil introuvable : %s.', $profileId));
         }
+        if (!$profile->isActive()) {
+            throw new PricingException('Impossible de définir un tarif sur un profil désactivé.');
+        }
 
         $this->guardNoOverlap($tenant, $profileId, $period);
 
-        $retroactive = $period->from() < $this->clock->now();
+        // Comparaison à la date du jour (minuit) : un tarif effectif « aujourd'hui » n'est pas
+        // rétroactif, même en cours de journée (l'heure de now() ne doit pas fausser le test).
+        $retroactive = $period->from() < $this->clock->now()->setTime(0, 0);
         if ($retroactive && !$confirmRetroactive) {
             throw new PricingException('Saisie tarifaire rétroactive : une confirmation explicite est requise (les valorisations passées ne seront pas réécrites).');
         }

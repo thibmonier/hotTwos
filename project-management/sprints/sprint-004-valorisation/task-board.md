@@ -7,14 +7,6 @@
 
 | ID | Élément | Tâche | Est. |
 |----|---------|-------|------|
-| T-011-01 | US-011 | `Profile` + mode de calcul + migration + RLS | 2h |
-| T-011-02 | US-011 | `ProfileRate` historisé + migration + repository | 3h |
-| T-011-03 | US-011 | Moteur `RateResolver` (tarif à une date, `ARC-6`) | 4h |
-| T-011-04 | US-011 | Cas d'usage `DefineProfileRate` (chevauchement/négatif/chargé/rétroactif) | 5h |
-| T-011-05 | US-011 | API DTO + vue historique tarifaire | 3h |
-| T-011-06 | US-011 | Écran profil + timeline historique | 4h |
-| T-011-07 | US-011 | Tests moteur + règles | 4h |
-| T-011-08 | US-011 | Doc + revue | 2h |
 | T-060-01 | US-060 | Message `TimeEntriesValidated` à la validation | 3h |
 | T-060-02 | US-060 | Handler async valorisation + snapshot figé | 5h |
 | T-060-03 | US-060 | Entité `TimeEntryValuation` + migration + RLS | 2h |
@@ -44,16 +36,23 @@
 | T-010-05 | US-010 | API Platform (unités + rattachements + timeline) ; DELETE=désactivation ; 403/422 via listeners — 5 tests fonctionnels | `b658956` |
 | T-010-06 | US-010 | Écran `/organisation` (arbre, création/désactivation/rattachement) Twig/Turbo/Stimulus accessible — 2 tests | `2329815` |
 | T-010-07 | US-010 | Test RLS d'intrusion tables org + fix policy texte robuste (+ cycle/403/422 déjà couverts) — 1 test | `f5c8131` |
-| T-010-08 | US-010 | Doc module + revues sécurité/Symfony ; durcissement (existence collaborateur, validation UUID, borne nom, ensureCan item provider) — `UserRepository` | _à committer_ |
+| T-010-08 | US-010 | Doc module + revues sécurité/Symfony ; durcissement (existence collaborateur, validation UUID, borne nom, ensureCan item provider) — `UserRepository` | `9deaf1b` |
+| T-011-01/02/03 | US-011 | `Profile` + `ProfileRate` (centimes, historisé) + `RateResolver` (ARC-6) + migrations RLS ; ports/adapters — 14 tests | `6fddb12` |
+| T-011-04 | US-011 | `DefineProfileRate` (CA-5 chevauchement, CA-6 ≤0, CA-3 rétroactif via Clock) + `LoadedCostCalculator` (CA-2) ; permission `MANAGE_PRICING` — 13 tests | `ff2efb1` |
+| T-011-05 | US-011 | API profils + tarifs + historique (403/422, DELETE=désactivation) ; `ManageProfiles` — 10 tests | `d73060e` |
+| T-011-06 | US-011 | Écran `/profils` + timeline (ligne en vigueur CA-4) Twig/Stimulus — 2 tests | `184558e` |
+| T-011-07 | US-011 | Test RLS d'intrusion tables tarification (+ moteur/règles déjà couverts) — 1 test | `e39c49c` |
+| T-011-08 | US-011 | Doc module + revues sécurité/Symfony ; durcissement (traçage lecture coût HAB-6, plafond montants, date stricte, profil désactivé, rétroactif du jour) — 3 tests | _à committer_ |
 
 ## 🚫 Bloqué
 | ID | Élément | Raison | Action |
 |----|---------|--------|--------|
 
 ## Métriques
-- **Tâches** : 26 engagées · 9 terminées (35 %) · +2 en réserve (T-TECH-03/04)
-- **Heures** : 84h estimées (engagé) · ~28h consommées (T-TECH-01 + US-010 complète)
-- **US-010 : ✅ TERMINÉE** (8/8 tâches, revues sécurité/Symfony passées). Prochain : US-011 (RateResolver).
+- **Tâches** : 26 engagées · 17 terminées (65 %) · +2 en réserve (T-TECH-03/04)
+- **Heures** : 84h estimées (engagé) · ~55h consommées (T-TECH-01 + US-010 + US-011)
+- **US-010 : ✅ TERMINÉE** · **US-011 : ✅ TERMINÉE** (8/8, revues passées)
+- **Reste : US-060** (T-060-01→08) + T-TECH-02. US-060 consomme `RateResolver` + Messenger (livrés).
 - **Bonus hors sprint** : dockerisation complète de l'outillage (Makefile, hook pre-commit, phpunit) — aucune commande sur l'hôte
 - **Points** : 21 engagés (US-010 : 5 · US-011 : 8 · US-060 : 8)
 - **Critère de sortie phare** : **temps validé → marge projet** avec tarif temporel **figé** (snapshot `INV-2/INV-3`), non-divergence verte (`ARC-113`).

@@ -35,6 +35,7 @@ final class DefineProfileRateTest extends TestCase
     private InMemoryProfileRepository $profiles;
     private InMemoryProfileRateRepository $rates;
     private RecordingSecurityAuditLogger $audit;
+    private Authorizer $authorizer;
     private DefineProfileRate $define;
     private User $admin;
     private User $collaborator;
@@ -54,9 +55,10 @@ final class DefineProfileRateTest extends TestCase
 
         $this->rates = new InMemoryProfileRateRepository();
         $this->audit = new RecordingSecurityAuditLogger();
+        $this->authorizer = new Authorizer($roles, $this->audit);
         // « Aujourd'hui » figé au 1er juin 2026 : ce qui précède est rétroactif.
         $this->define = new DefineProfileRate(
-            new Authorizer($roles, $this->audit),
+            $this->authorizer,
             $this->profiles,
             $this->rates,
             new MockClock(new DateTimeImmutable('2026-06-01 00:00:00', new DateTimeZone('UTC'))),
@@ -132,6 +134,37 @@ final class DefineProfileRateTest extends TestCase
 
         self::assertCount(1, $this->rates->rates);
         self::assertTrue($this->audit->has('profile_rate_defined_retroactive'));
+    }
+
+    public function testRateEffectiveTodayIsNotRetroactiveEvenLaterInTheDay(): void
+    {
+        // Horloge en cours de journée : un tarif effectif aujourd'hui ne doit pas être rétroactif.
+        $define = new DefineProfileRate(
+            $this->authorizer,
+            $this->profiles,
+            $this->rates,
+            new MockClock(new DateTimeImmutable('2026-06-01 14:30:00', new DateTimeZone('UTC'))),
+            $this->audit,
+        );
+
+        $define->define($this->tenant, $this->admin, $this->profileId, EffectivePeriod::since($this->date('2026-06-01')), 45000, 78000);
+
+        self::assertCount(1, $this->rates->rates);
+    }
+
+    public function testAmountAboveCapIsRejected(): void
+    {
+        $this->expectException(PricingException::class);
+
+        $this->define->define($this->tenant, $this->admin, $this->profileId, EffectivePeriod::since($this->date('2026-07-01')), 1_000_000_000, 78000);
+    }
+
+    public function testRateOnDeactivatedProfileIsRejected(): void
+    {
+        $this->profiles->find($this->tenant, $this->profileId)?->deactivate();
+
+        $this->expectException(PricingException::class);
+        $this->define->define($this->tenant, $this->admin, $this->profileId, EffectivePeriod::since($this->date('2026-07-01')), 45000, 78000);
     }
 
     private function date(string $value): DateTimeImmutable

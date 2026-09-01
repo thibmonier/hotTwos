@@ -59,7 +59,8 @@ final readonly class AttachCollaboratorProcessor implements ProcessorInterface
     private function parseDate(string $value): DateTimeImmutable
     {
         $date = DateTimeImmutable::createFromFormat('!Y-m-d', $value);
-        if (false === $date) {
+        $errors = DateTimeImmutable::getLastErrors();
+        if (false === $date || (is_array($errors) && ($errors['warning_count'] > 0 || $errors['error_count'] > 0))) {
             throw new OrganizationException(sprintf('Date invalide (attendu Y-m-d) : %s.', $value));
         }
 
