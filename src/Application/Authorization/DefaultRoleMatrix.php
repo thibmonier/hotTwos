@@ -40,6 +40,7 @@ final class DefaultRoleMatrix
                 Permission::VIEW_PROJECT_FINANCIALS,
                 Permission::REQUEST_PERIOD_REOPENING,
                 Permission::VALIDATE_ABSENCE,
+                Permission::VIEW_TEAM_COMPLETENESS,
             ], DataScope::OWN_PROJECTS),
 
             new RoleDefinition('Resource Manager', [
@@ -47,6 +48,7 @@ final class DefaultRoleMatrix
                 Permission::VIEW_COLLABORATOR,
                 Permission::VIEW_COLLABORATOR_COST,
                 Permission::VIEW_PROJECT_FINANCIALS,
+                Permission::VIEW_TEAM_COMPLETENESS,
             ], DataScope::POOL),
 
             new RoleDefinition('Dirigeant', [
@@ -54,6 +56,7 @@ final class DefaultRoleMatrix
                 Permission::VIEW_COLLABORATOR,
                 Permission::VIEW_COLLABORATOR_COST,
                 Permission::VIEW_PROJECT_FINANCIALS,
+                Permission::VIEW_TEAM_COMPLETENESS,
             ], DataScope::TENANT),
 
             new RoleDefinition('Administrateur', [
@@ -71,6 +74,7 @@ final class DefaultRoleMatrix
                 Permission::MANAGE_PERIODS,
                 Permission::REQUEST_PERIOD_REOPENING,
                 Permission::VALIDATE_ABSENCE,
+                Permission::VIEW_TEAM_COMPLETENESS,
             ], DataScope::TENANT),
         ];
     }

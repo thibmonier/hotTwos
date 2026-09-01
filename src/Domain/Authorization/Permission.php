@@ -49,4 +49,7 @@ enum Permission: string
 
     /** Validation/refus des demandes d'absence (manager N+1 — US-054). */
     case VALIDATE_ABSENCE = 'validate:absence';
+
+    /** Consultation de la complétude de saisie de l'équipe (chef de projet / BU — US-058). */
+    case VIEW_TEAM_COMPLETENESS = 'view:team_completeness';
 }
