@@ -54,6 +54,8 @@ security:
         - { path: ^/valorisation, roles: ROLE_USER }
         # Administration des périodes US-057 : authentifié ; habilitation MANAGE_PERIODS applicative.
         - { path: ^/administration/periodes, roles: ROLE_USER }
+        # Absences US-054 : authentifié ; l'habilitation de décision (VALIDATE_ABSENCE) est applicative.
+        - { path: ^/api/absences, roles: ROLE_USER }
 
 when@test:
     security:
