@@ -61,6 +61,7 @@ final class DefaultRoleMatrix
                 Permission::DELETE_PROJECT,
                 Permission::VIEW_COLLABORATOR,
                 Permission::VALIDATE_TIME,
+                Permission::RECOMPUTE_VALUATION,
             ], DataScope::TENANT),
         ];
     }

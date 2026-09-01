@@ -111,6 +111,24 @@ final readonly class DoctrineTimeEntryRepository implements TimeEntryRepository
         return $entries;
     }
 
+    public function findValidatedInPeriod(TenantId $tenant, DateTimeImmutable $from, DateTimeImmutable $to): array
+    {
+        /** @var list<TimeEntry> $entries */
+        $entries = $this->entityManager->createQuery(
+            'SELECT e FROM '.TimeEntry::class.' e'
+            .' WHERE e.tenantId = :tenant AND e.status = :validated'
+            .' AND e.workDate >= :from AND e.workDate < :to'
+            .' ORDER BY e.workDate ASC',
+        )
+            ->setParameter('tenant', $tenant->toString())
+            ->setParameter('validated', ValidationStatus::VALIDATED->value)
+            ->setParameter('from', $from, 'date_immutable')
+            ->setParameter('to', $to, 'date_immutable')
+            ->getResult();
+
+        return $entries;
+    }
+
     public function save(TimeEntry $entry): void
     {
         $this->entityManager->persist($entry);

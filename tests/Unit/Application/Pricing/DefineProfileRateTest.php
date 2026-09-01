@@ -16,8 +16,10 @@ use App\Domain\Pricing\Profile;
 use App\Domain\Shared\EffectivePeriod;
 use App\Domain\Tenant\TenantId;
 use App\Domain\User\User;
+use App\Application\Pricing\Message\ProfileRateDefined;
 use App\Tests\Support\Authorization\InMemoryRoleRepository;
 use App\Tests\Support\Authorization\RecordingSecurityAuditLogger;
+use App\Tests\Support\Messaging\RecordingMessageBus;
 use App\Tests\Support\Pricing\InMemoryProfileRateRepository;
 use App\Tests\Support\Pricing\InMemoryProfileRepository;
 use DateTimeImmutable;
@@ -35,6 +37,7 @@ final class DefineProfileRateTest extends TestCase
     private InMemoryProfileRepository $profiles;
     private InMemoryProfileRateRepository $rates;
     private RecordingSecurityAuditLogger $audit;
+    private RecordingMessageBus $bus;
     private Authorizer $authorizer;
     private DefineProfileRate $define;
     private User $admin;
@@ -55,6 +58,7 @@ final class DefineProfileRateTest extends TestCase
 
         $this->rates = new InMemoryProfileRateRepository();
         $this->audit = new RecordingSecurityAuditLogger();
+        $this->bus = new RecordingMessageBus();
         $this->authorizer = new Authorizer($roles, $this->audit);
         // « Aujourd'hui » figé au 1er juin 2026 : ce qui précède est rétroactif.
         $this->define = new DefineProfileRate(
@@ -63,6 +67,7 @@ final class DefineProfileRateTest extends TestCase
             $this->rates,
             new MockClock(new DateTimeImmutable('2026-06-01 00:00:00', new DateTimeZone('UTC'))),
             $this->audit,
+            $this->bus,
         );
 
         $this->admin = new User($this->tenant, 'admin@agence.test', 'hash', ['Administrateur']);
@@ -75,6 +80,27 @@ final class DefineProfileRateTest extends TestCase
 
         self::assertCount(1, $this->rates->rates);
         self::assertNotSame('', $id);
+    }
+
+    public function testDefiningARatePublishesRevaluationTrigger(): void
+    {
+        $this->define->define($this->tenant, $this->admin, $this->profileId, EffectivePeriod::since($this->date('2026-07-01')), 45000, 78000);
+
+        self::assertCount(1, $this->bus->dispatched, 'Un tarif défini déclenche la re-valorisation (CA-4).');
+        $message = $this->bus->dispatched[0];
+        self::assertInstanceOf(ProfileRateDefined::class, $message);
+        self::assertSame($this->profileId, $message->profileId());
+        self::assertTrue($message->tenantId()->equals($this->tenant));
+    }
+
+    public function testDeniedDefinitionPublishesNothing(): void
+    {
+        try {
+            $this->define->define($this->tenant, $this->collaborator, $this->profileId, EffectivePeriod::since($this->date('2026-07-01')), 45000, 78000);
+        } catch (AccessDeniedException) {
+        }
+
+        self::assertSame([], $this->bus->dispatched, 'Un refus d\'habilitation ne publie aucun événement.');
     }
 
     public function testWithoutPermissionIsDenied(): void
@@ -145,6 +171,7 @@ final class DefineProfileRateTest extends TestCase
             $this->rates,
             new MockClock(new DateTimeImmutable('2026-06-01 14:30:00', new DateTimeZone('UTC'))),
             $this->audit,
+            $this->bus,
         );
 
         $define->define($this->tenant, $this->admin, $this->profileId, EffectivePeriod::since($this->date('2026-06-01')), 45000, 78000);

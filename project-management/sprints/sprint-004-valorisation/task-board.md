@@ -7,7 +7,6 @@
 
 | ID | Élément | Tâche | Est. |
 |----|---------|-------|------|
-| T-060-05 | US-060 | Taux manquant (CA-4) + période clôturée 423 (CA-5) | 4h |
 | T-060-06 | US-060 | Dashboard financier (fraîcheur, progression, audit trail) | 4h |
 | T-060-07 | US-060 | Tests snapshot + non-divergence + charge | 5h |
 | T-060-08 | US-060 | Doc + revue sécurité | 2h |
@@ -42,7 +41,8 @@
 | T-060-01 | US-060 | `ValidateTimeEntries` publie `TimeEntriesValidated` (couplage par événement, transport async) | `7fe4d14` |
 | T-060-02 | US-060 | Handler async `ValueValidatedTimeHandler` + snapshot figé (INV-2/3) + pivot `ProfileAssignment` + `TimeValuationCalculator` | `44b35ae` |
 | T-060-03 | US-060 | Entité `TimeEntryValuation` figée + repository + migration RLS | `afc95f9` |
-| T-060-04 | US-060 | `RevenueRecognized` réel (temps × taux figé) → `EventStore` → projecteur → `fact_project_revenue` ; réducteur `RecognizedRevenue` (dernière reconnaissance/imputation gagne, non-divergence par construction) — +8 tests | _à committer_ |
+| T-060-04 | US-060 | `RevenueRecognized` réel (temps × taux figé) → `EventStore` → projecteur → `fact_project_revenue` ; réducteur `RecognizedRevenue` (dernière reconnaissance/imputation gagne, non-divergence par construction) — +8 tests | `9cfa6e8` |
+| T-060-05 | US-060 | CA-4 re-déclenchement auto (`ProfileRateDefined` async → re-valorise les `missing_rate`) + CA-5 `POST /api/valorisation/recompute` → **423** sur période clôturée (stub `PeriodClosureStatus` en attendant US-057), recalcul tracé ; permission `RECOMPUTE_VALUATION` — +10 tests | _à committer_ |
 
 ## 🚫 Bloqué
 | ID | Élément | Raison | Action |

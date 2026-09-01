@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\Pricing;
 
 use App\Application\Authorization\Authorizer;
+use App\Application\Pricing\Message\ProfileRateDefined;
 use App\Domain\Authorization\Permission;
 use App\Domain\Authorization\SecurityAuditLogger;
 use App\Domain\Pricing\PricingException;
@@ -16,6 +17,7 @@ use App\Domain\Shared\EffectivePeriod;
 use App\Domain\Tenant\TenantId;
 use App\Domain\User\User;
 use Psr\Clock\ClockInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Uid\Uuid;
 
 /**
@@ -37,6 +39,7 @@ final readonly class DefineProfileRate
         private ProfileRateRepository $rates,
         private ClockInterface $clock,
         private SecurityAuditLogger $audit,
+        private MessageBusInterface $bus,
     ) {
     }
 
@@ -87,6 +90,10 @@ final readonly class DefineProfileRate
             $actor->getUserIdentifier(),
             ['profile' => $profileId, 'rate' => $rate->id(), 'effective_from' => $period->from()->format('Y-m-d')],
         );
+
+        // Couplage par événement (US-060, CA-4) : un nouveau tarif re-déclenche la valorisation
+        // des imputations restées sans tarif pour ce tenant.
+        $this->bus->dispatch(new ProfileRateDefined($tenant->toString(), $profileId));
 
         return $rate->id();
     }

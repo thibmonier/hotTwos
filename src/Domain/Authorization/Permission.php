@@ -34,4 +34,7 @@ enum Permission: string
 
     /** Validation/refus des imputations de temps (chef de projet, sur ses projets — US-055). */
     case VALIDATE_TIME = 'validate:time';
+
+    /** Recalcul manuel de la valorisation d'une période (admin/contrôle de gestion — US-060, CA-5). */
+    case RECOMPUTE_VALUATION = 'recompute:valuation';
 }
