@@ -22,8 +22,13 @@ use Symfony\Component\Uid\Uuid;
 #[ORM\Entity]
 #[ORM\Table(name: 'absence_request')]
 #[ORM\Index(name: 'idx_absence_tenant_user', columns: ['tenant_id', 'user_id'])]
+#[ORM\Index(name: 'idx_absence_tenant_user_status', columns: ['tenant_id', 'user_id', 'status'])]
 class AbsenceRequest implements TenantOwned
 {
+    /** Bornes défensives : durée maximale d'une demande et longueur des champs libres. */
+    private const int MAX_SPAN_DAYS = 366;
+    private const int MAX_TEXT_LENGTH = 500;
+
     #[ORM\Id]
     #[ORM\Column(type: 'guid')]
     private string $id;
@@ -65,6 +70,12 @@ class AbsenceRequest implements TenantOwned
         if ($startDate > $endDate) {
             throw new InvalidArgumentException('La date de début doit précéder ou égaler la date de fin.');
         }
+        if ((int) $startDate->diff($endDate)->days > self::MAX_SPAN_DAYS) {
+            throw new InvalidArgumentException(sprintf('La durée d\'une absence ne peut pas dépasser %d jours.', self::MAX_SPAN_DAYS));
+        }
+        if (null !== $comment && mb_strlen($comment) > self::MAX_TEXT_LENGTH) {
+            throw new InvalidArgumentException('Le commentaire est trop long.');
+        }
 
         $this->id = Uuid::v7()->toRfc4122();
         $this->tenantId = $tenantId->toString();
@@ -89,6 +100,9 @@ class AbsenceRequest implements TenantOwned
         if ('' === trim($reason)) {
             throw new InvalidArgumentException('Un motif est obligatoire pour refuser une absence.');
         }
+        if (mb_strlen($reason) > self::MAX_TEXT_LENGTH) {
+            throw new InvalidArgumentException('Le motif de refus est trop long.');
+        }
 
         $this->status = AbsenceStatus::REJECTED;
         $this->rejectionReason = trim($reason);
@@ -110,7 +124,11 @@ class AbsenceRequest implements TenantOwned
         return $days;
     }
 
-    /** Le jour donné est-il couvert par cette absence (bornes incluses) ? */
+    /**
+     * Le jour donné est-il couvert (partiellement ou complètement) par cette absence (bornes
+     * incluses) ? Utilisé pour le blocage d'imputation (RG-TMP-3), qui ne distingue pas les demi-
+     * journées : une absence validée couvrant le jour bloque toute la production ce jour-là.
+     */
     public function coversDay(DateTimeImmutable $day): bool
     {
         $d = $day->format('Y-m-d');

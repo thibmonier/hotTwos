@@ -6,6 +6,7 @@ namespace App\Tests\Integration\Absence;
 
 use App\Domain\Absence\AbsenceRequest;
 use App\Domain\Absence\AbsenceType;
+use App\UI\Api\Resource\AbsenceBalanceResource;
 use App\UI\Api\Resource\AbsenceResource;
 use Doctrine\ORM\EntityManagerInterface;
 use ReflectionClass;
@@ -37,8 +38,10 @@ final class AbsenceRgpdComplianceTest extends KernelTestCase
 
     public function testNoHealthDataFieldOnApiResource(): void
     {
-        foreach (new ReflectionClass(AbsenceResource::class)->getProperties() as $property) {
-            self::assertFalse($this->isForbidden(strtolower($property->getName())), sprintf('Propriété d\'API de santé interdite (HAB-3) : %s', $property->getName()));
+        foreach ([AbsenceResource::class, AbsenceBalanceResource::class] as $resource) {
+            foreach (new ReflectionClass($resource)->getProperties() as $property) {
+                self::assertFalse($this->isForbidden(strtolower($property->getName())), sprintf('Propriété d\'API de santé interdite (HAB-3) : %s::%s', $resource, $property->getName()));
+            }
         }
     }
 

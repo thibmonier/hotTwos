@@ -129,6 +129,16 @@ final class AbsenceWorkflowTest extends TestCase
         $this->decideUseCase()->reject($this->tenant, $this->marc, $id, 'Trop tard');
     }
 
+    public function testManagerCannotDecideOwnAbsence(): void
+    {
+        // Marc (chef de projet, habilité VALIDATE_ABSENCE) déclare pour lui-même…
+        $id = $this->declareUseCase()->declare($this->tenant, $this->marc, $this->typeId, $this->date('2026-09-01'), $this->date('2026-09-05'));
+
+        // …et ne peut pas approuver sa propre demande (séparation des tâches).
+        $this->expectException(AbsenceException::class);
+        $this->decideUseCase()->approve($this->tenant, $this->marc, $id);
+    }
+
     private function declareUseCase(): DeclareAbsence
     {
         return new DeclareAbsence($this->types, $this->requests, $this->audit, $this->bus, $this->clock);

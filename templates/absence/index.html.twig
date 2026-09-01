@@ -23,6 +23,7 @@
             <form data-action="submit->absence#declare">
                 <label>Type
                     <select required data-absence-target="type">
+                        <option value="">— Choisir un type —</option>
                         {% for type in types %}
                             <option value="{{ type.id }}">{{ type.label }}</option>
                         {% endfor %}
@@ -32,7 +33,8 @@
                 <label>Au <input type="date" required data-absence-target="endDate"></label>
                 <label><input type="checkbox" checked data-absence-target="startsMorning"> Commence le matin</label>
                 <label><input type="checkbox" checked data-absence-target="endsAfternoon"> Finit l'après-midi</label>
-                <label>Commentaire (optionnel) <input type="text" data-absence-target="comment" placeholder="ex. Vacances d'été"></label>
+                <label>Commentaire (optionnel) <input type="text" maxlength="500" data-absence-target="comment" placeholder="ex. Vacances d'été" aria-describedby="comment-warning"></label>
+                <p id="comment-warning" class="hint">⚠️ Ne renseignez <strong>aucune donnée de santé</strong> (motif médical, diagnostic) — RGPD.</p>
                 <button type="submit">Soumettre la demande</button>
             </form>
             <p class="hint" aria-live="polite" data-absence-target="status"></p>

@@ -72,6 +72,12 @@ final readonly class DecideAbsence
         if (AbsenceStatus::PENDING !== $request->status()) {
             throw new AbsenceException('Cette demande d\'absence a déjà été traitée.');
         }
+        // Séparation des tâches : un collaborateur ne peut pas décider de sa propre absence.
+        if ($request->userId() === $manager->id()) {
+            $this->audit->record('absence_auto_decision_refusee', $tenant->toString(), $manager->getUserIdentifier(), ['request' => $requestId]);
+
+            throw new AbsenceException('Vous ne pouvez pas décider de votre propre demande d\'absence.');
+        }
 
         return $request;
     }
