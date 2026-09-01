@@ -57,6 +57,8 @@ security:
         # Absences US-054 : authentifié ; l'habilitation de décision (VALIDATE_ABSENCE) est applicative.
         - { path: ^/api/absences, roles: ROLE_USER }
         - { path: ^/absences, roles: ROLE_USER }
+        # Complétude US-058 : authentifié ; le périmètre équipe (VIEW_TEAM_COMPLETENESS) est applicatif.
+        - { path: ^/api/completude, roles: ROLE_USER }
 
 when@test:
     security:
