@@ -23,7 +23,7 @@ final readonly class CompletenessGrid
 {
     private const int WORKING_DAYS = 5;
     /** Délai indicatif « J+2 ouvré » après la fin de semaine (raffinement jours fériés ultérieur). */
-    private const int DEADLINE_OFFSET_DAYS = 8;
+    public const int DEADLINE_OFFSET_DAYS = 8;
 
     public function __construct(
         private TimeEntryRepository $entries,
@@ -77,11 +77,21 @@ final readonly class CompletenessGrid
         if (0 === $expected || $filled >= $expected) {
             return CompletenessState::SUBMITTED;
         }
-        if ($now < $monday->modify(sprintf('+%d days', self::DEADLINE_OFFSET_DAYS))) {
+        if ($now < self::deadline($monday)) {
             return CompletenessState::IN_PROGRESS;
         }
 
         return 0 === $filled ? CompletenessState::EMPTY_LATE : CompletenessState::PARTIAL;
+    }
+
+    /**
+     * Échéance de complétude (« J+2 ouvré ») d'une semaine : instant à partir duquel une semaine
+     * incomplète bascule en retard. Source unique du délai, réutilisée par le moteur de relances
+     * (US-056) qui ajoute son propre délai initial par-dessus.
+     */
+    public static function deadline(DateTimeImmutable $weekStart): DateTimeImmutable
+    {
+        return $weekStart->modify(sprintf('+%d days', self::DEADLINE_OFFSET_DAYS));
     }
 
     /**
