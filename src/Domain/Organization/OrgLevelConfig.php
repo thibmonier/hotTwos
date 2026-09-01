@@ -78,6 +78,9 @@ class OrgLevelConfig implements TenantOwned
         if ('' === $trimmed) {
             throw new InvalidArgumentException("Le nom d'un niveau hiérarchique est obligatoire.");
         }
+        if (mb_strlen($trimmed) > 255) {
+            throw new InvalidArgumentException("Le nom d'un niveau hiérarchique ne peut pas dépasser 255 caractères.");
+        }
 
         return $trimmed;
     }

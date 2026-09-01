@@ -12,6 +12,7 @@ use App\Domain\Organization\OrgUnit;
 use App\Domain\Organization\OrgUnitRepository;
 use App\Domain\Tenant\TenantId;
 use App\Domain\User\User;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * Paramétrage de la hiérarchie organisationnelle (US-010, T-010-04).
@@ -37,6 +38,7 @@ final readonly class ConfigureOrgHierarchy
         $this->authorizer->ensureCan($actor, Permission::MANAGE_ORGANIZATION);
 
         if (null !== $parentId) {
+            $this->requireUuid($parentId);
             $parent = $this->requireUnit($tenant, $parentId);
             if (!$parent->isActive()) {
                 throw new OrganizationException('Impossible de rattacher une unité sous une unité désactivée.');
@@ -58,9 +60,14 @@ final readonly class ConfigureOrgHierarchy
     {
         $this->authorizer->ensureCan($actor, Permission::MANAGE_ORGANIZATION);
 
+        $this->requireUuid($unitId);
         $unit = $this->requireUnit($tenant, $unitId);
 
         if (null !== $newParentId) {
+            $this->requireUuid($newParentId);
+            if ($newParentId === $unitId) {
+                throw new OrganizationException('Une unité ne peut pas être son propre parent.');
+            }
             $this->requireUnit($tenant, $newParentId);
             $this->guardNoCycle($tenant, $unitId, $newParentId);
         }
@@ -77,6 +84,7 @@ final readonly class ConfigureOrgHierarchy
     {
         $this->authorizer->ensureCan($actor, Permission::MANAGE_ORGANIZATION);
 
+        $this->requireUuid($unitId);
         $unit = $this->requireUnit($tenant, $unitId);
         $unit->deactivate();
         $this->units->save($unit);
@@ -111,5 +119,12 @@ final readonly class ConfigureOrgHierarchy
         }
 
         return $unit;
+    }
+
+    private function requireUuid(string $value): void
+    {
+        if (!Uuid::isValid($value)) {
+            throw new OrganizationException('Identifiant d\'unité invalide.');
+        }
     }
 }

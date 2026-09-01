@@ -106,6 +106,9 @@ class OrgUnit implements TenantOwned
         if ('' === $trimmed) {
             throw new InvalidArgumentException("Le nom d'une unité organisationnelle est obligatoire.");
         }
+        if (mb_strlen($trimmed) > 255) {
+            throw new InvalidArgumentException("Le nom d'une unité organisationnelle ne peut pas dépasser 255 caractères.");
+        }
 
         return $trimmed;
     }

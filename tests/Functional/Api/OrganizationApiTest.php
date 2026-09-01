@@ -24,11 +24,10 @@ use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
  */
 final class OrganizationApiTest extends WebTestCase
 {
-    private const string USER_ID = '018f9c4e-0000-7000-8000-0000000000aa';
-
     private KernelBrowser $client;
     private EntityManagerInterface $em;
     private TenantId $tenant;
+    private string $collaboratorId;
 
     /** @var list<\Doctrine\ORM\Mapping\ClassMetadata<object>> */
     private array $schema;
@@ -53,9 +52,12 @@ final class OrganizationApiTest extends WebTestCase
         new InitializeDefaultRoles(new DoctrineRoleRepository($this->em))->forTenant($this->tenant);
 
         $hasher = new SodiumPasswordHasher();
+        $collaborator = new User($this->tenant, 'camille@agence.test', $hasher->hash('motdepasse-solide'), ['Collaborateur']);
+        $this->collaboratorId = $collaborator->id();
         $this->em->persist(new Tenant($this->tenant, 'Agence A'));
         $this->em->persist(new User($this->tenant, 'admin@agence.test', $hasher->hash('motdepasse-solide'), ['Administrateur']));
         $this->em->persist(new User($this->tenant, 'marc@agence.test', $hasher->hash('motdepasse-solide'), ['Chef de projet']));
+        $this->em->persist($collaborator);
         $this->em->flush();
     }
 
@@ -102,7 +104,7 @@ final class OrganizationApiTest extends WebTestCase
         $unitId = $this->createUnit('Équipe Data');
 
         $this->postJson('/api/org-memberships', [
-            'userId' => self::USER_ID,
+            'userId' => $this->collaboratorId,
             'orgUnitId' => $unitId,
             'effectiveFrom' => '2026-01-01',
             'effectiveTo' => '2026-07-01',
@@ -110,7 +112,7 @@ final class OrganizationApiTest extends WebTestCase
         self::assertResponseStatusCodeSame(201);
 
         $this->postJson('/api/org-memberships', [
-            'userId' => self::USER_ID,
+            'userId' => $this->collaboratorId,
             'orgUnitId' => $unitId,
             'effectiveFrom' => '2026-03-01',
         ]);

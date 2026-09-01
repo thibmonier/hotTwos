@@ -15,6 +15,8 @@ use App\Domain\Organization\OrgUnitRepository;
 use App\Domain\Shared\EffectivePeriod;
 use App\Domain\Tenant\TenantId;
 use App\Domain\User\User;
+use App\Domain\User\UserRepository;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * Rattachement historisé d'un collaborateur à une unité (US-010, T-010-04, EF-REF-2).
@@ -29,6 +31,7 @@ final readonly class AttachCollaborator
         private Authorizer $authorizer,
         private OrgUnitRepository $units,
         private OrgMembershipRepository $memberships,
+        private UserRepository $users,
         private SecurityAuditLogger $audit,
     ) {
     }
@@ -36,6 +39,15 @@ final readonly class AttachCollaborator
     public function attach(TenantId $tenant, User $actor, string $userId, string $unitId, EffectivePeriod $period): string
     {
         $this->authorizer->ensureCan($actor, Permission::MANAGE_ORGANIZATION);
+
+        // Validation des identifiants avant toute requête (évite un 500 sur un id mal formé).
+        $this->requireUuid($userId, 'du collaborateur');
+        $this->requireUuid($unitId, "de l'unité");
+
+        // Deny by default : le collaborateur doit exister dans le tenant courant.
+        if (!$this->users->existsInTenant($tenant, $userId)) {
+            throw new OrganizationException('Collaborateur inconnu dans ce tenant.');
+        }
 
         $unit = $this->units->find($tenant, $unitId);
         if (!$unit instanceof OrgUnit) {
@@ -63,6 +75,13 @@ final readonly class AttachCollaborator
             if ($existing->period()->overlaps($period)) {
                 throw new OrganizationException('Le rattachement chevauche une période existante pour ce collaborateur.');
             }
+        }
+    }
+
+    private function requireUuid(string $value, string $label): void
+    {
+        if (!Uuid::isValid($value)) {
+            throw new OrganizationException(sprintf('Identifiant %s invalide.', $label));
         }
     }
 }

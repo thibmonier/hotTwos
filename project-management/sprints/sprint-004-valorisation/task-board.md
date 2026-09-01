@@ -7,10 +7,6 @@
 
 | ID | Élément | Tâche | Est. |
 |----|---------|-------|------|
-| T-010-05 | US-010 | API DTO unités + rattachements | 3h |
-| T-010-06 | US-010 | Écran hiérarchie + rattachements | 4h |
-| T-010-07 | US-010 | Tests (VO, cycle, isolation, 403) | 3h |
-| T-010-08 | US-010 | Doc + revue sécurité | 2h |
 | T-011-01 | US-011 | `Profile` + mode de calcul + migration + RLS | 2h |
 | T-011-02 | US-011 | `ProfileRate` historisé + migration + repository | 3h |
 | T-011-03 | US-011 | Moteur `RateResolver` (tarif à une date, `ARC-6`) | 4h |
@@ -44,15 +40,20 @@
 | T-010-01 | US-010 | VO `EffectivePeriod` (semi-ouvert `[from,to)`, `contains`/`overlaps`/`equals`, pur) — 13 tests | `da7cff8` |
 | T-010-02 | US-010 | `OrgUnit` + `OrgLevelConfig` + migration + **RLS** ; `schema:validate` OK — 9 tests | `da7cff8` |
 | T-010-03 | US-010 | `OrgMembership` (historisé, VO reconstruit) + migration + RLS + `OrgMembershipRepository` (port+Doctrine) — 5 tests (unit+intégration) | `da7cff8` |
-| T-010-04 | US-010 | Cas d'usage `ConfigureOrgHierarchy` (cycle CA-6, désactivation RG-REF-1) + `AttachCollaborator` (non-chevauchement) ; permission `MANAGE_ORGANIZATION` ; `OrgUnitRepository` — 13 tests | _à committer_ |
+| T-010-04 | US-010 | Cas d'usage `ConfigureOrgHierarchy` (cycle CA-6, désactivation RG-REF-1) + `AttachCollaborator` (non-chevauchement) ; permission `MANAGE_ORGANIZATION` ; `OrgUnitRepository` — 13 tests | `ba69328` |
+| T-010-05 | US-010 | API Platform (unités + rattachements + timeline) ; DELETE=désactivation ; 403/422 via listeners — 5 tests fonctionnels | `b658956` |
+| T-010-06 | US-010 | Écran `/organisation` (arbre, création/désactivation/rattachement) Twig/Turbo/Stimulus accessible — 2 tests | `2329815` |
+| T-010-07 | US-010 | Test RLS d'intrusion tables org + fix policy texte robuste (+ cycle/403/422 déjà couverts) — 1 test | `f5c8131` |
+| T-010-08 | US-010 | Doc module + revues sécurité/Symfony ; durcissement (existence collaborateur, validation UUID, borne nom, ensureCan item provider) — `UserRepository` | _à committer_ |
 
 ## 🚫 Bloqué
 | ID | Élément | Raison | Action |
 |----|---------|--------|--------|
 
 ## Métriques
-- **Tâches** : 26 engagées · 5 terminées (19 %) · +2 en réserve (T-TECH-03/04)
-- **Heures** : 84h estimées (engagé) · ~14h consommées (T-TECH-01 + T-010-01→04)
+- **Tâches** : 26 engagées · 9 terminées (35 %) · +2 en réserve (T-TECH-03/04)
+- **Heures** : 84h estimées (engagé) · ~28h consommées (T-TECH-01 + US-010 complète)
+- **US-010 : ✅ TERMINÉE** (8/8 tâches, revues sécurité/Symfony passées). Prochain : US-011 (RateResolver).
 - **Bonus hors sprint** : dockerisation complète de l'outillage (Makefile, hook pre-commit, phpunit) — aucune commande sur l'hôte
 - **Points** : 21 engagés (US-010 : 5 · US-011 : 8 · US-060 : 8)
 - **Critère de sortie phare** : **temps validé → marge projet** avec tarif temporel **figé** (snapshot `INV-2/INV-3`), non-divergence verte (`ARC-113`).

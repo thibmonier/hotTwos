@@ -54,6 +54,9 @@ services:
     App\Domain\Project\ProjectRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineProjectRepository'
     App\Domain\Timesheet\TimeEntryRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineTimeEntryRepository'
 
+    # Port utilisateur (lecture, US-010 — validation d'appartenance tenant).
+    App\Domain\User\UserRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineUserRepository'
+
     # Ports organisation (US-010, DIP).
     App\Domain\Organization\OrgUnitRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineOrgUnitRepository'
     App\Domain\Organization\OrgMembershipRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineOrgMembershipRepository'

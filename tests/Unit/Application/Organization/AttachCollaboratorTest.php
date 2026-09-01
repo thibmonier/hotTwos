@@ -19,6 +19,7 @@ use App\Tests\Support\Authorization\InMemoryRoleRepository;
 use App\Tests\Support\Authorization\RecordingSecurityAuditLogger;
 use App\Tests\Support\Organization\InMemoryOrgMembershipRepository;
 use App\Tests\Support\Organization\InMemoryOrgUnitRepository;
+use App\Tests\Support\User\InMemoryUserRepository;
 use DateTimeImmutable;
 use DateTimeZone;
 use PHPUnit\Framework\TestCase;
@@ -48,8 +49,10 @@ final class AttachCollaboratorTest extends TestCase
 
         $this->units = new InMemoryOrgUnitRepository();
         $this->memberships = new InMemoryOrgMembershipRepository();
+        $users = new InMemoryUserRepository();
+        $users->register($this->tenant, self::USER);
         $audit = new RecordingSecurityAuditLogger();
-        $this->attach = new AttachCollaborator(new Authorizer($roles, $audit), $this->units, $this->memberships, $audit);
+        $this->attach = new AttachCollaborator(new Authorizer($roles, $audit), $this->units, $this->memberships, $users, $audit);
 
         $this->admin = new User($this->tenant, 'admin@agence.test', 'hash', ['Administrateur']);
         $this->collaborator = new User($this->tenant, 'collab@agence.test', 'hash', ['Collaborateur']);
@@ -85,6 +88,14 @@ final class AttachCollaboratorTest extends TestCase
 
         $this->expectException(OrganizationException::class);
         $this->attach->attach($this->tenant, $this->admin, self::USER, $this->unit->id(), EffectivePeriod::since($this->date('2026-01-01')));
+    }
+
+    public function testAttachmentOfUnknownCollaboratorFails(): void
+    {
+        $unknownButValidUuid = TenantId::generate()->toString();
+
+        $this->expectException(OrganizationException::class);
+        $this->attach->attach($this->tenant, $this->admin, $unknownButValidUuid, $this->unit->id(), EffectivePeriod::since(self::date('2026-01-01')));
     }
 
     public function testOverlappingAttachmentIsRejected(): void

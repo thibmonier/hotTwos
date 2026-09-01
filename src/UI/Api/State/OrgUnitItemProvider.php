@@ -6,6 +6,8 @@ namespace App\UI\Api\State;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
+use App\Application\Authorization\Authorizer;
+use App\Domain\Authorization\Permission;
 use App\Domain\Organization\OrgUnit;
 use App\Domain\Organization\OrgUnitRepository;
 use App\UI\Api\Resource\OrgUnitResource;
@@ -19,6 +21,7 @@ use App\UI\Api\Resource\OrgUnitResource;
 final readonly class OrgUnitItemProvider implements ProviderInterface
 {
     public function __construct(
+        private Authorizer $authorizer,
         private CurrentUser $currentUser,
         private OrgUnitRepository $units,
     ) {
@@ -27,6 +30,7 @@ final readonly class OrgUnitItemProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?OrgUnitResource
     {
         $user = $this->currentUser->require();
+        $this->authorizer->ensureCan($user, Permission::MANAGE_ORGANIZATION);
         $id = is_string($uriVariables['id'] ?? null) ? $uriVariables['id'] : '';
 
         $unit = $this->units->find($user->tenantId(), $id);
