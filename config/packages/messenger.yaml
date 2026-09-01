@@ -40,6 +40,9 @@ framework:
             # US-054 CA-1 : notifications d'absence (manager / demandeur) hors requête.
             'App\Application\Absence\Message\AbsenceDeclared': async
             'App\Application\Absence\Message\AbsenceDecided': async
+            # US-056 T-056-03 : calcul + émission des relances hors requête (RLS armée par le
+            # middleware à la consommation ; jamais sync — le contexte de la requête serait effacé).
+            'App\Application\Reminder\Message\SendDueReminders': async
 
 when@test:
     framework:

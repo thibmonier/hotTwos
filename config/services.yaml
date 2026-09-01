@@ -97,3 +97,5 @@ services:
     App\Domain\Reminder\ReminderRuleRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineReminderRuleRepository'
     App\Domain\Reminder\ReminderPreferenceRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineReminderPreferenceRepository'
     App\Domain\Reminder\ReminderLogRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineReminderLogRepository'
+    App\Domain\Reminder\ReminderNotifier: '@App\Infrastructure\Reminder\LoggingReminderNotifier'
+    App\Domain\Tenant\TenantRegistry: '@App\Infrastructure\Persistence\Doctrine\DoctrineTenantRegistry'
