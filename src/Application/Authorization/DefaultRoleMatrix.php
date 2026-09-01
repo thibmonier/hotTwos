@@ -54,6 +54,7 @@ final class DefaultRoleMatrix
             new RoleDefinition('Administrateur', [
                 Permission::MANAGE_ROLES,
                 Permission::MANAGE_ORGANIZATION,
+                Permission::MANAGE_PRICING,
                 Permission::VIEW_PROJECT,
                 Permission::CREATE_PROJECT,
                 Permission::EDIT_PROJECT,

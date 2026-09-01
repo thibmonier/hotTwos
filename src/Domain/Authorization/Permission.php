@@ -29,6 +29,9 @@ enum Permission: string
     /** Paramétrage de l'organisation : hiérarchie et rattachements des collaborateurs (US-010, admin tenant). */
     case MANAGE_ORGANIZATION = 'manage:organization';
 
+    /** Paramétrage de la tarification : profils, coûts de revient et taux de vente (US-011, admin tenant). */
+    case MANAGE_PRICING = 'manage:pricing';
+
     /** Validation/refus des imputations de temps (chef de projet, sur ses projets — US-055). */
     case VALIDATE_TIME = 'validate:time';
 }
