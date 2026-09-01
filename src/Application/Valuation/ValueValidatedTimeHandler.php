@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Application\Valuation;
 
 use App\Application\Timesheet\Message\TimeEntriesValidated;
+use App\Domain\Analytics\EventStore;
+use App\Domain\Analytics\RevenueRecognized;
 use App\Domain\Pricing\NoEffectiveRateException;
 use App\Domain\Pricing\ProfileAssignmentRepository;
 use App\Domain\Pricing\RateResolver;
@@ -14,6 +16,7 @@ use App\Domain\Timesheet\TimeEntryRepository;
 use App\Domain\Valuation\TimeEntryValuation;
 use App\Domain\Valuation\TimeEntryValuationRepository;
 use App\Domain\Valuation\TimeValuationCalculator;
+use App\Domain\Valuation\ValuationStatus;
 use DateTimeImmutable;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -24,6 +27,11 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
  * imputation, résout le profil du collaborateur à la date de prestation, puis le tarif en vigueur
  * (RateResolver, ARC-6), calcule coût et revenu, et **fige** le snapshot (INV-2/INV-3). En
  * l'absence de profil ou de tarif à la date, la valorisation est marquée `missing_rate` (CA-4).
+ *
+ * Chaque valorisation figée `valued` produit un événement analytique {@see RevenueRecognized}
+ * appended à l'`EventStore` (US-060, T-060-04) : le projecteur en dérive `fact_project_revenue`,
+ * jamais écrit directement (ADR-9). Une imputation sans tarif (`missing_rate`) ne reconnaît
+ * aucun CA — la valorisation reste partielle jusqu'à correction du tarif (CA-4).
  */
 #[AsMessageHandler]
 final readonly class ValueValidatedTimeHandler
@@ -34,6 +42,7 @@ final readonly class ValueValidatedTimeHandler
         private RateResolver $rates,
         private TimeValuationCalculator $calculator,
         private TimeEntryValuationRepository $valuations,
+        private EventStore $events,
     ) {
     }
 
@@ -43,8 +52,35 @@ final readonly class ValueValidatedTimeHandler
         $validatedAt = $message->validatedAt();
 
         foreach ($this->entries->findByIds($tenant, $message->timeEntryIds()) as $entry) {
-            $this->valuations->save($this->value($tenant, $entry, $validatedAt));
+            $valuation = $this->value($tenant, $entry, $validatedAt);
+            $this->valuations->save($valuation);
+            $this->recognizeRevenue($tenant, $entry, $valuation, $validatedAt);
         }
+    }
+
+    /**
+     * Reconnaît le CA réel de l'imputation valorisée (temps validé × taux de vente figé)
+     * sur le mois de la prestation. Idempotent à la re-valorisation via `sourceTimeEntryId`
+     * (la reconnaissance précédente est remplacée, pas cumulée — voir {@see RevenueRecognized}).
+     */
+    private function recognizeRevenue(
+        TenantId $tenant,
+        TimeEntry $entry,
+        TimeEntryValuation $valuation,
+        DateTimeImmutable $occurredAt,
+    ): void {
+        if (ValuationStatus::VALUED !== $valuation->status()) {
+            return;
+        }
+
+        $this->events->append(new RevenueRecognized(
+            $tenant,
+            $entry->workDate()->format('Y-m'),
+            $entry->projectId(),
+            $valuation->revenueCents(),
+            $occurredAt,
+            $entry->id(),
+        ));
     }
 
     private function value(TenantId $tenant, TimeEntry $entry, DateTimeImmutable $validatedAt): TimeEntryValuation

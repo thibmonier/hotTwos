@@ -7,10 +7,6 @@
 
 | ID | Élément | Tâche | Est. |
 |----|---------|-------|------|
-| T-060-01 | US-060 | Message `TimeEntriesValidated` à la validation | 3h |
-| T-060-02 | US-060 | Handler async valorisation + snapshot figé | 5h |
-| T-060-03 | US-060 | Entité `TimeEntryValuation` + migration + RLS | 2h |
-| T-060-04 | US-060 | `RevenueRecognized` réel → projecteur → fait | 3h |
 | T-060-05 | US-060 | Taux manquant (CA-4) + période clôturée 423 (CA-5) | 4h |
 | T-060-06 | US-060 | Dashboard financier (fraîcheur, progression, audit trail) | 4h |
 | T-060-07 | US-060 | Tests snapshot + non-divergence + charge | 5h |
@@ -43,6 +39,10 @@
 | T-011-06 | US-011 | Écran `/profils` + timeline (ligne en vigueur CA-4) Twig/Stimulus — 2 tests | `184558e` |
 | T-011-07 | US-011 | Test RLS d'intrusion tables tarification (+ moteur/règles déjà couverts) — 1 test | `e39c49c` |
 | T-011-08 | US-011 | Doc module + revues sécurité/Symfony ; durcissement (traçage lecture coût HAB-6, plafond montants, date stricte, profil désactivé, rétroactif du jour) — 3 tests | _à committer_ |
+| T-060-01 | US-060 | `ValidateTimeEntries` publie `TimeEntriesValidated` (couplage par événement, transport async) | `7fe4d14` |
+| T-060-02 | US-060 | Handler async `ValueValidatedTimeHandler` + snapshot figé (INV-2/3) + pivot `ProfileAssignment` + `TimeValuationCalculator` | `44b35ae` |
+| T-060-03 | US-060 | Entité `TimeEntryValuation` figée + repository + migration RLS | `afc95f9` |
+| T-060-04 | US-060 | `RevenueRecognized` réel (temps × taux figé) → `EventStore` → projecteur → `fact_project_revenue` ; réducteur `RecognizedRevenue` (dernière reconnaissance/imputation gagne, non-divergence par construction) — +8 tests | _à committer_ |
 
 ## 🚫 Bloqué
 | ID | Élément | Raison | Action |

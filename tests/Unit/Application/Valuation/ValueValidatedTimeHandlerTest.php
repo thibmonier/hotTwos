@@ -14,6 +14,7 @@ use App\Domain\Tenant\TenantId;
 use App\Domain\Timesheet\TimeEntry;
 use App\Domain\Valuation\TimeValuationCalculator;
 use App\Domain\Valuation\ValuationStatus;
+use App\Tests\Support\Analytics\InMemoryEventStore;
 use App\Tests\Support\Pricing\InMemoryProfileAssignmentRepository;
 use App\Tests\Support\Pricing\InMemoryProfileRateRepository;
 use App\Tests\Support\Timesheet\InMemoryTimeEntryRepository;
@@ -37,6 +38,7 @@ final class ValueValidatedTimeHandlerTest extends TestCase
     private InMemoryProfileAssignmentRepository $assignments;
     private InMemoryProfileRateRepository $rates;
     private InMemoryTimeEntryValuationRepository $valuations;
+    private InMemoryEventStore $events;
     private ValueValidatedTimeHandler $handler;
 
     protected function setUp(): void
@@ -46,12 +48,14 @@ final class ValueValidatedTimeHandlerTest extends TestCase
         $this->assignments = new InMemoryProfileAssignmentRepository();
         $this->rates = new InMemoryProfileRateRepository();
         $this->valuations = new InMemoryTimeEntryValuationRepository();
+        $this->events = new InMemoryEventStore();
         $this->handler = new ValueValidatedTimeHandler(
             $this->entries,
             $this->assignments,
             new RateResolver($this->rates),
             new TimeValuationCalculator(),
             $this->valuations,
+            $this->events,
         );
     }
 
@@ -102,6 +106,36 @@ final class ValueValidatedTimeHandlerTest extends TestCase
         $this->handle([$entryId]);
 
         self::assertSame(ValuationStatus::MISSING_RATE, $this->valuations->findForTimeEntry($this->tenant, $entryId)?->status());
+    }
+
+    public function testValuedEntryRecognizesRealRevenueEvent(): void
+    {
+        $this->assignProfile();
+        $this->rates->save(new ProfileRate($this->tenant, self::PROFILE, EffectivePeriod::since($this->date('2026-01-01')), 45000, 78000));
+        $entryId = $this->saveEntry($this->date('2026-06-15'), 420);
+
+        $this->handle([$entryId]);
+
+        self::assertCount(1, $this->events->appended, 'Une imputation valorisée reconnaît un CA réel (T-060-04).');
+        $event = $this->events->appended[0];
+        self::assertSame('revenue_recognized', $event->name());
+        self::assertSame([
+            'period' => '2026-06',
+            'project_ref' => self::PROJECT,
+            'amount_cents' => 78000,
+            'source_time_entry_id' => $entryId,
+        ], $event->payload(), 'CA reconnu sur le mois de prestation, montant = revenu figé, source tracée.');
+    }
+
+    public function testMissingRateRecognizesNoRevenue(): void
+    {
+        $this->assignProfile();
+        // Aucun tarif : valorisation partielle (missing_rate) → aucun CA reconnu (CA-4).
+        $entryId = $this->saveEntry($this->date('2026-06-15'), 420);
+
+        $this->handle([$entryId]);
+
+        self::assertSame([], $this->events->appended);
     }
 
     private function assignProfile(): void
