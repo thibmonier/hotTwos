@@ -6,6 +6,13 @@
     <main class="container" data-controller="timesheet" data-timesheet-week-start-value="{{ weekStart }}">
         <h1>Saisie du temps</h1>
 
+        {% if reminderLateWeeks %}
+            <p class="reminder-banner" role="status">
+                <span aria-hidden="true">⏳</span>
+                Vous avez désactivé les relances automatiques. Il vous reste {{ reminderLateWeeks }} semaine{{ reminderLateWeeks > 1 ? 's' : '' }} en retard à compléter.
+            </p>
+        {% endif %}
+
         <nav class="week-nav">
             <a href="{{ path('timesheet_week', { date: prevDate }) }}" rel="prev">← Semaine précédente</a>
             <strong>{{ weekLabel }}</strong>

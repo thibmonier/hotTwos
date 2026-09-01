@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Timesheet;
 
 use App\Domain\Project\Project;
+use App\Domain\Reminder\ReminderPreference;
 use App\Domain\Tenant\Tenant;
 use App\Domain\Tenant\TenantId;
 use App\Domain\Absence\AbsenceRequest;
@@ -43,6 +44,7 @@ final class WeekBatchTest extends WebTestCase
             $this->em->getClassMetadata(TimeEntry::class),
             $this->em->getClassMetadata(AccountingPeriod::class),
             $this->em->getClassMetadata(AbsenceRequest::class),
+            $this->em->getClassMetadata(ReminderPreference::class),
         ];
         $tool = new SchemaTool($this->em);
         $tool->dropSchema($this->schema);

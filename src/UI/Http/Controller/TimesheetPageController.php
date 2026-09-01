@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\UI\Http\Controller;
 
+use App\Application\Reminder\ReminderBanner;
 use App\Application\Timesheet\EnsureAbsenceProject;
 use App\Domain\Project\Project;
 use App\Domain\Project\ProjectRepository;
@@ -28,6 +29,7 @@ final class TimesheetPageController extends AbstractController
         private readonly ProjectRepository $projects,
         private readonly TimeEntryRepository $entries,
         private readonly EnsureAbsenceProject $ensureAbsenceProject,
+        private readonly ReminderBanner $reminderBanner,
     ) {
     }
 
@@ -61,10 +63,13 @@ final class TimesheetPageController extends AbstractController
             $this->projects->findAllActive($user->tenantId()),
         );
 
+        $reminderLateWeeks = $this->reminderBanner->lateWeeksForOptedOut($user);
+
         return $this->render('timesheet/week.html.twig', [
             'days' => $days,
             'projects' => $projects,
             'grid' => $grid,
+            'reminderLateWeeks' => $reminderLateWeeks > 0 ? $reminderLateWeeks : null,
             'weekStart' => $monday->format('Y-m-d'),
             'weekLabel' => sprintf('Semaine du %s au %s', $monday->format('d/m/Y'), $sunday->format('d/m/Y')),
             'prevDate' => $monday->modify('-7 day')->format('Y-m-d'),

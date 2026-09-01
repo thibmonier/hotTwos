@@ -1,3 +1,92 @@
 body {
     background-color: skyblue;
 }
+
+/* Utilitaire d'accessibilité : masque visuellement un contenu tout en le laissant lisible par les
+   technologies d'assistance (titres de section, légendes de tableau). Référencé par plusieurs écrans. */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Texte d'aide secondaire, affiché sous un champ ou un contrôle. */
+.hint {
+    display: block;
+    font-size: 0.9em;
+    color: #555;
+}
+
+/* Messages flash (PRG). */
+.flash {
+    padding: 0.5rem 0.75rem;
+    border-left: 4px solid #999;
+    margin-bottom: 0.75rem;
+}
+.flash-success {
+    border-left-color: #2e7d32;
+}
+.flash-error {
+    border-left-color: #c62828;
+}
+
+/* Focus visible renforcé (WCAG 2.4.7) sur les contrôles interactifs. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+    outline: 3px solid #0b5fff;
+    outline-offset: 2px;
+}
+
+/* US-056 — écran de paramétrage des relances. */
+.reminder-master-toggle {
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+/* État désactivé : le fieldset porte l'attribut natif `disabled` (posé par Stimulus). */
+fieldset:disabled {
+    opacity: 0.5;
+}
+.reminder-preview {
+    list-style: none;
+    padding: 0;
+}
+.reminder-preview li {
+    padding: 0.25rem 0;
+}
+/* « Escaladé » : accent sobre, jamais de rouge alarmant (réservé aux vraies erreurs). */
+.badge-escalated {
+    border: 1px solid #777;
+    border-radius: 3px;
+    padding: 0 0.4rem;
+    font-size: 0.8em;
+}
+.is-escalated {
+    border-left: 3px solid #777;
+    padding-left: 0.4rem;
+}
+.reminders-history {
+    border-collapse: collapse;
+    width: 100%;
+}
+.reminders-history th,
+.reminders-history td {
+    padding: 0.4rem 0.6rem;
+    text-align: left;
+}
+
+/* Bandeau discret de rappel dans l'écran de saisie (opt-out + retard) — informatif, non alarmiste. */
+.reminder-banner {
+    border-left: 3px solid #ccc;
+    padding: 0.4rem 0.75rem;
+    margin-bottom: 1rem;
+    font-size: 0.9em;
+    color: #555;
+}

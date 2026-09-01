@@ -63,6 +63,7 @@ security:
         # Relances US-056 : authentifié ; l'habilitation de paramétrage (MANAGE_REMINDERS) est
         # applicative. L'opt-out individuel (^/api/me/reminder-preference) relève déjà de ^/api/me.
         - { path: ^/api/reminders, roles: ROLE_USER }
+        - { path: ^/relances, roles: ROLE_USER }
 
 when@test:
     security:
