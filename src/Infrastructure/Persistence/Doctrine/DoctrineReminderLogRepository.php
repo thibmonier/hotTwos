@@ -45,6 +45,24 @@ final readonly class DoctrineReminderLogRepository implements ReminderLogReposit
         return $log;
     }
 
+    public function sentOnDay(TenantId $tenant, string $userId, DateTimeImmutable $day): bool
+    {
+        $dayStart = $day->setTime(0, 0);
+
+        $count = $this->entityManager->createQuery(
+            'SELECT COUNT(l.id) FROM '.ReminderLog::class.' l'
+            .' WHERE l.tenantId = :tenant AND l.userId = :user'
+            .' AND l.sentAt >= :dayStart AND l.sentAt < :nextDay',
+        )
+            ->setParameter('tenant', $tenant->toString())
+            ->setParameter('user', $userId)
+            ->setParameter('dayStart', $dayStart, 'datetime_immutable')
+            ->setParameter('nextDay', $dayStart->modify('+1 day'), 'datetime_immutable')
+            ->getSingleScalarResult();
+
+        return is_numeric($count) && (int) $count > 0;
+    }
+
     public function findRecent(TenantId $tenant, ?string $userId, int $limit): array
     {
         $limit = max(1, min($limit, self::MAX_LIMIT));

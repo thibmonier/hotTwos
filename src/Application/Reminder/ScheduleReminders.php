@@ -68,12 +68,36 @@ final readonly class ScheduleReminders
             return [];
         }
 
-        $decisions = [];
+        /** @var array<string, list<ReminderDecision>> $candidatesByUser */
+        $candidatesByUser = [];
         foreach ($this->completeness->build($tenant, $userIds, $now, self::LOOKBACK_WEEKS) as $week) {
             $decision = $this->decide($tenant, $rule, $week, $now);
             if ($decision instanceof ReminderDecision) {
-                $decisions[] = $decision;
+                $candidatesByUser[$week->userId][] = $decision;
             }
+        }
+
+        return $this->capOnePerUserPerDay($tenant, $candidatesByUser, $now);
+    }
+
+    /**
+     * Plancher anti-spam par jour ouvré (CA-4) : au plus **une** relance par collaborateur et par
+     * jour. Un collaborateur déjà relancé aujourd'hui est ignoré ; sinon on ne retient que la dette
+     * la plus ancienne (semaine la plus lointaine), la plus urgente à rattraper.
+     *
+     * @param array<string, list<ReminderDecision>> $candidatesByUser
+     *
+     * @return list<ReminderDecision>
+     */
+    private function capOnePerUserPerDay(TenantId $tenant, array $candidatesByUser, DateTimeImmutable $now): array
+    {
+        $decisions = [];
+        foreach ($candidatesByUser as $userId => $candidates) {
+            if ($this->logs->sentOnDay($tenant, $userId, $now)) {
+                continue;
+            }
+            usort($candidates, static fn (ReminderDecision $a, ReminderDecision $b): int => $a->weekStart <=> $b->weekStart);
+            $decisions[] = $candidates[0];
         }
 
         return $decisions;

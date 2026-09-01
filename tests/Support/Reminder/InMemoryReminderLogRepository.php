@@ -39,6 +39,15 @@ final class InMemoryReminderLogRepository implements ReminderLogRepository
         return $latest;
     }
 
+    public function sentOnDay(TenantId $tenant, string $userId, DateTimeImmutable $day): bool
+    {
+        $target = $day->format('Y-m-d');
+
+        return array_any($this->logs, fn (ReminderLog $log): bool => $log->tenantId()->equals($tenant)
+            && $log->userId() === $userId
+            && $log->sentAt()->format('Y-m-d') === $target);
+    }
+
     public function findRecent(TenantId $tenant, ?string $userId, int $limit): array
     {
         $matching = array_values(array_filter(

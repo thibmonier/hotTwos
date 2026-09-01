@@ -15,10 +15,17 @@ interface ReminderLogRepository
     public function save(ReminderLog $log): void;
 
     /**
-     * Dernière relance émise pour `(collaborateur, semaine)` — base du plancher anti-spam et du
-     * rang d'escalade. `null` si aucune relance n'a encore été émise pour cette semaine.
+     * Dernière relance émise pour `(collaborateur, semaine)` — base du rang d'escalade et de la
+     * borne de fréquence par semaine. `null` si aucune relance n'a encore été émise pour cette semaine.
      */
     public function latestFor(TenantId $tenant, string $userId, DateTimeImmutable $weekStart): ?ReminderLog;
+
+    /**
+     * Une relance a-t-elle déjà été émise à ce collaborateur ce jour-là, **toutes semaines
+     * confondues** ? Pivot du plancher anti-spam par jour ouvré (CA-4) : au plus une relance par
+     * collaborateur et par jour, même s'il accumule plusieurs semaines en retard.
+     */
+    public function sentOnDay(TenantId $tenant, string $userId, DateTimeImmutable $day): bool;
 
     /**
      * Historique des relances émises, plus récentes d'abord ; filtrable par collaborateur.

@@ -55,6 +55,11 @@ final class ScheduleRemindersTest extends TestCase
 
         $this->users->register($this->tenant, self::USER);
         $this->rules->save(ReminderRule::default($this->tenant));
+
+        // Les semaines antérieures à la cible sont soumises : la semaine 24/08 est ainsi la plus
+        // ancienne dette, cible déterministe du plancher « une relance par jour » (voir capOne...).
+        $this->fillWeek('2026-08-10');
+        $this->fillWeek('2026-08-17');
     }
 
     public function testFirstReminderIsDueAfterInitialDelay(): void
@@ -155,6 +160,25 @@ final class ScheduleRemindersTest extends TestCase
         self::assertInstanceOf(ReminderDecision::class, $decision);
         self::assertSame(3, $decision->sequence);
         self::assertFalse($decision->escalated);
+    }
+
+    public function testAtMostOneReminderPerUserPerDayTargetsOldestDebt(): void
+    {
+        // Au 17/09, trois semaines vides sont en retard (24/08, 31/08, 07/09) : une seule relance
+        // est due ce jour-là, ciblant la dette la plus ancienne (24/08).
+        $decisions = $this->plan('2026-09-17 09:00:00');
+
+        self::assertCount(1, $decisions);
+        self::assertSame(self::WEEK, $decisions[0]->weekStart->format('Y-m-d'));
+    }
+
+    public function testUserAlreadyRemindedTodayIsSkippedAcrossWeeks(): void
+    {
+        // Une relance a déjà été émise aujourd'hui (sur une semaine) : aucune autre n'est envoyée le
+        // même jour ouvré, même si d'autres semaines sont en retard.
+        $this->logs->save($this->log(1, false, '2026-09-17 06:00:00'));
+
+        self::assertSame([], $this->plan('2026-09-17 09:00:00'));
     }
 
     /**
