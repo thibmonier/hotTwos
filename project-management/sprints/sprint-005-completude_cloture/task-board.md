@@ -7,10 +7,6 @@
 
 | ID | US | Tâche | Est. |
 |----|----|-------|------|
-| T-TECH-03 | Tech | Hardening `sprintf`→`set_config` (3 sites) | 3h |
-| T-057-01 | US-057 | Entités PeriodClosure/ReopeningRequest/AuditLog + RLS | 3h |
-| T-057-02 | US-057 | `ClosePeriod` (verrou + journal + CA-3) | 4h |
-| T-057-03 | US-057 | Raccord US-060 (vraie clôture → recompute 423) | 2h |
 | T-057-04 | US-057 | Verrou modif 423 + trigger anti-UPDATE/DELETE | 3h |
 | T-057-05 | US-057 | Réouverture formelle + reclôture auto 48h | 4h |
 | T-057-06 | US-057 | `PeriodClosed` async → calculs aval | 2h |
@@ -63,12 +59,17 @@
 ## ✅ Terminé
 | ID | US | Résultat | Commit |
 |----|----|----------|--------|
+| T-TECH-03 | Tech | Hardening `sprintf`→`set_config` (3 sites, param lié) | `f231e3f` |
+| T-057-01 | US-057 | Agrégat `AccountingPeriod` + RLS + repository | `89eab6e` |
+| T-057-02 | US-057 | `ClosePeriod` (403/CA-3 422/idempotent/journal/`PeriodClosed` async) | `9af3db0` |
+| T-057-03 | US-057 | `DoctrinePeriodClosure` → **remplace le stub** ; recompute 423 sur clôture réelle | `9af3db0` |
 
 ## 🚫 Bloqué
 | ID | US | Raison | Action |
 |----|----|--------|--------|
 
 ## Métriques
-- **Tâches** : 44 total | 0 terminées (0 %)
-- **Heures** : ~126h estimées | 0h consommées
-- **Points** : 22 engagés
+- **Tâches** : 44 total | 4 terminées (9 %)
+- **Heures** : ~126h estimées | ~12h consommées
+- **Points** : 22 engagés · US-057 : 4/9 tâches
+- **Suite (US-057)** : T-057-04 verrou 423 + trigger → T-057-05 réouverture → T-057-06 handler `PeriodClosed` → T-057-07 écran → T-057-08 tests (RLS-via-consume) → T-057-09 doc/revues
