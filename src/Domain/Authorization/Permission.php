@@ -40,4 +40,10 @@ enum Permission: string
 
     /** Consultation du tableau de bord financier projet — CA, marge, occupation (US-060, T-060-06). */
     case VIEW_PROJECT_FINANCIALS = 'view:project_financials';
+
+    /** Clôture d'une période et approbation des réouvertures (administrateur tenant — US-057). */
+    case MANAGE_PERIODS = 'manage:periods';
+
+    /** Demande de réouverture d'une période clôturée (chef de projet habilité — US-057). */
+    case REQUEST_PERIOD_REOPENING = 'request:period_reopening';
 }
