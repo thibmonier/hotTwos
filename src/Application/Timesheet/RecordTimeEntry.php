@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Application\Timesheet;
 
 use App\Application\Period\PeriodModificationGuard;
+use App\Domain\Absence\AbsenceRequest;
+use App\Domain\Absence\AbsenceRequestRepository;
 use App\Domain\Project\Project;
 use App\Domain\Project\ProjectRepository;
 use App\Domain\Tenant\TenantId;
@@ -28,6 +30,7 @@ final readonly class RecordTimeEntry
         private ProjectRepository $projects,
         private TimeEntryRepository $entries,
         private PeriodModificationGuard $periodGuard,
+        private AbsenceRequestRepository $absences,
     ) {
     }
 
@@ -41,6 +44,11 @@ final readonly class RecordTimeEntry
     ): void {
         // Verrou de clôture (US-057, CA-4) : aucune saisie/révision sur une période clôturée (423).
         $this->periodGuard->ensureModifiable($tenant, $userId, $workDate);
+
+        // Absence validée (US-054, RG-TMP-3) : pas d'imputation de production ce jour-là (422).
+        if ($this->absences->findValidatedCovering($tenant, $userId, $workDate) instanceof AbsenceRequest) {
+            throw new TimesheetException(sprintf('Impossible d\'imputer du temps de production sur une période d\'absence validée (%s).', $workDate->format('d/m/Y')));
+        }
 
         $project = $this->projects->findActive($tenant, $projectId);
         if (!$project instanceof Project) {

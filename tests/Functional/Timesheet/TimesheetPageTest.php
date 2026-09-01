@@ -7,6 +7,7 @@ namespace App\Tests\Functional\Timesheet;
 use App\Domain\Project\Project;
 use App\Domain\Tenant\Tenant;
 use App\Domain\Tenant\TenantId;
+use App\Domain\Absence\AbsenceRequest;
 use App\Domain\Period\AccountingPeriod;
 use App\Domain\Timesheet\TimeEntry;
 use App\Domain\User\User;
@@ -33,6 +34,7 @@ final class TimesheetPageTest extends WebTestCase
             $em->getClassMetadata(Project::class),
             $em->getClassMetadata(TimeEntry::class),
             $em->getClassMetadata(AccountingPeriod::class),
+            $em->getClassMetadata(AbsenceRequest::class),
         ];
         $tool = new SchemaTool($em);
         $tool->dropSchema($schema);

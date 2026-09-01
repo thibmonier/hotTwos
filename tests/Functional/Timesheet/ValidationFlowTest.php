@@ -9,6 +9,7 @@ use App\Domain\Authorization\Role;
 use App\Domain\Project\Project;
 use App\Domain\Tenant\Tenant;
 use App\Domain\Tenant\TenantId;
+use App\Domain\Absence\AbsenceRequest;
 use App\Domain\Period\AccountingPeriod;
 use App\Domain\Timesheet\TimeEntry;
 use App\Domain\User\User;
@@ -47,6 +48,7 @@ final class ValidationFlowTest extends WebTestCase
             $this->em->getClassMetadata(Project::class),
             $this->em->getClassMetadata(TimeEntry::class),
             $this->em->getClassMetadata(AccountingPeriod::class),
+            $this->em->getClassMetadata(AbsenceRequest::class),
         ];
         $tool = new SchemaTool($this->em);
         $tool->dropSchema($this->schema);

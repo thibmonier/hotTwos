@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Api;
 
+use App\Domain\Absence\AbsenceRequest;
 use App\Domain\Period\AccountingPeriod;
 use App\Domain\Period\ReopeningRequest;
 use App\Domain\Project\Project;
@@ -44,6 +45,7 @@ final class PeriodLockApiTest extends WebTestCase
             $this->em->getClassMetadata(TimeEntry::class),
             $this->em->getClassMetadata(AccountingPeriod::class),
             $this->em->getClassMetadata(ReopeningRequest::class),
+            $this->em->getClassMetadata(AbsenceRequest::class),
         ];
         $tool = new SchemaTool($this->em);
         $tool->dropSchema($this->schema);
