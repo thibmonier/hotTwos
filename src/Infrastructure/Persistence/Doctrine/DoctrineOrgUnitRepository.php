@@ -37,4 +37,16 @@ final readonly class DoctrineOrgUnitRepository implements OrgUnitRepository
 
         return $unit;
     }
+
+    public function findByTenant(TenantId $tenant): array
+    {
+        /** @var list<OrgUnit> $units */
+        $units = $this->entityManager->createQuery(
+            'SELECT u FROM '.OrgUnit::class.' u WHERE u.tenantId = :tenant ORDER BY u.name ASC',
+        )
+            ->setParameter('tenant', $tenant->toString())
+            ->getResult();
+
+        return $units;
+    }
 }

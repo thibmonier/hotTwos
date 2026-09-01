@@ -14,4 +14,11 @@ interface OrgUnitRepository
     public function save(OrgUnit $unit): void;
 
     public function find(TenantId $tenant, string $id): ?OrgUnit;
+
+    /**
+     * Toutes les unités du tenant (actives et désactivées), pour l'affichage de la hiérarchie.
+     *
+     * @return list<OrgUnit>
+     */
+    public function findByTenant(TenantId $tenant): array;
 }

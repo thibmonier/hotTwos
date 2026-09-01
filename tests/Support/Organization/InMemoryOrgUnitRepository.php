@@ -33,4 +33,12 @@ final class InMemoryOrgUnitRepository implements OrgUnitRepository
 
         return null;
     }
+
+    public function findByTenant(TenantId $tenant): array
+    {
+        return array_values(array_filter(
+            $this->units,
+            static fn (OrgUnit $unit): bool => $unit->tenantId()->equals($tenant),
+        ));
+    }
 }

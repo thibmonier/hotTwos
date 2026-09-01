@@ -37,6 +37,10 @@ security:
         - { path: ^/saisie, roles: ROLE_USER }
         # Validation des temps US-055 : le contrôle fin (permission + périmètre) est applicatif.
         - { path: ^/validation, roles: ROLE_USER }
+        # Organisation US-010 : authentification requise ; l'habilitation ADMIN (MANAGE_ORGANIZATION)
+        # est vérifiée dans la couche applicative (ARC-19).
+        - { path: ^/api/org-units, roles: ROLE_USER }
+        - { path: ^/api/org-memberships, roles: ROLE_USER }
 
 when@test:
     security:
