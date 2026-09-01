@@ -64,6 +64,9 @@ security:
         # applicative. L'opt-out individuel (^/api/me/reminder-preference) relève déjà de ^/api/me.
         - { path: ^/api/reminders, roles: ROLE_USER }
         - { path: ^/relances, roles: ROLE_USER }
+        # Synthèse d'activité US-059 : authentifié ; le cloisonnement strict au collaborateur courant
+        # (403 sur un autre user_id) est porté par la couche applicative (ARC-19).
+        - { path: ^/api/activity-summary, roles: ROLE_USER }
 
 when@test:
     security:
