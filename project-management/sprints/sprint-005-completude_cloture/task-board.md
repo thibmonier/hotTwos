@@ -7,12 +7,6 @@
 
 | ID | US | Tâche | Est. |
 |----|----|-------|------|
-| T-058-01 | US-058 | Service grille de complétude (4 états) | 4h |
-| T-058-02 | US-058 | Périmètre RBAC (403 scope équipe) | 3h |
-| T-058-03 | US-058 | API + export CSV anti-injection | 3h |
-| T-058-04 | US-058 | Écran `/completude` (grille couleur) | 4h |
-| T-058-05 | US-058 | Tests 403/vide/CSV + calcul taux | 3h |
-| T-058-06 | US-058 | Doc + revue (perf) | 1h |
 | T-056-01 | US-056 | Entités ReminderRule/ReminderLog/opt-out + RLS | 2h |
 | T-056-02 | US-056 | Moteur relances borné (plancher, escalade, arrêt) | 4h |
 | T-056-03 | US-056 | CLI cron + handler d'envoi async | 3h |
@@ -56,13 +50,14 @@
 | T-057-08 | US-057 | Fonctionnel **423** saisie en période clôturée (201 si ouverte) | `c64af85` |
 | T-057-09 | US-057 | Doc `docs/modules/period.md` + revues (GO) : 4-eyes, trigger move-in, dédup, a11y, DRY | `a47bdbc` |
 | US-054 | US-054 | **Absences (8/8)** : entités demi-journée + RLS, déclaration/décision + notifs, compteurs, blocage RG-TMP-3 (422), API, écran `/absences`, **gate RGPD HAB-3** + intrusion RLS, doc + revues (GO : self-approval, RGPD commentaire, index) | `6e2feb3`→`739c506` |
+| US-058 | US-058 | **Complétude (6/6)** : service grille (4 états, absences déduites), périmètre RBAC (403 équipe), API + export CSV anti-injection, écran `/completude` (grille couleur), doc + revue (GO ; N+1 accepté phase 1, cache/batch phase 2) | `222eb18`→`0add3d5` |
 
 ## 🚫 Bloqué
 | ID | US | Raison | Action |
 |----|----|--------|--------|
 
 ## Métriques
-- **Tâches** : 44 total | 21 terminées (48 %)
-- **Heures** : ~126h estimées | ~65h consommées
-- **Points** : 22 engagés · **US-057 : 9/9 ✅ · US-054 : 8/8 ✅** (+ T-TECH-03)
-- **Suite** : US-058 (complétude) → US-056 (relances) ; US-052/US-059 (UI) parallélisables
+- **Tâches** : 44 total | 27 terminées (61 %)
+- **Heures** : ~126h estimées | ~80h consommées
+- **Points** : 22 engagés · **US-057 : 9/9 ✅ · US-054 : 8/8 ✅ · US-058 : 6/6 ✅** (+ T-TECH-03)
+- **Suite** : US-056 (relances) ; US-052 (mobile) / US-059 (synthèse) parallélisables
