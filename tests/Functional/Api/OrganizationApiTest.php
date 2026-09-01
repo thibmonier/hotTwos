@@ -130,6 +130,25 @@ final class OrganizationApiTest extends WebTestCase
         self::assertFalse($list[0]['active'] ?? true);
     }
 
+    public function testAdminSeesTheOrganizationScreen(): void
+    {
+        $this->login('admin@agence.test');
+
+        $this->client->request('GET', '/organisation');
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('h1', 'Structure organisationnelle');
+    }
+
+    public function testNonAdminIsForbiddenFromTheScreen(): void
+    {
+        $this->login('marc@agence.test');
+
+        $this->client->request('GET', '/organisation');
+
+        self::assertResponseStatusCodeSame(403);
+    }
+
     private function createUnit(string $name): string
     {
         $this->postJson('/api/org-units', ['name' => $name]);
