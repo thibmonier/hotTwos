@@ -83,3 +83,7 @@ services:
     # Ports périodes comptables et réouvertures (US-057, DIP).
     App\Domain\Period\AccountingPeriodRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineAccountingPeriodRepository'
     App\Domain\Period\ReopeningRequestRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineReopeningRequestRepository'
+
+    # Ports absences (US-054, DIP).
+    App\Domain\Absence\AbsenceTypeRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineAbsenceTypeRepository'
+    App\Domain\Absence\AbsenceRequestRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineAbsenceRequestRepository'
