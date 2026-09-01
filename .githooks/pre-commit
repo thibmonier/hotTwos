@@ -2,21 +2,20 @@
 # US-009 (T-009-05) / ADR-16 — garde-fou pré-commit.
 # Active-le une fois : git config core.hooksPath .githooks
 # Rejoue en local les vérifications bloquantes de la CI (US-004).
+#
+# ARC-86 : TOUT s'exécute dans un conteneur (parité prod) — aucune commande sur l'hôte.
+# Seul Docker est requis sur le poste.
 set -e
 
-echo "▶ PHPStan (niveau max)…"
-php vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+echo "▶ Analyse conteneurisée (PHPStan max · Deptrac)…"
+docker compose run --rm -T app sh -lc '\
+  php vendor/bin/phpstan analyse --no-progress --memory-limit=1G && \
+  php vendor/bin/deptrac analyse --no-progress'
 
-echo "▶ Deptrac (frontières d'architecture)…"
-php vendor/bin/deptrac analyse --no-progress
+echo "▶ Tests conteneurisés…"
+docker compose run --rm -T -e APP_ENV=test app php bin/phpunit -c phpunit.dist.xml
 
-echo "▶ Tests…"
-php bin/phpunit
-
-# Détection de secrets si gitleaks est installé (ARC-88).
-if command -v gitleaks >/dev/null 2>&1; then
-  echo "▶ gitleaks (secrets)…"
-  gitleaks protect --staged --no-banner
-fi
+echo "▶ gitleaks (secrets, staged)…"
+docker run --rm -v "$(pwd):/repo:ro" zricethezav/gitleaks:v8.18.4 protect --staged --source=/repo --no-banner
 
 echo "✅ pre-commit OK"
