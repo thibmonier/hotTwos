@@ -40,9 +40,11 @@ final class Version20260901130000 extends AbstractMigration
         foreach (self::TENANT_TABLES as $table) {
             $this->addSql(sprintf('ALTER TABLE %s ENABLE ROW LEVEL SECURITY', $table));
             $this->addSql(sprintf('ALTER TABLE %s FORCE ROW LEVEL SECURITY', $table));
+            // Comparaison en texte (et non ::uuid) : robuste quand le contexte tenant est absent
+            // ou vide — sans contexte, la policy ne laisse rien passer sans lever d'erreur de cast.
             $this->addSql(sprintf(
                 "CREATE POLICY tenant_isolation ON %s "
-                . "USING (tenant_id = current_setting('app.current_tenant', true)::uuid)",
+                . "USING (tenant_id::text = current_setting('app.current_tenant', true))",
                 $table,
             ));
         }

@@ -29,9 +29,10 @@ final class Version20260901140000 extends AbstractMigration
 
         $this->addSql('ALTER TABLE org_membership ENABLE ROW LEVEL SECURITY');
         $this->addSql('ALTER TABLE org_membership FORCE ROW LEVEL SECURITY');
+        // Comparaison en texte (et non ::uuid) : robuste quand le contexte tenant est absent/vide.
         $this->addSql(
             "CREATE POLICY tenant_isolation ON org_membership "
-            . "USING (tenant_id = current_setting('app.current_tenant', true)::uuid)"
+            . "USING (tenant_id::text = current_setting('app.current_tenant', true))"
         );
     }
 
