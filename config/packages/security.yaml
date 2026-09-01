@@ -46,6 +46,9 @@ security:
         - { path: ^/api/profiles, roles: ROLE_USER }
         - { path: ^/api/profile-rates, roles: ROLE_USER }
         - { path: ^/profils, roles: ROLE_USER }
+        # Valorisation US-060 : recalcul manuel authentifié ; l'habilitation RECOMPUTE_VALUATION
+        # (et le verrou de période clôturée) sont vérifiés dans la couche applicative (ARC-19).
+        - { path: ^/api/valorisation, roles: ROLE_USER }
 
 when@test:
     security:
