@@ -7,12 +7,6 @@
 
 | ID | US | Tâche | Est. |
 |----|----|-------|------|
-| T-057-04 | US-057 | Verrou modif 423 + trigger anti-UPDATE/DELETE | 3h |
-| T-057-05 | US-057 | Réouverture formelle + reclôture auto 48h | 4h |
-| T-057-06 | US-057 | `PeriodClosed` async → calculs aval | 2h |
-| T-057-07 | US-057 | Écran `/administration/periodes` + historique | 4h |
-| T-057-08 | US-057 | Tests 423/403 + RLS-via-consume + immuabilité | 4h |
-| T-057-09 | US-057 | Doc + revues sécu/Symfony | 2h |
 | T-054-01 | US-054 | Entités AbsenceType/AbsenceRequest + RLS (HAB-3) | 3h |
 | T-054-02 | US-054 | `DeclareAbsence`/`DecideAbsence` + notifications | 4h |
 | T-054-03 | US-054 | Compteurs acquis/pris/attente/projeté | 3h |
@@ -63,13 +57,19 @@
 | T-057-01 | US-057 | Agrégat `AccountingPeriod` + RLS + repository | `89eab6e` |
 | T-057-02 | US-057 | `ClosePeriod` (403/CA-3 422/idempotent/journal/`PeriodClosed` async) | `9af3db0` |
 | T-057-03 | US-057 | `DoctrinePeriodClosure` → **remplace le stub** ; recompute 423 sur clôture réelle | `9af3db0` |
+| T-057-04 | US-057 | Verrou modif **423** (`PeriodModificationGuard`) + trigger DB anti-UPDATE/DELETE | `a7a4cc4` |
+| T-057-05 | US-057 | Réouverture formelle (403, fenêtre 48h) + garde levé/re-verrouillé | `15fa37c` |
+| T-057-06 | US-057 | Handler async `PeriodClosed` → calculs aval ; helper `CalendarMonth` (DRY) | `2718372` |
+| T-057-07 | US-057 | Écran `/administration/periodes` (statut couleur, clôture + confirmation + CSRF) | `bf52fee` |
+| T-057-08 | US-057 | Fonctionnel **423** saisie en période clôturée (201 si ouverte) | `c64af85` |
+| T-057-09 | US-057 | Doc `docs/modules/period.md` + revues (GO) : 4-eyes, trigger move-in, dédup, a11y, DRY | `a47bdbc` |
 
 ## 🚫 Bloqué
 | ID | US | Raison | Action |
 |----|----|--------|--------|
 
 ## Métriques
-- **Tâches** : 44 total | 4 terminées (9 %)
-- **Heures** : ~126h estimées | ~12h consommées
-- **Points** : 22 engagés · US-057 : 4/9 tâches
-- **Suite (US-057)** : T-057-04 verrou 423 + trigger → T-057-05 réouverture → T-057-06 handler `PeriodClosed` → T-057-07 écran → T-057-08 tests (RLS-via-consume) → T-057-09 doc/revues
+- **Tâches** : 44 total | 12 terminées (27 %)
+- **Heures** : ~126h estimées | ~40h consommées
+- **Points** : 22 engagés · **US-057 : 9/9 ✅** (+ T-TECH-03)
+- **Suite** : US-054 (absences) → US-058 (complétude) → US-056 (relances) ; US-052/US-059 (UI) parallélisables
