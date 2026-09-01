@@ -158,10 +158,16 @@ reusable_assets:
       delivered: "US-050 saisie (Project+TimeEntry, API, écran /saisie) ; US-051 semaine ≤2min (batch, duplication, clavier, absence) ; US-055 validation par lot (permission VALIDATE_TIME + périmètre « ses projets », API + écran /validation) ; TECH-3 RLS ACTIVE EN PROD (app sous hotones_app) + smoke déploiement."
       reserve: "Valorisation (US-060+US-011), E2E chronométré ≤2min, extension RLS aux tables métier (DBT-SEC-1), fixtures démo → Sprint 4."
       path: project-management/sprints/sprint-003-saisie_temps/
-    next_sprint:
+    current_sprint:
       id: 4
-      goal: "Valorisation automatique du temps validé (chiffrage €) — US-060 + taux US-011"
-      note: "Actions rétro S3 : E2E chronométré ≤2min (RSQ-1), extension RLS métier, fixtures de démo."
+      name: sprint-004-valorisation
+      goal: "Le temps validé est automatiquement valorisé (coût & vente au tarif en vigueur) et alimente la marge projet dans le modèle analytique"
+      committed_points: 21
+      stories: [US-010, US-011, US-060]
+      decision_po: "Chaîne complète org → taux → valorisation. Historisation à date d'effet (tarifs temporels), valorisation figée à la validation (INV-2/ARC-113). La sonde RevenueRecognized devient réelle."
+      blocker: "aucun (US-001/005/055 livrés)"
+      path: project-management/sprints/sprint-004-valorisation/
+      note: "Actions rétro S3 ouvertes (E2E ≤2min, extension RLS métier, fixtures) — intégrées si capacité."
     quality_gates:
       prd: "95% ✅"
       tech_spec: "96% ✅"
