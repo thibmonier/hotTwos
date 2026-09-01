@@ -133,5 +133,9 @@ Revue Symfony (82/100, « très bon ») :
   **imposé par Rector** ; PHPStan max et Doctrine l'acceptent. « Corriger » romprait la cohérence et
   serait redéfait par Rector. Conservé.
 
-**Conclusion des revues : GO** — habilitation, isolation tenant, CSRF et double barrière conformes ;
-tous les écarts Moyen/Faible sont corrigés ou documentés.
+Findings de style **écartés avec justification** : migration DQL→QueryBuilder (le projet utilise le
+DQL en chaîne partout — cohérence prime), nommage `PeriodModificationGuard` (déjà explicite), mapping
+listener pour d'hypothétiques futures sous-classes (YAGNI — l'`instanceof` couvre déjà tout héritier).
+
+**Conclusion des revues : GO — prêt pour production** — habilitation, isolation tenant, CSRF et double
+barrière conformes ; tous les écarts Moyen/Faible sont corrigés, documentés ou arbitrés.
