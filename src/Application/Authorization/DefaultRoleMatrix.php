@@ -36,6 +36,7 @@ final class DefaultRoleMatrix
                 Permission::CREATE_PROJECT,
                 Permission::EDIT_PROJECT,
                 Permission::VIEW_COLLABORATOR,
+                Permission::VALIDATE_TIME,
             ], DataScope::OWN_PROJECTS),
 
             new RoleDefinition('Resource Manager', [
@@ -57,6 +58,7 @@ final class DefaultRoleMatrix
                 Permission::EDIT_PROJECT,
                 Permission::DELETE_PROJECT,
                 Permission::VIEW_COLLABORATOR,
+                Permission::VALIDATE_TIME,
             ], DataScope::TENANT),
         ];
     }

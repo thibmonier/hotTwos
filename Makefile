@@ -61,3 +61,6 @@ secrets: ## Détecte les secrets commités (gitleaks, US-007/US-009)
 
 ci: cs rector analyse deptrac test ## Enchaîne les vérifications bloquantes en local (miroir CI)
 	@echo "✅ Vérifications locales OK"
+
+smoke: ## Smoke de déploiement : vérifie les endpoints critiques (make smoke URL=https://…)
+	php scripts/smoke.php $(URL)

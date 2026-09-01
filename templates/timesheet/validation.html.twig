@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Validation des temps{% endblock %}
+
+{% block body %}
+    <main class="container" data-controller="validation">
+        <h1>Validation des temps</h1>
+
+        {% if not hasProjects %}
+            <p>Vous n'êtes responsable d'aucun projet : aucune imputation à valider.</p>
+        {% elseif rows is empty %}
+            <p>Aucune imputation en attente sur vos projets. ✅</p>
+        {% else %}
+            <form data-action="submit->validation#submit">
+                <table class="validation">
+                    <thead>
+                        <tr>
+                            <th scope="col"><input type="checkbox" data-action="validation#toggleAll" aria-label="Tout sélectionner"></th>
+                            <th scope="col">Projet</th>
+                            <th scope="col">Jour</th>
+                            <th scope="col">Minutes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in rows %}
+                            <tr>
+                                <td><input type="checkbox" value="{{ row.id }}" data-validation-target="entry" aria-label="Sélectionner l'imputation {{ row.project }} {{ row.date }}"></td>
+                                <td>{{ row.project }}</td>
+                                <td>{{ row.date }}</td>
+                                <td>{{ row.minutes }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <div class="validation-actions">
+                    <button type="button" data-action="validation#validate">Valider la sélection</button>
+                    <label>Motif de refus <input type="text" data-validation-target="reason" placeholder="obligatoire pour refuser"></label>
+                    <button type="button" data-action="validation#reject">Refuser la sélection</button>
+                </div>
+            </form>
+
+            <p class="hint" aria-live="polite" data-validation-target="status"></p>
+        {% endif %}
+    </main>
+{% endblock %}

@@ -32,6 +32,11 @@ security:
         # Sonde d'habilitation US-003 : authentification requise ; le contrôle fin
         # (permission + périmètre) est fait dans la couche applicative (ARC-19).
         - { path: ^/api/_probe, roles: ROLE_USER }
+        # Saisie de temps US-050 : un collaborateur authentifié saisit pour lui-même.
+        - { path: ^/api/time-entries, roles: ROLE_USER }
+        - { path: ^/saisie, roles: ROLE_USER }
+        # Validation des temps US-055 : le contrôle fin (permission + périmètre) est applicatif.
+        - { path: ^/validation, roles: ROLE_USER }
 
 when@test:
     security:

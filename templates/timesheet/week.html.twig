@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Saisie du temps — {{ weekLabel }}{% endblock %}
+
+{% block body %}
+    <main class="container" data-controller="timesheet" data-timesheet-week-start-value="{{ weekStart }}">
+        <h1>Saisie du temps</h1>
+
+        <nav class="week-nav">
+            <a href="{{ path('timesheet_week', { date: prevDate }) }}" rel="prev">← Semaine précédente</a>
+            <strong>{{ weekLabel }}</strong>
+            <a href="{{ path('timesheet_week', { date: nextDate }) }}" rel="next">Semaine suivante →</a>
+        </nav>
+
+        {% if projects is empty %}
+            <p>Aucun projet actif : demandez à un administrateur d'en créer un pour saisir votre temps.</p>
+        {% else %}
+            <table class="timesheet" data-timesheet-target="grid">
+                <thead>
+                    <tr>
+                        <th scope="col">Projet</th>
+                        {% for day in days %}
+                            <th scope="col">{{ day.label }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for project in projects %}
+                        <tr>
+                            <th scope="row" title="{{ project.code }}">{{ project.name }}</th>
+                            {% for day in days %}
+                                {% set minutes = grid[project.id][day.date] ?? null %}
+                                <td>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        max="1440"
+                                        step="15"
+                                        inputmode="numeric"
+                                        aria-label="{{ project.name }} — {{ day.label }} (minutes)"
+                                        value="{{ minutes }}"
+                                        data-timesheet-target="cell"
+                                        data-project-id="{{ project.id }}"
+                                        data-date="{{ day.date }}"
+                                        data-action="change->timesheet#save"
+                                    >
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="timesheet-actions">
+                <button type="button" data-action="timesheet#duplicatePreviousWeek">Dupliquer la semaine précédente</button>
+                <button type="button" data-action="timesheet#saveWeek">Enregistrer la semaine</button>
+                <span class="hint">Entrée = valider et descendre · Tab = cellule suivante · saisie possible sans souris.</span>
+            </div>
+
+            <p class="hint" aria-live="polite" data-timesheet-target="status">
+                Saisissez les minutes par projet et par jour. L'enregistrement est automatique ; « Enregistrer la semaine » soumet tout en une fois.
+            </p>
+        {% endif %}
+    </main>
+{% endblock %}

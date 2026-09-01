@@ -133,19 +133,28 @@ reusable_assets:
       pr: "https://github.com/thibmonier/hotTwos/pull/2 (verte, MERGEABLE/CLEAN, à merger)"
       ceremonies: "Review + Rétro (Starfish) rédigées"
       path: project-management/sprints/sprint-001-walking_skeleton/
-    current_sprint:
+    sprint_2:
       id: 2
       name: sprint-002-consolidation_technique
       goal: "Socle durci et reproductible : schéma versionné (migrations), RLS runtime active, worker éprouvé, observabilité opérationnelle"
       committed_points: 20
       delivered_points: 20
       stories: [TECH-1, TECH-2, US-006, US-008]
-      status: "développement terminé (20/20) — branche feature/sprint-2-consolidation, CI verte ; Review/Rétro à faire, PR à ouvrir"
-      decision_po: "Consolidation technique choisie (dette rétro d'abord) ; valeur métier (saisie de temps) décalée au Sprint 3 — RSQ-17 surveillé"
-      delivered: "TECH-1 migrations Doctrine (schéma + durcissement versionné, étape CI, ADR-0017) ; TECH-2 RLS runtime (rôle hotones_app + TenantSessionConfigurator, prouvée sous rôle non-superutilisateur) ; US-006 worker FrankenPHP réel (bridge Symfony 8, reset kernel.reset, VALIDÉ en prod) ; US-008 /metrics Prometheus (live) + Sentry UE + validation variables + garde ADR-13 + runbook. Migrations appliquées au démarrage du conteneur (docker/start.sh)."
-      reserve: "RLS runtime inactive en prod tant que DATABASE_URL n'utilise pas hotones_app (DBT-RUN-2) ; isolation prod portée par le filtre ORM. Réconciliation analytique périodique + faits métier restent Sprint 3+."
+      status: done
+      pr: "https://github.com/thibmonier/hotTwos/pull/3 (MERGED → main)"
+      ceremonies: "Review + Rétro (Starfish) faites"
+      reserve: "RLS runtime inactive en prod tant que DATABASE_URL n'utilise pas hotones_app (DBT-RUN-2) → traité en Sprint 3 (TECH-3)"
       path: project-management/sprints/sprint-002-consolidation_technique/
-      note: "Première valeur métier (saisie de temps) engagée pour le Sprint 3"
+    current_sprint:
+      id: 3
+      name: sprint-003-saisie_temps
+      goal: "Un collaborateur saisit sa semaine de temps en moins de 2 minutes, et son chef de projet la valide par lot"
+      committed_points: 23
+      stories: [US-050, US-051, US-055, TECH-3]
+      decision_po: "Première valeur métier (RSQ-17) : saisie → validation. Valorisation (US-060) + taux (US-011) au Sprint 4. Référentiel Projet minimal dans US-050."
+      blocker: "aucun (US-001/003 livrés, hotones_app prêt)"
+      path: project-management/sprints/sprint-003-saisie_temps/
+      note: "Critère de sortie bloquant : saisie d'une semaine ≤ 2 min (RSQ-1). TECH-3 active la RLS prod + smoke de déploiement."
     quality_gates:
       prd: "95% ✅"
       tech_spec: "96% ✅"

@@ -20,7 +20,11 @@ if [ -n "$missing" ]; then
 fi
 
 echo "[start] Application des migrations Doctrine…"
-if php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration; then
+# Les migrations (DDL, gestion des rôles) exigent un rôle privilégié. Quand l'application
+# tourne sous le rôle applicatif hotones_app (RLS active, TECH-3), définir MIGRATION_DATABASE_URL
+# avec un rôle privilégié ; sinon on retombe sur DATABASE_URL.
+MIGRATE_URL="${MIGRATION_DATABASE_URL:-$DATABASE_URL}"
+if DATABASE_URL="$MIGRATE_URL" php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration; then
     echo "[start] Migrations appliquées."
 else
     echo "[start] AVERTISSEMENT : migrations en échec — démarrage du serveur malgré tout (voir logs ci-dessus)."
