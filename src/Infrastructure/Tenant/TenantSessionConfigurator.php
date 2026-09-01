@@ -14,8 +14,8 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
  * seconde barrière d'isolation (RLS, ARC-34) au runtime.
  *
  * S'exécute après {@see AuthenticatedTenantResolver} (qui résout le tenant, priorité 6).
- * Émet, pour chaque requête principale, `SET app.current_tenant = '<uuid>'` quand un tenant
- * est positionné, sinon `RESET app.current_tenant` — ce **reset systématique** garantit
+ * Émet, pour chaque requête principale, `set_config('app.current_tenant', <uuid>, false)` (paramètre
+ * lié) quand un tenant est positionné, sinon `RESET app.current_tenant` — ce **reset systématique** garantit
  * qu'aucun contexte ne fuit d'une requête à l'autre sur un worker FrankenPHP (RSQ-15).
  *
  * En production, l'application se connecte via le rôle `hotones_app` (non-superutilisateur) :
@@ -43,11 +43,10 @@ final readonly class TenantSessionConfigurator
             return;
         }
 
-        // Le tenant est un UUID validé ({@see \App\Domain\Tenant\TenantId}) — interpolation sûre
-        // (SET n'accepte pas de paramètre lié).
-        $this->connection->executeStatement(sprintf(
-            "SET app.current_tenant = '%s'",
-            $this->tenantContext->current()->toString(),
-        ));
+        // Paramètre **lié** via set_config (SET n'accepte pas de bind) — aucune interpolation.
+        $this->connection->executeStatement(
+            "SELECT set_config('app.current_tenant', ?, false)",
+            [$this->tenantContext->current()->toString()],
+        );
     }
 }

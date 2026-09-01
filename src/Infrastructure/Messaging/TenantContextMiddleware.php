@@ -62,8 +62,8 @@ final readonly class TenantContextMiddleware implements MiddlewareInterface
 
     private function bindDatabaseSession(TenantId $tenant): void
     {
-        // Le tenant est un UUID validé ({@see TenantId}) — interpolation sûre (SET n'accepte pas
-        // de paramètre lié). Même barrière RLS que le listener HTTP (TenantSessionConfigurator).
-        $this->connection->executeStatement(sprintf("SET app.current_tenant = '%s'", $tenant->toString()));
+        // Paramètre **lié** via set_config (SET n'accepte pas de bind) — aucune interpolation de
+        // chaîne. `is_local=false` : niveau session, comme le listener HTTP (TenantSessionConfigurator).
+        $this->connection->executeStatement("SELECT set_config('app.current_tenant', ?, false)", [$tenant->toString()]);
     }
 }
