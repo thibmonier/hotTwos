@@ -60,6 +60,9 @@ security:
         # Complétude US-058 : authentifié ; le périmètre équipe (VIEW_TEAM_COMPLETENESS) est applicatif.
         - { path: ^/api/completude, roles: ROLE_USER }
         - { path: ^/completude, roles: ROLE_USER }
+        # Relances US-056 : authentifié ; l'habilitation de paramétrage (MANAGE_REMINDERS) est
+        # applicative. L'opt-out individuel (^/api/me/reminder-preference) relève déjà de ^/api/me.
+        - { path: ^/api/reminders, roles: ROLE_USER }
 
 when@test:
     security:

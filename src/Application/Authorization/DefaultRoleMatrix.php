@@ -41,6 +41,7 @@ final class DefaultRoleMatrix
                 Permission::REQUEST_PERIOD_REOPENING,
                 Permission::VALIDATE_ABSENCE,
                 Permission::VIEW_TEAM_COMPLETENESS,
+                Permission::MANAGE_REMINDERS,
             ], DataScope::OWN_PROJECTS),
 
             new RoleDefinition('Resource Manager', [
@@ -75,6 +76,7 @@ final class DefaultRoleMatrix
                 Permission::REQUEST_PERIOD_REOPENING,
                 Permission::VALIDATE_ABSENCE,
                 Permission::VIEW_TEAM_COMPLETENESS,
+                Permission::MANAGE_REMINDERS,
             ], DataScope::TENANT),
         ];
     }

@@ -52,4 +52,7 @@ enum Permission: string
 
     /** Consultation de la complétude de saisie de l'équipe (chef de projet / BU — US-058). */
     case VIEW_TEAM_COMPLETENESS = 'view:team_completeness';
+
+    /** Paramétrage des relances de retard de saisie du tenant (chef de projet / admin — US-056). */
+    case MANAGE_REMINDERS = 'manage:reminders';
 }
