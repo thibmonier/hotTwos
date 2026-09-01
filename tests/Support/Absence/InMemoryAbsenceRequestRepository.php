@@ -57,4 +57,16 @@ final class InMemoryAbsenceRequestRepository implements AbsenceRequestRepository
 
         return null;
     }
+
+    public function findValidatedOverlapping(TenantId $tenant, string $userId, DateTimeImmutable $from, DateTimeImmutable $to): array
+    {
+        $fromKey = $from->format('Y-m-d');
+        $toKey = $to->format('Y-m-d');
+
+        return array_values(array_filter($this->requests, static fn (AbsenceRequest $r): bool => $r->tenantId()->equals($tenant)
+            && $r->userId() === $userId
+            && AbsenceStatus::VALIDATED === $r->status()
+            && $r->startDate()->format('Y-m-d') <= $toKey
+            && $r->endDate()->format('Y-m-d') >= $fromKey));
+    }
 }

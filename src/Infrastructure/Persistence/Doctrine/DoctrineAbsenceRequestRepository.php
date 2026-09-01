@@ -71,4 +71,22 @@ final readonly class DoctrineAbsenceRequestRepository implements AbsenceRequestR
 
         return $found;
     }
+
+    public function findValidatedOverlapping(TenantId $tenant, string $userId, DateTimeImmutable $from, DateTimeImmutable $to): array
+    {
+        /** @var list<AbsenceRequest> $requests */
+        $requests = $this->entityManager->createQuery(
+            'SELECT r FROM '.AbsenceRequest::class.' r'
+            .' WHERE r.tenantId = :tenant AND r.userId = :user AND r.status = :validated'
+            .' AND r.startDate <= :to AND r.endDate >= :from',
+        )
+            ->setParameter('tenant', $tenant->toString())
+            ->setParameter('user', $userId)
+            ->setParameter('validated', AbsenceStatus::VALIDATED->value)
+            ->setParameter('from', $from, 'date_immutable')
+            ->setParameter('to', $to, 'date_immutable')
+            ->getResult();
+
+        return $requests;
+    }
 }

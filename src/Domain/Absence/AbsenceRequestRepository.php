@@ -28,4 +28,12 @@ interface AbsenceRequestRepository
      * RG-TMP-3). `null` si le jour est libre.
      */
     public function findValidatedCovering(TenantId $tenant, string $userId, DateTimeImmutable $day): ?AbsenceRequest;
+
+    /**
+     * Absences **validées** d'un collaborateur chevauchant `[from, to]` — déduction des jours
+     * attendus dans le calcul de complétude (US-058).
+     *
+     * @return list<AbsenceRequest>
+     */
+    public function findValidatedOverlapping(TenantId $tenant, string $userId, DateTimeImmutable $from, DateTimeImmutable $to): array;
 }
