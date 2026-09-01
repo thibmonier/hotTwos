@@ -53,3 +53,6 @@ services:
     # Ports de saisie de temps (US-050, DIP).
     App\Domain\Project\ProjectRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineProjectRepository'
     App\Domain\Timesheet\TimeEntryRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineTimeEntryRepository'
+
+    # Ports organisation (US-010, DIP).
+    App\Domain\Organization\OrgMembershipRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineOrgMembershipRepository'
