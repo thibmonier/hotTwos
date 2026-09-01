@@ -80,5 +80,6 @@ services:
         arguments:
             $closedPeriods: '%valuation.closed_periods%'
 
-    # Port périodes comptables (US-057, DIP).
+    # Ports périodes comptables et réouvertures (US-057, DIP).
     App\Domain\Period\AccountingPeriodRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineAccountingPeriodRepository'
+    App\Domain\Period\ReopeningRequestRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineReopeningRequestRepository'

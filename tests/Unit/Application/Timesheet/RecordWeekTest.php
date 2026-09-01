@@ -12,8 +12,10 @@ use App\Domain\Project\Project;
 use App\Domain\Tenant\TenantId;
 use App\Tests\Support\Authorization\RecordingSecurityAuditLogger;
 use App\Tests\Support\Period\InMemoryAccountingPeriodRepository;
+use App\Tests\Support\Period\InMemoryReopeningRequestRepository;
 use App\Tests\Support\Timesheet\InMemoryProjectRepository;
 use App\Tests\Support\Timesheet\InMemoryTimeEntryRepository;
+use Symfony\Component\Clock\MockClock;
 use PHPUnit\Framework\TestCase;
 use DateTimeImmutable;
 
@@ -36,7 +38,12 @@ final class RecordWeekTest extends TestCase
         $this->recordWeek = new RecordWeek(new RecordTimeEntry(
             $projects,
             $this->entries,
-            new PeriodModificationGuard(new InMemoryAccountingPeriodRepository(), new RecordingSecurityAuditLogger()),
+            new PeriodModificationGuard(
+                new InMemoryAccountingPeriodRepository(),
+                new InMemoryReopeningRequestRepository(),
+                new RecordingSecurityAuditLogger(),
+                new MockClock(),
+            ),
         ));
 
         $project = new Project($this->tenant, 'PRJ-1', 'Refonte');

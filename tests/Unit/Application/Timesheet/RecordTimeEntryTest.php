@@ -13,9 +13,11 @@ use App\Domain\Tenant\TenantId;
 use App\Domain\Timesheet\TimesheetException;
 use App\Tests\Support\Authorization\RecordingSecurityAuditLogger;
 use App\Tests\Support\Period\InMemoryAccountingPeriodRepository;
+use App\Tests\Support\Period\InMemoryReopeningRequestRepository;
 use App\Tests\Support\Timesheet\InMemoryProjectRepository;
 use App\Tests\Support\Timesheet\InMemoryTimeEntryRepository;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Clock\MockClock;
 use DateTimeImmutable;
 
 /**
@@ -40,7 +42,12 @@ final class RecordTimeEntryTest extends TestCase
         $this->record = new RecordTimeEntry(
             $this->projects,
             $this->entries,
-            new PeriodModificationGuard($this->periods, new RecordingSecurityAuditLogger()),
+            new PeriodModificationGuard(
+                $this->periods,
+                new InMemoryReopeningRequestRepository(),
+                new RecordingSecurityAuditLogger(),
+                new MockClock(new DateTimeImmutable('2026-10-01 00:00:00')),
+            ),
         );
 
         $project = new Project($this->tenant, 'PRJ-1', 'Refonte');
