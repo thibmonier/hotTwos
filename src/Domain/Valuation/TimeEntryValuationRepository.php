@@ -21,4 +21,17 @@ interface TimeEntryValuationRepository
      * @return list<TimeEntryValuation>
      */
     public function findMissingRate(TenantId $tenant): array;
+
+    /**
+     * Agrégat du tableau de bord financier (US-060, T-060-06) : avancement, CA et coût cumulés,
+     * fraîcheur — en une seule agrégation, sans charger les lignes.
+     */
+    public function summaryFor(TenantId $tenant): ValuationSummary;
+
+    /**
+     * Dernières valorisations abouties (`valued`), pour l'audit trail du taux appliqué.
+     *
+     * @return list<TimeEntryValuation>
+     */
+    public function findValued(TenantId $tenant, int $limit): array;
 }

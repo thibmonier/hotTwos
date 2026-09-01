@@ -1,0 +1,103 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord financier{% endblock %}
+
+{% block body %}
+    <main class="container">
+        <h1>Valorisation — tableau de bord financier</h1>
+
+        {% if summary.hasIncompleteValuations %}
+            <p class="alert" role="alert">
+                ⚠️ Valorisation incomplète : {{ summary.missingRate }}
+                imputation{{ summary.missingRate > 1 ? 's' : '' }} sans tarif.
+                Renseignez le tarif du profil concerné pour compléter le calcul (relance automatique).
+            </p>
+        {% endif %}
+
+        <section aria-labelledby="freshness-heading">
+            <h2 id="freshness-heading">Fraîcheur</h2>
+            <p aria-live="polite">
+                {% if freshnessMinutes is null %}
+                    Aucune valorisation pour l'instant.
+                {% else %}
+                    Mise à jour il y a {{ freshnessMinutes }} min.
+                {% endif %}
+            </p>
+        </section>
+
+        <section aria-labelledby="progress-heading">
+            <h2 id="progress-heading">Avancement de la valorisation</h2>
+            <p>
+                <label for="valuation-progress">
+                    {{ summary.valued }} / {{ summary.total }} imputations valorisées
+                </label>
+            </p>
+            <progress id="valuation-progress" value="{{ summary.valued }}" max="{{ summary.total ?: 1 }}">
+                {{ summary.valued }} / {{ summary.total }}
+            </progress>
+        </section>
+
+        <section aria-labelledby="revenue-heading">
+            <h2 id="revenue-heading">Chiffre d'affaires reconnu</h2>
+            <p class="kpi kpi-revenue">
+                {{ (summary.revenueCents / 100)|number_format(2, ',', ' ') }} €
+            </p>
+        </section>
+
+        {% if canViewCost %}
+            <section aria-labelledby="margin-heading">
+                <h2 id="margin-heading">Coût & marge</h2>
+                <dl class="financials">
+                    <dt>Coût réel cumulé</dt>
+                    <dd>{{ (summary.costCents / 100)|number_format(2, ',', ' ') }} €</dd>
+                    <dt>Marge brute</dt>
+                    <dd>{{ (summary.marginCents / 100)|number_format(2, ',', ' ') }} €</dd>
+                </dl>
+            </section>
+
+            <section aria-labelledby="audit-heading">
+                <h2 id="audit-heading">Audit trail du taux appliqué</h2>
+                {% if auditTrail is empty %}
+                    <p>Aucune imputation valorisée à détailler.</p>
+                {% else %}
+                    <table class="valuation-audit">
+                        <thead>
+                            <tr>
+                                <th scope="col">Imputation</th>
+                                <th scope="col">Valorisée le</th>
+                                <th scope="col">CA (€)</th>
+                                <th scope="col">Coût (€)</th>
+                                <th scope="col">Détail du taux</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for line in auditTrail %}
+                                <tr>
+                                    <td><code>{{ line.timeEntryId[:8] }}</code></td>
+                                    <td>{{ line.valuedAt }}</td>
+                                    <td>{{ (line.revenueCents / 100)|number_format(2, ',', ' ') }}</td>
+                                    <td>{{ (line.costCents / 100)|number_format(2, ',', ' ') }}</td>
+                                    <td>
+                                        <details>
+                                            <summary aria-label="Voir le taux appliqué">ℹ️ Taux appliqué</summary>
+                                            <p>
+                                                Vente : {{ (line.sellingRateCents / 100)|number_format(2, ',', ' ') }} €/j —
+                                                Coût : {{ (line.costRateCents / 100)|number_format(2, ',', ' ') }} €/j
+                                                {% if line.rateDate %}— en vigueur au {{ line.rateDate }}{% endif %}
+                                            </p>
+                                        </details>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </section>
+        {% else %}
+            <section aria-labelledby="cost-restricted-heading">
+                <h2 id="cost-restricted-heading">Coût & marge</h2>
+                <p class="hint">Le détail des coûts et des taux est réservé au contrôle de gestion.</p>
+            </section>
+        {% endif %}
+    </main>
+{% endblock %}

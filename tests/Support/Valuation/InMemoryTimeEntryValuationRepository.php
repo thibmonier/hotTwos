@@ -8,6 +8,7 @@ use App\Domain\Tenant\TenantId;
 use App\Domain\Valuation\TimeEntryValuation;
 use App\Domain\Valuation\TimeEntryValuationRepository;
 use App\Domain\Valuation\ValuationStatus;
+use App\Domain\Valuation\ValuationSummary;
 
 final class InMemoryTimeEntryValuationRepository implements TimeEntryValuationRepository
 {
@@ -42,5 +43,42 @@ final class InMemoryTimeEntryValuationRepository implements TimeEntryValuationRe
             static fn (TimeEntryValuation $v): bool => $v->tenantId()->equals($tenant)
                 && ValuationStatus::MISSING_RATE === $v->status(),
         ));
+    }
+
+    public function summaryFor(TenantId $tenant): ValuationSummary
+    {
+        $own = array_filter($this->valuations, static fn (TimeEntryValuation $v): bool => $v->tenantId()->equals($tenant));
+
+        $valued = 0;
+        $missing = 0;
+        $revenue = 0;
+        $cost = 0;
+        $latest = null;
+        foreach ($own as $v) {
+            $revenue += $v->revenueCents();
+            $cost += $v->costCents();
+            if (ValuationStatus::VALUED === $v->status()) {
+                ++$valued;
+            } elseif (ValuationStatus::MISSING_RATE === $v->status()) {
+                ++$missing;
+            }
+            if (null === $latest || $v->valuedAt() > $latest) {
+                $latest = $v->valuedAt();
+            }
+        }
+
+        return new ValuationSummary(count($own), $valued, $missing, $revenue, $cost, $latest);
+    }
+
+    public function findValued(TenantId $tenant, int $limit): array
+    {
+        $valued = array_values(array_filter(
+            $this->valuations,
+            static fn (TimeEntryValuation $v): bool => $v->tenantId()->equals($tenant)
+                && ValuationStatus::VALUED === $v->status(),
+        ));
+        usort($valued, static fn (TimeEntryValuation $a, TimeEntryValuation $b): int => $b->valuedAt() <=> $a->valuedAt());
+
+        return array_slice($valued, 0, $limit);
     }
 }

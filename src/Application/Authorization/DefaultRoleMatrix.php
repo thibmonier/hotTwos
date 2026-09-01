@@ -37,18 +37,21 @@ final class DefaultRoleMatrix
                 Permission::EDIT_PROJECT,
                 Permission::VIEW_COLLABORATOR,
                 Permission::VALIDATE_TIME,
+                Permission::VIEW_PROJECT_FINANCIALS,
             ], DataScope::OWN_PROJECTS),
 
             new RoleDefinition('Resource Manager', [
                 Permission::VIEW_PROJECT,
                 Permission::VIEW_COLLABORATOR,
                 Permission::VIEW_COLLABORATOR_COST,
+                Permission::VIEW_PROJECT_FINANCIALS,
             ], DataScope::POOL),
 
             new RoleDefinition('Dirigeant', [
                 Permission::VIEW_PROJECT,
                 Permission::VIEW_COLLABORATOR,
                 Permission::VIEW_COLLABORATOR_COST,
+                Permission::VIEW_PROJECT_FINANCIALS,
             ], DataScope::TENANT),
 
             new RoleDefinition('Administrateur', [
@@ -62,6 +65,7 @@ final class DefaultRoleMatrix
                 Permission::VIEW_COLLABORATOR,
                 Permission::VALIDATE_TIME,
                 Permission::RECOMPUTE_VALUATION,
+                Permission::VIEW_PROJECT_FINANCIALS,
             ], DataScope::TENANT),
         ];
     }

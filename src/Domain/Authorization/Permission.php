@@ -37,4 +37,7 @@ enum Permission: string
 
     /** Recalcul manuel de la valorisation d'une période (admin/contrôle de gestion — US-060, CA-5). */
     case RECOMPUTE_VALUATION = 'recompute:valuation';
+
+    /** Consultation du tableau de bord financier projet — CA, marge, occupation (US-060, T-060-06). */
+    case VIEW_PROJECT_FINANCIALS = 'view:project_financials';
 }

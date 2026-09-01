@@ -7,7 +7,6 @@
 
 | ID | Élément | Tâche | Est. |
 |----|---------|-------|------|
-| T-060-06 | US-060 | Dashboard financier (fraîcheur, progression, audit trail) | 4h |
 | T-TECH-02 | TECH-4 | Étendre RLS aux tables métier + test d'intrusion | 3h |
 
 ## 🔄 En Cours
@@ -42,7 +41,8 @@
 | T-060-04 | US-060 | `RevenueRecognized` réel (temps × taux figé) → `EventStore` → projecteur → `fact_project_revenue` ; réducteur `RecognizedRevenue` (dernière reconnaissance/imputation gagne, non-divergence par construction) — +8 tests | `9cfa6e8` |
 | T-060-05 | US-060 | CA-4 re-déclenchement auto (`ProfileRateDefined` async → re-valorise les `missing_rate`) + CA-5 `POST /api/valorisation/recompute` → **423** sur période clôturée (stub `PeriodClosureStatus` en attendant US-057), recalcul tracé ; permission `RECOMPUTE_VALUATION` — +10 tests | `4e716b0` |
 | T-060-07 | US-060 | Tests : snapshot figé (CA-2/INV-2/3), non-divergence + supersede de l'indicateur valorisé (ARC-113), charge 1000 imputations (ENF-PERF-5, smoke), fonctionnel recompute (401/403/422/**423**/200) — +10 tests | `e37c966` |
-| T-060-08 | US-060 | Doc `docs/modules/valuation.md` + revues sécu/Symfony. **Fix [Élevé]** : RLS worker (SET/RESET `app.current_tenant` dans `TenantContextMiddleware`, parité HTTP) + tests d'intrusion RLS via consume ; findings Moyens/Faibles traités/documentés | _à committer_ |
+| T-060-08 | US-060 | Doc `docs/modules/valuation.md` + revues sécu/Symfony. **Fix [Élevé]** : RLS worker (SET/RESET `app.current_tenant` dans `TenantContextMiddleware`, parité HTTP) + tests d'intrusion RLS via consume ; findings Moyens/Faibles traités/documentés | `b2b1de2` |
+| T-060-06 | US-060 | Dashboard financier `/valorisation` (fraîcheur, progression `<progress>`, CA, bandeau alerte `missing_rate`, audit trail du taux via `<details>`). Permission `VIEW_PROJECT_FINANCIALS` ; coût/marge/audit gardés par `VIEW_COLLABORATOR_COST` (HAB-1, traçage HAB-6) — +4 tests. **US-060 complète** | _à committer_ |
 
 ## 🚫 Bloqué
 | ID | Élément | Raison | Action |
