@@ -7,12 +7,6 @@
 
 | ID | US | Tâche | Est. |
 |----|----|-------|------|
-| T-052-01 | US-052 | Vue quotidienne mobile-first (44px, clavier num.) | 4h |
-| T-052-02 | US-052 | Swipe jours + duplication (Turbo/Stimulus) | 3h |
-| T-052-03 | US-052 | Offline localStorage + resync | 3h |
-| T-052-04 | US-052 | Dégradation gracieuse 320px | 2h |
-| T-052-05 | US-052 | Tests responsive (320/375/390) + a11y | 3h |
-| T-052-06 | US-052 | Doc + revue a11y | 1h |
 | T-059-01 | US-059 | Service synthèse activité (projet/type/occupation) | 3h |
 | T-059-02 | US-059 | API scoped soi-même (403) + planning dégradé | 3h |
 | T-059-03 | US-059 | Drawer « Ma synthèse » (1 clic, non perturbant) | 4h |
@@ -45,13 +39,14 @@
 | US-054 | US-054 | **Absences (8/8)** : entités demi-journée + RLS, déclaration/décision + notifs, compteurs, blocage RG-TMP-3 (422), API, écran `/absences`, **gate RGPD HAB-3** + intrusion RLS, doc + revues (GO : self-approval, RGPD commentaire, index) | `6e2feb3`→`739c506` |
 | US-058 | US-058 | **Complétude (6/6)** : service grille (4 états, absences déduites), périmètre RBAC (403 équipe), API + export CSV anti-injection, écran `/completude` (grille couleur), doc + revue (GO ; N+1 accepté phase 1, cache/batch phase 2) | `222eb18`→`0add3d5` |
 | US-056 | US-056 | **Relances (7/7)** : entités + RLS (3 tables), moteur borné/déterministe (plancher **par jour ouvré**, escalade 3ᵉ, arrêt à la soumission, opt-out, désactivation globale), CLI cron + handler async + notifier + RLS-via-consume, permission MANAGE_REMINDERS + API (opt-out non forçable), écran `/relances` + bandeau `/saisie` (**conception UX/UI préalable** — consigne PO), doc + revues (GO) | `(S5)` |
+| US-052 | US-052 | **Saisie mobile (6/6)** : vue dédiée `/saisie/jour/{date}` (cartes mobile-first, 44px, inputmode, font ≥16px), Stimulus (total live, swipe + flèches accessibles, reprise veille, offline localStorage + resync), dégradation 320px, `<meta viewport>`+`lang=fr`, réutilise l'API US-050 (**conception UX/UI préalable**), doc + revues (GO : fuite listeners + N+1 corrigés) | `(S5)` |
 
 ## 🚫 Bloqué
 | ID | US | Raison | Action |
 |----|----|--------|--------|
 
 ## Métriques
-- **Tâches** : 44 total | 34 terminées (77 %)
-- **Heures** : ~126h estimées | ~100h consommées
-- **Points** : 22 engagés · **US-057 : 9/9 ✅ · US-054 : 8/8 ✅ · US-058 : 6/6 ✅ · US-056 : 7/7 ✅** (+ T-TECH-03)
-- **Suite** : US-052 (saisie mobile) / US-059 (synthèse activité) — parallélisables ; T-TECH-04 (fixtures démo, optionnel)
+- **Tâches** : 44 total | 40 terminées (91 %)
+- **Heures** : ~126h estimées | ~116h consommées
+- **Points** : 22 engagés · **US-057 : 9/9 ✅ · US-054 : 8/8 ✅ · US-058 : 6/6 ✅ · US-056 : 7/7 ✅ · US-052 : 6/6 ✅** (+ T-TECH-03)
+- **Suite** : US-059 (synthèse activité) ; T-TECH-04 (fixtures démo, optionnel)
