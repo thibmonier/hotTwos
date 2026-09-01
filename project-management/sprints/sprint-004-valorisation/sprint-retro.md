@@ -97,6 +97,20 @@
 | DoD | US-057 porte explicitement « remplace le stub de clôture global d'US-060 ». |
 | Priorité | Moyenne |
 
+### Action 4 : Intégrer une phase de conception UX/UI à chaque sprint
+
+| Attribut | Valeur |
+|----------|--------|
+| Description | Les écrans sont aujourd'hui livrés au fil de l'eau, sans validation de design en amont. **Entamer la mise en place d'écrans (maquettes / prototypes navigables) pour valider le design**, et **inscrire une phase de conception UX/UI** en début de chaque sprint (avant l'implémentation FE) — cadrage des parcours, wireframes, design system, revue d'accessibilité. |
+| Responsable | Product Owner + UX/UI |
+| Deadline | Dès le prochain planning ; formalisé dans le workflow de sprint |
+| DoD | Le workflow de sprint (`/workflow:start`) prévoit une étape « Conception UX/UI » ; chaque US à écran a une maquette validée avant le dev FE ; revue d'accessibilité (WCAG) intégrée à la DoD. |
+| Priorité | Haute (demande explicite du PO) |
+
+> **Note (demande PO)** : la validation du design par des écrans concrets devient un prérequis.
+> Les prochains sprints doivent réserver un temps de **conception UX/UI** (agents `ui-designer` /
+> `ux-ergonome` / `accessibility-expert` disponibles) en amont de l'implémentation.
+
 ## Suivi des actions précédentes
 
 | Sprint | Action | Status |

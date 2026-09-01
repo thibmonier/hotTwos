@@ -105,6 +105,9 @@ ajout de tarif, (3) verrou 423 sur période clôturée, (4) audit trail du taux 
 
 ## Prochaines étapes
 
+0. **[Demande PO] Conception UX/UI** : entamer la mise en place d'écrans (maquettes/prototypes) pour
+   valider le design, et intégrer une **phase de conception UX/UI** en début de chaque sprint (avant
+   le dev FE). Voir Action 4 de la rétrospective.
 1. Rétrospective du sprint (`/workflow:retro`).
 2. Traiter le reliquat de suivi (lot `set_config`) en début de sprint suivant ou en tech-debt.
 3. Planifier le sprint 5 (`/project:decompose-tasks 005`), en gardant US-057 en vue pour lever le stub de clôture.

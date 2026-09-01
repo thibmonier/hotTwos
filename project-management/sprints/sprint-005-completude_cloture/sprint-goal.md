@@ -73,3 +73,8 @@ recalcul s'appuiera alors sur une clôture **par tenant** persistée et tracée.
   socle) à traiter en tech-debt en début de sprint (hors points, avant US-057 qui touche la clôture).
 - **US-053 (préremplissage IA)** volontairement **exclue** : dépend du socle IA mutualisé (EPIC-010),
   à planifier ultérieurement.
+- **[Demande PO — Action rétro S4 #4]** À partir de maintenant, **une phase de conception UX/UI**
+  doit précéder l'implémentation des écrans : maquettes/prototypes validés avant le dev FE, design
+  system et revue d'accessibilité (WCAG). Les écrans du présent sprint (`/absences`,
+  `/administration/periodes`, `/completude`…) sont livrés au fil de l'eau et devront être **repris**
+  dans cette démarche de validation du design.
