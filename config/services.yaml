@@ -60,3 +60,7 @@ services:
     # Ports organisation (US-010, DIP).
     App\Domain\Organization\OrgUnitRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineOrgUnitRepository'
     App\Domain\Organization\OrgMembershipRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineOrgMembershipRepository'
+
+    # Ports tarification (US-011, DIP).
+    App\Domain\Pricing\ProfileRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineProfileRepository'
+    App\Domain\Pricing\ProfileRateRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineProfileRateRepository'
