@@ -64,3 +64,6 @@ services:
     # Ports tarification (US-011, DIP).
     App\Domain\Pricing\ProfileRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineProfileRepository'
     App\Domain\Pricing\ProfileRateRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineProfileRateRepository'
+
+    # Port valorisation (US-060, DIP).
+    App\Domain\Valuation\TimeEntryValuationRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineTimeEntryValuationRepository'
