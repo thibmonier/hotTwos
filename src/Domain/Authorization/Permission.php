@@ -46,4 +46,7 @@ enum Permission: string
 
     /** Demande de réouverture d'une période clôturée (chef de projet habilité — US-057). */
     case REQUEST_PERIOD_REOPENING = 'request:period_reopening';
+
+    /** Validation/refus des demandes d'absence (manager N+1 — US-054). */
+    case VALIDATE_ABSENCE = 'validate:absence';
 }

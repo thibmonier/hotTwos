@@ -39,6 +39,7 @@ final class DefaultRoleMatrix
                 Permission::VALIDATE_TIME,
                 Permission::VIEW_PROJECT_FINANCIALS,
                 Permission::REQUEST_PERIOD_REOPENING,
+                Permission::VALIDATE_ABSENCE,
             ], DataScope::OWN_PROJECTS),
 
             new RoleDefinition('Resource Manager', [
@@ -69,6 +70,7 @@ final class DefaultRoleMatrix
                 Permission::VIEW_PROJECT_FINANCIALS,
                 Permission::MANAGE_PERIODS,
                 Permission::REQUEST_PERIOD_REOPENING,
+                Permission::VALIDATE_ABSENCE,
             ], DataScope::TENANT),
         ];
     }

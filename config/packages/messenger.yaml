@@ -37,6 +37,9 @@ framework:
             'App\Application\Pricing\Message\ProfileRateDefined': async
             # US-057 CA-1 : les calculs aval à la clôture d'une période sont traités hors requête.
             'App\Application\Period\Message\PeriodClosed': async
+            # US-054 CA-1 : notifications d'absence (manager / demandeur) hors requête.
+            'App\Application\Absence\Message\AbsenceDeclared': async
+            'App\Application\Absence\Message\AbsenceDecided': async
 
 when@test:
     framework:
