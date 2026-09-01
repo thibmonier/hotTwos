@@ -92,3 +92,8 @@ services:
     App\Application\Absence\AbsenceBalance:
         arguments:
             $acquiredDays: '%absence.acquired_days%'
+
+    # Ports relances (US-056, DIP).
+    App\Domain\Reminder\ReminderRuleRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineReminderRuleRepository'
+    App\Domain\Reminder\ReminderPreferenceRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineReminderPreferenceRepository'
+    App\Domain\Reminder\ReminderLogRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineReminderLogRepository'
