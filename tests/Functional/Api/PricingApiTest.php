@@ -144,6 +144,25 @@ final class PricingApiTest extends WebTestCase
         self::assertFalse($this->decodeList()[0]['active'] ?? true);
     }
 
+    public function testAdminSeesThePricingScreen(): void
+    {
+        $this->login('admin@agence.test');
+
+        $this->client->request('GET', '/profils');
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('h1', 'Profils de tarification');
+    }
+
+    public function testNonAdminIsForbiddenFromTheScreen(): void
+    {
+        $this->login('marc@agence.test');
+
+        $this->client->request('GET', '/profils');
+
+        self::assertResponseStatusCodeSame(403);
+    }
+
     private function createProfile(string $name, string $mode): string
     {
         $this->postJson('/api/profiles', ['name' => $name, 'calculationMode' => $mode]);

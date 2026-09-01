@@ -1,0 +1,83 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profils & tarifs{% endblock %}
+
+{% block body %}
+    <main class="container" data-controller="pricing">
+        <h1>Profils de tarification</h1>
+
+        <section aria-labelledby="profiles-heading">
+            <h2 id="profiles-heading">Profils</h2>
+            {% if rows is empty %}
+                <p>Aucun profil pour l'instant. Créez le premier ci-dessous.</p>
+            {% else %}
+                <ul class="profile-list">
+                    {% for row in rows %}
+                        <li>
+                            <span class="{{ row.active ? '' : 'profile-inactive' }}">
+                                {{ row.name }} <em>({{ row.mode }})</em>{{ row.active ? '' : ' — désactivé' }}
+                            </span>
+                            <button type="button" data-action="pricing#showHistory" data-profile-id="{{ row.id }}"
+                                    aria-label="Voir l'historique tarifaire de {{ row.name }}">Historique</button>
+                            {% if row.active %}
+                                <button type="button" data-action="pricing#deactivate" data-profile-id="{{ row.id }}"
+                                        aria-label="Désactiver le profil {{ row.name }}">Désactiver</button>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </section>
+
+        <section aria-labelledby="create-profile-heading">
+            <h2 id="create-profile-heading">Ajouter un profil</h2>
+            <form data-action="submit->pricing#createProfile">
+                <label>Nom <input type="text" required data-pricing-target="profileName" placeholder="ex. Développeur senior"></label>
+                <label>Mode de calcul du coût
+                    <select data-pricing-target="profileMode">
+                        <option value="direct">Direct</option>
+                        <option value="loaded">Chargé</option>
+                        <option value="full">Complet</option>
+                    </select>
+                </label>
+                <button type="submit">Créer le profil</button>
+            </form>
+        </section>
+
+        <section aria-labelledby="define-rate-heading">
+            <h2 id="define-rate-heading">Définir un tarif</h2>
+            <form data-action="submit->pricing#defineRate">
+                <label>Profil
+                    <select required data-pricing-target="rateProfile">
+                        {% for row in rows %}
+                            <option value="{{ row.id }}">{{ row.name }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <label>À partir du <input type="date" required data-pricing-target="rateFrom"></label>
+                <label>Jusqu'au (optionnel) <input type="date" data-pricing-target="rateTo"></label>
+                <label>Coût de revient (centimes) <input type="number" min="1" required data-pricing-target="rateCost"></label>
+                <label>Taux de vente (centimes) <input type="number" min="1" required data-pricing-target="rateSelling"></label>
+                <label><input type="checkbox" data-pricing-target="rateConfirm"> Confirmer une saisie rétroactive</label>
+                <button type="submit">Enregistrer le tarif</button>
+            </form>
+        </section>
+
+        <section aria-labelledby="history-heading">
+            <h2 id="history-heading">Historique tarifaire</h2>
+            <table class="rate-history">
+                <thead>
+                    <tr>
+                        <th scope="col">À partir du</th>
+                        <th scope="col">Jusqu'au</th>
+                        <th scope="col">Coût (cts)</th>
+                        <th scope="col">Vente (cts)</th>
+                    </tr>
+                </thead>
+                <tbody data-pricing-target="history"></tbody>
+            </table>
+        </section>
+
+        <p class="hint" aria-live="polite" data-pricing-target="status"></p>
+    </main>
+{% endblock %}
