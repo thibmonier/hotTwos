@@ -59,6 +59,7 @@ security:
         - { path: ^/absences, roles: ROLE_USER }
         # Complétude US-058 : authentifié ; le périmètre équipe (VIEW_TEAM_COMPLETENESS) est applicatif.
         - { path: ^/api/completude, roles: ROLE_USER }
+        - { path: ^/completude, roles: ROLE_USER }
 
 when@test:
     security:
