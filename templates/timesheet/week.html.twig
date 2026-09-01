@@ -19,6 +19,8 @@
             <a href="{{ path('timesheet_week', { date: nextDate }) }}" rel="next">Semaine suivante →</a>
         </nav>
 
+        <p><a href="{{ path('timesheet_day', { date: weekStart }) }}">Vue jour (mobile)</a></p>
+
         {% if projects is empty %}
             <p>Aucun projet actif : demandez à un administrateur d'en créer un pour saisir votre temps.</p>
         {% else %}

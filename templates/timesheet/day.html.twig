@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Saisie du jour — {{ dayLabel }}{% endblock %}
+
+{% block body %}
+    <main class="container day-view"
+          data-controller="timesheet-day"
+          data-timesheet-day-date-value="{{ date }}"
+          data-timesheet-day-prev-value="{{ prevDate }}"
+          data-timesheet-day-next-value="{{ nextDate }}">
+        <h1>Saisie du jour</h1>
+
+        <nav class="day-nav" aria-label="Navigation entre les jours">
+            <a href="{{ path('timesheet_day', { date: prevDate }) }}" class="day-nav-btn" rel="prev" aria-label="Jour précédent">←</a>
+            <a href="{{ path('timesheet_day', { date: todayDate }) }}" class="day-nav-label">{{ dayLabel }} — semaine {{ weekNumber }}</a>
+            <a href="{{ path('timesheet_day', { date: nextDate }) }}" class="day-nav-btn" rel="next" aria-label="Jour suivant">→</a>
+        </nav>
+
+        <p class="day-total" data-timesheet-day-target="total" aria-live="polite"></p>
+
+        <p class="offline-banner" role="status" aria-live="polite" hidden data-timesheet-day-target="offlineBanner">
+            <span aria-hidden="true">📴</span> Pas de connexion — vos saisies sont conservées sur cet appareil.
+        </p>
+        <p class="offline-banner" role="status" aria-live="polite" hidden data-timesheet-day-target="resyncBanner">
+            <span aria-hidden="true">🔄</span> Saisies en attente de synchronisation.
+            <button type="button" data-action="timesheet-day#resync">Resynchroniser</button>
+        </p>
+
+        {% if projects is empty %}
+            <p>Aucun projet actif : demandez à un administrateur d'en créer un pour saisir votre temps.</p>
+        {% else %}
+            <p>
+                <button type="button" data-action="timesheet-day#duplicatePrevious">Reprendre la saisie de la veille</button>
+            </p>
+
+            <ul class="day-entries">
+                {% for project in projects %}
+                    {% set minutes = minutesByProject[project.id] ?? null %}
+                    <li class="day-entry-card">
+                        <div class="day-entry-header">{{ project.name }} <small>{{ project.code }}</small></div>
+
+                        <label class="day-entry-field" for="duration-{{ loop.index }}">Durée (minutes)</label>
+                        <input type="number" id="duration-{{ loop.index }}" class="day-entry-duration"
+                               inputmode="numeric" min="0" max="1440" step="15"
+                               value="{{ minutes }}"
+                               data-timesheet-day-target="entry"
+                               data-project-id="{{ project.id }}"
+                               data-previous-minutes="{{ previousMinutesByProject[project.id] ?? '' }}"
+                               data-action="input->timesheet-day#recalculate"
+                               aria-describedby="duration-help">
+
+                        <label class="day-entry-field" for="comment-{{ loop.index }}">Commentaire (optionnel)</label>
+                        <input type="text" id="comment-{{ loop.index }}" class="day-entry-comment"
+                               maxlength="500" data-timesheet-day-target="comment" data-project-id="{{ project.id }}">
+                    </li>
+                {% endfor %}
+            </ul>
+            <p id="duration-help" class="hint">Durée en minutes, par pas de 15 (ex. 90 pour 1h30).</p>
+
+            <div class="day-submit-bar">
+                <button type="button" class="day-submit-btn" data-timesheet-day-target="submit" data-action="timesheet-day#submitDay">
+                    Enregistrer la journée
+                </button>
+                <span class="hint" role="status" aria-live="polite" data-timesheet-day-target="status"></span>
+            </div>
+        {% endif %}
+
+        <p><a href="{{ path('timesheet_week', { date: date }) }}">Vue semaine (bureau)</a></p>
+    </main>
+{% endblock %}
