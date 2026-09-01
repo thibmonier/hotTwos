@@ -3,12 +3,13 @@
 ## Métadonnées
 - **ID**: US-060
 - **EPIC**: EPIC-003
-- **Sprint**: Sprint 3
+- **Sprint**: Sprint 4
 - **Statut**: 🔴 To Do
 - **Points**: 8
 - **Persona**: P2 (Marc — chef de projet), P6 (Directeur financier / contrôleur de gestion)
 - **Créé le**: 2026-08-31
-- **Mis à jour**: 2026-08-31
+- **Mis à jour**: 2026-09-01
+<!-- last_sync: 2026-09-01 (source: workflow-status.yaml current_sprint id:4) -->
 
 ## Traçabilité
 - **Implémente**: EF-TMP-29 (alimentation automatique des indicateurs coûts projet, marge et taux d'occupation après validation des temps, délai maximum 15 minutes), INV-2 (valorisation figée à la date de validation : un changement de taux ultérieur ne réécrit pas les données historiques), INV-3 (intégrité du calcul : le taux appliqué est le taux en vigueur à la date de validation, conservé dans l'historique), ENF-PERF-5 (performance : valorisation de 1 000 imputations en ≤ 15 minutes, traitement asynchrone)

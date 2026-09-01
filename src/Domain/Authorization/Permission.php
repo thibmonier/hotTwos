@@ -26,6 +26,18 @@ enum Permission: string
     /** Attribution de rôles à d'autres utilisateurs (soumise à l'anti-élévation — CA-6). */
     case MANAGE_ROLES = 'manage:roles';
 
+    /** Paramétrage de l'organisation : hiérarchie et rattachements des collaborateurs (US-010, admin tenant). */
+    case MANAGE_ORGANIZATION = 'manage:organization';
+
+    /** Paramétrage de la tarification : profils, coûts de revient et taux de vente (US-011, admin tenant). */
+    case MANAGE_PRICING = 'manage:pricing';
+
     /** Validation/refus des imputations de temps (chef de projet, sur ses projets — US-055). */
     case VALIDATE_TIME = 'validate:time';
+
+    /** Recalcul manuel de la valorisation d'une période (admin/contrôle de gestion — US-060, CA-5). */
+    case RECOMPUTE_VALUATION = 'recompute:valuation';
+
+    /** Consultation du tableau de bord financier projet — CA, marge, occupation (US-060, T-060-06). */
+    case VIEW_PROJECT_FINANCIALS = 'view:project_financials';
 }

@@ -14,7 +14,10 @@
         <ini name="display_errors" value="1" />
         <ini name="error_reporting" value="-1" />
         <server name="APP_ENV" value="test" force="true" />
-        <server name="DATABASE_URL" value="postgresql://app:app@127.0.0.1:5432/app?serverVersion=16&amp;charset=utf8" force="true" />
+        <!-- DATABASE_URL n'est PAS forcé : l'environnement fournit l'hôte réel de la base.
+             En Docker (make test), le conteneur pointe vers le service `database`; en CI GitHub,
+             le job fournit `127.0.0.1`. La valeur ci-dessous n'est qu'un repli si rien n'est défini. -->
+        <server name="DATABASE_URL" value="postgresql://app:app@127.0.0.1:5432/app?serverVersion=16&amp;charset=utf8" />
         <server name="SHELL_VERBOSITY" value="-1" />
     </php>
 

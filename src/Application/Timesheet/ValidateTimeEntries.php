@@ -11,10 +11,12 @@ use App\Domain\Authorization\SecurityAuditLogger;
 use App\Domain\Project\Project;
 use App\Domain\Project\ProjectRepository;
 use App\Domain\Tenant\TenantId;
+use App\Application\Timesheet\Message\TimeEntriesValidated;
 use App\Domain\Timesheet\TimeEntryRepository;
 use App\Domain\Timesheet\TimesheetException;
 use App\Domain\User\User;
 use DateTimeImmutable;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
  * Validation/refus des imputations par lot (US-055, ARC-19/ARC-106).
@@ -32,6 +34,7 @@ final readonly class ValidateTimeEntries
         private ProjectRepository $projects,
         private TimeEntryRepository $entries,
         private SecurityAuditLogger $audit,
+        private MessageBusInterface $bus,
     ) {
     }
 
@@ -79,9 +82,11 @@ final readonly class ValidateTimeEntries
         }
 
         $decidedAt = new DateTimeImmutable();
+        $validatedIds = [];
         foreach ($entries as $entry) {
             if (null === $reason) {
                 $entry->validate($actor->id(), $decidedAt);
+                $validatedIds[] = $entry->id();
             } else {
                 $entry->reject($actor->id(), $reason, $decidedAt);
             }
@@ -94,6 +99,11 @@ final readonly class ValidateTimeEntries
             $actor->getUserIdentifier(),
             ['count' => (string) count($entries)],
         );
+
+        // Couplage par événement (US-060) : le temps validé déclenche sa valorisation asynchrone.
+        if ([] !== $validatedIds) {
+            $this->bus->dispatch(new TimeEntriesValidated($tenant->toString(), $validatedIds, $decidedAt));
+        }
 
         return count($entries);
     }

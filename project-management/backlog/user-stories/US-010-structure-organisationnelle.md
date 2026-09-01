@@ -3,12 +3,13 @@
 ## Métadonnées
 - **ID**: US-010
 - **EPIC**: EPIC-001
-- **Sprint**: Sprint 1
+- **Sprint**: Sprint 4
 - **Statut**: 🔴 To Do
 - **Points**: 5
 - **Persona**: ADMIN
 - **Créé le**: 2026-08-31
-- **Mis à jour**: 2026-08-31
+- **Mis à jour**: 2026-09-01
+<!-- last_sync: 2026-09-01 (source: workflow-status.yaml current_sprint id:4) -->
 
 ## Traçabilité
 - **Implémente**: EF-REF-1, EF-REF-2, EF-REF-3, RG-REF-1

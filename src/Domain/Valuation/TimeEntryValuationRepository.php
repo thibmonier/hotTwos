@@ -1,0 +1,37 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Domain\Valuation;
+
+use App\Domain\Tenant\TenantId;
+
+/**
+ * Port de persistance des valorisations figées (US-060, DIP). Tenant explicite.
+ */
+interface TimeEntryValuationRepository
+{
+    public function save(TimeEntryValuation $valuation): void;
+
+    public function findForTimeEntry(TenantId $tenant, string $timeEntryId): ?TimeEntryValuation;
+
+    /**
+     * Valorisations en attente de tarif (CA-4), à re-déclencher.
+     *
+     * @return list<TimeEntryValuation>
+     */
+    public function findMissingRate(TenantId $tenant): array;
+
+    /**
+     * Agrégat du tableau de bord financier (US-060, T-060-06) : avancement, CA et coût cumulés,
+     * fraîcheur — en une seule agrégation, sans charger les lignes.
+     */
+    public function summaryFor(TenantId $tenant): ValuationSummary;
+
+    /**
+     * Dernières valorisations abouties (`valued`), pour l'audit trail du taux appliqué.
+     *
+     * @return list<TimeEntryValuation>
+     */
+    public function findValued(TenantId $tenant, int $limit): array;
+}

@@ -1,6 +1,6 @@
 # Backlog Index — HotOnes
 
-> Dernière mise à jour: 2026-08-31
+> Dernière mise à jour: 2026-09-01
 > Source de vérité fonctionnelle : `project-management/cdc/` · PRD : `project-management/prd.md`
 
 ---
@@ -39,29 +39,31 @@
 
 ---
 
-## Sprint Actuel : Sprint 0 — Fondations & Outillage ✅ composé
+## Sprint Actuel : Sprint 4 — Valorisation automatique du temps validé 🔄 en cours
 
-**Goal :** Installer le socle technique (squelette Symfony 8 mode worker + architecture, environnement conteneurisé, staging, outillage qualité/sécurité) afin que le Sprint 1 construise sur un socle sûr, reproductible et vérifié en continu. **Aucune valeur métier** — de la capacité de construire.
-**Période :** 2026-08-18 → 2026-08-29 (10 j ouvrés) · **Détail :** `sprints/sprint-000-fondations/`
-**Capacité (prévision) :** 28 points — à recalibrer (hypothèse d'équipe, cf. `ARB-20`).
+**Goal :** Dès qu'un temps est validé, il est automatiquement valorisé (coût & taux en vigueur à la période) et le modèle analytique reflète la marge du projet.
+**Période :** 2026-09-29 → 2026-10-10 (10 j ouvrés) · **Détail :** `sprints/sprint-004-valorisation/`
+**Capacité (prévision) :** ~24 points (moy. S1-S3 : 29/20/23) · **Engagé : 21 pts**
 
 | US | EPIC | Points | Statut |
 |----|------|--------|--------|
-| US-006 Squelette Symfony 8 + FrankenPHP worker + archi | EPIC-000 | 8 | 🔴 |
-| US-007 Environnement conteneurisé + données de test | EPIC-000 | 5 | 🔴 |
-| US-004 Chaîne CI/CD et exécution en mode worker | EPIC-000 | 5 | 🔴 |
-| US-008 Staging + secrets + observabilité | EPIC-000 | 5 | 🔴 |
-| US-009 Outillage qualité/sécurité + conventions agent | EPIC-000 | 5 | 🔴 |
-| **Total engagé** | | **28** | |
+| US-010 Structure organisationnelle et rattachements historisés | EPIC-001 | 5 | 🔴 |
+| US-011 Référentiel de profils avec coûts et taux historisés | EPIC-001 | 8 | 🔴 |
+| US-060 Valorisation automatique après validation (≤ 15 min) | EPIC-003 | 8 | 🔴 |
+| **Total engagé** | | **21** | |
 
-> ⚠️ Prérequis non-logiciels en parallèle (hors backlog dev) : `AUD-1`/`AUD-2` (audit existant, peut réviser le scénario — `CDR-5`), design system (`cdc/11`), AIPD (`ENF-RGPD-5`), AI Act (`CTR-3`).
+> Décision PO : chaîne complète org → taux → valorisation. Historisation à date d'effet, valorisation **figée** à la validation (`INV-2`/`ARC-113`). La sonde `RevenueRecognized` devient réelle.
 
-### Sprint suivant : Sprint 1 — Walking Skeleton applicatif (composé, 29 pts)
+### Sprints livrés
 
-**Goal :** Charpente applicative — tenant isolé (barrière testée), auth + RBAC, modèle analytique reconstructible. Première saisie de temps engagée pour le Sprint 2.
-US : US-001 (8), US-002 (5), US-003 (8), US-005 (8) · **Détail :** `sprints/sprint-001-walking_skeleton/`
+| Sprint | But | Points | Statut |
+|--------|-----|--------|--------|
+| Sprint 0 | Fondations & outillage | 28 | ✅ |
+| Sprint 1 | Walking Skeleton (multi-tenant, auth/RBAC, analytique) | 29 | ✅ merged (#2) |
+| Sprint 2 | Consolidation technique (migrations, RLS runtime, worker, obs.) | 20 | ✅ merged (#3) |
+| Sprint 3 | Première saisie de temps (saisie ≤2min, validation par lot, RLS prod) | 23 | ✅ merged (#4) |
 
-Prochaine étape : `/project:decompose-tasks 000` (tâches en heures), puis `/sprint:dev US-006`.
+Prochaine étape : décomposition Sprint 4 faite (`sprints/sprint-004-valorisation/task-board.md`), puis `/sprint:dev US-010`.
 
 ---
 

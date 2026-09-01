@@ -8,6 +8,7 @@ use App\Domain\Analytics\AnalyticsProjector;
 use App\Domain\Analytics\DimPeriod;
 use App\Domain\Analytics\EventStore;
 use App\Domain\Analytics\FactProjectRevenue;
+use App\Domain\Analytics\RecognizedRevenue;
 use App\Domain\Tenant\TenantId;
 use Doctrine\ORM\EntityManagerInterface;
 use Throwable;
@@ -67,21 +68,9 @@ final readonly class DoctrineAnalyticsProjector implements AnalyticsProjector
 
     private function replay(TenantId $tenant): void
     {
-        /** @var array<string, array<string, int>> $totals period => (projectRef => amountCents) */
-        $totals = [];
-
-        foreach ($this->eventStore->streamFor($tenant) as $event) {
-            if ('revenue_recognized' !== $event->name()) {
-                continue;
-            }
-
-            $payload = $event->payload();
-            $period = (string) $payload['period'];
-            $projectRef = (string) $payload['project_ref'];
-            $amount = (int) $payload['amount_cents'];
-
-            $totals[$period][$projectRef] = ($totals[$period][$projectRef] ?? 0) + $amount;
-        }
+        // Sémantique de projection centralisée (US-060) : partagée avec le vérificateur de
+        // non-divergence pour garantir l'égalité source/modèle par construction.
+        $totals = RecognizedRevenue::byPeriodAndProject($this->eventStore->streamFor($tenant));
 
         foreach ($totals as $period => $byProject) {
             $this->entityManager->persist(new DimPeriod($tenant, $period));

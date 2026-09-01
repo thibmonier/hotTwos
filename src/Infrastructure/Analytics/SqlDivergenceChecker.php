@@ -8,6 +8,7 @@ use App\Domain\Analytics\Divergence;
 use App\Domain\Analytics\DivergenceChecker;
 use App\Domain\Analytics\EventStore;
 use App\Domain\Analytics\FactProjectRevenue;
+use App\Domain\Analytics\RecognizedRevenue;
 use App\Domain\Tenant\TenantId;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -56,15 +57,12 @@ final readonly class SqlDivergenceChecker implements DivergenceChecker
      */
     private function expectedFromSource(TenantId $tenant): array
     {
+        // Même réduction que le projecteur (US-060) : chemin de code distinct (recalcul PHP
+        // vs matérialisation SQL) mais règle métier unique — un écart ne peut venir que d'un
+        // bug de matérialisation, jamais d'une divergence de définition de l'indicateur.
         $expected = [];
-        foreach ($this->eventStore->streamFor($tenant) as $event) {
-            if ('revenue_recognized' !== $event->name()) {
-                continue;
-            }
-
-            $payload = $event->payload();
-            $period = (string) $payload['period'];
-            $expected[$period] = ($expected[$period] ?? 0) + (int) $payload['amount_cents'];
+        foreach (RecognizedRevenue::byPeriodAndProject($this->eventStore->streamFor($tenant)) as $period => $byProject) {
+            $expected[$period] = array_sum($byProject);
         }
 
         return $expected;

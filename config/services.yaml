@@ -7,6 +7,9 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    # US-060 / CA-5 — périodes comptables clôturées (mois `YYYY-MM`), en attendant US-057.
+    # Stub par configuration : vide = aucune clôture. Surchargeable en test/déploiement.
+    valuation.closed_periods: []
 
 services:
     # default configuration for services in *this* file
@@ -53,3 +56,24 @@ services:
     # Ports de saisie de temps (US-050, DIP).
     App\Domain\Project\ProjectRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineProjectRepository'
     App\Domain\Timesheet\TimeEntryRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineTimeEntryRepository'
+
+    # Port utilisateur (lecture, US-010 — validation d'appartenance tenant).
+    App\Domain\User\UserRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineUserRepository'
+
+    # Ports organisation (US-010, DIP).
+    App\Domain\Organization\OrgUnitRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineOrgUnitRepository'
+    App\Domain\Organization\OrgMembershipRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineOrgMembershipRepository'
+
+    # Ports tarification (US-011, DIP).
+    App\Domain\Pricing\ProfileRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineProfileRepository'
+    App\Domain\Pricing\ProfileRateRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineProfileRateRepository'
+    App\Domain\Pricing\ProfileAssignmentRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineProfileAssignmentRepository'
+
+    # Port valorisation (US-060, DIP).
+    App\Domain\Valuation\TimeEntryValuationRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineTimeEntryValuationRepository'
+
+    # Statut de clôture de période (US-060 CA-5) : stub par configuration jusqu'à US-057.
+    App\Domain\Valuation\PeriodClosureStatus: '@App\Infrastructure\Valuation\ConfiguredPeriodClosure'
+    App\Infrastructure\Valuation\ConfiguredPeriodClosure:
+        arguments:
+            $closedPeriods: '%valuation.closed_periods%'

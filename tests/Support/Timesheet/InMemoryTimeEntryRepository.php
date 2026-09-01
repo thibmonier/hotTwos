@@ -68,6 +68,20 @@ final class InMemoryTimeEntryRepository implements TimeEntryRepository
         ));
     }
 
+    public function findValidatedInPeriod(TenantId $tenant, DateTimeImmutable $from, DateTimeImmutable $to): array
+    {
+        $fromKey = $from->format('Y-m-d');
+        $toKey = $to->format('Y-m-d');
+
+        return array_values(array_filter($this->entries, static function (TimeEntry $entry) use ($tenant, $fromKey, $toKey): bool {
+            $day = $entry->workDate()->format('Y-m-d');
+
+            return $entry->tenantId()->equals($tenant)
+                && ValidationStatus::VALIDATED === $entry->status()
+                && $day >= $fromKey && $day < $toKey;
+        }));
+    }
+
     public function save(TimeEntry $entry): void
     {
         foreach ($this->entries as $existing) {

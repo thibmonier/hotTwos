@@ -1,0 +1,74 @@
+# File d'exécution batch — Sprint 4 (Valorisation)
+# Généré par /project:run-sprint 004 --auto le 2026-09-01
+# Note : pas de .bmad/ dans ce projet → file rangée sous project-management/
+
+metadata:
+  sprint_id: 4
+  name: sprint-004-valorisation
+  goal: "Le temps validé est automatiquement valorisé (coût & vente au tarif en vigueur) et alimente la marge projet"
+  gate: "validé 100/100 (2026-09-01)"
+  committed_points: 21
+  estimated_hours: 84
+
+execution:
+  mode: sequential            # chaîne strictement séquentielle US-010 → US-011 → US-060
+  parallel_limit: 1           # aucun parallélisme au niveau story (dépendances dures)
+  resume_on_failure: true
+  checkpoint_interval: 1      # checkpoint après chaque tâche/story
+
+# Ordre d'exécution (le plus récent gagne). Chemin critique en gras dans le plan.
+queue:
+  - id: T-TECH-01
+    story: TECH-4
+    title: "Installer/configurer Messenger (async, transport Doctrine)"
+    priority: 1
+    depends_on: []
+    est_hours: 3
+    status: pending
+
+  - id: US-010
+    title: "Structure organisationnelle et rattachements historisés"
+    points: 5
+    priority: 2
+    depends_on: [US-001]          # multi-tenant ✅ livré
+    tasks: [T-010-01, T-010-02, T-010-03, T-010-04, T-010-05, T-010-06, T-010-07, T-010-08]
+    critical_path_root: T-010-01  # VO EffectivePeriod (risque n°1)
+    est_hours: 23
+    status: pending
+
+  - id: US-011
+    title: "Référentiel de profils : coûts & taux historisés à date d'effet"
+    points: 8
+    priority: 3
+    depends_on: [US-010]          # VO EffectivePeriod
+    tasks: [T-011-01, T-011-02, T-011-03, T-011-04, T-011-05, T-011-06, T-011-07, T-011-08]
+    critical_path: T-011-03       # RateResolver (ARC-6), consommé par US-060
+    est_hours: 27
+    status: pending
+
+  - id: US-060
+    title: "Valorisation automatique après validation (≤ 15 min)"
+    points: 8
+    priority: 4
+    depends_on: [T-TECH-01, US-011, US-055, US-005]  # US-055/005 ✅ livrés
+    tasks: [T-060-01, T-060-02, T-060-03, T-060-04, T-060-05, T-060-06, T-060-07, T-060-08]
+    critical_path: [T-060-02, T-060-04, T-060-07]    # snapshot → fait réel → non-divergence
+    est_hours: 28
+    status: pending
+
+  - id: T-TECH-02
+    story: TECH-4
+    title: "Étendre RLS aux tables métier + test d'intrusion"
+    priority: 5
+    depends_on: [US-010, US-011, US-060]  # après toutes les migrations
+    est_hours: 3
+    status: pending
+
+# Réserve (hors engagement, si capacité) — non mise en file auto
+reserve:
+  - id: T-TECH-03
+    title: "E2E chronométré ≤ 2 min (RSQ-1)"
+    est_hours: 2
+  - id: T-TECH-04
+    title: "Fixtures de démo"
+    est_hours: 2

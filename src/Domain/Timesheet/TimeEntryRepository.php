@@ -46,5 +46,13 @@ interface TimeEntryRepository
      */
     public function findPendingForProjects(TenantId $tenant, array $projectIds): array;
 
+    /**
+     * Imputations **validées** dont le jour de prestation appartient à `[from, to)` — recalcul
+     * de valorisation d'une période (US-060, CA-5). Bornes semi-ouvertes (from inclus, to exclu).
+     *
+     * @return list<TimeEntry>
+     */
+    public function findValidatedInPeriod(TenantId $tenant, DateTimeImmutable $from, DateTimeImmutable $to): array;
+
     public function save(TimeEntry $entry): void;
 }

@@ -37,6 +37,21 @@ security:
         - { path: ^/saisie, roles: ROLE_USER }
         # Validation des temps US-055 : le contrôle fin (permission + périmètre) est applicatif.
         - { path: ^/validation, roles: ROLE_USER }
+        # Organisation US-010 : authentification requise ; l'habilitation ADMIN (MANAGE_ORGANIZATION)
+        # est vérifiée dans la couche applicative (ARC-19).
+        - { path: ^/api/org-units, roles: ROLE_USER }
+        - { path: ^/api/org-memberships, roles: ROLE_USER }
+        - { path: ^/organisation, roles: ROLE_USER }
+        # Tarification US-011 : authentification requise ; habilitation ADMIN (MANAGE_PRICING) en applicatif.
+        - { path: ^/api/profiles, roles: ROLE_USER }
+        - { path: ^/api/profile-rates, roles: ROLE_USER }
+        - { path: ^/profils, roles: ROLE_USER }
+        # Valorisation US-060 : recalcul manuel authentifié ; l'habilitation RECOMPUTE_VALUATION
+        # (et le verrou de période clôturée) sont vérifiés dans la couche applicative (ARC-19).
+        - { path: ^/api/valorisation, roles: ROLE_USER }
+        # Dashboard financier US-060 : authentifié ; habilitation VIEW_PROJECT_FINANCIALS (et le
+        # gating du coût sensible) portés par la couche applicative (ARC-19).
+        - { path: ^/valorisation, roles: ROLE_USER }
 
 when@test:
     security:

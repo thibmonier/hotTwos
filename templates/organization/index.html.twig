@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Organisation{% endblock %}
+
+{% block body %}
+    <main class="container" data-controller="organization">
+        <h1>Structure organisationnelle</h1>
+
+        <section aria-labelledby="units-heading">
+            <h2 id="units-heading">Unités</h2>
+            {% if rows is empty %}
+                <p data-organization-target="empty">Aucune unité pour l'instant. Créez la première ci-dessous.</p>
+            {% else %}
+                <ul class="org-tree">
+                    {% for row in rows %}
+                        <li style="margin-left: {{ row.depth * 1.5 }}rem">
+                            <span class="org-unit-name{{ row.active ? '' : ' org-unit-inactive' }}">
+                                {{ row.name }}{{ row.active ? '' : ' (désactivée)' }}
+                            </span>
+                            {% if row.active %}
+                                <button type="button"
+                                        data-action="organization#deactivate"
+                                        data-org-id="{{ row.id }}"
+                                        aria-label="Désactiver l'unité {{ row.name }}">Désactiver</button>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </section>
+
+        <section aria-labelledby="create-heading">
+            <h2 id="create-heading">Ajouter une unité</h2>
+            <form data-action="submit->organization#createUnit">
+                <label>Nom
+                    <input type="text" required data-organization-target="unitName" placeholder="ex. Direction financière">
+                </label>
+                <label>Rattacher sous
+                    <select data-organization-target="unitParent">
+                        <option value="">— racine —</option>
+                        {% for row in rows %}
+                            <option value="{{ row.id }}">{{ row.indent }}{{ row.name }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <button type="submit">Créer l'unité</button>
+            </form>
+        </section>
+
+        <section aria-labelledby="attach-heading">
+            <h2 id="attach-heading">Rattacher un collaborateur</h2>
+            <form data-action="submit->organization#attach">
+                <label>Identifiant du collaborateur
+                    <input type="text" required data-organization-target="userId" placeholder="UUID du collaborateur">
+                </label>
+                <label>Unité
+                    <select required data-organization-target="attachUnit">
+                        {% for row in rows|filter(r => r.active) %}
+                            <option value="{{ row.id }}">{{ row.indent }}{{ row.name }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <label>À partir du
+                    <input type="date" required data-organization-target="effectiveFrom">
+                </label>
+                <button type="submit">Rattacher</button>
+            </form>
+        </section>
+
+        <p class="hint" aria-live="polite" data-organization-target="status"></p>
+    </main>
+{% endblock %}
