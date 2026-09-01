@@ -7,12 +7,6 @@
 
 | ID | US | Tâche | Est. |
 |----|----|-------|------|
-| T-059-01 | US-059 | Service synthèse activité (projet/type/occupation) | 3h |
-| T-059-02 | US-059 | API scoped soi-même (403) + planning dégradé | 3h |
-| T-059-03 | US-059 | Drawer « Ma synthèse » (1 clic, non perturbant) | 4h |
-| T-059-04 | US-059 | Bottom-sheet mobile | 2h |
-| T-059-05 | US-059 | Tests 403/vide/CA-5 | 3h |
-| T-059-06 | US-059 | Doc + revue | 1h |
 | T-TECH-04 | Tech | Fixtures démo EPIC-003 (🟢 optionnel) | 2h |
 
 ## 🔄 En Cours
@@ -40,13 +34,15 @@
 | US-058 | US-058 | **Complétude (6/6)** : service grille (4 états, absences déduites), périmètre RBAC (403 équipe), API + export CSV anti-injection, écran `/completude` (grille couleur), doc + revue (GO ; N+1 accepté phase 1, cache/batch phase 2) | `222eb18`→`0add3d5` |
 | US-056 | US-056 | **Relances (7/7)** : entités + RLS (3 tables), moteur borné/déterministe (plancher **par jour ouvré**, escalade 3ᵉ, arrêt à la soumission, opt-out, désactivation globale), CLI cron + handler async + notifier + RLS-via-consume, permission MANAGE_REMINDERS + API (opt-out non forçable), écran `/relances` + bandeau `/saisie` (**conception UX/UI préalable** — consigne PO), doc + revues (GO) | `(S5)` |
 | US-052 | US-052 | **Saisie mobile (6/6)** : vue dédiée `/saisie/jour/{date}` (cartes mobile-first, 44px, inputmode, font ≥16px), Stimulus (total live, swipe + flèches accessibles, reprise veille, offline localStorage + resync), dégradation 320px, `<meta viewport>`+`lang=fr`, réutilise l'API US-050 (**conception UX/UI préalable**), doc + revues (GO : fuite listeners + N+1 corrigés) | `(S5)` |
+| US-059 | US-059 | **Synthèse activité (6/6)** : service `ActivitySummary` (répartition projet/type, occupation, statuts RG-TMP-4), API `/api/activity-summary` scoped soi-même (403 sur user_id tiers) + planning dégradé (US-037 absente), drawer « Ma synthèse » `<dialog>` SSR lecture seule (1 clic, focus rétabli — CA-5) + bottom-sheet mobile, barres accessibles, doc + revues (**conception UX/UI préalable** ; GO) | `(S5)` |
 
 ## 🚫 Bloqué
 | ID | US | Raison | Action |
 |----|----|--------|--------|
 
 ## Métriques
-- **Tâches** : 44 total | 40 terminées (91 %)
-- **Heures** : ~126h estimées | ~116h consommées
-- **Points** : 22 engagés · **US-057 : 9/9 ✅ · US-054 : 8/8 ✅ · US-058 : 6/6 ✅ · US-056 : 7/7 ✅ · US-052 : 6/6 ✅** (+ T-TECH-03)
-- **Suite** : US-059 (synthèse activité) ; T-TECH-04 (fixtures démo, optionnel)
+- **Tâches** : 44 total | 43 terminées (98 %) — seul T-TECH-04 (🟢 optionnel) reste
+- **Heures** : ~126h estimées | ~132h consommées
+- **Points** : 22 engagés · **6/6 US livrées** : US-057 ✅ · US-054 ✅ · US-058 ✅ · US-056 ✅ · US-052 ✅ · US-059 ✅ (+ T-TECH-03)
+- **CI** : `make ci` vert — **371 tests**, PHPStan max, Deptrac, cs/rector, gitleaks, `schema:validate`.
+- **Suite** : T-TECH-04 (fixtures démo, optionnel) ; sinon sprint prêt pour Review/Rétro et PR #7 « ready ».

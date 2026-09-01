@@ -8,7 +8,8 @@
 - **Branche** : `feature/sprint-5-planning`. **PR draft #7** ouverte (WIP). Base `main` (Sprint 4
   mergé PR #6, Railway à jour). Tout est commité et **vert** : `make ci` = **318 tests**, PHPStan
   max 0, Deptrac 0, cs/rector OK, gitleaks OK. `schema:validate` OK.
-- **Avancement : 34/44 tâches (77 %)** — voir `task-board.md`. `make ci` = **360 tests** verts.
+- **Avancement : 43/44 tâches (98 %)** — **6/6 US livrées**, seul T-TECH-04 (fixtures démo, 🟢
+  optionnel) reste. Voir `task-board.md`. `make ci` = **371 tests** verts.
   - ✅ **T-TECH-03** (hardening `set_config`).
   - ✅ **US-057 Clôture de période (9/9)** — `AccountingPeriod` + RLS, `ClosePeriod`, verrou **423**
     (garde `PeriodModificationGuard` + trigger DB), réouverture formelle (4-eyes), handler
@@ -32,18 +33,28 @@
     **GO** (findings traités : plancher par jour ouvré corrigé, tests opt-out ajoutés ; hashage userId
     rejeté — UUID pseudonyme cohérent codebase).
 
-## Prochaine tâche : US-052 (saisie mobile responsive — web, pas de Flutter) puis US-059
+  - ✅ **US-052 Saisie mobile (6/6)** — vue dédiée `/saisie/jour/{date}` (`TimesheetDayController` +
+    `day.html.twig`, cartes mobile-first 44px, `inputmode`, font ≥16px), Stimulus `timesheet-day`
+    (total live, swipe + flèches accessibles, reprise veille, offline `localStorage` + resync),
+    dégradation 320px, `<meta viewport>` + `lang=fr` en base, réutilise l'API US-050. Doc
+    `docs/modules/timesheet-mobile.md`. Revues GO (fuite listeners + N+1 corrigés).
+  - ✅ **US-059 Synthèse activité (6/6)** — `ActivitySummary` (répartition projet/type production/
+    absence, occupation, statuts VALIDÉ+SOUMIS — RG-TMP-4), API `/api/activity-summary` scoped
+    soi-même (403 sur `user_id` tiers) + planning dégradé (US-037 absente), drawer « Ma synthèse »
+    (`<dialog>` natif **SSR lecture seule**, 1 clic, focus rétabli — CA-5) + bottom-sheet mobile,
+    barres CSS accessibles. Doc `docs/modules/activity.md`. Revue GO.
 
-Parallélisables (surtout FE). Voir `tasks/US-052-tasks.md` et `tasks/US-059-tasks.md`.
-- **US-052** (6 tâches) : vue quotidienne mobile-first (cibles 44px, clavier numérique), swipe jours +
-  duplication (Turbo/Stimulus), offline localStorage + resync, dégradation 320px, tests responsive
-  (320/375/390) + a11y, doc + revue a11y.
-- **US-059** (6 tâches) : service synthèse activité (projet/type/occupation), API scoped soi-même
-  (403) + planning dégradé (US-037 absente), drawer « Ma synthèse », bottom-sheet mobile, tests
-  403/vide/CA-5, doc + revue.
+## Reste : T-TECH-04 (optionnel) puis clôture
 
-**Rappel consigne PO** : phase de conception UX/UI (maquettes validées) AVANT le dev des écrans →
-lancer `ui-designer` + `ux-ergonome` + `accessibility-expert` (comme fait pour US-056/T-056-05).
+- **T-TECH-04** (🟢 optionnel) : fixtures de démo EPIC-003. `LoadFixturesCommand` est aujourd'hui un
+  squelette (affiche les volumétries cibles, ne génère pas d'entités — « à brancher avec le modèle
+  US-001 »). Générer des données de démo réalistes (tenant, users, projets, imputations, absences,
+  périodes, règles de relance) est un effort à part entière ; à traiter isolément si souhaité.
+- Sinon, le sprint est **prêt pour la Sprint Review / Rétro** et la PR draft #7 peut passer « ready ».
+
+**Consigne PO honorée** : chaque écran livré ce sprint (US-056 `/relances` + bandeau, US-052
+`/saisie/jour`, US-059 drawer) a été **précédé d'une phase de conception UX/UI** (ux-ergonome +
+ui-designer + accessibility-expert), puis revu (a11y WCAG 2.2 AA).
 
 ## Pièges & conventions (NE PAS re-découvrir)
 
