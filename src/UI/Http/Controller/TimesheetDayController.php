@@ -47,30 +47,30 @@ final class TimesheetDayController extends AbstractController
             $this->projects->findAllActive($user->tenantId()),
         );
 
+        // Une seule requête pour le jour ET la veille (source de la reprise), découpée en mémoire.
+        $entries = $this->entries->findForUserInRange($user->tenantId(), $user->id(), $previous, $day);
+        $today = $day->format('Y-m-d');
+        $minutesByProject = [];
+        $previousMinutesByProject = [];
+        foreach ($entries as $entry) {
+            if ($entry->workDate()->format('Y-m-d') === $today) {
+                $minutesByProject[$entry->projectId()] = $entry->minutes();
+            } else {
+                $previousMinutesByProject[$entry->projectId()] = $entry->minutes();
+            }
+        }
+
         return $this->render('timesheet/day.html.twig', [
-            'date' => $day->format('Y-m-d'),
+            'date' => $today,
             'dayLabel' => $this->label($day),
             'weekNumber' => (int) $day->format('W'),
             'prevDate' => $previous->format('Y-m-d'),
             'nextDate' => $day->modify('+1 day')->format('Y-m-d'),
             'todayDate' => new DateTimeImmutable('today')->format('Y-m-d'),
             'projects' => $projects,
-            'minutesByProject' => $this->minutesByProject($user, $day),
-            'previousMinutesByProject' => $this->minutesByProject($user, $previous),
+            'minutesByProject' => $minutesByProject,
+            'previousMinutesByProject' => $previousMinutesByProject,
         ]);
-    }
-
-    /**
-     * @return array<string, int> projectId => minutes saisies ce jour-là
-     */
-    private function minutesByProject(User $user, DateTimeImmutable $day): array
-    {
-        $minutes = [];
-        foreach ($this->entries->findForUserInRange($user->tenantId(), $user->id(), $day, $day) as $entry) {
-            $minutes[$entry->projectId()] = $entry->minutes();
-        }
-
-        return $minutes;
     }
 
     private function label(DateTimeImmutable $day): string

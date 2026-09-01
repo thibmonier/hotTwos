@@ -45,6 +45,12 @@ select:focus-visible {
     outline-offset: 2px;
 }
 
+/* État désactivé lisible et non ambigu (ex. bouton en cours d'envoi). */
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 /* US-056 — écran de paramétrage des relances. */
 .reminder-master-toggle {
     font-weight: 600;

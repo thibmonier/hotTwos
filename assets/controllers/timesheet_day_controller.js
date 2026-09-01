@@ -17,8 +17,10 @@ export default class extends Controller {
         window.addEventListener('offline', this.onOffline);
 
         this.touchStartX = null;
-        this.element.addEventListener('touchstart', (e) => this.#onTouchStart(e), { passive: true });
-        this.element.addEventListener('touchend', (e) => this.#onTouchEnd(e), { passive: true });
+        this.onTouchStart = (e) => this.#onTouchStart(e);
+        this.onTouchEnd = (e) => this.#onTouchEnd(e);
+        this.element.addEventListener('touchstart', this.onTouchStart, { passive: true });
+        this.element.addEventListener('touchend', this.onTouchEnd, { passive: true });
 
         this.recalculate();
         this.#refreshConnectivity();
@@ -27,6 +29,8 @@ export default class extends Controller {
     disconnect() {
         window.removeEventListener('online', this.onOnline);
         window.removeEventListener('offline', this.onOffline);
+        this.element.removeEventListener('touchstart', this.onTouchStart, { passive: true });
+        this.element.removeEventListener('touchend', this.onTouchEnd, { passive: true });
     }
 
     recalculate() {
@@ -186,6 +190,12 @@ export default class extends Controller {
         }
         this.submitTarget.disabled = !enabled;
         this.submitTarget.textContent = label;
+        // Annonce aux technologies d'assistance que le bouton est en cours de traitement.
+        if (enabled) {
+            this.submitTarget.removeAttribute('aria-busy');
+        } else {
+            this.submitTarget.setAttribute('aria-busy', 'true');
+        }
     }
 
     #format(minutes) {
