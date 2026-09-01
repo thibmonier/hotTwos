@@ -79,6 +79,18 @@ final class ActivitySummaryTest extends TestCase
         self::assertSame(0.0, $report->occupationRate());
     }
 
+    public function testOnlyRejectedEntriesYieldEmptyReport(): void
+    {
+        // Une imputation refusée est exclue (RG-TMP-4) : le rapport est vide, occupation nulle.
+        $this->entries->save($this->rejected($this->alpha, '2026-09-14', 420));
+
+        $report = $this->summary()->forUser($this->tenant, self::USER, $this->at('2026-09-16 09:00:00'), 4);
+
+        self::assertTrue($report->isEmpty());
+        self::assertSame(0, $report->productionMinutes);
+        self::assertSame(0.0, $report->occupationRate());
+    }
+
     public function testOccupationRateUsesExpectedWorkingTime(): void
     {
         // 4 semaines glissantes depuis lundi : 420 min de production sur ~15 jours ouvrés attendus.
