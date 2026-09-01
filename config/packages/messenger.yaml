@@ -1,0 +1,41 @@
+framework:
+    messenger:
+        # Les échecs définitifs (après épuisement des tentatives) sont isolés pour analyse (US-060, ADR-0007).
+        failure_transport: failed
+
+        transports:
+            # Traitement asynchrone hors requête HTTP (US-060 : valorisation ≤ 15 min).
+            # Transport Doctrine (ADR-0007) : durable, rejouable, cohérent avec l'hôte managé.
+            # auto_setup=0 : la table est versionnée par migration (jamais de DDL implicite en prod).
+            async:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                retry_strategy:
+                    # Retry borné (ENF-PERF-5 / résilience) : 3 tentatives, backoff exponentiel.
+                    max_retries: 3
+                    delay: 1000
+                    multiplier: 2
+                    max_delay: 0
+
+            # Messages en échec définitif, conservés pour inspection (messenger:failed:show).
+            failed: 'doctrine://default?queue_name=failed'
+
+            # Bus synchrone pour les messages non routés vers l'async.
+            sync: 'sync://'
+
+        buses:
+            messenger.bus.default:
+                middleware:
+                    # ARC-47 / RSQ-15 : à la consommation, le contexte tenant est posé depuis le
+                    # message puis effacé, sans état résiduel d'un message à l'autre (parité worker).
+                    - App\Infrastructure\Messaging\TenantContextMiddleware
+
+        routing:
+            # Routé en Sprint 4 par T-060-01 (US-060) :
+            # 'App\Application\Timesheet\Message\TimeEntriesValidated': async
+
+when@test:
+    framework:
+        messenger:
+            transports:
+                # En test, l'async est un transport in-memory (pas d'I/O Doctrine, consommation déterministe).
+                async: 'in-memory://'

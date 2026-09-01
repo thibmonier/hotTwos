@@ -6,6 +6,10 @@ doctrine:
         # either here or in the DATABASE_URL env var (see .env file)
         #server_version: '16'
 
+        # La table du transport Doctrine de Messenger (T-TECH-01) n'est pas une entité mappée :
+        # on l'exclut de la gestion de schéma (diff / schema:validate) — elle est versionnée à part.
+        schema_filter: ~^(?!messenger_messages$).*~
+
         profiling_collect_backtrace: '%kernel.debug%'
     orm:
         validate_xml_mapping: true
