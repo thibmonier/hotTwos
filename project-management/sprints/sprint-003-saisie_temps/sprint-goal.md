@@ -32,7 +32,7 @@
 | US-050 | Saisie hebdomadaire (+ Projet minimal) | 5 | P1 Camille | ✅ Done |
 | US-051 | Semaine ≤ 2 min (bloquant RSQ-1) | 8 | P1 Camille | ✅ Done (capacité livrée : batch + duplication + clavier ; mesure E2E chronométrée = validation d'usage à faire) |
 | US-055 | Validation par lot | 5 | P2 Marc | ✅ Done |
-| TECH-3 | Activer la RLS en production (DBT-RUN-2) + smoke de déploiement automatisé | 5 | Équipe technique | 🔄 code + smoke livrés ; bascule ops (mot de passe + DATABASE_URL) en attente |
+| TECH-3 | Activer la RLS en production (DBT-RUN-2) + smoke de déploiement automatisé | 5 | Équipe technique | ✅ Done — bascule faite : app en prod sous hotones_app (RLS active), migrations via MIGRATION_DATABASE_URL, smoke 5/5 |
 
 **Total engagé : 23 points** (dans la vélocité cible 20–40).
 

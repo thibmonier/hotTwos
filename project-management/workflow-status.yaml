@@ -145,16 +145,23 @@ reusable_assets:
       ceremonies: "Review + Rétro (Starfish) faites"
       reserve: "RLS runtime inactive en prod tant que DATABASE_URL n'utilise pas hotones_app (DBT-RUN-2) → traité en Sprint 3 (TECH-3)"
       path: project-management/sprints/sprint-002-consolidation_technique/
-    current_sprint:
+    sprint_3:
       id: 3
       name: sprint-003-saisie_temps
       goal: "Un collaborateur saisit sa semaine de temps en moins de 2 minutes, et son chef de projet la valide par lot"
       committed_points: 23
+      delivered_points: 23
       stories: [US-050, US-051, US-055, TECH-3]
-      decision_po: "Première valeur métier (RSQ-17) : saisie → validation. Valorisation (US-060) + taux (US-011) au Sprint 4. Référentiel Projet minimal dans US-050."
-      blocker: "aucun (US-001/003 livrés, hotones_app prêt)"
+      status: done
+      pr: "https://github.com/thibmonier/hotTwos/pull/4 (MERGED → main)"
+      ceremonies: "Review + Rétro (Starfish) faites"
+      delivered: "US-050 saisie (Project+TimeEntry, API, écran /saisie) ; US-051 semaine ≤2min (batch, duplication, clavier, absence) ; US-055 validation par lot (permission VALIDATE_TIME + périmètre « ses projets », API + écran /validation) ; TECH-3 RLS ACTIVE EN PROD (app sous hotones_app) + smoke déploiement."
+      reserve: "Valorisation (US-060+US-011), E2E chronométré ≤2min, extension RLS aux tables métier (DBT-SEC-1), fixtures démo → Sprint 4."
       path: project-management/sprints/sprint-003-saisie_temps/
-      note: "Critère de sortie bloquant : saisie d'une semaine ≤ 2 min (RSQ-1). TECH-3 active la RLS prod + smoke de déploiement."
+    next_sprint:
+      id: 4
+      goal: "Valorisation automatique du temps validé (chiffrage €) — US-060 + taux US-011"
+      note: "Actions rétro S3 : E2E chronométré ≤2min (RSQ-1), extension RLS métier, fixtures de démo."
     quality_gates:
       prd: "95% ✅"
       tech_spec: "96% ✅"
