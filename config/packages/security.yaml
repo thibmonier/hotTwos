@@ -52,6 +52,8 @@ security:
         # Dashboard financier US-060 : authentifié ; habilitation VIEW_PROJECT_FINANCIALS (et le
         # gating du coût sensible) portés par la couche applicative (ARC-19).
         - { path: ^/valorisation, roles: ROLE_USER }
+        # Administration des périodes US-057 : authentifié ; habilitation MANAGE_PERIODS applicative.
+        - { path: ^/administration/periodes, roles: ROLE_USER }
 
 when@test:
     security:

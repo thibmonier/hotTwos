@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Administration des périodes{% endblock %}
+
+{% block body %}
+    <main class="container">
+        <h1>Périodes comptables</h1>
+
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <p class="flash flash-{{ label }}" role="{{ label == 'error' ? 'alert' : 'status' }}">{{ message }}</p>
+            {% endfor %}
+        {% endfor %}
+
+        <section aria-labelledby="periods-heading">
+            <h2 id="periods-heading">Périodes</h2>
+            {% if periods is empty %}
+                <p>Aucune période clôturée pour l'instant.</p>
+            {% else %}
+                <table class="period-list">
+                    <thead>
+                        <tr>
+                            <th scope="col">Période</th>
+                            <th scope="col">Statut</th>
+                            <th scope="col">Clôturée le</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in periods %}
+                            <tr>
+                                <td>{{ p.period }}</td>
+                                <td>
+                                    {% if p.status == 'closed' %}🔴 Clôturée
+                                    {% elseif p.status == 'closing' %}🟡 En clôture
+                                    {% else %}🟢 Ouverte{% endif %}
+                                </td>
+                                <td>{{ p.closedAt ?? '—' }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </section>
+
+        <section aria-labelledby="close-heading">
+            <h2 id="close-heading">Clôturer une période</h2>
+            <form method="post" action="{{ path('period_close') }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('close_period') }}">
+                <label>Période (YYYY-MM)
+                    <input type="text" name="period" required pattern="\d{4}-(0[1-9]|1[0-2])" placeholder="2026-08">
+                </label>
+                <label>Confirmation — ressaisir le code de la période
+                    <input type="text" name="confirmation" required placeholder="2026-08"
+                           aria-describedby="confirm-help">
+                </label>
+                <p id="confirm-help" class="hint">Pour éviter une clôture accidentelle, ressaisissez le code exact de la période.</p>
+                <label><input type="checkbox" name="force" value="1"> Clôturer malgré des imputations non finalisées</label>
+                <button type="submit">Clôturer la période</button>
+            </form>
+        </section>
+    </main>
+{% endblock %}

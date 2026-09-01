@@ -42,7 +42,7 @@ final readonly class ClosePeriod
     }
 
     /**
-     * @param non-empty-string $period mois au format YYYY-MM
+     * @param string $period mois au format YYYY-MM (validé)
      *
      * @return int nombre d'imputations non finalisées exclues de la clôture (0 en clôture propre)
      */

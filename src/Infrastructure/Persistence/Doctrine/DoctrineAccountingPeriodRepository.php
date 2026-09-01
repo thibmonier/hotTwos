@@ -37,4 +37,14 @@ final readonly class DoctrineAccountingPeriodRepository implements AccountingPer
 
         return $found;
     }
+
+    public function findAllByTenant(TenantId $tenant): array
+    {
+        /** @var list<AccountingPeriod> $periods */
+        $periods = $this->entityManager->createQuery(
+            'SELECT p FROM '.AccountingPeriod::class.' p WHERE p.tenantId = :tenant ORDER BY p.period DESC',
+        )->setParameter('tenant', $tenant->toString())->getResult();
+
+        return $periods;
+    }
 }

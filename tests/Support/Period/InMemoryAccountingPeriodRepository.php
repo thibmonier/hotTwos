@@ -33,4 +33,15 @@ final class InMemoryAccountingPeriodRepository implements AccountingPeriodReposi
 
         return null;
     }
+
+    public function findAllByTenant(TenantId $tenant): array
+    {
+        $own = array_values(array_filter(
+            $this->periods,
+            static fn (AccountingPeriod $p): bool => $p->tenantId()->equals($tenant),
+        ));
+        usort($own, static fn (AccountingPeriod $a, AccountingPeriod $b): int => $b->period() <=> $a->period());
+
+        return $own;
+    }
 }
