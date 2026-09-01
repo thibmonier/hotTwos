@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Timesheet;
 
+use App\Application\Period\PeriodModificationGuard;
 use App\Application\Timesheet\RecordTimeEntry;
+use App\Domain\Period\AccountingPeriod;
+use App\Domain\Period\PeriodLockedException;
 use App\Domain\Project\Project;
 use App\Domain\Tenant\TenantId;
 use App\Domain\Timesheet\TimesheetException;
+use App\Tests\Support\Authorization\RecordingSecurityAuditLogger;
+use App\Tests\Support\Period\InMemoryAccountingPeriodRepository;
 use App\Tests\Support\Timesheet\InMemoryProjectRepository;
 use App\Tests\Support\Timesheet\InMemoryTimeEntryRepository;
 use PHPUnit\Framework\TestCase;
@@ -23,6 +28,7 @@ final class RecordTimeEntryTest extends TestCase
     private InMemoryProjectRepository $projects;
     private InMemoryTimeEntryRepository $entries;
     private RecordTimeEntry $record;
+    private InMemoryAccountingPeriodRepository $periods;
     private string $projectId;
 
     protected function setUp(): void
@@ -30,11 +36,26 @@ final class RecordTimeEntryTest extends TestCase
         $this->tenant = TenantId::generate();
         $this->projects = new InMemoryProjectRepository();
         $this->entries = new InMemoryTimeEntryRepository();
-        $this->record = new RecordTimeEntry($this->projects, $this->entries);
+        $this->periods = new InMemoryAccountingPeriodRepository();
+        $this->record = new RecordTimeEntry(
+            $this->projects,
+            $this->entries,
+            new PeriodModificationGuard($this->periods, new RecordingSecurityAuditLogger()),
+        );
 
         $project = new Project($this->tenant, 'PRJ-1', 'Refonte');
         $this->projects->save($project);
         $this->projectId = $project->id();
+    }
+
+    public function testRefusesRecordingOnAClosedPeriod(): void
+    {
+        $closed = new AccountingPeriod($this->tenant, '2026-09');
+        $closed->close('admin', new DateTimeImmutable('2026-10-01 10:00:00'));
+        $this->periods->save($closed);
+
+        $this->expectException(PeriodLockedException::class);
+        $this->record->record($this->tenant, 'camille', $this->projectId, new DateTimeImmutable('2026-09-15'), 240);
     }
 
     public function testRecordsAnEntry(): void

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Timesheet;
 
+use App\Application\Period\PeriodModificationGuard;
 use App\Domain\Project\Project;
 use App\Domain\Project\ProjectRepository;
 use App\Domain\Tenant\TenantId;
@@ -26,6 +27,7 @@ final readonly class RecordTimeEntry
     public function __construct(
         private ProjectRepository $projects,
         private TimeEntryRepository $entries,
+        private PeriodModificationGuard $periodGuard,
     ) {
     }
 
@@ -37,6 +39,9 @@ final readonly class RecordTimeEntry
         int $minutes,
         ?string $comment = null,
     ): void {
+        // Verrou de clôture (US-057, CA-4) : aucune saisie/révision sur une période clôturée (423).
+        $this->periodGuard->ensureModifiable($tenant, $userId, $workDate);
+
         $project = $this->projects->findActive($tenant, $projectId);
         if (!$project instanceof Project) {
             throw new TimesheetException('Projet introuvable ou inactif : imputation impossible.');

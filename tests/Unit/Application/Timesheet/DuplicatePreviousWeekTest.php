@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Timesheet;
 
+use App\Application\Period\PeriodModificationGuard;
 use App\Application\Timesheet\DuplicatePreviousWeek;
 use App\Application\Timesheet\RecordTimeEntry;
 use App\Application\Timesheet\RecordWeek;
 use App\Domain\Project\Project;
 use App\Domain\Tenant\TenantId;
 use App\Domain\Timesheet\TimeEntry;
+use App\Tests\Support\Authorization\RecordingSecurityAuditLogger;
+use App\Tests\Support\Period\InMemoryAccountingPeriodRepository;
 use App\Tests\Support\Timesheet\InMemoryProjectRepository;
 use App\Tests\Support\Timesheet\InMemoryTimeEntryRepository;
 use PHPUnit\Framework\TestCase;
@@ -26,7 +29,11 @@ final class DuplicatePreviousWeekTest extends TestCase
         $tenant = TenantId::generate();
         $projects = new InMemoryProjectRepository();
         $entries = new InMemoryTimeEntryRepository();
-        $duplicate = new DuplicatePreviousWeek($entries, new RecordWeek(new RecordTimeEntry($projects, $entries)));
+        $duplicate = new DuplicatePreviousWeek($entries, new RecordWeek(new RecordTimeEntry(
+            $projects,
+            $entries,
+            new PeriodModificationGuard(new InMemoryAccountingPeriodRepository(), new RecordingSecurityAuditLogger()),
+        )));
 
         $project = new Project($tenant, 'PRJ-1', 'Refonte');
         $projects->save($project);
