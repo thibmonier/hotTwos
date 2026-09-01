@@ -8,8 +8,8 @@
 - **Branche** : `feature/sprint-5-planning`. **PR draft #7** ouverte (WIP). Base `main` (Sprint 4
   mergé PR #6, Railway à jour). Tout est commité et **vert** : `make ci` = **318 tests**, PHPStan
   max 0, Deptrac 0, cs/rector OK, gitleaks OK. `schema:validate` OK.
-- **Avancement : 43/44 tâches (98 %)** — **6/6 US livrées**, seul T-TECH-04 (fixtures démo, 🟢
-  optionnel) reste. Voir `task-board.md`. `make ci` = **371 tests** verts.
+- **Avancement : 44/44 tâches (100 %)** — **6/6 US livrées** + T-TECH-04. Sprint **terminé**. Voir
+  `task-board.md`. `make ci` = **372 tests** verts.
   - ✅ **T-TECH-03** (hardening `set_config`).
   - ✅ **US-057 Clôture de période (9/9)** — `AccountingPeriod` + RLS, `ClosePeriod`, verrou **423**
     (garde `PeriodModificationGuard` + trigger DB), réouverture formelle (4-eyes), handler
@@ -44,13 +44,22 @@
     (`<dialog>` natif **SSR lecture seule**, 1 clic, focus rétabli — CA-5) + bottom-sheet mobile,
     barres CSS accessibles. Doc `docs/modules/activity.md`. Revue GO.
 
-## Reste : T-TECH-04 (optionnel) puis clôture
+  - ✅ **T-TECH-04 Seed de démo** — `app:demo:seed` crée un tenant de démo cohérent (3 users, projets,
+    imputations sur 4 semaines, absence validée, règle de relance) exerçant tous les modules du sprint.
+    Contexte tenant PostgreSQL posé avant les écritures (franchit la RLS) ; prod-guardé (ADR-13).
+    Vérifié en réel sur la base dev.
 
-- **T-TECH-04** (🟢 optionnel) : fixtures de démo EPIC-003. `LoadFixturesCommand` est aujourd'hui un
-  squelette (affiche les volumétries cibles, ne génère pas d'entités — « à brancher avec le modèle
-  US-001 »). Générer des données de démo réalistes (tenant, users, projets, imputations, absences,
-  périodes, règles de relance) est un effort à part entière ; à traiter isolément si souhaité.
-- Sinon, le sprint est **prêt pour la Sprint Review / Rétro** et la PR draft #7 peut passer « ready ».
+## Sprint terminé — reste la clôture
+
+Toutes les tâches (44/44) sont livrées et vertes. Étapes de clôture restantes (non-code) :
+- **Sprint Review** : démo des 6 US (clôture période, absences, complétude, relances, saisie mobile,
+  synthèse). **Rétrospective** : Directive Fondamentale + actions (dont suivi de la dette notifications
+  et de US-037 pour le planning).
+- **PR draft #7** : `git push` des commits du sprint puis passage en « ready for review » vers `main`.
+
+**Consigne PO honorée** : chaque écran livré ce sprint (US-056 `/relances` + bandeau, US-052
+`/saisie/jour`, US-059 drawer) a été **précédé d'une phase de conception UX/UI** (ux-ergonome +
+ui-designer + accessibility-expert), puis revu (a11y WCAG 2.2 AA).
 
 **Consigne PO honorée** : chaque écran livré ce sprint (US-056 `/relances` + bandeau, US-052
 `/saisie/jour`, US-059 drawer) a été **précédé d'une phase de conception UX/UI** (ux-ergonome +

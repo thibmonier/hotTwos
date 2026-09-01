@@ -7,7 +7,7 @@
 
 | ID | US | Tâche | Est. |
 |----|----|-------|------|
-| T-TECH-04 | Tech | Fixtures démo EPIC-003 (🟢 optionnel) | 2h |
+| — | — | _(vide — toutes les tâches sont terminées)_ | — |
 
 ## 🔄 En Cours
 | ID | US | Tâche | Démarré |
@@ -35,14 +35,15 @@
 | US-056 | US-056 | **Relances (7/7)** : entités + RLS (3 tables), moteur borné/déterministe (plancher **par jour ouvré**, escalade 3ᵉ, arrêt à la soumission, opt-out, désactivation globale), CLI cron + handler async + notifier + RLS-via-consume, permission MANAGE_REMINDERS + API (opt-out non forçable), écran `/relances` + bandeau `/saisie` (**conception UX/UI préalable** — consigne PO), doc + revues (GO) | `(S5)` |
 | US-052 | US-052 | **Saisie mobile (6/6)** : vue dédiée `/saisie/jour/{date}` (cartes mobile-first, 44px, inputmode, font ≥16px), Stimulus (total live, swipe + flèches accessibles, reprise veille, offline localStorage + resync), dégradation 320px, `<meta viewport>`+`lang=fr`, réutilise l'API US-050 (**conception UX/UI préalable**), doc + revues (GO : fuite listeners + N+1 corrigés) | `(S5)` |
 | US-059 | US-059 | **Synthèse activité (6/6)** : service `ActivitySummary` (répartition projet/type, occupation, statuts RG-TMP-4), API `/api/activity-summary` scoped soi-même (403 sur user_id tiers) + planning dégradé (US-037 absente), drawer « Ma synthèse » `<dialog>` SSR lecture seule (1 clic, focus rétabli — CA-5) + bottom-sheet mobile, barres accessibles, doc + revues (**conception UX/UI préalable** ; GO) | `(S5)` |
+| T-TECH-04 | Tech | **Seed de démo EPIC-003** : `app:demo:seed` (tenant + 3 users + projets + imputations 4 sem. + absence + règle de relance), contexte tenant RLS posé, prod-guardé (ADR-13), fonctionnel | `(S5)` |
 
 ## 🚫 Bloqué
 | ID | US | Raison | Action |
 |----|----|--------|--------|
 
 ## Métriques
-- **Tâches** : 44 total | 43 terminées (98 %) — seul T-TECH-04 (🟢 optionnel) reste
-- **Heures** : ~126h estimées | ~132h consommées
-- **Points** : 22 engagés · **6/6 US livrées** : US-057 ✅ · US-054 ✅ · US-058 ✅ · US-056 ✅ · US-052 ✅ · US-059 ✅ (+ T-TECH-03)
-- **CI** : `make ci` vert — **371 tests**, PHPStan max, Deptrac, cs/rector, gitleaks, `schema:validate`.
-- **Suite** : T-TECH-04 (fixtures démo, optionnel) ; sinon sprint prêt pour Review/Rétro et PR #7 « ready ».
+- **Tâches** : 44 total | **44 terminées (100 %)** 🎉
+- **Heures** : ~126h estimées | ~134h consommées
+- **Points** : 22 engagés · **6/6 US livrées** : US-057 ✅ · US-054 ✅ · US-058 ✅ · US-056 ✅ · US-052 ✅ · US-059 ✅ (+ T-TECH-03, T-TECH-04)
+- **CI** : `make ci` vert — **372 tests**, PHPStan max, Deptrac, cs/rector, gitleaks, `schema:validate`.
+- **Suite** : sprint **terminé** — prêt pour la Sprint Review / Rétro et le passage de la PR #7 en « ready ».
