@@ -7,8 +7,6 @@
 
 | ID | US | Tâche | Est. |
 |----|----|-------|------|
-| T-056-06 | US-056 | Tests borne/annulation + RLS-via-consume | 3h |
-| T-056-07 | US-056 | Doc + revue (opt-out RGPD) | 1h |
 | T-052-01 | US-052 | Vue quotidienne mobile-first (44px, clavier num.) | 4h |
 | T-052-02 | US-052 | Swipe jours + duplication (Turbo/Stimulus) | 3h |
 | T-052-03 | US-052 | Offline localStorage + resync | 3h |
@@ -26,7 +24,6 @@
 ## 🔄 En Cours
 | ID | US | Tâche | Démarré |
 |----|----|-------|---------|
-| T-056-05 | US-056 | Écran config + prévisualisation (phase conception UX/UI préalable — consigne PO) | S5 |
 
 ## 👀 En Review
 | ID | US | Tâche | Reviewer |
@@ -47,17 +44,14 @@
 | T-057-09 | US-057 | Doc `docs/modules/period.md` + revues (GO) : 4-eyes, trigger move-in, dédup, a11y, DRY | `a47bdbc` |
 | US-054 | US-054 | **Absences (8/8)** : entités demi-journée + RLS, déclaration/décision + notifs, compteurs, blocage RG-TMP-3 (422), API, écran `/absences`, **gate RGPD HAB-3** + intrusion RLS, doc + revues (GO : self-approval, RGPD commentaire, index) | `6e2feb3`→`739c506` |
 | US-058 | US-058 | **Complétude (6/6)** : service grille (4 états, absences déduites), périmètre RBAC (403 équipe), API + export CSV anti-injection, écran `/completude` (grille couleur), doc + revue (GO ; N+1 accepté phase 1, cache/batch phase 2) | `222eb18`→`0add3d5` |
-| T-056-01 | US-056 | Entités ReminderRule/Preference/Log + ports + RLS (3 tables) + intrusion RLS | `(S5)` |
-| T-056-02 | US-056 | Moteur ScheduleReminders borné/déterministe (plancher, escalade, arrêt, opt-out) | `(S5)` |
-| T-056-03 | US-056 | CLI `app:reminders:run` + handler async + notifier (logging) + RLS-via-consume | `(S5)` |
-| T-056-04 | US-056 | Permission MANAGE_REMINDERS, API règles + opt-out (non forçable), 401/403/422 | `(S5)` |
+| US-056 | US-056 | **Relances (7/7)** : entités + RLS (3 tables), moteur borné/déterministe (plancher **par jour ouvré**, escalade 3ᵉ, arrêt à la soumission, opt-out, désactivation globale), CLI cron + handler async + notifier + RLS-via-consume, permission MANAGE_REMINDERS + API (opt-out non forçable), écran `/relances` + bandeau `/saisie` (**conception UX/UI préalable** — consigne PO), doc + revues (GO) | `(S5)` |
 
 ## 🚫 Bloqué
 | ID | US | Raison | Action |
 |----|----|--------|--------|
 
 ## Métriques
-- **Tâches** : 44 total | 31 terminées (70 %)
-- **Heures** : ~126h estimées | ~91h consommées
-- **Points** : 22 engagés · **US-057 : 9/9 ✅ · US-054 : 8/8 ✅ · US-058 : 6/6 ✅ · US-056 : 4/7 🔄** (+ T-TECH-03)
-- **Suite** : US-056 (T-056-05 écran en conception UX/UI, puis T-056-06/07) ; US-052 (mobile) / US-059 (synthèse) parallélisables
+- **Tâches** : 44 total | 34 terminées (77 %)
+- **Heures** : ~126h estimées | ~100h consommées
+- **Points** : 22 engagés · **US-057 : 9/9 ✅ · US-054 : 8/8 ✅ · US-058 : 6/6 ✅ · US-056 : 7/7 ✅** (+ T-TECH-03)
+- **Suite** : US-052 (saisie mobile) / US-059 (synthèse activité) — parallélisables ; T-TECH-04 (fixtures démo, optionnel)
