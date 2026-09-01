@@ -29,8 +29,6 @@ use Symfony\Component\Messenger\MessageBusInterface;
  */
 final readonly class ClosePeriod
 {
-    private const string PERIOD_FORMAT = '/^\d{4}-(0[1-9]|1[0-2])$/';
-
     public function __construct(
         private Authorizer $authorizer,
         private AccountingPeriodRepository $periods,
@@ -50,7 +48,7 @@ final readonly class ClosePeriod
     {
         $this->authorizer->ensureCan($actor, Permission::MANAGE_PERIODS);
 
-        if (1 !== preg_match(self::PERIOD_FORMAT, $period)) {
+        if (!CalendarMonth::isValid($period)) {
             throw new PeriodException(sprintf('Période invalide « %s » (attendu YYYY-MM).', $period));
         }
 

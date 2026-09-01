@@ -42,6 +42,9 @@ final readonly class DoctrineReopeningRequestRepository implements ReopeningRequ
 
     public function findActiveForPeriod(TenantId $tenant, string $period, DateTimeImmutable $now): ?ReopeningRequest
     {
+        // Le filtre SQL (statut approuvé + validUntil > now) reflète volontairement le prédicat
+        // métier {@see ReopeningRequest::isActiveAt()} — évalué ici en base pour ne pas charger
+        // toutes les demandes ; le double en mémoire, lui, s'appuie directement sur `isActiveAt()`.
         /** @var ReopeningRequest|null $found */
         $found = $this->entityManager->createQuery(
             'SELECT r FROM '.ReopeningRequest::class.' r'

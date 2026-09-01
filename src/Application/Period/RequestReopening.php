@@ -51,6 +51,11 @@ final readonly class RequestReopening
             throw new PeriodException(sprintf('La période %s n\'est pas clôturée : aucune réouverture nécessaire.', $period));
         }
 
+        // Pas de demande redondante quand une réouverture est déjà active (évite l'« approval fatigue »).
+        if ($this->reopenings->findActiveForPeriod($tenant, $period, $this->clock->now()) instanceof ReopeningRequest) {
+            throw new PeriodException(sprintf('Une réouverture est déjà active sur la période %s.', $period));
+        }
+
         $request = new ReopeningRequest($tenant, $period, $actor->id(), trim($reason), $this->clock->now());
         $this->reopenings->save($request);
 

@@ -30,9 +30,9 @@
                             <tr>
                                 <td>{{ p.period }}</td>
                                 <td>
-                                    {% if p.status == 'closed' %}🔴 Clôturée
-                                    {% elseif p.status == 'closing' %}🟡 En clôture
-                                    {% else %}🟢 Ouverte{% endif %}
+                                    {% if p.status == 'closed' %}<span aria-hidden="true">🔴</span> Clôturée
+                                    {% elseif p.status == 'closing' %}<span aria-hidden="true">🟡</span> En clôture
+                                    {% else %}<span aria-hidden="true">🟢</span> Ouverte{% endif %}
                                 </td>
                                 <td>{{ p.closedAt ?? '—' }}</td>
                             </tr>

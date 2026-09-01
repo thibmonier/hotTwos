@@ -105,6 +105,24 @@ final class ReopeningWorkflowTest extends TestCase
         $this->requestUseCase()->request($this->tenant, $this->marc, '2026-09', 'Pas clôturée');
     }
 
+    public function testApproverCannotBeTheRequester(): void
+    {
+        // L'admin cumule les deux permissions : il demande puis tente d'approuver sa propre demande.
+        $requestId = $this->requestUseCase()->request($this->tenant, $this->admin, '2026-08', 'Erreur');
+
+        $this->expectException(PeriodException::class);
+        $this->approveUseCase()->approve($this->tenant, $this->admin, $requestId);
+    }
+
+    public function testCannotRequestWhileAReopeningIsActive(): void
+    {
+        $requestId = $this->requestUseCase()->request($this->tenant, $this->marc, '2026-08', 'Erreur 1');
+        $this->approveUseCase()->approve($this->tenant, $this->admin, $requestId);
+
+        $this->expectException(PeriodException::class);
+        $this->requestUseCase()->request($this->tenant, $this->marc, '2026-08', 'Erreur 2');
+    }
+
     private function assertLocked(): void
     {
         try {

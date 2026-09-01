@@ -90,6 +90,11 @@ class ReopeningRequest implements TenantOwned
         return $this->period;
     }
 
+    public function requestedBy(): string
+    {
+        return $this->requestedBy;
+    }
+
     public function status(): ReopeningStatus
     {
         return $this->status;

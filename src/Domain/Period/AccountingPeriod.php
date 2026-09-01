@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Period;
 
+use App\Domain\Shared\CalendarMonth;
 use App\Domain\Tenant\TenantId;
 use App\Domain\Tenant\TenantOwned;
 use DateTimeImmutable;
@@ -22,8 +23,6 @@ use Symfony\Component\Uid\Uuid;
 #[ORM\UniqueConstraint(name: 'uniq_period_tenant_month', columns: ['tenant_id', 'period'])]
 class AccountingPeriod implements TenantOwned
 {
-    private const string PERIOD_FORMAT = '/^\d{4}-(0[1-9]|1[0-2])$/';
-
     #[ORM\Id]
     #[ORM\Column(type: 'guid')]
     private string $id;
@@ -47,7 +46,7 @@ class AccountingPeriod implements TenantOwned
         #[ORM\Column(name: 'status', length: 20, enumType: PeriodStatus::class)]
         private PeriodStatus $status = PeriodStatus::OPEN,
     ) {
-        if (1 !== preg_match(self::PERIOD_FORMAT, $period)) {
+        if (!CalendarMonth::isValid($period)) {
             throw new InvalidArgumentException(sprintf('Période invalide « %s » (attendu YYYY-MM).', $period));
         }
 

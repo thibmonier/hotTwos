@@ -47,6 +47,15 @@ final readonly class ApproveReopening
             throw new PeriodException('Cette demande de réouverture a déjà été traitée.');
         }
 
+        // Séparation des tâches (4-eyes, INV-7) : l'approbateur ne peut pas être le demandeur.
+        if ($request->requestedBy() === $approver->id()) {
+            $this->audit->record('reouverture_auto_approbation_refusee', $tenant->toString(), $approver->getUserIdentifier(), [
+                'request' => $request->id(),
+            ]);
+
+            throw new PeriodException('Une réouverture ne peut pas être approuvée par son demandeur (contrôle à deux personnes).');
+        }
+
         $validUntil = $this->clock->now()->modify(sprintf('+%d hours', self::VALIDITY_HOURS));
         $request->approve($approver->id(), $validUntil);
         $this->reopenings->save($request);
