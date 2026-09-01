@@ -55,4 +55,5 @@ services:
     App\Domain\Timesheet\TimeEntryRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineTimeEntryRepository'
 
     # Ports organisation (US-010, DIP).
+    App\Domain\Organization\OrgUnitRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineOrgUnitRepository'
     App\Domain\Organization\OrgMembershipRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineOrgMembershipRepository'

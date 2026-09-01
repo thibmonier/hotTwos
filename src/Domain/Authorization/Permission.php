@@ -26,6 +26,9 @@ enum Permission: string
     /** Attribution de rôles à d'autres utilisateurs (soumise à l'anti-élévation — CA-6). */
     case MANAGE_ROLES = 'manage:roles';
 
+    /** Paramétrage de l'organisation : hiérarchie et rattachements des collaborateurs (US-010, admin tenant). */
+    case MANAGE_ORGANIZATION = 'manage:organization';
+
     /** Validation/refus des imputations de temps (chef de projet, sur ses projets — US-055). */
     case VALIDATE_TIME = 'validate:time';
 }

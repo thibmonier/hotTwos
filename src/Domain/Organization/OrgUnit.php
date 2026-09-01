@@ -81,6 +81,15 @@ class OrgUnit implements TenantOwned
         $this->name = $this->guardName($name);
     }
 
+    /**
+     * Rattache l'unité à un nouveau parent (ou la promeut racine si null). La prévention des
+     * cycles est assurée en couche applicative, qui connaît l'ensemble de la hiérarchie.
+     */
+    public function attachToParent(?string $parentId): void
+    {
+        $this->parentId = $parentId;
+    }
+
     public function deactivate(): void
     {
         $this->active = false;
