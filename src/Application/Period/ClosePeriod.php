@@ -11,11 +11,10 @@ use App\Domain\Authorization\SecurityAuditLogger;
 use App\Domain\Period\AccountingPeriod;
 use App\Domain\Period\AccountingPeriodRepository;
 use App\Domain\Period\PeriodException;
+use App\Domain\Shared\CalendarMonth;
 use App\Domain\Tenant\TenantId;
 use App\Domain\Timesheet\TimeEntryRepository;
 use App\Domain\User\User;
-use DateTimeImmutable;
-use DateTimeZone;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -60,7 +59,7 @@ final readonly class ClosePeriod
             throw new PeriodException(sprintf('La période %s est déjà clôturée.', $period));
         }
 
-        [$from, $to] = $this->monthBounds($period);
+        [$from, $to] = CalendarMonth::bounds($period);
         $unvalidated = $this->entries->countUnvalidatedInPeriod($tenant, $from, $to);
         if ($unvalidated > 0 && !$force) {
             throw new PeriodException(sprintf('%d imputation(s) non finalisée(s) sur %s. Confirmez pour clôturer malgré tout.', $unvalidated, $period));
@@ -80,15 +79,5 @@ final readonly class ClosePeriod
         $this->bus->dispatch(new PeriodClosed($tenant->toString(), $period));
 
         return $unvalidated;
-    }
-
-    /**
-     * @return array{DateTimeImmutable, DateTimeImmutable} bornes [1er jour du mois, 1er jour du mois suivant)
-     */
-    private function monthBounds(string $period): array
-    {
-        $from = new DateTimeImmutable($period.'-01 00:00:00', new DateTimeZone('UTC'));
-
-        return [$from, $from->modify('+1 month')];
     }
 }

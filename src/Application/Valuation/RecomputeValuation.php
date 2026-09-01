@@ -8,6 +8,7 @@ use App\Application\Authorization\Authorizer;
 use App\Application\Timesheet\Message\TimeEntriesValidated;
 use App\Domain\Authorization\Permission;
 use App\Domain\Authorization\SecurityAuditLogger;
+use App\Domain\Shared\CalendarMonth;
 use App\Domain\Tenant\TenantId;
 use App\Domain\Timesheet\TimeEntry;
 use App\Domain\Timesheet\TimeEntryRepository;
@@ -15,8 +16,6 @@ use App\Domain\User\User;
 use App\Domain\Valuation\PeriodClosedException;
 use App\Domain\Valuation\PeriodClosureStatus;
 use App\Domain\Valuation\ValuationException;
-use DateTimeImmutable;
-use DateTimeZone;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -62,7 +61,7 @@ final readonly class RecomputeValuation
             throw new PeriodClosedException(sprintf('La période %s est clôturée — recalcul impossible sans réouverture formelle (US-057).', $this->label($period)));
         }
 
-        [$from, $to] = $this->monthBounds($period);
+        [$from, $to] = CalendarMonth::bounds($period);
         $entryIds = array_map(
             static fn (TimeEntry $entry): string => $entry->id(),
             $this->entries->findValidatedInPeriod($tenant, $from, $to),
@@ -78,16 +77,6 @@ final readonly class RecomputeValuation
         ]);
 
         return count($entryIds);
-    }
-
-    /**
-     * @return array{DateTimeImmutable, DateTimeImmutable} bornes [premier jour du mois, premier jour du mois suivant)
-     */
-    private function monthBounds(string $period): array
-    {
-        $from = new DateTimeImmutable($period.'-01 00:00:00', new DateTimeZone('UTC'));
-
-        return [$from, $from->modify('+1 month')];
     }
 
     private function label(string $period): string

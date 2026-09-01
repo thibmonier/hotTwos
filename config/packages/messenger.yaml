@@ -35,6 +35,8 @@ framework:
             # US-060 CA-4 : le re-déclenchement à la définition d'un tarif est asynchrone (jamais
             # dans la requête HTTP — sinon le middleware tenant effacerait le contexte de la requête).
             'App\Application\Pricing\Message\ProfileRateDefined': async
+            # US-057 CA-1 : les calculs aval à la clôture d'une période sont traités hors requête.
+            'App\Application\Period\Message\PeriodClosed': async
 
 when@test:
     framework:
