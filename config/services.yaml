@@ -77,3 +77,6 @@ services:
     App\Infrastructure\Valuation\ConfiguredPeriodClosure:
         arguments:
             $closedPeriods: '%valuation.closed_periods%'
+
+    # Port périodes comptables (US-057, DIP).
+    App\Domain\Period\AccountingPeriodRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineAccountingPeriodRepository'
