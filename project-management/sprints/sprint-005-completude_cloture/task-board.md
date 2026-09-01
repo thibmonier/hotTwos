@@ -7,14 +7,6 @@
 
 | ID | US | Tâche | Est. |
 |----|----|-------|------|
-| T-054-01 | US-054 | Entités AbsenceType/AbsenceRequest + RLS (HAB-3) | 3h |
-| T-054-02 | US-054 | `DeclareAbsence`/`DecideAbsence` + notifications | 4h |
-| T-054-03 | US-054 | Compteurs acquis/pris/attente/projeté | 3h |
-| T-054-04 | US-054 | Blocage imputation sur absence validée (422) | 2h |
-| T-054-05 | US-054 | API absences + balance | 3h |
-| T-054-06 | US-054 | Module `/absences` + widget compteurs | 4h |
-| T-054-07 | US-054 | Tests RGPD (HAB-3) + 422 + RLS | 4h |
-| T-054-08 | US-054 | Doc + revues (données de santé) | 2h |
 | T-058-01 | US-058 | Service grille de complétude (4 états) | 4h |
 | T-058-02 | US-058 | Périmètre RBAC (403 scope équipe) | 3h |
 | T-058-03 | US-058 | API + export CSV anti-injection | 3h |
@@ -63,13 +55,14 @@
 | T-057-07 | US-057 | Écran `/administration/periodes` (statut couleur, clôture + confirmation + CSRF) | `bf52fee` |
 | T-057-08 | US-057 | Fonctionnel **423** saisie en période clôturée (201 si ouverte) | `c64af85` |
 | T-057-09 | US-057 | Doc `docs/modules/period.md` + revues (GO) : 4-eyes, trigger move-in, dédup, a11y, DRY | `a47bdbc` |
+| US-054 | US-054 | **Absences (8/8)** : entités demi-journée + RLS, déclaration/décision + notifs, compteurs, blocage RG-TMP-3 (422), API, écran `/absences`, **gate RGPD HAB-3** + intrusion RLS, doc + revues (GO : self-approval, RGPD commentaire, index) | `6e2feb3`→`739c506` |
 
 ## 🚫 Bloqué
 | ID | US | Raison | Action |
 |----|----|--------|--------|
 
 ## Métriques
-- **Tâches** : 44 total | 12 terminées (27 %)
-- **Heures** : ~126h estimées | ~40h consommées
-- **Points** : 22 engagés · **US-057 : 9/9 ✅** (+ T-TECH-03)
-- **Suite** : US-054 (absences) → US-058 (complétude) → US-056 (relances) ; US-052/US-059 (UI) parallélisables
+- **Tâches** : 44 total | 21 terminées (48 %)
+- **Heures** : ~126h estimées | ~65h consommées
+- **Points** : 22 engagés · **US-057 : 9/9 ✅ · US-054 : 8/8 ✅** (+ T-TECH-03)
+- **Suite** : US-058 (complétude) → US-056 (relances) ; US-052/US-059 (UI) parallélisables
