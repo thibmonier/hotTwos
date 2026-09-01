@@ -8,7 +8,7 @@
 - **Branche** : `feature/sprint-5-planning`. **PR draft #7** ouverte (WIP). Base `main` (Sprint 4
   mergé PR #6, Railway à jour). Tout est commité et **vert** : `make ci` = **318 tests**, PHPStan
   max 0, Deptrac 0, cs/rector OK, gitleaks OK. `schema:validate` OK.
-- **Avancement : 27/44 tâches (61 %)** — voir `task-board.md`.
+- **Avancement : 34/44 tâches (77 %)** — voir `task-board.md`. `make ci` = **360 tests** verts.
   - ✅ **T-TECH-03** (hardening `set_config`).
   - ✅ **US-057 Clôture de période (9/9)** — `AccountingPeriod` + RLS, `ClosePeriod`, verrou **423**
     (garde `PeriodModificationGuard` + trigger DB), réouverture formelle (4-eyes), handler
@@ -21,24 +21,29 @@
   - ✅ **US-058 Complétude (6/6)** — `CompletenessGrid` (4 états, absences déduites, J+2),
     `CompletenessScope` (403 équipe), API `/api/completude` + export CSV anti-injection, écran
     `/completude`. Doc `docs/modules/completeness.md`. Revue GO.
+  - ✅ **US-056 Relances (7/7)** — entités `ReminderRule`/`Preference`/`Log` + RLS (3 tables), moteur
+    `ScheduleReminders` pur/déterministe (**plancher par jour ouvré et par collaborateur** —
+    `capOnePerUserPerDay`/`sentOnDay`, escalade 3ᵉ, arrêt à la soumission, opt-out, désactivation),
+    CLI `app:reminders:run` + `SendDueReminders`/handler async + `ReminderNotifier` (adaptateur
+    logging — livraison in-app/email en dette) + **RLS-via-consume**, permission `MANAGE_REMINDERS` +
+    API (`/api/reminders/rules`, `/api/me/reminder-preference` opt-out **non forçable**), écran
+    `/relances` + bandeau `/saisie` (**conception UX/UI préalable** : ux-ergonome + ui-designer +
+    accessibility-expert). Doc `docs/modules/reminder.md`. Revues security-auditor + symfony-reviewer :
+    **GO** (findings traités : plancher par jour ouvré corrigé, tests opt-out ajoutés ; hashage userId
+    rejeté — UUID pseudonyme cohérent codebase).
 
-## Prochaine tâche : US-056 (relances automatiques de retard) — 7 tâches
+## Prochaine tâche : US-052 (saisie mobile responsive — web, pas de Flutter) puis US-059
 
-Voir `tasks/US-056-tasks.md` (décomposition détaillée). Ordre : T-056-01 → 07.
-- **T-056-01** : entités `ReminderRule` (tenant : délai, fréquence, canal, escalade, actif) +
-  `ReminderLog` + préférence collaborateur `reminder_opt_out` + migration **RLS**.
-- **T-056-02** : moteur `ScheduleReminders` (détecte les retards via la complétude US-058, borne de
-  fréquence — plancher 1 j ouvré **hardcodé**, escalade N+1 à la 3ᵉ relance, arrêt à la soumission,
-  respect opt-out + désactivation globale tenant).
-- **T-056-03** : commande CLI `app:reminders:run` (cron) qui **dispatch** un message **tenant-aware
-  async** + handler d'envoi (in-app/email) → **test d'intrusion RLS via consume** (action rétro S4).
-- **T-056-04** : API config règles + opt-out individuel (non forçable par l'admin).
-- **T-056-05** : écran config + prévisualisation ; bandeau discret dans `/saisie` si opt-out + retard.
-- **T-056-06** : tests (borne, annulation, escalade, opt-out) + RLS-via-consume.
-- **T-056-07** : doc + revue (opt-out RGPD).
+Parallélisables (surtout FE). Voir `tasks/US-052-tasks.md` et `tasks/US-059-tasks.md`.
+- **US-052** (6 tâches) : vue quotidienne mobile-first (cibles 44px, clavier numérique), swipe jours +
+  duplication (Turbo/Stimulus), offline localStorage + resync, dégradation 320px, tests responsive
+  (320/375/390) + a11y, doc + revue a11y.
+- **US-059** (6 tâches) : service synthèse activité (projet/type/occupation), API scoped soi-même
+  (403) + planning dégradé (US-037 absente), drawer « Ma synthèse », bottom-sheet mobile, tests
+  403/vide/CA-5, doc + revue.
 
-Puis **US-052** (saisie mobile responsive — web, pas de Flutter) et **US-059** (synthèse activité,
-planning dégradé car US-037 absente) — parallélisables (surtout FE).
+**Rappel consigne PO** : phase de conception UX/UI (maquettes validées) AVANT le dev des écrans →
+lancer `ui-designer` + `ux-ergonome` + `accessibility-expert` (comme fait pour US-056/T-056-05).
 
 ## Pièges & conventions (NE PAS re-découvrir)
 
