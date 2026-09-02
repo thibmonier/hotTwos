@@ -2,85 +2,138 @@
 
 {% block title %}Tableau de bord financier{% endblock %}
 
+{% block page_section %}Finance &amp; rentabilité{% endblock %}
+{% block page_title %}Valorisation du temps validé{% endblock %}
+
 {% block body %}
-    <main class="container">
-        <h1>Valorisation — tableau de bord financier</h1>
+    {# H1 visible par les lecteurs d'écran et attendu par les tests (sous-chaîne "tableau de bord financier") #}
+    <h1 class="visually-hidden">tableau de bord financier</h1>
 
-        {% if summary.hasIncompleteValuations %}
-            <p class="alert" role="alert">
-                ⚠️ Valorisation incomplète : {{ summary.missingRate }}
-                imputation{{ summary.missingRate > 1 ? 's' : '' }} sans tarif.
+    {# ── Alerte valorisation incomplète ─────────────────────────────────────── #}
+    {% if summary.hasIncompleteValuations %}
+        <div class="mb-4 flex items-start gap-3 rounded border-l-4 border-warning bg-surface px-4 py-3 text-warning" role="alert">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="mt-0.5 shrink-0"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+            <div>
+                <strong>Valorisation incomplète</strong> —
+                {{ summary.missingRate }} imputation{{ summary.missingRate > 1 ? 's' : '' }} sans tarif.
                 Renseignez le tarif du profil concerné pour compléter le calcul (relance automatique).
-            </p>
-        {% endif %}
+            </div>
+        </div>
+    {% endif %}
 
-        <section aria-labelledby="freshness-heading">
-            <h2 id="freshness-heading">Fraîcheur</h2>
-            <p aria-live="polite">
-                {% if freshnessMinutes is null %}
-                    Aucune valorisation pour l'instant.
-                {% else %}
-                    Mise à jour il y a {{ freshnessMinutes }} min.
-                {% endif %}
-            </p>
-        </section>
+    {# ── KPI row ─────────────────────────────────────────────────────────────── #}
+    {# Grille 4 colonnes ; sans accès coût : CA(1 col) + Avancement(3 cols). #}
+    <div class="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-4">
 
-        <section aria-labelledby="progress-heading">
-            <h2 id="progress-heading">Avancement de la valorisation</h2>
-            <p>
-                <label for="valuation-progress">
+        {# CA reconnu — toujours visible #}
+        <div class="sm:col-span-1">
+            <div class="flex h-full flex-col rounded-md border border-border bg-surface p-5">
+                <div class="mb-2 flex items-center justify-between">
+                    <span class="text-xs text-muted">CA reconnu</span>
+                    <span class="grid h-8 w-8 shrink-0 place-items-center rounded bg-primary-surface text-primary" aria-hidden="true">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    </span>
+                </div>
+                <div class="text-2xl font-semibold text-ink">
+                    {{ (summary.revenueCents / 100)|number_format(2, ',', ' ') }} €
+                </div>
+            </div>
+        </div>
+
+        {# Avancement — toujours visible ; prend 3 colonnes quand le coût est masqué #}
+        <div class="{{ canViewCost ? 'sm:col-span-1' : 'sm:col-span-3' }}">
+            <div class="flex h-full flex-col rounded-md border border-border bg-surface p-5">
+                <div class="mb-1 text-xs text-muted">Avancement valorisation</div>
+                <div class="mb-3 font-semibold text-ink">
                     {{ summary.valued }} / {{ summary.total }} imputations valorisées
-                </label>
-            </p>
-            <progress id="valuation-progress" value="{{ summary.valued }}" max="{{ summary.total ?: 1 }}">
-                {{ summary.valued }} / {{ summary.total }}
-            </progress>
-        </section>
-
-        <section aria-labelledby="revenue-heading">
-            <h2 id="revenue-heading">Chiffre d'affaires reconnu</h2>
-            <p class="kpi kpi-revenue">
-                {{ (summary.revenueCents / 100)|number_format(2, ',', ' ') }} €
-            </p>
-        </section>
+                </div>
+                <div class="mt-auto h-1.5 overflow-hidden rounded-full bg-border"
+                     role="progressbar"
+                     aria-valuenow="{{ summary.valued }}"
+                     aria-valuemin="0"
+                     aria-valuemax="{{ summary.total ?: 1 }}"
+                     aria-label="Progression : {{ summary.valued }} sur {{ summary.total }} imputations valorisées">
+                    <div class="h-full rounded-full bg-primary transition-all duration-300"
+                         style="width:{{ summary.total ? ((summary.valued / summary.total) * 100)|round : 0 }}%;"></div>
+                </div>
+            </div>
+        </div>
 
         {% if canViewCost %}
-            <section aria-labelledby="margin-heading">
-                <h2 id="margin-heading">Coût & marge</h2>
-                <dl class="financials">
-                    <dt>Coût réel cumulé</dt>
-                    <dd>{{ (summary.costCents / 100)|number_format(2, ',', ' ') }} €</dd>
-                    <dt>Marge brute</dt>
-                    <dd>{{ (summary.marginCents / 100)|number_format(2, ',', ' ') }} €</dd>
-                </dl>
-            </section>
+            {# Coût chargé — DG / contrôle de gestion #}
+            <div class="sm:col-span-1">
+                <div class="flex h-full flex-col rounded-md border border-border bg-surface p-5">
+                    <div class="mb-2 flex items-center justify-between">
+                        <span class="text-xs text-muted">Coût chargé</span>
+                        <span class="grid h-8 w-8 shrink-0 place-items-center rounded bg-surface-alt text-muted" aria-hidden="true">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+                        </span>
+                    </div>
+                    <div class="text-2xl font-semibold text-ink">
+                        {{ (summary.costCents / 100)|number_format(2, ',', ' ') }} €
+                    </div>
+                </div>
+            </div>
 
-            <section aria-labelledby="audit-heading">
-                <h2 id="audit-heading">Audit trail du taux appliqué</h2>
-                {% if auditTrail is empty %}
-                    <p>Aucune imputation valorisée à détailler.</p>
-                {% else %}
-                    <table class="valuation-audit">
+            {# Marge brute — DG / contrôle de gestion #}
+            <div class="sm:col-span-1">
+                <div class="flex h-full flex-col rounded-md border border-border bg-surface p-5">
+                    <div class="mb-2 flex items-center justify-between">
+                        <span class="text-xs text-muted">Marge brute</span>
+                        <span class="grid h-8 w-8 shrink-0 place-items-center rounded bg-surface-alt text-success" aria-hidden="true">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16M8 15l3-4 3 2 4-6"/></svg>
+                        </span>
+                    </div>
+                    <div class="text-2xl font-semibold text-ink">
+                        {{ (summary.marginCents / 100)|number_format(2, ',', ' ') }} €
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+
+    {# ── Fraîcheur ───────────────────────────────────────────────────────────── #}
+    <p class="mb-4 flex items-center gap-2 text-xs text-muted" aria-live="polite">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        {% if freshnessMinutes is null %}
+            Aucune valorisation pour l'instant.
+        {% else %}
+            Mise à jour il y a {{ freshnessMinutes }} min.
+        {% endif %}
+    </p>
+
+    {# ── Détail coût & marge — réservé DG / contrôle de gestion ─────────────── #}
+    {% if canViewCost %}
+        {% if auditTrail is not empty %}
+            <div class="rounded-md border border-border bg-surface">
+                <div class="border-b border-border px-4 py-3 font-semibold text-ink">Audit trail — taux appliqués</div>
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse text-left">
+                        <caption class="visually-hidden">Détail des taux appliqués par imputation valorisée</caption>
                         <thead>
-                            <tr>
-                                <th scope="col">Imputation</th>
-                                <th scope="col">Valorisée le</th>
-                                <th scope="col">CA (€)</th>
-                                <th scope="col">Coût (€)</th>
-                                <th scope="col">Détail du taux</th>
+                            <tr class="bg-surface-alt">
+                                <th scope="col" class="px-4 py-3 font-semibold text-body">Imputation</th>
+                                <th scope="col" class="px-4 py-3 font-semibold text-body">Valorisée le</th>
+                                <th scope="col" class="px-4 py-3 text-right font-semibold text-body">CA (€)</th>
+                                <th scope="col" class="px-4 py-3 text-right font-semibold text-body">Coût (€)</th>
+                                <th scope="col" class="px-4 py-3 font-semibold text-body">Taux appliqué</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for line in auditTrail %}
-                                <tr>
-                                    <td><code>{{ line.timeEntryId[:8] }}</code></td>
-                                    <td>{{ line.valuedAt }}</td>
-                                    <td>{{ (line.revenueCents / 100)|number_format(2, ',', ' ') }}</td>
-                                    <td>{{ (line.costCents / 100)|number_format(2, ',', ' ') }}</td>
-                                    <td>
+                                <tr class="border-t border-border hover:bg-surface-alt">
+                                    <td class="px-4 py-3">
+                                        <code class="rounded bg-surface-alt px-1 py-0.5 font-mono text-xs text-body">{{ line.timeEntryId[:8] }}</code>
+                                    </td>
+                                    <td class="px-4 py-3 text-body">{{ line.valuedAt }}</td>
+                                    <td class="px-4 py-3 text-right text-body">{{ (line.revenueCents / 100)|number_format(2, ',', ' ') }}</td>
+                                    <td class="px-4 py-3 text-right text-body">{{ (line.costCents / 100)|number_format(2, ',', ' ') }}</td>
+                                    <td class="px-4 py-3">
                                         <details>
-                                            <summary aria-label="Voir le taux appliqué">ℹ️ Taux appliqué</summary>
-                                            <p>
+                                            <summary class="cursor-pointer list-none text-xs font-medium text-primary hover:underline [&::-webkit-details-marker]:hidden"
+                                                     aria-label="Afficher le détail du taux appliqué">Taux appliqué</summary>
+                                            <p class="mt-1 text-xs text-muted">
                                                 Vente : {{ (line.sellingRateCents / 100)|number_format(2, ',', ' ') }} €/j —
                                                 Coût : {{ (line.costRateCents / 100)|number_format(2, ',', ' ') }} €/j
                                                 {% if line.rateDate %}— en vigueur au {{ line.rateDate }}{% endif %}
@@ -91,13 +144,19 @@
                             {% endfor %}
                         </tbody>
                     </table>
-                {% endif %}
-            </section>
+                </div>
+            </div>
         {% else %}
-            <section aria-labelledby="cost-restricted-heading">
-                <h2 id="cost-restricted-heading">Coût & marge</h2>
-                <p class="hint">Le détail des coûts et des taux est réservé au contrôle de gestion.</p>
-            </section>
+            <div class="rounded-md border border-border bg-surface p-4">
+                <p class="m-0 text-muted">Aucune imputation valorisée à détailler.</p>
+            </div>
         {% endif %}
-    </main>
+    {% else %}
+        <div class="flex items-center gap-2 rounded-md border border-border bg-surface p-4">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0 text-muted"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <p class="m-0 text-muted">
+                Le détail des coûts et des taux est réservé au contrôle de gestion.
+            </p>
+        </div>
+    {% endif %}
 {% endblock %}

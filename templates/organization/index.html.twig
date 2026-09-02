@@ -2,71 +2,118 @@
 
 {% block title %}Organisation{% endblock %}
 
-{% block body %}
-    <main class="container" data-controller="organization">
-        <h1>Structure organisationnelle</h1>
+{% block page_section %}Administration{% endblock %}
+{% block page_title %}Structure organisationnelle{% endblock %}
 
-        <section aria-labelledby="units-heading">
-            <h2 id="units-heading">Unités</h2>
+{% block body %}
+    <h1 class="visually-hidden">Structure organisationnelle</h1>
+
+    <div data-controller="organization">
+
+        {# Unités #}
+        <section aria-labelledby="units-heading" class="mb-6">
+            <h2 id="units-heading" class="mb-3 text-base font-semibold text-ink">Unités</h2>
+
             {% if rows is empty %}
-                <p data-organization-target="empty">Aucune unité pour l'instant. Créez la première ci-dessous.</p>
+                <p class="text-muted" data-organization-target="empty">
+                    Aucune unité pour l'instant. Créez la première ci-dessous.
+                </p>
             {% else %}
-                <ul class="org-tree">
-                    {% for row in rows %}
-                        <li style="margin-left: {{ row.depth * 1.5 }}rem">
-                            <span class="org-unit-name{{ row.active ? '' : ' org-unit-inactive' }}">
-                                {{ row.name }}{{ row.active ? '' : ' (désactivée)' }}
-                            </span>
-                            {% if row.active %}
-                                <button type="button"
-                                        data-action="organization#deactivate"
-                                        data-org-id="{{ row.id }}"
-                                        aria-label="Désactiver l'unité {{ row.name }}">Désactiver</button>
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
+                <div class="rounded-md border border-border bg-surface">
+                    <ul role="list">
+                        {% for row in rows %}
+                            <li class="flex items-center justify-between gap-2 border-b border-border px-4 py-3 last:border-b-0"
+                                style="padding-left: calc(1rem + {{ row.depth * 1.5 }}rem)">
+                                <span class="{{ row.active ? 'font-medium text-ink' : 'italic text-muted' }}">
+                                    {{ row.name }}{{ row.active ? '' : ' (désactivée)' }}
+                                </span>
+                                {% if row.active %}
+                                    <button type="button"
+                                            class="inline-flex min-h-9 items-center rounded border border-border-strong px-3 text-xs font-semibold text-muted hover:bg-surface-alt hover:text-ink focus:outline-none focus:ring-2 focus:ring-focus"
+                                            data-action="organization#deactivate"
+                                            data-org-id="{{ row.id }}"
+                                            aria-label="Désactiver l'unité {{ row.name }}">
+                                        Désactiver
+                                    </button>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
             {% endif %}
         </section>
 
-        <section aria-labelledby="create-heading">
-            <h2 id="create-heading">Ajouter une unité</h2>
-            <form data-action="submit->organization#createUnit">
-                <label>Nom
-                    <input type="text" required data-organization-target="unitName" placeholder="ex. Direction financière">
-                </label>
-                <label>Rattacher sous
-                    <select data-organization-target="unitParent">
-                        <option value="">— racine —</option>
-                        {% for row in rows %}
-                            <option value="{{ row.id }}">{{ row.indent }}{{ row.name }}</option>
-                        {% endfor %}
-                    </select>
-                </label>
-                <button type="submit">Créer l'unité</button>
-            </form>
+        {# Ajouter une unité #}
+        <section aria-labelledby="create-heading" class="mb-6">
+            <h2 id="create-heading" class="mb-3 text-base font-semibold text-ink">Ajouter une unité</h2>
+            <div class="rounded-md border border-border bg-surface">
+                <div class="p-4">
+                    <form data-action="submit->organization#createUnit">
+                        <div class="mb-4">
+                            <label for="org-unit-name" class="mb-1 block text-xs font-medium text-body">Nom</label>
+                            <input type="text" id="org-unit-name" required
+                                   data-organization-target="unitName"
+                                   placeholder="ex. Direction financière"
+                                   class="w-full max-w-md rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-focus">
+                        </div>
+                        <div class="mb-4">
+                            <label for="org-unit-parent" class="mb-1 block text-xs font-medium text-body">Rattacher sous</label>
+                            <select id="org-unit-parent"
+                                    data-organization-target="unitParent"
+                                    class="w-full max-w-md rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-focus">
+                                <option value="">— racine —</option>
+                                {% for row in rows %}
+                                    <option value="{{ row.id }}">{{ row.indent }}{{ row.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit"
+                                class="inline-flex min-h-9 items-center rounded bg-primary px-4 text-xs font-semibold text-primary-fg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1">
+                            Créer l'unité
+                        </button>
+                    </form>
+                </div>
+            </div>
         </section>
 
-        <section aria-labelledby="attach-heading">
-            <h2 id="attach-heading">Rattacher un collaborateur</h2>
-            <form data-action="submit->organization#attach">
-                <label>Identifiant du collaborateur
-                    <input type="text" required data-organization-target="userId" placeholder="UUID du collaborateur">
-                </label>
-                <label>Unité
-                    <select required data-organization-target="attachUnit">
-                        {% for row in rows|filter(r => r.active) %}
-                            <option value="{{ row.id }}">{{ row.indent }}{{ row.name }}</option>
-                        {% endfor %}
-                    </select>
-                </label>
-                <label>À partir du
-                    <input type="date" required data-organization-target="effectiveFrom">
-                </label>
-                <button type="submit">Rattacher</button>
-            </form>
+        {# Rattacher un collaborateur #}
+        <section aria-labelledby="attach-heading" class="mb-6">
+            <h2 id="attach-heading" class="mb-3 text-base font-semibold text-ink">Rattacher un collaborateur</h2>
+            <div class="rounded-md border border-border bg-surface">
+                <div class="p-4">
+                    <form data-action="submit->organization#attach">
+                        <div class="mb-4">
+                            <label for="org-user-id" class="mb-1 block text-xs font-medium text-body">Identifiant du collaborateur</label>
+                            <input type="text" id="org-user-id" required
+                                   data-organization-target="userId"
+                                   placeholder="UUID du collaborateur"
+                                   class="w-full max-w-md rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-focus">
+                        </div>
+                        <div class="mb-4">
+                            <label for="org-attach-unit" class="mb-1 block text-xs font-medium text-body">Unité</label>
+                            <select id="org-attach-unit" required
+                                    data-organization-target="attachUnit"
+                                    class="w-full max-w-md rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-focus">
+                                {% for row in rows|filter(r => r.active) %}
+                                    <option value="{{ row.id }}">{{ row.indent }}{{ row.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="org-effective-from" class="mb-1 block text-xs font-medium text-body">À partir du</label>
+                            <input type="date" id="org-effective-from" required
+                                   data-organization-target="effectiveFrom"
+                                   class="w-full max-w-md rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-focus">
+                        </div>
+                        <button type="submit"
+                                class="inline-flex min-h-9 items-center rounded bg-primary px-4 text-xs font-semibold text-primary-fg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1">
+                            Rattacher
+                        </button>
+                    </form>
+                </div>
+            </div>
         </section>
 
-        <p class="hint" aria-live="polite" data-organization-target="status"></p>
-    </main>
+        <p class="text-xs text-muted" aria-live="polite" data-organization-target="status"></p>
+    </div>
 {% endblock %}

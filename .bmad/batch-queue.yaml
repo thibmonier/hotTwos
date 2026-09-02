@@ -1,0 +1,58 @@
+# File d'exécution — Sprint 7 (généré par /project:run-sprint 007)
+sprint: sprint-007-design-system
+generated_at: 2026-09-02
+goal: "Design system posé et appliqué au lot 1 (EPIC-012 D1→D4)"
+
+execution:
+  mode: sequential
+  parallel_limit: 2
+  resume_on_failure: true
+  checkpoint_interval: 1
+
+# Prérequis et gates NON automatisables — à lever avant/pendant l'exécution
+gates:
+  - id: pr-12-merge
+    desc: "PR #12 (US-061→066 + conception) mergée sur main"
+    status: pending
+  - id: maquettes-validees
+    desc: "US-062 : validation PO des maquettes. LEVÉ le 2026-09-02 — 3 écrans validés sur maquette + direction pré-approuvée pour les 8 restants (process assoupli). Reskin US-064 débloqué (validation PO en lot du résultat). Plancher DoD conservé : WCAG 2.2 AA + états sans-permission (données sensibles)."
+    status: satisfied
+
+stories:
+  - id: US-061
+    title: "Charte & design system (tokens + composants Skote)"
+    points: 5
+    priority: 1
+    depends_on: []
+    status: pending
+    note: "Fondation — aucun gate externe, exécutable en premier."
+  - id: US-062
+    title: "Conception UX/UI — maquettes validées"
+    points: 5
+    priority: 2
+    depends_on: []
+    status: pending
+    gate: maquettes-validees
+    note: "Reste à faire léger (pré-avancée en conception) ; DoD = validation PO."
+  - id: US-063
+    title: "Intégration du layout Skote sur le socle Twig/Stimulus"
+    points: 5
+    priority: 3
+    depends_on: [US-061]
+    status: pending
+  - id: US-064
+    title: "Reskin des écrans livrés selon les maquettes"
+    points: 8
+    priority: 4
+    depends_on: [US-061, US-062, US-063]
+    status: pending
+    gate: maquettes-validees
+    note: "Reskin écran par écran conditionné à la maquette validée."
+
+total_points: 23
+
+# Ordre d'exécution (phases)
+plan:
+  phase_1: [T-TECH-01, US-061]        # dette RLS + fondation design system
+  phase_2: [US-062, US-063]           # maquettes (→ validation PO) ‖ layout
+  phase_3: [US-064]                   # reskin (après validation maquettes + layout)

@@ -12,9 +12,16 @@ final class InMemoryUserRepository implements UserRepository
     /** @var array<string, true> clés « tenant|userId » des utilisateurs connus */
     private array $known = [];
 
-    public function register(TenantId $tenant, string $userId): void
+    /** @var array<string, string> */
+    private array $emails = [];
+
+    public function register(TenantId $tenant, string $userId, ?string $email = null): void
     {
         $this->known[$this->key($tenant, $userId)] = true;
+
+        if (null !== $email) {
+            $this->emails[$this->key($tenant, $userId)] = $email;
+        }
     }
 
     public function existsInTenant(TenantId $tenant, string $userId): bool
@@ -33,6 +40,19 @@ final class InMemoryUserRepository implements UserRepository
         }
 
         return $ids;
+    }
+
+    public function findEmailsByIds(TenantId $tenant, array $userIds): array
+    {
+        $emails = [];
+        foreach ($userIds as $userId) {
+            $key = $this->key($tenant, $userId);
+            if (isset($this->emails[$key])) {
+                $emails[$userId] = $this->emails[$key];
+            }
+        }
+
+        return $emails;
     }
 
     private function key(TenantId $tenant, string $userId): string

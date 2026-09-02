@@ -1,17 +1,38 @@
 <!DOCTYPE html>
-<html lang="fr">
+{#
+  base.html.twig — Layout Tailwind v4 (ADR-0019). Sidebar 250px (sombre invariante)
+  + topbar 70px + zone de contenu. Blocs : page_section, page_title, topbar_actions,
+  body (rétrocompatible), stylesheets, javascripts, title.
+  Nav filtrée par is_granted (PermissionVoter). Interactivité en Stimulus (thème, sidebar).
+#}
+<html lang="{{ app.request.locale|default('fr') }}" class="h-full">
     <head>
         <meta charset="UTF-8">
-        {# Prérequis responsive mobile-first (US-052) ; zoom non bloqué (WCAG 1.4.4). #}
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
+        <title>{% block title %}HotOnes{% endblock %}</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
+
+        {# Early-init thème (anti-FOUC) — pose data-theme avant le CSS. #}
+        <script>
+            (function () {
+                var t = localStorage.getItem('theme');
+                if (t === 'dark' || t === 'light') {
+                    document.documentElement.setAttribute('data-theme', t);
+                }
+            })();
+        </script>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap">
+
+        {# CSS Tailwind buildé (tailwind-bundle swappe vers var/tailwind/tailwind.built.css). #}
+        <link rel="stylesheet" href="{{ asset('styles/tailwind.css') }}">
 
         {% block javascripts %}
             {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
+        {% block stylesheets %}{% endblock %}
 
         {% set frankenphp_hot_reload = app.request.server.get('FRANKENPHP_HOT_RELOAD') %}
         {% if frankenphp_hot_reload %}
@@ -20,7 +41,86 @@
         <script src="https://cdn.jsdelivr.net/npm/frankenphp-hot-reload/+esm" type="module"></script>
         {% endif %}
     </head>
-    <body>
-        {% block body %}{% endblock %}
+    <body class="h-full bg-bg font-sans text-[13px] leading-normal text-body antialiased">
+
+        <a href="#main-content" class="visually-hidden">Aller au contenu principal</a>
+
+        <div class="flex h-full min-h-screen" data-controller="sidebar-toggle">
+
+            {# ── Sidebar (sombre invariante) ─────────────────────────────── #}
+            <aside id="app-sidebar" data-sidebar-toggle-target="sidebar" aria-label="Navigation principale"
+                   class="fixed inset-y-0 left-0 z-30 flex w-[250px] shrink-0 -translate-x-full flex-col bg-sidebar text-sidebar-text transition-transform md:static md:translate-x-0">
+                <a href="{{ path('home') }}" class="flex h-[70px] items-center gap-3 border-b border-sidebar-alt px-5">
+                    <span class="grid h-7 w-7 place-items-center rounded-lg bg-primary-surface text-sm font-bold text-white">H</span>
+                    <span class="text-lg font-semibold text-white">HotOnes</span>
+                </a>
+                {% if is_granted('ROLE_USER') %}
+                {% set r = app.request.attributes.get('_route') %}
+                <p class="px-5 pt-4 pb-1.5 text-xs font-semibold uppercase tracking-wider text-sidebar-label">Menu</p>
+                <nav aria-label="Navigation principale" class="flex flex-col gap-0.5 px-3">
+                    {% set items = [
+                        {label:'Accueil', route:'home', match:'home', perm:null},
+                        {label:'Saisie', route:'timesheet_week', match:'timesheet_', perm:null},
+                        {label:'Validation', route:'timesheet_validation', match:'timesheet_validation', perm:'validate:time'},
+                        {label:'Complétude', route:'completeness_page', match:'completeness_page', perm:null},
+                        {label:'Valorisation', route:'valuation_dashboard', match:'valuation_dashboard', perm:'view:project_financials'},
+                        {label:'Projets', route:'project_index', match:'project_', perm:null},
+                        {label:'Absences', route:'absence_page', match:'absence_page', perm:null},
+                        {label:'Relances', route:'reminders_page', match:'reminders_', perm:'manage:reminders'},
+                        {label:'Organisation', route:'organization_admin', match:'organization_admin', perm:'manage:organization'},
+                        {label:'Profils', route:'pricing_admin', match:'pricing_admin', perm:'manage:pricing'},
+                        {label:'Admin — Périodes', route:'period_admin', match:'period_', perm:'manage:periods'}
+                    ] %}
+                    {% for it in items %}
+                        {% if it.perm is null or is_granted(it.perm) %}
+                            {% set active = r starts with it.match %}
+                            <a href="{{ path(it.route) }}"
+                               class="flex min-h-11 items-center gap-3 rounded px-3 text-[13px] {{ active ? 'bg-primary font-medium text-white' : 'hover:bg-white/5 hover:text-white' }}"
+                               {% if active %}aria-current="page"{% endif %}>
+                                <span aria-hidden="true" class="grid h-5 w-5 place-items-center rounded-sm bg-white/10 text-[10px]">•</span>
+                                <span>{{ it.label }}</span>
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+                </nav>
+                {% endif %}
+            </aside>
+
+            {# Overlay mobile #}
+            <button type="button" data-sidebar-toggle-target="overlay" data-action="click->sidebar-toggle#closeOverlay"
+                    aria-label="Fermer le menu" tabindex="-1"
+                    class="fixed inset-0 z-20 hidden bg-black/50 md:hidden"></button>
+
+            {# ── Colonne principale ──────────────────────────────────────── #}
+            <div class="flex min-w-0 flex-1 flex-col">
+                <header role="banner" class="flex h-[70px] shrink-0 items-center justify-between border-b border-border bg-surface px-6">
+                    <div class="flex items-center gap-3">
+                        <button type="button" data-sidebar-toggle-target="button" data-action="click->sidebar-toggle#toggle"
+                                aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="app-sidebar"
+                                class="grid h-10 w-10 place-items-center rounded border border-border text-muted md:hidden">≡</button>
+                        <div class="flex flex-col">
+                            <span class="text-xs text-muted">{% block page_section '' %}</span>
+                            <span class="text-base font-semibold text-ink">{% block page_title '' %}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3.5">
+                        {% block topbar_actions %}{% endblock %}
+                        <button type="button" data-controller="theme-toggle" data-action="click->theme-toggle#toggle"
+                                aria-label="Basculer le thème"
+                                class="grid h-9 w-9 place-items-center rounded border border-border text-muted hover:text-ink">☾</button>
+                        {% if app.user %}
+                        <div class="flex items-center gap-2.5">
+                            <span aria-hidden="true" class="grid h-9 w-9 place-items-center rounded-full bg-primary-surface text-xs font-semibold text-white">{{ app.user.getUserIdentifier()|slice(0,1)|upper }}</span>
+                            <span class="text-xs text-body">{{ app.user.getUserIdentifier() }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </header>
+
+                <main id="main-content" role="main" tabindex="-1" class="flex-1 overflow-auto bg-bg p-6">
+                    {% block body %}{% endblock %}
+                </main>
+            </div>
+        </div>
     </body>
 </html>

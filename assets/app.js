@@ -1,10 +1,7 @@
 import './stimulus_bootstrap.js';
-/*
- * Welcome to your app's main JavaScript file!
- *
- * This file will be included onto the page via the importmap() Twig function,
- * which should already be in your base.html.twig.
- */
-import './styles/app.css';
 
-console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');
+/*
+ * HotOnes — point d'entrée AssetMapper (ADR-0019).
+ * Le CSS est fourni par Tailwind (tailwind-bundle) et chargé via <link> dans base.html.twig
+ * (assets/styles/tailwind.css). Ici : uniquement l'amorçage Stimulus.
+ */

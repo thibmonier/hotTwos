@@ -1,75 +1,189 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Mes absences{% endblock %}
+{% block page_section %}Absences{% endblock %}
+{% block page_title %}Mes absences{% endblock %}
 
 {% block body %}
-    <main class="container" data-controller="absence">
-        <h1>Mes absences</h1>
+<div data-controller="absence">
+    <h1 class="visually-hidden">Mes absences</h1>
 
-        <section aria-labelledby="counters-heading" class="absence-counters">
-            <h2 id="counters-heading">Mes compteurs</h2>
-            <dl>
-                <dt>Acquis</dt><dd>{{ counters.acquired }} j</dd>
-                <dt>Pris</dt><dd>{{ counters.taken }} j</dd>
-                <dt>En attente</dt><dd>{{ counters.pending }} j</dd>
-                <dt>Solde</dt><dd>{{ counters.balance }} j</dd>
-                <dt>Solde projeté <span class="hint" title="Si toutes les demandes en attente sont approuvées">ℹ️</span></dt>
-                <dd>{{ counters.projected }} j</dd>
+    {# ── Compteurs ───────────────────────────────────────────────── #}
+    <section aria-labelledby="counters-heading" class="mb-4 rounded-md border border-border bg-surface">
+        <div class="border-b border-border bg-surface-alt px-4 py-3">
+            <h2 id="counters-heading" class="text-sm font-semibold text-ink">Mes compteurs</h2>
+        </div>
+        <div class="p-4">
+            <dl class="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(9rem,1fr))]">
+                <div>
+                    <dt class="mb-1 text-xs text-muted">Acquis</dt>
+                    <dd class="m-0 text-lg font-semibold text-ink">{{ counters.acquired }} j</dd>
+                </div>
+                <div>
+                    <dt class="mb-1 text-xs text-muted">Pris</dt>
+                    <dd class="m-0 text-lg font-semibold text-ink">{{ counters.taken }} j</dd>
+                </div>
+                <div>
+                    <dt class="mb-1 text-xs text-muted">En attente</dt>
+                    <dd class="m-0 text-lg font-semibold text-ink">{{ counters.pending }} j</dd>
+                </div>
+                <div>
+                    <dt class="mb-1 text-xs text-muted">Solde</dt>
+                    <dd class="m-0 text-lg font-semibold text-ink">{{ counters.balance }} j</dd>
+                </div>
+                <div>
+                    <dt class="mb-1 text-xs text-muted">
+                        Solde projeté
+                        <span role="img" title="Si toutes les demandes en attente sont approuvées"
+                              aria-label="Si toutes les demandes en attente sont approuvées">
+                            <span aria-hidden="true">ℹ️</span>
+                        </span>
+                    </dt>
+                    <dd class="m-0 text-lg font-semibold text-ink">{{ counters.projected }} j</dd>
+                </div>
             </dl>
-        </section>
+        </div>
+    </section>
 
-        <section aria-labelledby="declare-heading">
-            <h2 id="declare-heading">Déclarer une absence</h2>
-            <form data-action="submit->absence#declare">
-                <label>Type
-                    <select required data-absence-target="type">
+    {# ── Déclarer une absence ────────────────────────────────────── #}
+    <section aria-labelledby="declare-heading" class="mb-4 rounded-md border border-border bg-surface">
+        <div class="border-b border-border bg-surface-alt px-4 py-3">
+            <h2 id="declare-heading" class="text-sm font-semibold text-ink">Déclarer une absence</h2>
+        </div>
+        <div class="p-4">
+            <form data-action="submit->absence#declare" aria-labelledby="declare-heading" novalidate>
+                <div class="mb-4">
+                    <label for="absence-type" class="mb-1 block text-sm font-medium text-body">
+                        Type
+                        <span aria-hidden="true" class="text-danger">*</span>
+                        <span class="visually-hidden">(obligatoire)</span>
+                    </label>
+                    <select id="absence-type"
+                            class="block w-full rounded border border-border-strong bg-surface px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-primary"
+                            required
+                            data-absence-target="type">
                         <option value="">— Choisir un type —</option>
                         {% for type in types %}
                             <option value="{{ type.id }}">{{ type.label }}</option>
                         {% endfor %}
                     </select>
-                </label>
-                <label>Du <input type="date" required data-absence-target="startDate"></label>
-                <label>Au <input type="date" required data-absence-target="endDate"></label>
-                <label><input type="checkbox" checked data-absence-target="startsMorning"> Commence le matin</label>
-                <label><input type="checkbox" checked data-absence-target="endsAfternoon"> Finit l'après-midi</label>
-                <label>Commentaire (optionnel) <input type="text" maxlength="500" data-absence-target="comment" placeholder="ex. Vacances d'été" aria-describedby="comment-warning"></label>
-                <p id="comment-warning" class="hint">⚠️ Ne renseignez <strong>aucune donnée de santé</strong> (motif médical, diagnostic) — RGPD.</p>
-                <button type="submit">Soumettre la demande</button>
-            </form>
-            <p class="hint" aria-live="polite" data-absence-target="status"></p>
-        </section>
+                </div>
 
-        <section aria-labelledby="list-heading">
-            <h2 id="list-heading">Mes demandes</h2>
-            {% if requests is empty %}
-                <p>Aucune demande d'absence pour l'instant.</p>
-            {% else %}
-                <table class="absence-list">
+                <div class="mb-4 flex flex-wrap gap-4">
+                    <div class="min-w-0 flex-1">
+                        <label for="absence-start" class="mb-1 block text-sm font-medium text-body">
+                            Du
+                            <span aria-hidden="true" class="text-danger">*</span>
+                            <span class="visually-hidden">(obligatoire)</span>
+                        </label>
+                        <input type="date" id="absence-start"
+                               class="block w-full rounded border border-border-strong bg-surface px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-primary"
+                               required
+                               data-absence-target="startDate">
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <label for="absence-end" class="mb-1 block text-sm font-medium text-body">
+                            Au
+                            <span aria-hidden="true" class="text-danger">*</span>
+                            <span class="visually-hidden">(obligatoire)</span>
+                        </label>
+                        <input type="date" id="absence-end"
+                               class="block w-full rounded border border-border-strong bg-surface px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-primary"
+                               required
+                               data-absence-target="endDate">
+                    </div>
+                </div>
+
+                <div class="mb-4 flex flex-wrap gap-4">
+                    <label class="inline-flex min-h-11 cursor-pointer items-center gap-2">
+                        <input type="checkbox" id="absence-starts-morning"
+                               class="h-4 w-4 rounded border-border-strong accent-primary"
+                               checked data-absence-target="startsMorning">
+                        <span class="text-sm text-body">Commence le matin</span>
+                    </label>
+                    <label class="inline-flex min-h-11 cursor-pointer items-center gap-2">
+                        <input type="checkbox" id="absence-ends-afternoon"
+                               class="h-4 w-4 rounded border-border-strong accent-primary"
+                               checked data-absence-target="endsAfternoon">
+                        <span class="text-sm text-body">Finit l'après-midi</span>
+                    </label>
+                </div>
+
+                <div class="mb-5">
+                    <label for="absence-comment" class="mb-1 block text-sm font-medium text-body">
+                        Commentaire
+                        <span class="font-normal text-muted">(optionnel)</span>
+                    </label>
+                    <input type="text" id="absence-comment"
+                           class="block w-full rounded border border-border-strong bg-surface px-3 py-2 text-sm text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-primary"
+                           maxlength="500" data-absence-target="comment"
+                           placeholder="ex. Vacances d'été" aria-describedby="comment-warning">
+                    <p id="comment-warning" class="mt-1.5 text-xs text-muted">
+                        <span aria-hidden="true">⚠️</span>
+                        Ne renseignez <strong>aucune donnée de santé</strong>
+                        (motif médical, diagnostic) — RGPD.
+                    </p>
+                </div>
+
+                <button type="submit"
+                        class="inline-flex min-h-11 items-center rounded bg-primary px-4 py-2.5 text-sm font-semibold text-primary-fg hover:opacity-90">
+                    Soumettre la demande
+                </button>
+            </form>
+
+            <p class="mt-3 text-xs text-muted" aria-live="polite" data-absence-target="status"></p>
+        </div>
+    </section>
+
+    {# ── Mes demandes ────────────────────────────────────────────── #}
+    <section aria-labelledby="list-heading" class="rounded-md border border-border bg-surface">
+        <div class="border-b border-border bg-surface-alt px-4 py-3">
+            <h2 id="list-heading" class="text-sm font-semibold text-ink">Mes demandes</h2>
+        </div>
+        {% if requests is empty %}
+            <div class="p-4">
+                <p class="text-muted">Aucune demande d'absence pour l'instant.</p>
+            </div>
+        {% else %}
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse text-left text-sm"
+                       aria-labelledby="list-heading">
+                    <caption class="visually-hidden">Liste de vos demandes d'absence</caption>
                     <thead>
-                        <tr>
-                            <th scope="col">Du</th>
-                            <th scope="col">Au</th>
-                            <th scope="col">Statut</th>
-                            <th scope="col">Motif de refus</th>
+                        <tr class="bg-surface-alt">
+                            <th scope="col" class="px-4 py-3 font-semibold text-body">Du</th>
+                            <th scope="col" class="px-4 py-3 font-semibold text-body">Au</th>
+                            <th scope="col" class="px-4 py-3 font-semibold text-body">Statut</th>
+                            <th scope="col" class="px-4 py-3 font-semibold text-body">Motif de refus</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for r in requests %}
-                            <tr>
-                                <td>{{ r.from }}</td>
-                                <td>{{ r.to }}</td>
-                                <td>
-                                    {% if r.status == 'validated' %}<span aria-hidden="true">✅</span> Validée
-                                    {% elseif r.status == 'rejected' %}<span aria-hidden="true">❌</span> Refusée
-                                    {% else %}<span aria-hidden="true">⏳</span> En attente{% endif %}
+                            <tr class="border-t border-border hover:bg-surface-alt">
+                                <td class="px-4 py-3 text-ink">{{ r.from }}</td>
+                                <td class="px-4 py-3 text-ink">{{ r.to }}</td>
+                                <td class="px-4 py-3">
+                                    {% if r.status == 'validated' %}
+                                        <span class="status-badge status-badge-success">
+                                            <span aria-hidden="true">✅</span> Validée
+                                        </span>
+                                    {% elseif r.status == 'rejected' %}
+                                        <span class="status-badge status-badge-danger">
+                                            <span aria-hidden="true">❌</span> Refusée
+                                        </span>
+                                    {% else %}
+                                        <span class="status-badge status-badge-warning">
+                                            <span aria-hidden="true">⏳</span> En attente
+                                        </span>
+                                    {% endif %}
                                 </td>
-                                <td>{{ r.reason ?? '—' }}</td>
+                                <td class="px-4 py-3 text-muted">{{ r.reason ?? '—' }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
-            {% endif %}
-        </section>
-    </main>
+            </div>
+        {% endif %}
+    </section>
+</div>
 {% endblock %}

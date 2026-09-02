@@ -1,119 +1,211 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Relances de saisie{% endblock %}
+{% block page_section %}Relances{% endblock %}
+{% block page_title %}Relances de saisie{% endblock %}
 
 {% block body %}
-    <main class="container" data-controller="reminders">
-        <h1>Relances de saisie</h1>
-        <p>Paramétrage des relances automatiques de retard de saisie, pour l'ensemble du cabinet.</p>
+<div data-controller="reminders">
+    <h1 class="visually-hidden">Relances de saisie</h1>
+    <p class="mb-4 text-muted">
+        Paramétrage des relances automatiques de retard de saisie, pour l'ensemble du cabinet.
+    </p>
 
-        {% for label, messages in app.flashes %}
-            {% for message in messages %}
-                <p class="flash flash-{{ label }}" role="{{ label == 'error' ? 'alert' : 'status' }}">{{ message }}</p>
-            {% endfor %}
-        {% endfor %}
+    {# ── Messages flash ──────────────────────────────────────────── #}
+    {% for message in app.flashes('success') %}
+        <div class="flash flash-success mb-3" role="status">{{ message }}</div>
+    {% endfor %}
+    {% for message in app.flashes('error') %}
+        <div class="flash flash-error mb-3" role="alert">{{ message }}</div>
+    {% endfor %}
 
-        <section aria-labelledby="config-heading">
-            <h2 id="config-heading">Règle de relance</h2>
-            <form method="post" action="{{ path('reminders_update') }}">
+    {# ── Règle de relance ────────────────────────────────────────── #}
+    <section aria-labelledby="config-heading" class="mb-4 rounded-md border border-border bg-surface">
+        <div class="border-b border-border bg-surface-alt px-4 py-3">
+            <h2 id="config-heading" class="text-sm font-semibold text-ink">Règle de relance</h2>
+        </div>
+        <div class="p-4">
+            <form method="post" action="{{ path('reminders_update') }}"
+                  aria-labelledby="config-heading">
                 <input type="hidden" name="_token" value="{{ csrf_token('configure_reminders') }}">
 
-                <p class="reminder-master-toggle">
-                    <label>
-                        <input type="checkbox" name="active" data-reminders-target="master"
-                               data-action="change->reminders#toggle"{{ rule.active ? ' checked' : '' }}>
-                        Activer les relances automatiques
+                {# Activation globale #}
+                <div class="mb-5">
+                    <label class="inline-flex min-h-11 cursor-pointer items-center gap-3">
+                        <input class="h-4 w-4 rounded border-border-strong accent-primary"
+                               type="checkbox"
+                               id="active" name="active" role="switch"
+                               data-reminders-target="master"
+                               data-action="change->reminders#toggle"
+                               aria-describedby="active-help"
+                               {{ rule.active ? 'checked' : '' }}>
+                        <span class="text-sm font-semibold text-body">
+                            Activer les relances automatiques
+                        </span>
                     </label>
-                    <span class="hint" id="active-help">Si désactivé, aucune relance n'est envoyée, quels que soient les autres réglages.</span>
-                </p>
+                    <p id="active-help" class="mt-1.5 text-xs text-muted">
+                        Si désactivé, aucune relance n'est envoyée,
+                        quels que soient les autres réglages.
+                    </p>
+                </div>
 
-                <fieldset data-reminders-target="dependent">
-                    <legend>Cadence</legend>
+                {# Cadence #}
+                <fieldset class="mb-5" data-reminders-target="dependent">
+                    <legend class="mb-3 text-sm font-semibold text-ink">Cadence</legend>
 
-                    <label for="initialDelayDays">Délai avant la première relance (jours)</label>
-                    <input type="number" id="initialDelayDays" name="initialDelayDays"
-                           min="0" max="30" step="1" value="{{ rule.initialDelayDays }}"
-                           inputmode="numeric" aria-describedby="delay-help" required>
-                    <span class="hint" id="delay-help">Jours de retard après l'échéance de complétude avant l'envoi de la première relance (0 à 30).</span>
+                    <div class="mb-4">
+                        <label for="initialDelayDays" class="mb-1 block text-sm font-medium text-body">
+                            Délai avant la première relance (jours)
+                        </label>
+                        <input type="number" id="initialDelayDays" name="initialDelayDays"
+                               class="block max-w-48 rounded border border-border-strong bg-surface px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-primary"
+                               min="0" max="30" step="1" value="{{ rule.initialDelayDays }}"
+                               inputmode="numeric" aria-describedby="delay-help" required>
+                        <p id="delay-help" class="mt-1.5 text-xs text-muted">
+                            Jours de retard après l'échéance de complétude avant l'envoi
+                            de la première relance (0 à 30).
+                        </p>
+                    </div>
 
-                    <label for="frequencyDays">Fréquence des relances suivantes (jours)</label>
-                    <input type="number" id="frequencyDays" name="frequencyDays"
-                           min="1" max="30" step="1" value="{{ rule.frequencyDays }}"
-                           inputmode="numeric" aria-describedby="frequency-help" required>
-                    <span class="hint" id="frequency-help">Intervalle entre deux relances si le retard persiste (1 à 30). Au plus une relance par jour ouvré.</span>
+                    <div class="mb-2">
+                        <label for="frequencyDays" class="mb-1 block text-sm font-medium text-body">
+                            Fréquence des relances suivantes (jours)
+                        </label>
+                        <input type="number" id="frequencyDays" name="frequencyDays"
+                               class="block max-w-48 rounded border border-border-strong bg-surface px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-primary"
+                               min="1" max="30" step="1" value="{{ rule.frequencyDays }}"
+                               inputmode="numeric" aria-describedby="frequency-help" required>
+                        <p id="frequency-help" class="mt-1.5 text-xs text-muted">
+                            Intervalle entre deux relances si le retard persiste (1 à 30).
+                            Au plus une relance par jour ouvré.
+                        </p>
+                    </div>
                 </fieldset>
 
-                <fieldset data-reminders-target="dependent">
-                    <legend>Diffusion</legend>
+                {# Diffusion #}
+                <fieldset class="mb-5" data-reminders-target="dependent">
+                    <legend class="mb-3 text-sm font-semibold text-ink">Diffusion</legend>
 
-                    <label for="channel">Canal de relance</label>
-                    <select id="channel" name="channel">
-                        {% for value, label in channelLabels %}
-                            <option value="{{ value }}"{{ rule.channel == value ? ' selected' : '' }}>{{ label }}</option>
-                        {% endfor %}
-                    </select>
+                    <div class="mb-4">
+                        <label for="channel" class="mb-1 block text-sm font-medium text-body">
+                            Canal de relance
+                        </label>
+                        <select id="channel" name="channel"
+                                class="block max-w-xs rounded border border-border-strong bg-surface px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-primary">
+                            {% for value, label in channelLabels %}
+                                <option value="{{ value }}"
+                                        {{ rule.channel == value ? 'selected' : '' }}>
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-                    <label class="reminder-checkbox">
-                        <input type="checkbox" name="escalationEnabled"
-                               aria-describedby="escalation-help"{{ rule.escalationEnabled ? ' checked' : '' }}>
-                        Escalader au responsable (N+1) si le retard persiste
-                    </label>
-                    <span class="hint" id="escalation-help">Le responsable est informé à partir de la troisième relance sans effet.</span>
+                    <div class="mb-2">
+                        <label class="inline-flex min-h-11 cursor-pointer items-center gap-3">
+                            <input class="h-4 w-4 rounded border-border-strong accent-primary"
+                                   type="checkbox"
+                                   id="escalationEnabled" name="escalationEnabled"
+                                   aria-describedby="escalation-help"
+                                   {{ rule.escalationEnabled ? 'checked' : '' }}>
+                            <span class="text-sm text-body">
+                                Escalader au responsable (N+1) si le retard persiste
+                            </span>
+                        </label>
+                        <p id="escalation-help" class="mt-1.5 text-xs text-muted">
+                            Le responsable est informé à partir de la troisième relance sans effet.
+                        </p>
+                    </div>
                 </fieldset>
 
-                <button type="submit">Enregistrer les réglages</button>
+                <button type="submit"
+                        class="inline-flex min-h-11 items-center rounded bg-primary px-4 py-2.5 text-sm font-semibold text-primary-fg hover:opacity-90">
+                    Enregistrer les réglages
+                </button>
             </form>
-        </section>
+        </div>
+    </section>
 
-        <section aria-labelledby="preview-heading">
-            <h2 id="preview-heading">Qui serait relancé maintenant</h2>
-            {% if not active %}
-                <p>Les relances automatiques sont désactivées. Aucun aperçu n'est calculé.</p>
-            {% elseif preview is empty %}
-                <p>Aucun collaborateur ne serait relancé actuellement avec ces réglages.</p>
-            {% else %}
-                <ul class="reminder-preview">
-                    {% for row in preview %}
-                        <li class="{{ row.escalated ? 'is-escalated' : '' }}">
-                            <code>{{ row.userId[:8] }}</code> — semaine du {{ row.week }} — relance n° {{ row.rank }}
-                            {% if row.escalated %}<span class="badge-escalated">Escaladé N+1</span>{% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        </section>
+    {# ── Aperçu : qui serait relancé ─────────────────────────────── #}
+    <section aria-labelledby="preview-heading" class="mb-4 rounded-md border border-border bg-surface">
+        <div class="border-b border-border bg-surface-alt px-4 py-3">
+            <h2 id="preview-heading" class="text-sm font-semibold text-ink">Qui serait relancé maintenant</h2>
+        </div>
+        {% if not active %}
+            <div class="p-4">
+                <p class="text-muted">
+                    Les relances automatiques sont désactivées. Aucun aperçu n'est calculé.
+                </p>
+            </div>
+        {% elseif preview is empty %}
+            <div class="p-4">
+                <p class="text-muted">
+                    Aucun collaborateur ne serait relancé actuellement avec ces réglages.
+                </p>
+            </div>
+        {% else %}
+            <ul class="divide-y divide-border" aria-labelledby="preview-heading">
+                {% for row in preview %}
+                    <li class="flex items-center gap-2 px-4 py-3
+                               {{ row.escalated ? 'border-l-2 [border-left-color:var(--color-warning)]' : '' }}">
+                        <code class="text-xs text-body">{{ row.userId[:8] }}</code>
+                        <span class="text-sm text-muted">— semaine du {{ row.week }} — relance n° {{ row.rank }}</span>
+                        {% if row.escalated %}
+                            <span class="status-badge status-badge-neutral ml-auto">
+                                Escaladé N+1
+                            </span>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </section>
 
-        <section aria-labelledby="history-heading">
-            <h2 id="history-heading">Historique des relances</h2>
-            {% if history is empty %}
-                <p>Aucune relance n'a encore été émise.</p>
-            {% else %}
-                <table class="reminders-history">
-                    <caption class="visually-hidden">Historique des relances de saisie émises, de la plus récente à la plus ancienne.</caption>
+    {# ── Historique des relances ──────────────────────────────────── #}
+    <section aria-labelledby="history-heading" class="rounded-md border border-border bg-surface">
+        <div class="border-b border-border bg-surface-alt px-4 py-3">
+            <h2 id="history-heading" class="text-sm font-semibold text-ink">Historique des relances</h2>
+        </div>
+        {% if history is empty %}
+            <div class="p-4">
+                <p class="text-muted">Aucune relance n'a encore été émise.</p>
+            </div>
+        {% else %}
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse text-left text-sm"
+                       aria-labelledby="history-heading">
+                    <caption class="visually-hidden">
+                        Historique des relances de saisie émises,
+                        de la plus récente à la plus ancienne.
+                    </caption>
                     <thead>
-                        <tr>
-                            <th scope="col">Destinataire</th>
-                            <th scope="col">Semaine</th>
-                            <th scope="col">Canal</th>
-                            <th scope="col">Rang</th>
-                            <th scope="col">Escaladé</th>
-                            <th scope="col">Date d'envoi</th>
+                        <tr class="bg-surface-alt">
+                            <th scope="col" class="px-4 py-3 font-semibold text-body">Destinataire</th>
+                            <th scope="col" class="px-4 py-3 font-semibold text-body">Semaine</th>
+                            <th scope="col" class="px-4 py-3 font-semibold text-body">Canal</th>
+                            <th scope="col" class="px-4 py-3 font-semibold text-body">Rang</th>
+                            <th scope="col" class="px-4 py-3 font-semibold text-body">Escaladé</th>
+                            <th scope="col" class="px-4 py-3 font-semibold text-body">Date d'envoi</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for row in history %}
-                            <tr class="{{ row.escalated ? 'is-escalated' : '' }}">
-                                <th scope="row"><code>{{ row.userId[:8] }}</code></th>
-                                <td>{{ row.week }}</td>
-                                <td>{{ row.channel }}</td>
-                                <td>{{ row.rank }}</td>
-                                <td>{{ row.escalated ? 'Oui' : '—' }}</td>
-                                <td>{{ row.sentAt }}</td>
+                            <tr class="border-t border-border hover:bg-surface-alt
+                                       {{ row.escalated ? 'border-l-2 [border-left-color:var(--color-warning)]' : '' }}">
+                                <th scope="row" class="px-4 py-3 font-normal text-ink">
+                                    <code class="text-xs">{{ row.userId[:8] }}</code>
+                                </th>
+                                <td class="px-4 py-3 text-ink">{{ row.week }}</td>
+                                <td class="px-4 py-3 text-ink">{{ row.channel }}</td>
+                                <td class="px-4 py-3 text-ink">{{ row.rank }}</td>
+                                <td class="px-4 py-3 text-muted">{{ row.escalated ? 'Oui' : '—' }}</td>
+                                <td class="px-4 py-3 text-muted">{{ row.sentAt }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
-            {% endif %}
-        </section>
-    </main>
+            </div>
+        {% endif %}
+    </section>
+</div>
 {% endblock %}

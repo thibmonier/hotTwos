@@ -87,7 +87,10 @@ audit: ## Audit des vulnérabilités des dépendances (ENF-SEC-11)
 secrets: ## Détecte les secrets commités (gitleaks conteneurisé, US-007/US-009)
 	docker run --rm -v "$(CURDIR):/repo:ro" $(GITLEAKS_IMAGE) detect --source=/repo --no-banner || true
 
-ci: cs rector analyse deptrac test ## Enchaîne les vérifications bloquantes en local (miroir CI)
+tailwind: ## Build le CSS Tailwind (binaire autonome, sans Node.js — ADR-0019)
+	$(APP) php bin/console tailwind:build --minify
+
+ci: tailwind cs rector analyse deptrac test ## Enchaîne les vérifications bloquantes en local (miroir CI)
 	@echo "✅ Vérifications locales OK"
 
 smoke: ## Smoke de déploiement : vérifie les endpoints critiques (make smoke URL=https://…)

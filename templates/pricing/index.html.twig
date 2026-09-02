@@ -2,82 +2,179 @@
 
 {% block title %}Profils & tarifs{% endblock %}
 
-{% block body %}
-    <main class="container" data-controller="pricing">
-        <h1>Profils de tarification</h1>
+{% block page_section %}Administration{% endblock %}
+{% block page_title %}Profils de tarification{% endblock %}
 
-        <section aria-labelledby="profiles-heading">
-            <h2 id="profiles-heading">Profils</h2>
+{% block body %}
+    <h1 class="visually-hidden">Profils de tarification</h1>
+
+    <div data-controller="pricing">
+
+        {# Liste des profils #}
+        <section aria-labelledby="profiles-heading" class="mb-6">
+            <h2 id="profiles-heading" class="mb-3 text-base font-semibold text-ink">Profils</h2>
+
             {% if rows is empty %}
-                <p>Aucun profil pour l'instant. Créez le premier ci-dessous.</p>
+                <p class="text-muted">Aucun profil pour l'instant. Créez le premier ci-dessous.</p>
             {% else %}
-                <ul class="profile-list">
-                    {% for row in rows %}
-                        <li>
-                            <span class="{{ row.active ? '' : 'profile-inactive' }}">
-                                {{ row.name }} <em>({{ row.mode }})</em>{{ row.active ? '' : ' — désactivé' }}
-                            </span>
-                            <button type="button" data-action="pricing#showHistory" data-profile-id="{{ row.id }}"
-                                    aria-label="Voir l'historique tarifaire de {{ row.name }}">Historique</button>
-                            {% if row.active %}
-                                <button type="button" data-action="pricing#deactivate" data-profile-id="{{ row.id }}"
-                                        aria-label="Désactiver le profil {{ row.name }}">Désactiver</button>
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
+                <div class="rounded-md border border-border bg-surface">
+                    <ul role="list">
+                        {% for row in rows %}
+                            <li class="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3 last:border-b-0">
+                                <span class="{{ row.active ? 'font-medium text-ink' : 'italic text-muted' }}">
+                                    {{ row.name }}
+                                    <em class="font-normal text-muted not-italic">({{ row.mode }})</em>
+                                    {% if not row.active %}
+                                        <span class="status-badge status-badge-neutral ml-1">Désactivé</span>
+                                    {% endif %}
+                                </span>
+                                <span class="flex gap-1">
+                                    <button type="button"
+                                            class="inline-flex min-h-9 items-center rounded border border-border-strong px-3 text-xs font-semibold text-muted hover:bg-surface-alt hover:text-ink focus:outline-none focus:ring-2 focus:ring-focus"
+                                            data-action="pricing#showHistory"
+                                            data-profile-id="{{ row.id }}"
+                                            aria-label="Voir l'historique tarifaire de {{ row.name }}">
+                                        Historique
+                                    </button>
+                                    {% if row.active %}
+                                        <button type="button"
+                                                class="inline-flex min-h-9 items-center rounded border border-border-strong px-3 text-xs font-semibold text-muted hover:bg-surface-alt hover:text-ink focus:outline-none focus:ring-2 focus:ring-focus"
+                                                data-action="pricing#deactivate"
+                                                data-profile-id="{{ row.id }}"
+                                                aria-label="Désactiver le profil {{ row.name }}">
+                                            Désactiver
+                                        </button>
+                                    {% endif %}
+                                </span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
             {% endif %}
         </section>
 
-        <section aria-labelledby="create-profile-heading">
-            <h2 id="create-profile-heading">Ajouter un profil</h2>
-            <form data-action="submit->pricing#createProfile">
-                <label>Nom <input type="text" required data-pricing-target="profileName" placeholder="ex. Développeur senior"></label>
-                <label>Mode de calcul du coût
-                    <select data-pricing-target="profileMode">
-                        <option value="direct">Direct</option>
-                        <option value="loaded">Chargé</option>
-                        <option value="full">Complet</option>
-                    </select>
-                </label>
-                <button type="submit">Créer le profil</button>
-            </form>
+        {# Ajouter un profil #}
+        <section aria-labelledby="create-profile-heading" class="mb-6">
+            <h2 id="create-profile-heading" class="mb-3 text-base font-semibold text-ink">Ajouter un profil</h2>
+            <div class="rounded-md border border-border bg-surface">
+                <div class="p-4">
+                    <form data-action="submit->pricing#createProfile">
+                        <div class="mb-4">
+                            <label for="pricing-profile-name" class="mb-1 block text-xs font-medium text-body">Nom</label>
+                            <input type="text" id="pricing-profile-name" required
+                                   data-pricing-target="profileName"
+                                   placeholder="ex. Développeur senior"
+                                   class="w-full max-w-md rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-focus">
+                        </div>
+                        <div class="mb-4">
+                            <label for="pricing-profile-mode" class="mb-1 block text-xs font-medium text-body">Mode de calcul du coût</label>
+                            <select id="pricing-profile-mode"
+                                    data-pricing-target="profileMode"
+                                    class="w-full max-w-md rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-focus">
+                                <option value="direct">Direct</option>
+                                <option value="loaded">Chargé</option>
+                                <option value="full">Complet</option>
+                            </select>
+                        </div>
+                        <button type="submit"
+                                class="inline-flex min-h-9 items-center rounded bg-primary px-4 text-xs font-semibold text-primary-fg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1">
+                            Créer le profil
+                        </button>
+                    </form>
+                </div>
+            </div>
         </section>
 
-        <section aria-labelledby="define-rate-heading">
-            <h2 id="define-rate-heading">Définir un tarif</h2>
-            <form data-action="submit->pricing#defineRate">
-                <label>Profil
-                    <select required data-pricing-target="rateProfile">
-                        {% for row in rows %}
-                            <option value="{{ row.id }}">{{ row.name }}</option>
-                        {% endfor %}
-                    </select>
-                </label>
-                <label>À partir du <input type="date" required data-pricing-target="rateFrom"></label>
-                <label>Jusqu'au (optionnel) <input type="date" data-pricing-target="rateTo"></label>
-                <label>Coût de revient (centimes) <input type="number" min="1" required data-pricing-target="rateCost"></label>
-                <label>Taux de vente (centimes) <input type="number" min="1" required data-pricing-target="rateSelling"></label>
-                <label><input type="checkbox" data-pricing-target="rateConfirm"> Confirmer une saisie rétroactive</label>
-                <button type="submit">Enregistrer le tarif</button>
-            </form>
+        {# Définir un tarif #}
+        <section aria-labelledby="define-rate-heading" class="mb-6">
+            <h2 id="define-rate-heading" class="mb-3 text-base font-semibold text-ink">Définir un tarif</h2>
+            <div class="rounded-md border border-border bg-surface">
+                <div class="p-4">
+                    <form data-action="submit->pricing#defineRate">
+                        <div class="mb-4">
+                            <label for="pricing-rate-profile" class="mb-1 block text-xs font-medium text-body">Profil</label>
+                            <select id="pricing-rate-profile" required
+                                    data-pricing-target="rateProfile"
+                                    class="w-full max-w-md rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-focus">
+                                {% for row in rows %}
+                                    <option value="{{ row.id }}">{{ row.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-4 flex flex-wrap gap-4">
+                            <div class="flex-1 min-w-[180px]">
+                                <label for="pricing-rate-from" class="mb-1 block text-xs font-medium text-body">À partir du</label>
+                                <input type="date" id="pricing-rate-from" required
+                                       data-pricing-target="rateFrom"
+                                       class="w-full rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-focus">
+                            </div>
+                            <div class="flex-1 min-w-[180px]">
+                                <label for="pricing-rate-to" class="mb-1 block text-xs font-medium text-body">
+                                    Jusqu'au <span class="font-normal text-muted">(optionnel)</span>
+                                </label>
+                                <input type="date" id="pricing-rate-to"
+                                       data-pricing-target="rateTo"
+                                       class="w-full rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-focus">
+                            </div>
+                        </div>
+
+                        <div class="mb-4 flex flex-wrap gap-4">
+                            <div class="flex-1 min-w-[180px]">
+                                <label for="pricing-rate-cost" class="mb-1 block text-xs font-medium text-body">
+                                    Coût de revient <span class="font-normal text-muted">(centimes)</span>
+                                </label>
+                                <input type="number" id="pricing-rate-cost" min="1" required
+                                       data-pricing-target="rateCost"
+                                       class="w-full rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-focus">
+                            </div>
+                            <div class="flex-1 min-w-[180px]">
+                                <label for="pricing-rate-selling" class="mb-1 block text-xs font-medium text-body">
+                                    Taux de vente <span class="font-normal text-muted">(centimes)</span>
+                                </label>
+                                <input type="number" id="pricing-rate-selling" min="1" required
+                                       data-pricing-target="rateSelling"
+                                       class="w-full rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-focus">
+                            </div>
+                        </div>
+
+                        <div class="mb-4 flex items-start gap-2">
+                            <input type="checkbox" id="pricing-rate-confirm"
+                                   data-pricing-target="rateConfirm"
+                                   class="mt-0.5 h-4 w-4 rounded border-border-strong text-primary focus:ring-focus">
+                            <label for="pricing-rate-confirm" class="text-xs text-body">
+                                Confirmer une saisie rétroactive
+                            </label>
+                        </div>
+
+                        <button type="submit"
+                                class="inline-flex min-h-9 items-center rounded bg-primary px-4 text-xs font-semibold text-primary-fg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1">
+                            Enregistrer le tarif
+                        </button>
+                    </form>
+                </div>
+            </div>
         </section>
 
-        <section aria-labelledby="history-heading">
-            <h2 id="history-heading">Historique tarifaire</h2>
-            <table class="rate-history">
-                <thead>
-                    <tr>
-                        <th scope="col">À partir du</th>
-                        <th scope="col">Jusqu'au</th>
-                        <th scope="col">Coût (cts)</th>
-                        <th scope="col">Vente (cts)</th>
-                    </tr>
-                </thead>
-                <tbody data-pricing-target="history"></tbody>
-            </table>
+        {# Historique tarifaire #}
+        <section aria-labelledby="history-heading" class="mb-6">
+            <h2 id="history-heading" class="mb-3 text-base font-semibold text-ink">Historique tarifaire</h2>
+            <div class="overflow-x-auto rounded-md border border-border bg-surface">
+                <table class="w-full border-collapse text-left">
+                    <caption class="visually-hidden">Historique des tarifs par profil</caption>
+                    <thead>
+                        <tr class="bg-surface-alt">
+                            <th scope="col" class="px-4 py-3 font-semibold text-body">À partir du</th>
+                            <th scope="col" class="px-4 py-3 font-semibold text-body">Jusqu'au</th>
+                            <th scope="col" class="px-4 py-3 font-semibold text-body">Coût (cts)</th>
+                            <th scope="col" class="px-4 py-3 font-semibold text-body">Vente (cts)</th>
+                        </tr>
+                    </thead>
+                    <tbody data-pricing-target="history"></tbody>
+                </table>
+            </div>
         </section>
 
-        <p class="hint" aria-live="polite" data-pricing-target="status"></p>
-    </main>
+        <p class="text-xs text-muted" aria-live="polite" data-pricing-target="status"></p>
+    </div>
 {% endblock %}

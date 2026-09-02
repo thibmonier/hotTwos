@@ -2,70 +2,128 @@
 
 {% block title %}Nouveau projet{% endblock %}
 
+{% block page_section %}Projets{% endblock %}
+{% block page_title %}Nouveau projet{% endblock %}
+
 {% block body %}
-    <main class="container">
-        <h1>Nouveau projet</h1>
+    <h1 class="visually-hidden">Nouveau projet</h1>
 
-        {% for label, messages in app.flashes %}
-            {% for message in messages %}
-                <p class="flash flash-{{ label }}" role="{{ label == 'error' ? 'alert' : 'status' }}">{{ message }}</p>
-            {% endfor %}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="flash flash-{{ label == 'error' ? 'error' : label }}"
+                 role="{{ label == 'error' ? 'alert' : 'status' }}">{{ message }}</div>
         {% endfor %}
+    {% endfor %}
 
-        <p class="hint">Les champs marqués <abbr title="obligatoire">*</abbr> sont obligatoires (RG-PRJ-1).</p>
+    <div class="mx-auto max-w-[720px] rounded-md border border-border bg-surface">
+        <div class="flex items-center justify-between border-b border-border px-5 py-3">
+            <span class="font-semibold text-ink">Nouveau projet</span>
+            <a href="{{ path('project_index') }}" class="text-sm text-primary hover:underline">← Retour à la liste</a>
+        </div>
+        <div class="px-5 py-4">
+            <p class="mb-3 text-xs text-muted">
+                Les champs marqués <abbr title="obligatoire">*</abbr> sont obligatoires (RG-PRJ-1).
+            </p>
 
-        <form method="post" action="{{ path('project_create') }}">
-            <input type="hidden" name="_token" value="{{ csrf_token('create_project') }}">
+            <form method="post" action="{{ path('project_create') }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('create_project') }}">
 
-            <fieldset class="project-form-group">
-                <legend>Identification</legend>
+                <fieldset class="mb-4 rounded border border-border px-4 py-3">
+                    <legend class="px-2 text-sm font-semibold text-ink">Identification</legend>
 
-                <div class="project-form-field">
-                    <label for="name">Nom du projet <abbr title="obligatoire">*</abbr></label>
-                    <input type="text" id="name" name="name" maxlength="255" required aria-required="true">
-                </div>
-                <div class="project-form-field">
-                    <label for="clientName">Client <abbr title="obligatoire">*</abbr></label>
-                    <input type="text" id="clientName" name="clientName" maxlength="255" required aria-required="true" aria-describedby="client-help">
-                    <span class="hint" id="client-help">Saisie libre — deviendra une liste avec le référentiel clients (US-014).</span>
-                </div>
-                <div class="project-form-field">
-                    <label for="responsibleUserId">Responsable</label>
-                    <input type="text" id="responsibleUserId" name="responsibleUserId" aria-describedby="resp-help">
-                    <span class="hint" id="resp-help">Identifiant du chef de projet responsable ; par défaut, vous-même.</span>
-                </div>
-                <div class="project-form-field">
-                    <label for="budgetEuros">Budget (€) <abbr title="obligatoire">*</abbr></label>
-                    <input type="number" id="budgetEuros" name="budgetEuros" min="1" step="1" inputmode="numeric" required aria-required="true">
-                </div>
-            </fieldset>
-
-            <fieldset class="project-form-group">
-                <legend>Contractualisation et calendrier <span class="hint">(le calendrier est optionnel)</span></legend>
-
-                <fieldset>
-                    <legend>Contractualisation <abbr title="obligatoire">*</abbr></legend>
-                    {% for type in contractTypes %}
-                        <label class="project-radio">
-                            <input type="radio" name="contractType" value="{{ type.value }}"{{ loop.first ? ' checked' : '' }}>
-                            {{ type.label }}
+                    <div class="mb-3">
+                        <label for="name" class="mb-1 block text-[13px] font-medium text-ink">
+                            Nom du projet <abbr title="obligatoire">*</abbr>
                         </label>
-                    {% endfor %}
+                        <input type="text"
+                               class="w-full rounded border border-border bg-surface px-3 py-2 text-[13px] text-body focus:border-primary focus:outline-none"
+                               id="name" name="name" maxlength="255" required aria-required="true">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="clientName" class="mb-1 block text-[13px] font-medium text-ink">
+                            Client <abbr title="obligatoire">*</abbr>
+                        </label>
+                        <input type="text"
+                               class="w-full rounded border border-border bg-surface px-3 py-2 text-[13px] text-body focus:border-primary focus:outline-none"
+                               id="clientName" name="clientName" maxlength="255" required aria-required="true"
+                               aria-describedby="client-help">
+                        <p id="client-help" class="mt-1 text-xs text-muted">
+                            Saisie libre — deviendra une liste avec le référentiel clients (US-014).
+                        </p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="responsibleUserId" class="mb-1 block text-[13px] font-medium text-ink">Responsable</label>
+                        <input type="text"
+                               class="w-full rounded border border-border bg-surface px-3 py-2 text-[13px] text-body focus:border-primary focus:outline-none"
+                               id="responsibleUserId" name="responsibleUserId" aria-describedby="resp-help">
+                        <p id="resp-help" class="mt-1 text-xs text-muted">
+                            Identifiant du chef de projet responsable ; par défaut, vous-même.
+                        </p>
+                    </div>
+
+                    <div class="mb-0">
+                        <label for="budgetEuros" class="mb-1 block text-[13px] font-medium text-ink">
+                            Budget (€) <abbr title="obligatoire">*</abbr>
+                        </label>
+                        <input type="number"
+                               class="w-full rounded border border-border bg-surface px-3 py-2 text-[13px] text-body focus:border-primary focus:outline-none"
+                               id="budgetEuros" name="budgetEuros" min="1" step="1" inputmode="numeric"
+                               required aria-required="true">
+                    </div>
                 </fieldset>
 
-                <div class="project-form-field">
-                    <label for="startDate">Date de début</label>
-                    <input type="date" id="startDate" name="startDate">
-                </div>
-                <div class="project-form-field">
-                    <label for="endDate">Date de fin</label>
-                    <input type="date" id="endDate" name="endDate">
-                </div>
-            </fieldset>
+                <fieldset class="mb-4 rounded border border-border px-4 py-3">
+                    <legend class="px-2 text-sm font-semibold text-ink">
+                        Contractualisation et calendrier
+                        <span class="font-normal text-muted">(le calendrier est optionnel)</span>
+                    </legend>
 
-            <p class="hint">Statut initial : <strong>En préparation</strong>.</p>
-            <button type="submit">Créer le projet</button>
-            <a href="{{ path('project_index') }}">Annuler</a>
-        </form>
-    </main>
+                    <fieldset class="mb-3">
+                        <legend class="mb-1 block text-[13px] font-medium text-ink">
+                            Contractualisation <abbr title="obligatoire">*</abbr>
+                        </legend>
+                        <div class="flex flex-wrap gap-3">
+                            {% for type in contractTypes %}
+                                <label class="flex min-h-11 cursor-pointer items-center gap-2 px-2 py-1">
+                                    <input type="radio"
+                                           class="h-[18px] w-[18px] flex-shrink-0 cursor-pointer"
+                                           name="contractType" value="{{ type.value }}"{{ loop.first ? ' checked' : '' }}>
+                                    {{ type.label }}
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </fieldset>
+
+                    <div class="mb-0 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <div>
+                            <label for="startDate" class="mb-1 block text-[13px] font-medium text-ink">Date de début</label>
+                            <input type="date"
+                                   class="w-full rounded border border-border bg-surface px-3 py-2 text-[13px] text-body focus:border-primary focus:outline-none"
+                                   id="startDate" name="startDate">
+                        </div>
+                        <div>
+                            <label for="endDate" class="mb-1 block text-[13px] font-medium text-ink">Date de fin</label>
+                            <input type="date"
+                                   class="w-full rounded border border-border bg-surface px-3 py-2 text-[13px] text-body focus:border-primary focus:outline-none"
+                                   id="endDate" name="endDate">
+                        </div>
+                    </div>
+                </fieldset>
+
+                <p class="mb-3 text-xs text-muted">
+                    Statut initial : <strong>En préparation</strong>.
+                </p>
+
+                <div class="mt-4 flex items-center gap-3">
+                    <button type="submit"
+                            class="inline-flex min-h-11 items-center rounded bg-primary px-4 text-sm font-semibold text-primary-fg hover:opacity-90">
+                        Créer le projet
+                    </button>
+                    <a href="{{ path('project_index') }}" class="text-sm text-primary hover:underline">Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
 {% endblock %}

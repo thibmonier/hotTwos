@@ -1,0 +1,280 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Styleguide — HotOnes Design System{% endblock %}
+
+{% block page_section %}Design System{% endblock %}
+{% block page_title %}Styleguide{% endblock %}
+
+{% block body %}
+<div class="mx-auto max-w-4xl">
+
+    {# En-tête #}
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-md border border-border bg-surface px-4 py-3">
+        <div>
+            <strong class="text-base font-semibold text-ink">HotOnes Design System</strong>
+            <span class="ml-2 text-xs text-muted">Tailwind v4 — ADR-0019</span>
+        </div>
+        <nav aria-label="Sections du styleguide" class="flex flex-wrap gap-3">
+            <a href="#tokens" class="text-xs text-muted hover:text-primary">Tokens</a>
+            <a href="#boutons" class="text-xs text-muted hover:text-primary">Boutons</a>
+            <a href="#badges" class="text-xs text-muted hover:text-primary">Badges</a>
+            <a href="#table" class="text-xs text-muted hover:text-primary">Table</a>
+            <a href="#formulaire" class="text-xs text-muted hover:text-primary">Formulaire</a>
+            <a href="#alertes" class="text-xs text-muted hover:text-primary">Alertes</a>
+            <a href="#typo" class="text-xs text-muted hover:text-primary">Typographie</a>
+            <a href="#theme" class="text-xs text-muted hover:text-primary">Thème</a>
+        </nav>
+    </div>
+
+    {# ── BASCULE DE THÈME ── #}
+    <section id="theme" class="mb-10" aria-labelledby="theme-heading">
+        <h2 id="theme-heading" class="mb-3 border-b border-border pb-2 text-base font-semibold text-ink">Bascule de thème</h2>
+        <p class="mb-3 text-xs text-muted">
+            Le thème est contrôlé par l'attribut <code class="rounded bg-surface-alt px-1 py-0.5">data-theme</code> sur
+            <code class="rounded bg-surface-alt px-1 py-0.5">&lt;html&gt;</code>.
+            En l'absence de cet attribut, <code class="rounded bg-surface-alt px-1 py-0.5">prefers-color-scheme</code> s'applique automatiquement.
+        </p>
+        <div class="flex flex-wrap gap-2">
+            <button type="button"
+                    onclick="document.documentElement.removeAttribute('data-theme'); updateThemeDisplay()"
+                    class="inline-flex min-h-9 items-center rounded border border-border-strong px-3 text-xs font-semibold text-muted hover:bg-surface-alt hover:text-ink focus:outline-none focus:ring-2 focus:ring-focus">
+                Système (auto)
+            </button>
+            <button type="button"
+                    onclick="document.documentElement.setAttribute('data-theme','light'); updateThemeDisplay()"
+                    class="inline-flex min-h-9 items-center rounded border border-border-strong px-3 text-xs font-semibold text-muted hover:bg-surface-alt hover:text-ink focus:outline-none focus:ring-2 focus:ring-focus">
+                ☀️ Clair
+            </button>
+            <button type="button"
+                    onclick="document.documentElement.setAttribute('data-theme','dark'); updateThemeDisplay()"
+                    class="inline-flex min-h-9 items-center rounded border border-border-strong px-3 text-xs font-semibold text-muted hover:bg-surface-alt hover:text-ink focus:outline-none focus:ring-2 focus:ring-focus">
+                🌙 Sombre
+            </button>
+        </div>
+        <p class="mt-2 text-xs text-muted">
+            Thème actif : <code id="sg-theme-display" class="rounded bg-surface-alt px-1 py-0.5 text-ink">système</code>
+        </p>
+        <script>
+            function updateThemeDisplay() {
+                var t = document.documentElement.getAttribute('data-theme');
+                document.getElementById('sg-theme-display').textContent = t || 'système (prefers-color-scheme)';
+            }
+            updateThemeDisplay();
+        </script>
+    </section>
+
+    {# ── TOKENS DE COULEUR ── #}
+    <section id="tokens" class="mb-10" aria-labelledby="tokens-heading">
+        <h2 id="tokens-heading" class="mb-3 border-b border-border pb-2 text-base font-semibold text-ink">Tokens de couleur</h2>
+
+        <h3 class="mb-2 mt-4 text-xs font-medium text-muted uppercase tracking-wider">Surfaces &amp; Texte</h3>
+        <div class="flex flex-wrap items-end gap-3">
+            {% set swatches_surface = [
+                {token: '--color-bg', label: 'bg'},
+                {token: '--color-surface', label: 'surface'},
+                {token: '--color-surface-alt', label: 'surface-alt'},
+                {token: '--color-ink', label: 'ink'},
+                {token: '--color-body', label: 'body'},
+                {token: '--color-muted', label: 'muted'},
+                {token: '--color-border', label: 'border'},
+                {token: '--color-border-strong', label: 'border-strong'},
+            ] %}
+            {% for s in swatches_surface %}
+                <div style="background: var({{ s.token }}); width: 72px; height: 52px; border-radius: 4px; border: 1px solid var(--color-border); display: flex; align-items: flex-end; padding: 3px;">
+                    <span style="font-size: 0.6rem; line-height: 1.2; background: rgba(255,255,255,0.85); padding: 1px 3px; border-radius: 2px; color: #111; word-break: break-all;">{{ s.label }}</span>
+                </div>
+            {% endfor %}
+        </div>
+
+        <h3 class="mb-2 mt-4 text-xs font-medium text-muted uppercase tracking-wider">Marque &amp; Statuts</h3>
+        <div class="flex flex-wrap items-end gap-3">
+            {% set swatches_status = [
+                {token: '--color-primary', label: 'primary'},
+                {token: '--color-success', label: 'success'},
+                {token: '--color-warning', label: 'warning'},
+                {token: '--color-danger', label: 'danger'},
+                {token: '--color-info', label: 'info'},
+                {token: '--color-focus', label: 'focus'},
+            ] %}
+            {% for s in swatches_status %}
+                <div style="background: var({{ s.token }}); width: 72px; height: 52px; border-radius: 4px; border: 1px solid var(--color-border); display: flex; align-items: flex-end; padding: 3px;">
+                    <span style="font-size: 0.6rem; line-height: 1.2; background: rgba(255,255,255,0.85); padding: 1px 3px; border-radius: 2px; color: #111; word-break: break-all;">{{ s.label }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    {# ── BOUTONS ── #}
+    <section id="boutons" class="mb-10" aria-labelledby="boutons-heading">
+        <h2 id="boutons-heading" class="mb-3 border-b border-border pb-2 text-base font-semibold text-ink">Boutons</h2>
+        <p class="mb-3 text-xs text-muted">Texte blanc sur Primary. Contraste WCAG 2.2 AA vérifié (5.08:1 sur --color-primary).</p>
+
+        <h3 class="mb-2 mt-4 text-xs font-medium text-muted uppercase tracking-wider">Plein</h3>
+        <div class="flex flex-wrap gap-2 rounded-md border border-border bg-surface p-4">
+            <button type="button" class="inline-flex min-h-9 items-center rounded bg-primary px-4 text-xs font-semibold text-primary-fg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1">Primary</button>
+            <button type="button" class="inline-flex min-h-9 items-center rounded bg-success px-4 text-xs font-semibold text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-success focus:ring-offset-1">Success</button>
+            <button type="button" class="inline-flex min-h-9 items-center rounded bg-warning px-4 text-xs font-semibold text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-warning focus:ring-offset-1">Warning</button>
+            <button type="button" class="inline-flex min-h-9 items-center rounded bg-danger px-4 text-xs font-semibold text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-danger focus:ring-offset-1">Danger</button>
+            <button type="button" class="inline-flex min-h-9 items-center rounded bg-info px-4 text-xs font-semibold text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-info focus:ring-offset-1">Info</button>
+        </div>
+
+        <h3 class="mb-2 mt-4 text-xs font-medium text-muted uppercase tracking-wider">Outline</h3>
+        <div class="flex flex-wrap gap-2 rounded-md border border-border bg-surface p-4">
+            <button type="button" class="inline-flex min-h-9 items-center rounded border border-primary px-4 text-xs font-semibold text-primary hover:bg-surface-alt focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1">Primary</button>
+            <button type="button" class="inline-flex min-h-9 items-center rounded border border-success px-4 text-xs font-semibold text-success hover:bg-surface-alt focus:outline-none focus:ring-2 focus:ring-success focus:ring-offset-1">Success</button>
+            <button type="button" class="inline-flex min-h-9 items-center rounded border border-danger px-4 text-xs font-semibold text-danger hover:bg-surface-alt focus:outline-none focus:ring-2 focus:ring-danger focus:ring-offset-1">Danger</button>
+            <button type="button" class="inline-flex min-h-9 items-center rounded border border-border-strong px-4 text-xs font-semibold text-muted hover:bg-surface-alt hover:text-ink focus:outline-none focus:ring-2 focus:ring-focus">Secondaire</button>
+        </div>
+
+        <h3 class="mb-2 mt-4 text-xs font-medium text-muted uppercase tracking-wider">États</h3>
+        <div class="flex flex-wrap items-center gap-2 rounded-md border border-border bg-surface p-4">
+            <button type="button" class="inline-flex min-h-9 items-center rounded bg-primary px-3 text-xs font-semibold text-primary-fg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1">Petit (sm)</button>
+            <button type="button" class="inline-flex min-h-11 items-center rounded bg-primary px-5 text-sm font-semibold text-primary-fg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1">Grand (lg)</button>
+            <button type="button" disabled class="inline-flex min-h-9 cursor-not-allowed items-center rounded bg-primary px-4 text-xs font-semibold text-primary-fg opacity-50">Désactivé</button>
+        </div>
+
+        <p class="mt-2 text-xs text-muted">Appuyez sur <kbd class="rounded border border-border px-1 font-mono">Tab</kbd> pour voir l'anneau focus (<code>--color-focus</code>, 3px).</p>
+    </section>
+
+    {# ── BADGES / STATUTS ── #}
+    <section id="badges" class="mb-10" aria-labelledby="badges-heading">
+        <h2 id="badges-heading" class="mb-3 border-b border-border pb-2 text-base font-semibold text-ink">Badges &amp; Statuts</h2>
+        <p class="mb-3 text-xs text-muted">Motif bordé (fond transparent) — contraste ≥ 4.5:1 sur toutes surfaces. WCAG 1.4.1 : le texte porte le sens, la couleur renforce.</p>
+        <div class="flex flex-wrap items-center gap-2 rounded-md border border-border bg-surface p-4">
+            <span class="status-badge status-badge-success">Soumis</span>
+            <span class="status-badge status-badge-warning">Partiel</span>
+            <span class="status-badge status-badge-danger">Vide / J+2</span>
+            <span class="status-badge status-badge-neutral">En cours</span>
+        </div>
+    </section>
+
+    {# ── TABLE ── #}
+    <section id="table" class="mb-10" aria-labelledby="table-heading">
+        <h2 id="table-heading" class="mb-3 border-b border-border pb-2 text-base font-semibold text-ink">Table</h2>
+        <div class="overflow-x-auto rounded-md border border-border bg-surface">
+            <table class="w-full border-collapse text-left">
+                <caption class="visually-hidden">Exemple de tableau de données — démonstration design system</caption>
+                <thead>
+                    <tr class="bg-surface-alt">
+                        <th scope="col" class="px-4 py-3 font-semibold text-body">Projet</th>
+                        <th scope="col" class="px-4 py-3 font-semibold text-body">Statut</th>
+                        <th scope="col" class="px-4 py-3 font-semibold text-body">Complétude</th>
+                        <th scope="col" class="px-4 py-3 font-semibold text-body">Heures</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="border-t border-border">
+                        <td class="px-4 py-3 text-ink"><a href="#" class="text-primary hover:underline">Projet Alpha</a></td>
+                        <td class="px-4 py-3"><span class="status-badge status-badge-success">Actif</span></td>
+                        <td class="px-4 py-3"><span class="status-badge status-badge-success">Soumis</span></td>
+                        <td class="px-4 py-3 text-muted">8h</td>
+                    </tr>
+                    <tr class="border-t border-border">
+                        <td class="px-4 py-3 text-ink"><a href="#" class="text-primary hover:underline">Projet Beta</a></td>
+                        <td class="px-4 py-3"><span class="status-badge status-badge-success">Actif</span></td>
+                        <td class="px-4 py-3"><span class="status-badge status-badge-warning">Partiel</span></td>
+                        <td class="px-4 py-3 text-muted">3h</td>
+                    </tr>
+                    <tr class="border-t border-border">
+                        <td class="px-4 py-3 text-ink"><a href="#" class="text-primary hover:underline">Projet Gamma</a></td>
+                        <td class="px-4 py-3"><span class="status-badge status-badge-neutral">Clôturé</span></td>
+                        <td class="px-4 py-3"><span class="status-badge status-badge-neutral">En cours</span></td>
+                        <td class="px-4 py-3 text-muted">—</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    {# ── FORMULAIRE ── #}
+    <section id="formulaire" class="mb-10" aria-labelledby="formulaire-heading">
+        <h2 id="formulaire-heading" class="mb-3 border-b border-border pb-2 text-base font-semibold text-ink">Formulaire</h2>
+        <p class="mb-3 text-xs text-muted">Bordure <code class="rounded bg-surface-alt px-1">--color-border-strong</code> (#74788d, 4.36:1 sur fond — WCAG 1.4.11).</p>
+        <div class="rounded-md border border-border bg-surface p-4">
+            <form>
+                <div class="mb-4">
+                    <label for="sg-email" class="mb-1 block text-xs font-medium text-body">Email</label>
+                    <input type="email" id="sg-email" placeholder="prenom.nom@exemple.fr"
+                           class="w-full max-w-sm rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-focus">
+                    <p class="mt-1 text-xs text-muted">Format : prénom.nom@domaine.fr</p>
+                </div>
+                <div class="mb-4">
+                    <label for="sg-projet" class="mb-1 block text-xs font-medium text-body">Projet</label>
+                    <select id="sg-projet"
+                            class="w-full max-w-sm rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-focus">
+                        <option>-- Sélectionner --</option>
+                        <option>Projet Alpha</option>
+                        <option>Projet Beta</option>
+                    </select>
+                </div>
+                <div class="mb-4 flex items-start gap-2">
+                    <input type="checkbox" id="sg-checkbox"
+                           class="mt-0.5 h-4 w-4 rounded border-border-strong text-primary focus:ring-focus">
+                    <label for="sg-checkbox" class="text-xs text-body">Case à cocher</label>
+                </div>
+                <div class="flex gap-2">
+                    <button type="submit" class="inline-flex min-h-9 items-center rounded bg-primary px-4 text-xs font-semibold text-primary-fg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1">Enregistrer</button>
+                    <button type="reset" class="inline-flex min-h-9 items-center rounded border border-border-strong px-4 text-xs font-semibold text-muted hover:bg-surface-alt hover:text-ink focus:outline-none focus:ring-2 focus:ring-focus">Annuler</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    {# ── ALERTES / FLASH ── #}
+    <section id="alertes" class="mb-10" aria-labelledby="alertes-heading">
+        <h2 id="alertes-heading" class="mb-3 border-b border-border pb-2 text-base font-semibold text-ink">Alertes &amp; Flash messages</h2>
+        <p class="mb-3 text-xs text-muted">Motif : bordure gauche 4px. Classes <code class="rounded bg-surface-alt px-1">.flash-success</code> et <code class="rounded bg-surface-alt px-1">.flash-error</code> assertées par les tests.</p>
+
+        <div class="flash flash-success mb-2" role="status"><strong>Succès.</strong> Saisie enregistrée avec succès.</div>
+        <div class="flash flash-error mb-2" role="alert"><strong>Erreur.</strong> Une erreur est survenue lors de l'enregistrement.</div>
+    </section>
+
+    {# ── TYPOGRAPHIE ── #}
+    <section id="typo" class="mb-10" aria-labelledby="typo-heading">
+        <h2 id="typo-heading" class="mb-3 border-b border-border pb-2 text-base font-semibold text-ink">Typographie</h2>
+        <p class="mb-3 text-xs text-muted">Police : Poppins (300/400/500/600) — taille de base 13px.</p>
+        <div class="rounded-md border border-border bg-surface p-4">
+            <p class="mb-2 text-3xl font-semibold text-ink">Titre niveau 1 — text-3xl</p>
+            <p class="mb-2 text-2xl font-semibold text-ink">Titre niveau 2 — text-2xl</p>
+            <p class="mb-2 text-xl font-semibold text-ink">Titre niveau 3 — text-xl</p>
+            <p class="mb-2 text-base font-semibold text-ink">Titre niveau 4 — text-base</p>
+            <p class="mb-2 text-xs text-ink">Texte de base (13px / text-xs) — couleur <code>--color-ink</code></p>
+            <p class="mb-2 text-xs text-muted">Texte secondaire — couleur <code>--color-muted</code></p>
+            <p class="mb-2 text-xs font-light text-body">Poids léger (300)</p>
+            <p class="mb-2 text-xs font-normal text-body">Poids normal (400)</p>
+            <p class="mb-2 text-xs font-medium text-body">Poids medium (500)</p>
+            <p class="mb-2 text-xs font-semibold text-body">Poids semi-gras (600)</p>
+        </div>
+    </section>
+
+    {# ── TOKENS EN TABLE ── #}
+    <section class="mb-10" aria-labelledby="spacing-heading">
+        <h2 id="spacing-heading" class="mb-3 border-b border-border pb-2 text-base font-semibold text-ink">Tokens CSS disponibles</h2>
+        <div class="overflow-x-auto rounded-md border border-border bg-surface">
+            <table class="w-full border-collapse text-left text-xs">
+                <thead>
+                    <tr class="bg-surface-alt">
+                        <th scope="col" class="px-4 py-3 font-semibold text-body">Token</th>
+                        <th scope="col" class="px-4 py-3 font-semibold text-body">Valeur (clair)</th>
+                        <th scope="col" class="px-4 py-3 font-semibold text-body">Usage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="border-t border-border"><td class="px-4 py-2 font-mono text-ink">--color-primary</td><td class="px-4 py-2 text-muted">#4e65d4</td><td class="px-4 py-2 text-muted">Accent principal, boutons</td></tr>
+                    <tr class="border-t border-border"><td class="px-4 py-2 font-mono text-ink">--color-success</td><td class="px-4 py-2 text-muted">#2e7d32</td><td class="px-4 py-2 text-muted">États positifs</td></tr>
+                    <tr class="border-t border-border"><td class="px-4 py-2 font-mono text-ink">--color-warning</td><td class="px-4 py-2 text-muted">#60481e</td><td class="px-4 py-2 text-muted">Alertes modérées</td></tr>
+                    <tr class="border-t border-border"><td class="px-4 py-2 font-mono text-ink">--color-danger</td><td class="px-4 py-2 text-muted">#c62828</td><td class="px-4 py-2 text-muted">Erreurs, suppression</td></tr>
+                    <tr class="border-t border-border"><td class="px-4 py-2 font-mono text-ink">--color-bg</td><td class="px-4 py-2 text-muted">#f6f7f9</td><td class="px-4 py-2 text-muted">Fond de page</td></tr>
+                    <tr class="border-t border-border"><td class="px-4 py-2 font-mono text-ink">--color-surface</td><td class="px-4 py-2 text-muted">#ffffff</td><td class="px-4 py-2 text-muted">Fond de carte/panel</td></tr>
+                    <tr class="border-t border-border"><td class="px-4 py-2 font-mono text-ink">--color-ink</td><td class="px-4 py-2 text-muted">#212529</td><td class="px-4 py-2 text-muted">Texte principal</td></tr>
+                    <tr class="border-t border-border"><td class="px-4 py-2 font-mono text-ink">--color-muted</td><td class="px-4 py-2 text-muted">#555555</td><td class="px-4 py-2 text-muted">Texte secondaire/inactif</td></tr>
+                    <tr class="border-t border-border"><td class="px-4 py-2 font-mono text-ink">--color-border</td><td class="px-4 py-2 text-muted">#eff2f7</td><td class="px-4 py-2 text-muted">Bordures subtiles</td></tr>
+                    <tr class="border-t border-border"><td class="px-4 py-2 font-mono text-ink">--color-border-strong</td><td class="px-4 py-2 text-muted">#74788d</td><td class="px-4 py-2 text-muted">Champs de saisie (WCAG 1.4.11)</td></tr>
+                    <tr class="border-t border-border"><td class="px-4 py-2 font-mono text-ink">--color-focus</td><td class="px-4 py-2 text-muted">#0b5fff</td><td class="px-4 py-2 text-muted">Anneau focus (WCAG 2.4.7)</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</div>
+{% endblock %}

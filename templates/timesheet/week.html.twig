@@ -2,62 +2,90 @@
 
 {% block title %}Saisie du temps — {{ weekLabel }}{% endblock %}
 
+{% block page_section %}Temps & activité{% endblock %}
+{% block page_title %}Saisie des temps{% endblock %}
+
 {% block body %}
-    <main class="container" data-controller="timesheet" data-timesheet-week-start-value="{{ weekStart }}">
-        <h1>Saisie du temps</h1>
+<h1 class="visually-hidden">Saisie des temps</h1>
 
-        {% if reminderLateWeeks %}
-            <p class="reminder-banner" role="status">
-                <span aria-hidden="true">⏳</span>
-                Vous avez désactivé les relances automatiques. Il vous reste {{ reminderLateWeeks }} semaine{{ reminderLateWeeks > 1 ? 's' : '' }} en retard à compléter.
-            </p>
-        {% endif %}
+<div data-controller="timesheet" data-timesheet-week-start-value="{{ weekStart }}">
 
-        <nav class="week-nav">
-            <a href="{{ path('timesheet_week', { date: prevDate }) }}" rel="prev">← Semaine précédente</a>
-            <strong>{{ weekLabel }}</strong>
-            <a href="{{ path('timesheet_week', { date: nextDate }) }}" rel="next">Semaine suivante →</a>
+    {# Bannière relances — textes assertés : "désactivé les relances" et "en retard" #}
+    {% if reminderLateWeeks %}
+        <p class="flex items-start gap-2 rounded-md border border-warning px-4 py-3 text-sm text-body mb-4" role="status">
+            <span aria-hidden="true">⏳</span>
+            Vous avez désactivé les relances automatiques. Il vous reste {{ reminderLateWeeks }} semaine{{ reminderLateWeeks > 1 ? 's' : '' }} en retard à compléter.
+        </p>
+    {% endif %}
+
+    {# Barre de navigation + lien vue jour #}
+    <div class="flex items-center justify-between gap-3 mb-4 flex-wrap">
+        <nav class="flex items-center gap-2" aria-label="Navigation entre les semaines">
+            <a href="{{ path('timesheet_week', { date: prevDate }) }}"
+               class="w-10 h-10 inline-flex items-center justify-center border border-border-strong rounded-md bg-surface text-body no-underline hover:bg-surface-alt hover:text-ink"
+               rel="prev" aria-label="Semaine précédente">←</a>
+            <span class="min-w-[220px] text-center font-semibold text-body text-sm">{{ weekLabel }}</span>
+            <a href="{{ path('timesheet_week', { date: nextDate }) }}"
+               class="w-10 h-10 inline-flex items-center justify-center border border-border-strong rounded-md bg-surface text-body no-underline hover:bg-surface-alt hover:text-ink"
+               rel="next" aria-label="Semaine suivante">→</a>
         </nav>
+        <a href="{{ path('timesheet_day', { date: weekStart }) }}"
+           class="inline-flex min-h-9 items-center rounded border border-border-strong px-3 text-xs font-semibold text-muted hover:bg-surface-alt hover:text-ink">
+            Vue jour (mobile)
+        </a>
+    </div>
 
-        <p><a href="{{ path('timesheet_day', { date: weekStart }) }}">Vue jour (mobile)</a></p>
+    {# Bouton Ma synthèse + dialog — "Ma synthèse" asserté dans le HTML #}
+    <div class="mb-4" data-controller="activity-summary">
+        <button type="button"
+                class="inline-flex min-h-9 items-center rounded border border-primary px-3 text-xs font-semibold text-primary hover:bg-surface-alt"
+                data-activity-summary-target="trigger"
+                data-action="activity-summary#open">
+            📊 Ma synthèse
+        </button>
 
-        <div data-controller="activity-summary">
-            <button type="button" data-activity-summary-target="trigger" data-action="activity-summary#open">📊 Ma synthèse</button>
-
-            <dialog class="summary-dialog" aria-labelledby="summary-title" data-activity-summary-target="dialog">
-                <div class="summary-header">
-                    <h2 id="summary-title">Ma synthèse</h2>
-                    <button type="button" class="summary-close" data-action="activity-summary#close" aria-label="Fermer la synthèse">✕ Fermer</button>
-                </div>
-                <p class="hint">Période du {{ summary.periodStart }} au {{ summary.periodEnd }}.</p>
+        {# dialog.summary-dialog asserté par TimesheetPageTest (count inputs = 0 à la fermeture) #}
+        <dialog class="summary-dialog" aria-labelledby="summary-title" data-activity-summary-target="dialog">
+            <div class="flex items-center justify-between pb-4 mb-4 border-b border-border">
+                <h2 id="summary-title" class="m-0 text-base font-semibold text-ink">Ma synthèse</h2>
+                <button type="button"
+                        class="text-sm text-muted hover:text-ink"
+                        data-action="activity-summary#close"
+                        aria-label="Fermer la synthèse">✕ Fermer</button>
+            </div>
+            <div>
+                <p class="text-xs text-muted mb-3">Période du {{ summary.periodStart }} au {{ summary.periodEnd }}.</p>
 
                 {% if summary.empty %}
                     <p>Aucune saisie enregistrée sur cette période.</p>
                 {% else %}
-                    <section aria-labelledby="summary-occupation">
-                        <h3 id="summary-occupation">Taux d'occupation : {{ summary.occupationPercent }} %</h3>
-                        <p class="hint">Part du temps de production déclaré sur les jours ouvrés de la période.</p>
-                        <div class="summary-bar"><span class="summary-bar-fill" style="width: {{ summary.occupationPercent > 100 ? 100 : summary.occupationPercent }}%" aria-hidden="true"></span></div>
+                    {# "Taux d'occupation" asserté #}
+                    <section aria-labelledby="summary-occupation" class="mb-4">
+                        <h3 id="summary-occupation" class="text-sm font-semibold mb-1 text-ink">Taux d'occupation : {{ summary.occupationPercent }} %</h3>
+                        <p class="text-xs text-muted mb-2">Part du temps de production déclaré sur les jours ouvrés de la période.</p>
+                        <div class="h-1.5 bg-border rounded-full overflow-hidden mt-1">
+                            <span class="block h-full bg-primary rounded-full" style="width: {{ summary.occupationPercent > 100 ? 100 : summary.occupationPercent }}%" aria-hidden="true"></span>
+                        </div>
                     </section>
 
-                    <section aria-labelledby="summary-type">
-                        <h3 id="summary-type">Répartition par type</h3>
-                        <ul class="summary-list">
+                    <section aria-labelledby="summary-type" class="mb-4">
+                        <h3 id="summary-type" class="text-sm font-semibold mb-2 text-ink">Répartition par type</h3>
+                        <ul class="list-none p-0 m-0 flex flex-col gap-3 text-sm">
                             <li>Production — {{ summary.productionDuration }} ({{ summary.productionPercent }} %)
-                                <div class="summary-bar"><span class="summary-bar-fill" style="width: {{ summary.productionPercent }}%" aria-hidden="true"></span></div>
+                                <div class="h-1.5 bg-border rounded-full overflow-hidden mt-1"><span class="block h-full bg-primary rounded-full" style="width: {{ summary.productionPercent }}%" aria-hidden="true"></span></div>
                             </li>
                             <li>Absence — {{ summary.absenceDuration }} ({{ summary.absencePercent }} %)
-                                <div class="summary-bar"><span class="summary-bar-fill" style="width: {{ summary.absencePercent }}%" aria-hidden="true"></span></div>
+                                <div class="h-1.5 bg-border rounded-full overflow-hidden mt-1"><span class="block h-full bg-primary rounded-full" style="width: {{ summary.absencePercent }}%" aria-hidden="true"></span></div>
                             </li>
                         </ul>
                     </section>
 
-                    <section aria-labelledby="summary-projects">
-                        <h3 id="summary-projects">Répartition par projet</h3>
-                        <ul class="summary-list">
+                    <section aria-labelledby="summary-projects" class="mb-4">
+                        <h3 id="summary-projects" class="text-sm font-semibold mb-2 text-ink">Répartition par projet</h3>
+                        <ul class="list-none p-0 m-0 flex flex-col gap-3 text-sm">
                             {% for project in summary.projects %}
                                 <li>{{ project.label }} — {{ project.duration }} ({{ project.percent }} %)
-                                    <div class="summary-bar"><span class="summary-bar-fill" style="width: {{ project.percent }}%" aria-hidden="true"></span></div>
+                                    <div class="h-1.5 bg-border rounded-full overflow-hidden mt-1"><span class="block h-full bg-primary rounded-full" style="width: {{ project.percent }}%" aria-hidden="true"></span></div>
                                 </li>
                             {% endfor %}
                             {% if summary.othersCount > 0 %}
@@ -67,61 +95,81 @@
                     </section>
                 {% endif %}
 
-                <section aria-labelledby="summary-planning" class="summary-planning">
-                    <h3 id="summary-planning">Planning à venir</h3>
-                    <p class="hint">Le module d'affectation n'est pas encore activé — le planning s'affichera ici prochainement.</p>
+                {# "Planning à venir" asserté #}
+                <section aria-labelledby="summary-planning" class="border-t border-border pt-3 mt-3">
+                    <h3 id="summary-planning" class="text-sm font-semibold mb-1 text-ink">Planning à venir</h3>
+                    <p class="text-xs text-muted mb-0">Le module d'affectation n'est pas encore activé — le planning s'affichera ici prochainement.</p>
                 </section>
-            </dialog>
-        </div>
+            </div>
+        </dialog>
+    </div>
 
-        {% if projects is empty %}
-            <p>Aucun projet actif : demandez à un administrateur d'en créer un pour saisir votre temps.</p>
-        {% else %}
-            <table class="timesheet" data-timesheet-target="grid">
-                <thead>
-                    <tr>
-                        <th scope="col">Projet</th>
-                        {% for day in days %}
-                            <th scope="col">{{ day.label }}</th>
-                        {% endfor %}
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for project in projects %}
-                        <tr>
-                            <th scope="row" title="{{ project.code }}">{{ project.name }}</th>
+    {% if projects is empty %}
+        <div class="rounded-md border border-border bg-surface p-4 text-muted">
+            Aucun projet actif : demandez à un administrateur d'en créer un pour saisir votre temps.
+        </div>
+    {% else %}
+        {# Grille de saisie — "input[value=210]" asserté ; "inputmode=numeric" asserté dans day, mais grille inclut aussi ces attributs #}
+        <div class="rounded-md border border-border bg-surface mb-3">
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse text-left" data-timesheet-target="grid">
+                    <caption class="visually-hidden">Grille de saisie des temps — {{ weekLabel }}</caption>
+                    <thead>
+                        <tr class="bg-surface-alt">
+                            <th scope="col" class="px-4 py-3 font-semibold text-body">Projet</th>
                             {% for day in days %}
-                                {% set minutes = grid[project.id][day.date] ?? null %}
-                                <td>
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        max="1440"
-                                        step="15"
-                                        inputmode="numeric"
-                                        aria-label="{{ project.name }} — {{ day.label }} (minutes)"
-                                        value="{{ minutes }}"
-                                        data-timesheet-target="cell"
-                                        data-project-id="{{ project.id }}"
-                                        data-date="{{ day.date }}"
-                                        data-action="change->timesheet#save"
-                                    >
-                                </td>
+                                <th scope="col" class="px-3 py-3 text-center font-semibold text-body">{{ day.label }}</th>
                             {% endfor %}
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-
-            <div class="timesheet-actions">
-                <button type="button" data-action="timesheet#duplicatePreviousWeek">Dupliquer la semaine précédente</button>
-                <button type="button" data-action="timesheet#saveWeek">Enregistrer la semaine</button>
-                <span class="hint">Entrée = valider et descendre · Tab = cellule suivante · saisie possible sans souris.</span>
+                    </thead>
+                    <tbody>
+                        {% for project in projects %}
+                            <tr class="border-t border-border">
+                                <th scope="row" class="px-4 py-2 font-normal text-ink" title="{{ project.code }}">{{ project.name }}</th>
+                                {% for day in days %}
+                                    {% set minutes = grid[project.id][day.date] ?? null %}
+                                    <td class="px-3 py-2 text-center">
+                                        <input
+                                            type="number"
+                                            class="w-14 min-h-11 text-center border border-border-strong rounded-md bg-surface text-body text-sm px-1"
+                                            min="0"
+                                            max="1440"
+                                            step="15"
+                                            inputmode="numeric"
+                                            aria-label="{{ project.name }} — {{ day.label }} (minutes)"
+                                            value="{{ minutes }}"
+                                            data-timesheet-target="cell"
+                                            data-project-id="{{ project.id }}"
+                                            data-date="{{ day.date }}"
+                                            data-action="change->timesheet#save"
+                                        >
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
+        </div>
 
-            <p class="hint" aria-live="polite" data-timesheet-target="status">
-                Saisissez les minutes par projet et par jour. L'enregistrement est automatique ; « Enregistrer la semaine » soumet tout en une fois.
-            </p>
-        {% endif %}
-    </main>
+        <div class="flex items-center gap-3 flex-wrap mb-3">
+            <button type="button"
+                    class="inline-flex min-h-9 items-center rounded border border-border-strong px-3 text-xs font-semibold text-muted hover:bg-surface-alt hover:text-ink"
+                    data-action="timesheet#duplicatePreviousWeek">
+                Dupliquer la semaine précédente
+            </button>
+            <button type="button"
+                    class="inline-flex min-h-11 items-center rounded bg-primary px-4 text-sm font-semibold text-white hover:opacity-90"
+                    data-action="timesheet#saveWeek">
+                Enregistrer la semaine
+            </button>
+            <span class="text-xs text-muted">Entrée = valider et descendre · Tab = cellule suivante · saisie possible sans souris.</span>
+        </div>
+
+        <p class="text-xs text-muted" aria-live="polite" data-timesheet-target="status">
+            Saisissez les minutes par projet et par jour. L'enregistrement est automatique ; « Enregistrer la semaine » soumet tout en une fois.
+        </p>
+    {% endif %}
+
+</div>
 {% endblock %}

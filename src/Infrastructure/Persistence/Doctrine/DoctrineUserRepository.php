@@ -39,4 +39,26 @@ final readonly class DoctrineUserRepository implements UserRepository
 
         return array_map(static fn (array $row): string => $row['id'], $rows);
     }
+
+    public function findEmailsByIds(TenantId $tenant, array $userIds): array
+    {
+        if ([] === $userIds) {
+            return [];
+        }
+
+        /** @var list<array{id: string, email: string}> $rows */
+        $rows = $this->entityManager->createQuery(
+            'SELECT u.id AS id, u.email AS email FROM '.User::class.' u WHERE u.tenantId = :tenant AND u.id IN (:ids)',
+        )
+            ->setParameter('tenant', $tenant->toString())
+            ->setParameter('ids', $userIds)
+            ->getResult();
+
+        $emails = [];
+        foreach ($rows as $row) {
+            $emails[$row['id']] = $row['email'];
+        }
+
+        return $emails;
+    }
 }

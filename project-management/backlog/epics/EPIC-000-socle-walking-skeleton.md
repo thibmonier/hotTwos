@@ -53,6 +53,15 @@ L'objectif du Walking Skeleton est de démontrer, en conditions réelles sur une
 | US-003 | Rôles et habilitations (RBAC + périmètre de données) | 🔴 To Do | 8 | 1 |
 | US-005 | Modèle analytique en étoile et non-divergence | 🔴 To Do | 8 | 1 |
 
+**Backlog — Identité & authentification (non assigné)**
+
+| ID | Nom | Statut | Points | Sprint |
+|----|-----|--------|--------|--------|
+| US-067 | Enrichissement du profil utilisateur (nom et prénom) | 🔴 To Do | 3 | — |
+| US-068 | Écrans web d'authentification (login, mot de passe oublié, déconnexion, changement de mot de passe) | 🔴 To Do | 8 | — |
+
+> Question ouverte (hors périmètre US-068) : **création/provisionnement d'un compte** — à définir plus tard.
+
 ---
 
 ## Critères de Succès
@@ -78,7 +87,7 @@ L'objectif du Walking Skeleton est de démontrer, en conditions réelles sur une
 
 ## Progression
 
-0/9 US complétées (0 %) · 57 points (Sprint 0 : 28 · Sprint 1 : 29)
+0/11 US complétées (0 %) · 68 points (Sprint 0 : 28 · Sprint 1 : 29 · Backlog identité/auth : 11)
 
 ---
 

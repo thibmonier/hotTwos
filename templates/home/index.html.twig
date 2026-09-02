@@ -1,14 +1,29 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ appName }} — Socle{% endblock %}
+{% block title %}{{ appName }} — Accueil{% endblock %}
+
+{% block page_section %}Tableau de bord{% endblock %}
+{% block page_title %}{{ appName }}{% endblock %}
 
 {% block body %}
-    <main class="container">
-        <h1>{{ appName }}</h1>
-        <p>Socle applicatif opérationnel — rendu serveur (Twig + Turbo + Stimulus).</p>
-        <ul>
-            <li>Santé API (DTO) : <a href="/api/status">/api/status</a></li>
-            <li>Santé applicative : <a href="/health">/health</a></li>
-        </ul>
-    </main>
+    <h1 class="visually-hidden">{{ appName }}</h1>
+
+    <div class="rounded-md border border-border bg-surface">
+        <div class="border-b border-border px-4 py-3 font-semibold text-ink">Socle applicatif</div>
+        <div class="p-4">
+            <p class="mb-3 text-muted">
+                Rendu serveur opérationnel — Twig + Turbo + Stimulus.
+            </p>
+            <ul class="flex flex-col gap-2">
+                <li class="flex items-center gap-2">
+                    <span class="text-muted">Santé API (DTO) :</span>
+                    <a href="/api/status" class="text-primary hover:underline">/api/status</a>
+                </li>
+                <li class="flex items-center gap-2">
+                    <span class="text-muted">Santé applicative :</span>
+                    <a href="/health" class="text-primary hover:underline">/health</a>
+                </li>
+            </ul>
+        </div>
+    </div>
 {% endblock %}
