@@ -60,7 +60,38 @@
     color: var(--color-on-status);
 }
 
+/* Primaire : Bootstrap compile #556ee6 (blanc = 4.41:1, texte = 4.41:1 — échec AA).
+   US-065 : utiliser --color-primary (#4e65d4) accessible. */
+.btn-primary {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-on-primary);
+}
+.btn-primary:hover {
+    background-color: var(--color-link-hover);
+    border-color: var(--color-link-hover);
+    color: var(--color-on-primary);
+}
+.btn-outline-primary {
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+.btn-outline-primary:hover {
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+}
+
 /* Boutons outline sémantiques — texte emphasis accessible */
+/* Secondaire : Bootstrap utilise #74788d (4.06:1 sur le fond de page — échec AA).
+   US-065 : texte/bordure neutres emphasis (#555, ≥ 4.5:1). */
+.btn-outline-secondary {
+    color: var(--color-status-neutral-emphasis);
+    border-color: var(--color-border-strong);
+}
+.btn-outline-secondary:hover {
+    background-color: var(--color-surface-alt);
+    color: var(--color-ink);
+}
 .btn-outline-success {
     color: var(--color-success-emphasis);
     border-color: var(--color-success-emphasis);
@@ -318,4 +349,10 @@ a {
 }
 a:hover {
     color: var(--color-link-hover);
+}
+
+/* Code inline : Bootstrap rend <code> en rose #e83e8c (3.81:1 — échec AA).
+   US-065 : couleur de marque accessible (theme-aware). */
+code {
+    color: var(--color-primary);
 }

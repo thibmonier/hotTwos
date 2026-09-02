@@ -116,8 +116,9 @@
 
     .completeness-rate {
         font-size: 10px;
-        opacity: 0.75;
         margin-left: 3px;
+        /* US-065 : pas d'opacity (elle abaissait le contraste du % sous 4.5:1) ;
+           le % hérite de la couleur -emphasis du badge (conforme AA). */
     }
 </style>
 {% endblock %}
