@@ -40,20 +40,22 @@
 
 ---
 
-## Sprint Actuel : Sprint 4 — Valorisation automatique du temps validé 🔄 en cours
+## Chantier actuel : EPIC-012 — Intégration du design et de l'ergonomie 🔄 conception faite
 
-**Goal :** Dès qu'un temps est validé, il est automatiquement valorisé (coût & taux en vigueur à la période) et le modèle analytique reflète la marge du projet.
-**Période :** 2026-09-29 → 2026-10-10 (10 j ouvrés) · **Détail :** `sprints/sprint-004-valorisation/`
-**Capacité (prévision) :** ~24 points (moy. S1-S3 : 29/20/23) · **Engagé : 21 pts**
+**But :** poser le design system (thème Skote + tokens) et l'ergonomie définitive **avant** d'étendre le développement front (chantier transverse, fast-track, hors cadence sprint).
+**Détail :** `backlog/epics/EPIC-012-integration-design.md` · **PR :** [#12](https://github.com/thibmonier/hotTwos/pull/12)
 
 | US | EPIC | Points | Statut |
 |----|------|--------|--------|
-| US-010 Structure organisationnelle et rattachements historisés | EPIC-001 | 5 | 🔴 |
-| US-011 Référentiel de profils avec coûts et taux historisés | EPIC-001 | 8 | 🔴 |
-| US-060 Valorisation automatique après validation (≤ 15 min) | EPIC-003 | 8 | 🔴 |
-| **Total engagé** | | **21** | |
+| US-061 Charte & design system (tokens + composants Skote) | EPIC-012 | 5 | 🔴 |
+| US-062 Conception UX/UI des écrans du lot 1 (maquettes validées) | EPIC-012 | 5 | 🔴 |
+| US-063 Intégration du layout Skote sur le socle Twig/Stimulus | EPIC-012 | 5 | 🔴 |
+| US-064 Reskin des écrans livrés (dont F-S5-4, F-S5-5) | EPIC-012 | 8 | 🔴 |
+| US-065 Audit & conformité accessibilité (WCAG 2.2 AA) | EPIC-012 | 5 | 🔴 |
+| US-066 Recette d'ergonomie et validation utilisateurs | EPIC-012 | 3 | 🔴 |
+| **Total indicatif** | | **~31** | |
 
-> Décision PO : chaîne complète org → taux → valorisation. Historisation à date d'effet, valorisation **figée** à la validation (`INV-2`/`ARC-113`). La sonde `RevenueRecognized` devient réelle.
+> Conception livrée : ADR-0018 (CSS Skote compilé + tokens, sans build Sass), `architecture/design-system.md` (contrastes WCAG AA vérifiés), `architecture/ux-conception-lot1.md`, maquettes `architecture/design-canvas/` (canevas claude-design). Décisions : F-S5-4 → e-mail, statuts texte+icône+couleur. À trancher en US-063 : breakpoint 640/768 px, chargement Poppins.
 
 ### Sprints livrés
 
@@ -63,8 +65,11 @@
 | Sprint 1 | Walking Skeleton (multi-tenant, auth/RBAC, analytique) | 29 | ✅ merged (#2) |
 | Sprint 2 | Consolidation technique (migrations, RLS runtime, worker, obs.) | 20 | ✅ merged (#3) |
 | Sprint 3 | Première saisie de temps (saisie ≤2min, validation par lot, RLS prod) | 23 | ✅ merged (#4) |
+| Sprint 4 | Valorisation automatique (org → taux → valorisation figée, marge) | 21 | ✅ merged (#6) |
+| Sprint 5 | Complétude & clôture du cycle temps (EPIC-003 achevé) | 22 | ✅ merged |
+| Sprint 6 | Projets & delivery (cycle de vie, structure, affectation, clôture — EPIC-002) | 21 | ✅ merged (#8) |
 
-Prochaine étape : décomposition Sprint 4 faite (`sprints/sprint-004-valorisation/task-board.md`), puis `/sprint:dev US-010`.
+Prochaine étape : merger la PR #12, puis planifier la suite (`/workflow:start 7` — implémentation EPIC-012 ou reprise de la cadence lots).
 
 ---
 
