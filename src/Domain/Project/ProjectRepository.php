@@ -29,5 +29,13 @@ interface ProjectRepository
      */
     public function findByResponsible(TenantId $tenant, string $responsibleUserId): array;
 
+    /**
+     * @return list<Project> tous les projets du tenant quel que soit leur statut (gestion — US-030), triés par code
+     */
+    public function findAllByTenant(TenantId $tenant): array;
+
+    /** Nombre de projets du tenant (génération du code séquentiel `PRJ-XXXX` — US-030). */
+    public function countByTenant(TenantId $tenant): int;
+
     public function save(Project $project): void;
 }

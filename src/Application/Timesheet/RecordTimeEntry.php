@@ -7,7 +7,10 @@ namespace App\Application\Timesheet;
 use App\Application\Period\PeriodModificationGuard;
 use App\Domain\Absence\AbsenceRequest;
 use App\Domain\Absence\AbsenceRequestRepository;
+use App\Domain\Project\ExceptionalImputationOpeningRepository;
 use App\Domain\Project\Project;
+use App\Domain\Project\ProjectAssignmentRepository;
+use App\Domain\Project\ProjectReopeningRepository;
 use App\Domain\Project\ProjectRepository;
 use App\Domain\Tenant\TenantId;
 use App\Domain\Timesheet\TimeEntry;
@@ -31,6 +34,9 @@ final readonly class RecordTimeEntry
         private TimeEntryRepository $entries,
         private PeriodModificationGuard $periodGuard,
         private AbsenceRequestRepository $absences,
+        private ProjectAssignmentRepository $assignments,
+        private ExceptionalImputationOpeningRepository $openings,
+        private ProjectReopeningRepository $reopenings,
     ) {
     }
 
@@ -42,6 +48,12 @@ final readonly class RecordTimeEntry
         int $minutes,
         ?string $comment = null,
     ): void {
+        // Borne basse défensive : une durée nulle ou négative n'est pas une imputation valide
+        // (évite tout contournement du plafond journalier par cumul de valeurs négatives).
+        if ($minutes <= 0) {
+            throw new TimesheetException('La durée imputée doit être strictement positive.');
+        }
+
         // Verrou de clôture (US-057, CA-4) : aucune saisie/révision sur une période clôturée (423).
         $this->periodGuard->ensureModifiable($tenant, $userId, $workDate);
 
@@ -53,6 +65,29 @@ final readonly class RecordTimeEntry
         $project = $this->projects->findActive($tenant, $projectId);
         if (!$project instanceof Project) {
             throw new TimesheetException('Projet introuvable ou inactif : imputation impossible.');
+        }
+
+        // Cycle de vie du projet (US-030, CA-2) : l'imputation n'est ouverte qu'« En cours ».
+        // Le projet système « Absence » est « En cours » par défaut : il reste imputable.
+        // Exception (US-038, CA-3/CA-7) : un projet clôturé redevient imputable pendant une fenêtre de
+        // réouverture formelle approuvée par un ADMIN (4-eyes).
+        if (!$project->allowsImputation()) {
+            if ($project->isClosed() && $this->reopenings->hasActiveOn($tenant, $projectId, $workDate)) {
+                // Réouverture active : imputation autorisée sur la fenêtre.
+            } elseif ($project->isClosed()) {
+                throw new TimesheetException('Imputations fermées : projet clôturé — une réouverture formelle validée par un administrateur est requise (RG-TMP-6).');
+            } else {
+                throw new TimesheetException(sprintf('Imputations non autorisées : projet « %s ».', $project->status()->label()));
+            }
+        }
+
+        // Affectation (US-037, CA-1) : dès qu'un projet a des affectations, seuls les collaborateurs
+        // affectés (ou bénéficiant d'une ouverture exceptionnelle sur la semaine) peuvent imputer.
+        // Un projet sans affectation reste ouvert (rétro-compatibilité — le projet « Absence » inclus).
+        if ($this->assignments->hasAssignments($tenant, $projectId)
+            && !$this->assignments->isAssignedOn($tenant, $projectId, $userId, $workDate)
+            && !$this->openings->coversDay($tenant, $projectId, $userId, $workDate)) {
+            throw new TimesheetException('Imputation non autorisée : vous n\'êtes pas affecté à ce projet.');
         }
 
         $otherProjectsMinutes = $this->entries->minutesLoggedForDay($tenant, $userId, $workDate, $projectId);

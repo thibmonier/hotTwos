@@ -67,6 +67,8 @@ security:
         # Synthèse d'activité US-059 : authentifié ; le cloisonnement strict au collaborateur courant
         # (403 sur un autre user_id) est porté par la couche applicative (ARC-19).
         - { path: ^/api/activity-summary, roles: ROLE_USER }
+        # Projets US-030+ : authentifié ; les habilitations (VIEW/CREATE/EDIT_PROJECT) sont applicatives.
+        - { path: ^/projets, roles: ROLE_USER }
 
 when@test:
     security:

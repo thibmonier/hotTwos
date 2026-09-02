@@ -59,6 +59,20 @@ services:
     App\Domain\Project\ProjectRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineProjectRepository'
     App\Domain\Timesheet\TimeEntryRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineTimeEntryRepository'
 
+    # Ports structure de projet (US-031, DIP).
+    App\Domain\Project\ProjectLotRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineProjectLotRepository'
+    App\Domain\Project\ProjectMilestoneRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineProjectMilestoneRepository'
+
+    # Ports affectation de projet (US-037, DIP).
+    App\Domain\Project\ProjectAssignmentRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineProjectAssignmentRepository'
+    App\Domain\Project\ExceptionalImputationOpeningRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineExceptionalImputationOpeningRepository'
+
+    # Port engagements externes (US-034, DIP).
+    App\Domain\Project\ExternalCommitmentRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineExternalCommitmentRepository'
+
+    # Port réouverture de projet (US-038, DIP).
+    App\Domain\Project\ProjectReopeningRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineProjectReopeningRepository'
+
     # Port utilisateur (lecture, US-010 — validation d'appartenance tenant).
     App\Domain\User\UserRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineUserRepository'
 

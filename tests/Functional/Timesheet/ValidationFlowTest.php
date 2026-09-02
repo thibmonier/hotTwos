@@ -7,6 +7,7 @@ namespace App\Tests\Functional\Timesheet;
 use App\Application\Authorization\InitializeDefaultRoles;
 use App\Domain\Authorization\Role;
 use App\Domain\Project\Project;
+use App\Domain\Project\ProjectAssignment;
 use App\Domain\Tenant\Tenant;
 use App\Domain\Tenant\TenantId;
 use App\Domain\Absence\AbsenceRequest;
@@ -47,6 +48,7 @@ final class ValidationFlowTest extends WebTestCase
             $this->em->getClassMetadata(Role::class),
             $this->em->getClassMetadata(Project::class),
             $this->em->getClassMetadata(TimeEntry::class),
+            $this->em->getClassMetadata(ProjectAssignment::class),
             $this->em->getClassMetadata(AccountingPeriod::class),
             $this->em->getClassMetadata(AbsenceRequest::class),
         ];

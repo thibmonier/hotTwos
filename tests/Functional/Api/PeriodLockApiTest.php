@@ -8,6 +8,7 @@ use App\Domain\Absence\AbsenceRequest;
 use App\Domain\Period\AccountingPeriod;
 use App\Domain\Period\ReopeningRequest;
 use App\Domain\Project\Project;
+use App\Domain\Project\ProjectAssignment;
 use App\Domain\Tenant\Tenant;
 use App\Domain\Tenant\TenantId;
 use App\Domain\Timesheet\TimeEntry;
@@ -43,6 +44,7 @@ final class PeriodLockApiTest extends WebTestCase
             $this->em->getClassMetadata(User::class),
             $this->em->getClassMetadata(Project::class),
             $this->em->getClassMetadata(TimeEntry::class),
+            $this->em->getClassMetadata(ProjectAssignment::class),
             $this->em->getClassMetadata(AccountingPeriod::class),
             $this->em->getClassMetadata(ReopeningRequest::class),
             $this->em->getClassMetadata(AbsenceRequest::class),

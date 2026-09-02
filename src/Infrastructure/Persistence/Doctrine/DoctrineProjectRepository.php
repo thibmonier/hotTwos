@@ -70,6 +70,25 @@ final readonly class DoctrineProjectRepository implements ProjectRepository
         return $projects;
     }
 
+    public function findAllByTenant(TenantId $tenant): array
+    {
+        /** @var list<Project> $projects */
+        $projects = $this->entityManager->createQuery(
+            'SELECT p FROM '.Project::class.' p WHERE p.tenantId = :tenant ORDER BY p.code ASC',
+        )->setParameter('tenant', $tenant->toString())->getResult();
+
+        return $projects;
+    }
+
+    public function countByTenant(TenantId $tenant): int
+    {
+        $count = $this->entityManager->createQuery(
+            'SELECT COUNT(p.id) FROM '.Project::class.' p WHERE p.tenantId = :tenant',
+        )->setParameter('tenant', $tenant->toString())->getSingleScalarResult();
+
+        return is_numeric($count) ? (int) $count : 0;
+    }
+
     public function save(Project $project): void
     {
         $this->entityManager->persist($project);

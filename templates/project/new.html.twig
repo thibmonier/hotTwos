@@ -1,0 +1,71 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouveau projet{% endblock %}
+
+{% block body %}
+    <main class="container">
+        <h1>Nouveau projet</h1>
+
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <p class="flash flash-{{ label }}" role="{{ label == 'error' ? 'alert' : 'status' }}">{{ message }}</p>
+            {% endfor %}
+        {% endfor %}
+
+        <p class="hint">Les champs marqués <abbr title="obligatoire">*</abbr> sont obligatoires (RG-PRJ-1).</p>
+
+        <form method="post" action="{{ path('project_create') }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('create_project') }}">
+
+            <fieldset class="project-form-group">
+                <legend>Identification</legend>
+
+                <div class="project-form-field">
+                    <label for="name">Nom du projet <abbr title="obligatoire">*</abbr></label>
+                    <input type="text" id="name" name="name" maxlength="255" required aria-required="true">
+                </div>
+                <div class="project-form-field">
+                    <label for="clientName">Client <abbr title="obligatoire">*</abbr></label>
+                    <input type="text" id="clientName" name="clientName" maxlength="255" required aria-required="true" aria-describedby="client-help">
+                    <span class="hint" id="client-help">Saisie libre — deviendra une liste avec le référentiel clients (US-014).</span>
+                </div>
+                <div class="project-form-field">
+                    <label for="responsibleUserId">Responsable</label>
+                    <input type="text" id="responsibleUserId" name="responsibleUserId" aria-describedby="resp-help">
+                    <span class="hint" id="resp-help">Identifiant du chef de projet responsable ; par défaut, vous-même.</span>
+                </div>
+                <div class="project-form-field">
+                    <label for="budgetEuros">Budget (€) <abbr title="obligatoire">*</abbr></label>
+                    <input type="number" id="budgetEuros" name="budgetEuros" min="1" step="1" inputmode="numeric" required aria-required="true">
+                </div>
+            </fieldset>
+
+            <fieldset class="project-form-group">
+                <legend>Contractualisation et calendrier <span class="hint">(le calendrier est optionnel)</span></legend>
+
+                <fieldset>
+                    <legend>Contractualisation <abbr title="obligatoire">*</abbr></legend>
+                    {% for type in contractTypes %}
+                        <label class="project-radio">
+                            <input type="radio" name="contractType" value="{{ type.value }}"{{ loop.first ? ' checked' : '' }}>
+                            {{ type.label }}
+                        </label>
+                    {% endfor %}
+                </fieldset>
+
+                <div class="project-form-field">
+                    <label for="startDate">Date de début</label>
+                    <input type="date" id="startDate" name="startDate">
+                </div>
+                <div class="project-form-field">
+                    <label for="endDate">Date de fin</label>
+                    <input type="date" id="endDate" name="endDate">
+                </div>
+            </fieldset>
+
+            <p class="hint">Statut initial : <strong>En préparation</strong>.</p>
+            <button type="submit">Créer le projet</button>
+            <a href="{{ path('project_index') }}">Annuler</a>
+        </form>
+    </main>
+{% endblock %}
