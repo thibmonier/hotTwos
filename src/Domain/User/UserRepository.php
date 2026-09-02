@@ -20,4 +20,14 @@ interface UserRepository
      * @return list<string>
      */
     public function findIdsByTenant(TenantId $tenant): array;
+
+    /**
+     * Résout les adresses e-mail d'un ensemble d'utilisateurs, bornée au tenant (F-S5-4 : identifier
+     * les collaborateurs par leur e-mail plutôt que par un identifiant technique).
+     *
+     * @param list<string> $userIds
+     *
+     * @return array<string, string> map userId => email (les ids inconnus ou hors tenant sont absents)
+     */
+    public function findEmailsByIds(TenantId $tenant, array $userIds): array;
 }

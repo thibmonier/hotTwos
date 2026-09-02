@@ -9,6 +9,7 @@ use App\Application\Completeness\CompletenessGrid;
 use App\Application\Completeness\CompletenessScope;
 use App\Domain\Authorization\Permission;
 use App\Domain\User\User;
+use App\Domain\User\UserRepository;
 use Psr\Clock\ClockInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,6 +31,7 @@ final class CompletenessPageController extends AbstractController
         private readonly CompletenessScope $scope,
         private readonly CompletenessGrid $grid,
         private readonly ClockInterface $clock,
+        private readonly UserRepository $users,
     ) {
     }
 
@@ -50,10 +52,14 @@ final class CompletenessPageController extends AbstractController
         }
         ksort($weeks);
 
+        // F-S5-4 : identifier les collaborateurs par leur e-mail plutôt que par un identifiant technique.
+        $userEmails = $this->users->findEmailsByIds($user->tenantId(), array_keys($rows));
+
         return $this->render('completeness/index.html.twig', [
             'team' => $team,
             'weeks' => array_keys($weeks),
             'rows' => $rows,
+            'userEmails' => $userEmails,
         ]);
     }
 }

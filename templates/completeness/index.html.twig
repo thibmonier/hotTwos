@@ -62,7 +62,7 @@
                 <tbody>
                     {% for userId, cells in rows %}
                         <tr>
-                            <th scope="row" class="completeness-user-cell">{{ userId[:8] }}</th>
+                            <th scope="row" class="completeness-user-cell">{{ userEmails[userId]|default(userId[:8]) }}</th>
                             {% for week in weeks %}
                                 {% set cell = cells[week] ?? null %}
                                 <td class="text-center">
