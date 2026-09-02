@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Projets{% endblock %}
+
+{% block body %}
+    <main class="container">
+        <h1>Projets</h1>
+
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <p class="flash flash-{{ label }}" role="{{ label == 'error' ? 'alert' : 'status' }}">{{ message }}</p>
+            {% endfor %}
+        {% endfor %}
+
+        {% if canCreate %}
+            <p><a href="{{ path('project_new') }}">+ Nouveau projet</a></p>
+        {% endif %}
+
+        {% if projects is empty %}
+            <p>Aucun projet pour le moment.{% if canCreate %} <a href="{{ path('project_new') }}">Créer le premier projet</a>.{% endif %}</p>
+        {% else %}
+            <table class="project-list">
+                <caption class="visually-hidden">Liste des projets du cabinet</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Code</th>
+                        <th scope="col">Nom</th>
+                        <th scope="col">Client</th>
+                        <th scope="col">Statut</th>
+                        <th scope="col">Budget</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in projects %}
+                        <tr>
+                            <th scope="row"><code>{{ p.code }}</code></th>
+                            <td class="project-list-name"><a href="{{ path('project_show', { id: p.id }) }}">{{ p.name }}</a></td>
+                            <td>{{ p.client ?? '—' }}</td>
+                            <td><span class="project-status-badge project-status-{{ p.statusFamily }}">{{ p.status }}</span></td>
+                            <td>{{ p.budgetEuros is not null ? (p.budgetEuros|number_format(0, ',', ' ') ~ ' €') : '—' }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </main>
+{% endblock %}

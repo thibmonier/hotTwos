@@ -250,3 +250,120 @@ fieldset:disabled {
         border-radius: 0;
     }
 }
+
+/* Module Projets (EPIC-002) — badge de statut (le libellé texte porte toujours le sens ; la couleur
+   renforce, jamais seule — WCAG 1.4.1). 3 familles sémantiques + « annulé » (seule exception rouge). */
+.project-status-badge {
+    display: inline-block;
+    padding: 0.15rem 0.55rem;
+    border: 1px solid #999;
+    border-radius: 3px;
+    font-size: 0.8em;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.project-status-neutral { border-color: #777; color: #555; }
+.project-status-active { border-color: #2e7d32; color: #2e7d32; }
+.project-status-closed { border-color: #555; color: #555; background: #f2f2f2; }
+.project-status-cancelled { border-color: #c62828; color: #c62828; }
+
+/* Table de liste des projets. */
+.project-list {
+    border-collapse: collapse;
+    width: 100%;
+}
+.project-list th,
+.project-list td {
+    padding: 0.4rem 0.6rem;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+.project-list-name a {
+    font-weight: 600;
+}
+
+/* Onglets accessibles (détail projet). */
+.project-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 1rem;
+}
+.project-tab {
+    min-height: 44px;
+    padding: 0.5rem 0.9rem;
+    background: none;
+    border: 1px solid transparent;
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+    font: inherit;
+    color: #555;
+    cursor: pointer;
+}
+.project-tab[aria-selected="true"] {
+    color: #111;
+    font-weight: 600;
+    border-color: #ccc;
+    background: #fff;
+    margin-bottom: -1px;
+}
+.project-transitions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+/* Formulaire de création. */
+.project-form-group {
+    border: 1px solid #eee;
+    border-radius: 6px;
+    padding: 0.75rem 1rem 1rem;
+    margin-bottom: 1rem;
+}
+.project-form-group legend {
+    font-weight: 600;
+}
+.project-form-field {
+    display: block;
+    margin-bottom: 0.75rem;
+}
+.project-form-field label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+}
+.project-form-field input,
+.project-form-field select {
+    width: 100%;
+    max-width: 32rem;
+    min-height: 44px;
+    padding: 0.4rem 0.5rem;
+    box-sizing: border-box;
+    font-size: 1rem;
+}
+.project-radio {
+    margin-right: 1rem;
+}
+
+/* Arbre de lots (onglet Structure, US-031). */
+.project-lot-tree,
+.project-milestone-list {
+    list-style: none;
+    padding: 0;
+}
+.project-lot-item {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 0.6rem 0.75rem;
+    margin-bottom: 0.5rem;
+}
+.project-milestone-list {
+    margin: 0.5rem 0 0 1.25rem;
+    border-left: 2px solid #eee;
+}
+.project-budget-gap {
+    border-left: 3px solid #b26a00;
+    background: #fff8e6;
+    padding: 0.3rem 0.6rem;
+}

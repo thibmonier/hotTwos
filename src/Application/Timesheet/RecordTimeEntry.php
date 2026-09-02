@@ -55,6 +55,12 @@ final readonly class RecordTimeEntry
             throw new TimesheetException('Projet introuvable ou inactif : imputation impossible.');
         }
 
+        // Cycle de vie du projet (US-030, CA-2) : l'imputation n'est ouverte qu'« En cours ».
+        // Le projet système « Absence » est « En cours » par défaut : il reste imputable.
+        if (!$project->allowsImputation()) {
+            throw new TimesheetException(sprintf('Imputations non autorisées : projet « %s ».', $project->status()->label()));
+        }
+
         $otherProjectsMinutes = $this->entries->minutesLoggedForDay($tenant, $userId, $workDate, $projectId);
         if ($otherProjectsMinutes + $minutes > self::DAILY_CAP_MINUTES) {
             throw new TimesheetException(sprintf('Plafond journalier dépassé : %d min déjà imputées, %d demandées (max %d).', $otherProjectsMinutes, $minutes, self::DAILY_CAP_MINUTES));

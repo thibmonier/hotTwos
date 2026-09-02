@@ -106,6 +106,24 @@ final class RecordTimeEntryTest extends TestCase
         $this->record->record($this->tenant, 'camille', 'projet-inexistant', new DateTimeImmutable('2026-09-15'), 60);
     }
 
+    public function testRefusesImputationOnProjectNotInProgress(): void
+    {
+        // Projet métier « En préparation » (US-030, CA-2) : imputation refusée tant qu'il n'est pas « En cours ».
+        $draft = Project::createBusiness($this->tenant, 'PRJ-0001', 'Refonte', 'Acme', 'marc', 12_000_000, \App\Domain\Project\ContractType::FORFAIT, null, null);
+        $this->projects->save($draft);
+
+        try {
+            $this->record->record($this->tenant, 'camille', $draft->id(), new DateTimeImmutable('2026-09-15'), 120);
+            self::fail('Une imputation sur un projet en préparation doit être refusée.');
+        } catch (TimesheetException) {
+            // attendu
+        }
+
+        $draft->changeStatus(\App\Domain\Project\ProjectStatus::EN_COURS);
+        $this->record->record($this->tenant, 'camille', $draft->id(), new DateTimeImmutable('2026-09-15'), 120);
+        self::assertCount(1, $this->entries->entries);
+    }
+
     public function testEnforcesDailyCapAcrossProjects(): void
     {
         $other = new Project($this->tenant, 'PRJ-2', 'Autre');

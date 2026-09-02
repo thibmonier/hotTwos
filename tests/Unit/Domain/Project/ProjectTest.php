@@ -4,36 +4,81 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Domain\Project;
 
+use App\Domain\Project\ContractType;
 use App\Domain\Project\Project;
+use App\Domain\Project\ProjectException;
+use App\Domain\Project\ProjectStatus;
 use App\Domain\Tenant\TenantId;
 use PHPUnit\Framework\TestCase;
-use InvalidArgumentException;
+use DateTimeImmutable;
+use DateTimeZone;
 
 /**
- * US-050 — un projet minimal porte une identité (code, nom) et un état actif.
+ * US-030 — l'agrégat projet applique RG-PRJ-1 (client, responsable, budget obligatoires), démarre
+ * « En préparation », conditionne l'imputation au statut « En cours » (CA-2), et n'autorise que les
+ * transitions valides (EF-PRJ-4).
  */
 final class ProjectTest extends TestCase
 {
-    public function testExposesIdentityAndActiveState(): void
+    public function testMinimalProjectDefaultsToInProgressAndImputable(): void
     {
-        $project = new Project(TenantId::generate(), 'PRJ-1', 'Refonte SI');
+        // Usage rétro-compatible (US-050) : projet système/technique imputable par défaut.
+        $project = new Project(TenantId::generate(), 'ABSENCE', 'Absence');
 
-        self::assertSame('PRJ-1', $project->code());
-        self::assertSame('Refonte SI', $project->name());
-        self::assertTrue($project->isActive());
+        self::assertSame(ProjectStatus::EN_COURS, $project->status());
+        self::assertTrue($project->allowsImputation());
     }
 
-    public function testCanBeInactive(): void
+    public function testBusinessProjectStartsInPreparationAndBlocksImputation(): void
     {
-        $project = new Project(TenantId::generate(), 'PRJ-2', 'Archivé', false);
+        $project = $this->business();
 
-        self::assertFalse($project->isActive());
+        self::assertSame(ProjectStatus::EN_PREPARATION, $project->status());
+        self::assertFalse($project->allowsImputation());
+        self::assertSame('Acme Corp', $project->clientName());
+        self::assertSame(12_000_000, $project->budgetCents());
     }
 
-    public function testRejectsEmptyCode(): void
+    public function testImputationOpensWhenStatusBecomesInProgress(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $project = $this->business();
+        $project->changeStatus(ProjectStatus::EN_COURS);
 
-        new Project(TenantId::generate(), '', 'Sans code');
+        self::assertTrue($project->allowsImputation());
+    }
+
+    public function testInvalidTransitionIsRejected(): void
+    {
+        $project = $this->business(); // En préparation
+        $this->expectException(ProjectException::class);
+
+        $project->changeStatus(ProjectStatus::RECEPTIONNE);
+    }
+
+    public function testClientIsMandatory(): void
+    {
+        $this->expectException(ProjectException::class);
+        Project::createBusiness(TenantId::generate(), 'PRJ-0001', 'Refonte', '  ', 'marc', 12_000_000, ContractType::FORFAIT, null, null);
+    }
+
+    public function testBudgetIsMandatory(): void
+    {
+        $this->expectException(ProjectException::class);
+        Project::createBusiness(TenantId::generate(), 'PRJ-0001', 'Refonte', 'Acme Corp', 'marc', 0, ContractType::FORFAIT, null, null);
+    }
+
+    private function business(): Project
+    {
+        return Project::createBusiness(
+            TenantId::generate(),
+            'PRJ-0042',
+            'Refonte SI',
+            'Acme Corp',
+            'marc',
+            12_000_000,
+            ContractType::FORFAIT,
+            new DateTimeImmutable('2026-09-01', new DateTimeZone('UTC')),
+            new DateTimeImmutable('2027-03-31', new DateTimeZone('UTC')),
+        );
     }
 }

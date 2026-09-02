@@ -1,0 +1,69 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ project.code }} — {{ project.name }}{% endblock %}
+
+{% block body %}
+    <main class="container">
+        <p><a href="{{ path('project_index') }}">← Projets</a></p>
+        <h1>{{ project.code }} — {{ project.name }}
+            <span class="project-status-badge project-status-{{ project.statusFamily }}">{{ project.status }}</span>
+        </h1>
+        <p class="hint">
+            Client : {{ project.client ?? '—' }} · Contractualisation : {{ project.contractType ?? '—' }}
+            · Budget : {{ project.budgetEuros is not null ? (project.budgetEuros|number_format(0, ',', ' ') ~ ' €') : '—' }}
+            {% if project.startDate %} · Du {{ project.startDate }}{% if project.endDate %} au {{ project.endDate }}{% endif %}{% endif %}
+        </p>
+
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <p class="flash flash-{{ label }}" role="{{ label == 'error' ? 'alert' : 'status' }}">{{ message }}</p>
+            {% endfor %}
+        {% endfor %}
+
+        <div data-controller="tabs">
+            <div class="project-tabs" role="tablist" aria-label="Sections du projet">
+                <button class="project-tab" role="tab" id="tab-lifecycle" aria-controls="panel-lifecycle" aria-selected="true" data-tabs-target="tab" data-action="tabs#select keydown->tabs#keydown">Cycle de vie</button>
+                <button class="project-tab" role="tab" id="tab-structure" aria-controls="panel-structure" aria-selected="false" tabindex="-1" data-tabs-target="tab" data-action="tabs#select keydown->tabs#keydown">Structure</button>
+                <button class="project-tab" role="tab" id="tab-team" aria-controls="panel-team" aria-selected="false" tabindex="-1" data-tabs-target="tab" data-action="tabs#select keydown->tabs#keydown">Équipe</button>
+                <button class="project-tab" role="tab" id="tab-commitments" aria-controls="panel-commitments" aria-selected="false" tabindex="-1" data-tabs-target="tab" data-action="tabs#select keydown->tabs#keydown">Engagements</button>
+                <button class="project-tab" role="tab" id="tab-closure" aria-controls="panel-closure" aria-selected="false" tabindex="-1" data-tabs-target="tab" data-action="tabs#select keydown->tabs#keydown">Clôture</button>
+            </div>
+
+            <section class="project-tabpanel" id="panel-lifecycle" role="tabpanel" aria-labelledby="tab-lifecycle" data-tabs-target="panel">
+                <h2>Cycle de vie</h2>
+                <p>Statut actuel : <strong>{{ project.status }}</strong>.</p>
+                {% if canEdit and transitions is not empty %}
+                    <p>Actions disponibles :</p>
+                    <div class="project-transitions">
+                        {% for t in transitions %}
+                            <form method="post" action="{{ path('project_change_status', { id: project.id }) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('change_project_status') }}">
+                                <input type="hidden" name="status" value="{{ t.value }}">
+                                <button type="submit">Passer à « {{ t.label }} »</button>
+                            </form>
+                        {% endfor %}
+                    </div>
+                {% elseif transitions is empty %}
+                    <p class="hint">Aucune transition disponible depuis ce statut.</p>
+                {% endif %}
+            </section>
+
+            <section class="project-tabpanel" id="panel-structure" role="tabpanel" aria-labelledby="tab-structure" data-tabs-target="panel" hidden>
+                <h2>Structure (lots &amp; jalons)</h2>
+                <p class="hint">Sera disponible avec US-031.</p>
+            </section>
+            <section class="project-tabpanel" id="panel-team" role="tabpanel" aria-labelledby="tab-team" data-tabs-target="panel" hidden>
+                <h2>Équipe</h2>
+                <p class="hint">Sera disponible avec US-037.</p>
+            </section>
+            <section class="project-tabpanel" id="panel-commitments" role="tabpanel" aria-labelledby="tab-commitments" data-tabs-target="panel" hidden>
+                <h2>Engagements externes</h2>
+                <p class="hint">Sera disponible avec US-034.</p>
+            </section>
+            <section class="project-tabpanel" id="panel-closure" role="tabpanel" aria-labelledby="tab-closure" data-tabs-target="panel" hidden>
+                <h2>Clôture</h2>
+                <p class="hint">Sera disponible avec US-038.</p>
+            </section>
+        </div>
+    </main>
+{% endblock %}

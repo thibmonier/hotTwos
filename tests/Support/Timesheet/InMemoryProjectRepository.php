@@ -57,6 +57,25 @@ final class InMemoryProjectRepository implements ProjectRepository
         return $found;
     }
 
+    public function findAllByTenant(TenantId $tenant): array
+    {
+        $found = array_values(array_filter(
+            $this->projects,
+            static fn (Project $project): bool => $project->tenantId()->equals($tenant),
+        ));
+        usort($found, static fn (Project $a, Project $b): int => $a->code() <=> $b->code());
+
+        return $found;
+    }
+
+    public function countByTenant(TenantId $tenant): int
+    {
+        return count(array_filter(
+            $this->projects,
+            static fn (Project $project): bool => $project->tenantId()->equals($tenant),
+        ));
+    }
+
     public function save(Project $project): void
     {
         $this->projects[] = $project;
