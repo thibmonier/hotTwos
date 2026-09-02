@@ -31,7 +31,8 @@
 | [ADR-0015](#adr-0015) | ADR-15 | Sécurité automatisée : 8 couches outillées + test d'intrusion annuel externe | Adopté |
 | [ADR-0016](#adr-0016) | ADR-16 | Développement assisté par agent (claude-craft), TDD imposé, périmètre de sécurité non délégué | Adopté |
 | [ADR-0017](./0017-migrations-source-du-schema.md) | — (réalisation) | Migrations Doctrine = source du schéma de production ; durcissement RLS/trigger versionné ; CI valide migrations ↔ mapping | Adopté |
-| [ADR-0018](./0018-integration-design-system-skote.md) | — (réalisation) | Intégration du design system Skote en CSS Bootstrap compilé + tokens CSS custom properties, sans build Sass ; thème clair/sombre par tokens (précise ADR-0005) | Adopté |
+| [ADR-0018](./0018-integration-design-system-skote.md) | — (réalisation) | Intégration du design system Skote en CSS Bootstrap compilé + tokens CSS custom properties, sans build Sass | **Superseded by ADR-0019** |
+| [ADR-0019](./0019-frontend-tailwind-assetmapper.md) | — (réalisation) | Front en **Tailwind CSS v4 via AssetMapper (sans Node.js)** + TailAdmin (MIT), design system CSS-first `@theme` ; abandon Bootstrap/Skote (supersede ADR-0018, précise ADR-0005) | Adopté |
 
 ---
 

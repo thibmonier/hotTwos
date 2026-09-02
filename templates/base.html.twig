@@ -1,60 +1,37 @@
 <!DOCTYPE html>
 {#
-  base.html.twig — Layout Skote (US-063)
-  Sidebar 250px (sombre invariant) + Topbar 70px + Zone contenu fluide.
-
-  Blocs exposés aux pages enfants :
-    - page_section    : libellé de section/module (topbar, ex. "Temps & activité")
-    - page_title      : titre de page (topbar, ex. "Saisie des temps")
-    - topbar_actions  : actions contextuelles topbar (optionnel)
-    - body            : contenu principal — conservé pour rétrocompatibilité (toutes pages existantes)
-    - stylesheets     : <link> CSS additionnels (inséré après les CSS de base)
-    - javascripts     : scripts additionnels (avant </body>)
-    - title           : titre <title> (conservé pour rétrocompatibilité)
-    - importmap       : bloc importmap (conservé pour rétrocompatibilité)
-
-  Navigation — T-063-02 :
-    Visibilité via is_granted() en Twig, parité avec la couche d'autorisation serveur.
-    Les permissions fonctionnelles (view:project_financials, etc.) nécessitent
-    l'enregistrement de Symfony voters dans src/Domain/Authorization/Rbac/.
-    Jusqu'alors, is_granted() renvoie false pour ces permissions (comportement sûr).
-
-  Thème — T-063-04 :
-    Script early-init posé AVANT tout CSS pour éviter le FOUC.
-    data-theme + data-bs-theme synchronisés sur <html>.
-    Bascule via ThemeToggleController (Stimulus).
-    Sidebar toujours sombre (tokens --sidebar-* constants).
+  base.html.twig — Layout Tailwind v4 (ADR-0019). Sidebar 250px (sombre invariante)
+  + topbar 70px + zone de contenu. Blocs : page_section, page_title, topbar_actions,
+  body (rétrocompatible), stylesheets, javascripts, title.
+  Nav filtrée par is_granted (PermissionVoter). Interactivité en Stimulus (thème, sidebar).
 #}
-<html lang="{{ app.request.locale|default('fr') }}">
+<html lang="{{ app.request.locale|default('fr') }}" class="h-full">
     <head>
         <meta charset="UTF-8">
-        {# Prérequis responsive mobile-first (US-052) ; zoom non bloqué (WCAG 1.4.4). #}
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{% block title %}HotOnes{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
 
-        {# Early-init thème — DOIT précéder tout CSS pour éviter le FOUC.
-           Lit localStorage et pose data-theme + data-bs-theme sur <html> avant le rendu. #}
+        {# Early-init thème (anti-FOUC) — pose data-theme avant le CSS. #}
         <script>
             (function () {
-                var t = localStorage.getItem('theme'); // 'dark' | 'light' | null
+                var t = localStorage.getItem('theme');
                 if (t === 'dark' || t === 'light') {
                     document.documentElement.setAttribute('data-theme', t);
-                    document.documentElement.setAttribute('data-bs-theme', t);
                 }
-                // null = défaut système : aucun attribut, prefers-color-scheme CSS fait foi
             })();
         </script>
 
-        {# Poppins — police Skote (T-061-02). Chargement asynchrone via Google Fonts. #}
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap">
 
+        {# CSS Tailwind buildé (tailwind-bundle swappe vers var/tailwind/tailwind.built.css). #}
+        <link rel="stylesheet" href="{{ asset('styles/tailwind.css') }}">
+
         {% block javascripts %}
             {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
-
         {% block stylesheets %}{% endblock %}
 
         {% set frankenphp_hot_reload = app.request.server.get('FRANKENPHP_HOT_RELOAD') %}
@@ -64,275 +41,86 @@
         <script src="https://cdn.jsdelivr.net/npm/frankenphp-hot-reload/+esm" type="module"></script>
         {% endif %}
     </head>
-    <body>
-        {# Lien d'évitement — WCAG 2.4.1 : contourner les blocs de navigation #}
-        <a href="#main-content" class="visually-hidden focusable">
-            Aller au contenu principal
-        </a>
+    <body class="h-full bg-bg font-sans text-[13px] leading-normal text-body antialiased">
 
-        {# ── Conteneur principal du layout ──────────────────────────────────────── #}
-        <div class="app-layout"
-             data-controller="sidebar-toggle">
+        <a href="#main-content" class="visually-hidden">Aller au contenu principal</a>
 
-            {# ── Sidebar (sombre invariant) ──────────────────────────────────────── #}
-            <aside class="app-sidebar"
-                   id="app-sidebar"
-                   data-sidebar-toggle-target="sidebar"
-                   aria-label="Navigation principale">
+        <div class="flex h-full min-h-screen" data-controller="sidebar-toggle">
 
-                {# Brand / Logo #}
-                <a href="{{ path('home') }}" class="app-sidebar-brand">
-                    <svg class="app-sidebar-brand-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <rect width="32" height="32" rx="8" fill="#556ee6"/>
-                        <text x="4" y="24" font-family="system-ui" font-size="18" font-weight="700" fill="white">H</text>
-                    </svg>
-                    <span class="app-sidebar-brand-name">HotOnes</span>
+            {# ── Sidebar (sombre invariante) ─────────────────────────────── #}
+            <aside id="app-sidebar" data-sidebar-toggle-target="sidebar" aria-label="Navigation principale"
+                   class="fixed inset-y-0 left-0 z-30 flex w-[250px] shrink-0 -translate-x-full flex-col bg-sidebar text-sidebar-text transition-transform md:static md:translate-x-0">
+                <a href="{{ path('home') }}" class="flex h-[70px] items-center gap-3 border-b border-sidebar-alt px-5">
+                    <span class="grid h-7 w-7 place-items-center rounded-lg bg-primary-surface text-sm font-bold text-white">H</span>
+                    <span class="text-lg font-semibold text-white">HotOnes</span>
                 </a>
-
-                {# Label de section navigation #}
-                <p class="app-sidebar-label" aria-hidden="true">Menu</p>
-
-                {# Navigation principale — T-063-02 : filtrage par is_granted()
-                   Parité avec la couche d'autorisation serveur (ARC-19, ADR-0018).
-                   Note : les permissions fonctionnelles requièrent des Symfony voters
-                   enregistrés dans src/Domain/Authorization/Rbac/ pour être effectives.
-                #}
                 {% if is_granted('ROLE_USER') %}
-                {% set currentRoute = app.request.attributes.get('_route') %}
-                <nav aria-label="Navigation principale">
-                    <ul class="app-nav">
-
-                        {# Accueil — visible à tous les utilisateurs authentifiés #}
-                        <li>
-                            <a href="{{ path('home') }}"
-                               class="app-nav-link{{ currentRoute == 'home' ? ' is-active' : '' }}"
-                               {% if currentRoute == 'home' %}aria-current="page"{% endif %}>
-                                <svg class="app-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
-                                </svg>
-                                <span>Accueil</span>
+                {% set r = app.request.attributes.get('_route') %}
+                <p class="px-5 pt-4 pb-1.5 text-xs font-semibold uppercase tracking-wider text-sidebar-label">Menu</p>
+                <nav aria-label="Navigation principale" class="flex flex-col gap-0.5 px-3">
+                    {% set items = [
+                        {label:'Accueil', route:'home', match:'home', perm:null},
+                        {label:'Saisie', route:'timesheet_week', match:'timesheet_', perm:null},
+                        {label:'Validation', route:'timesheet_validation', match:'timesheet_validation', perm:'validate:time'},
+                        {label:'Complétude', route:'completeness_page', match:'completeness_page', perm:null},
+                        {label:'Valorisation', route:'valuation_dashboard', match:'valuation_dashboard', perm:'view:project_financials'},
+                        {label:'Projets', route:'project_index', match:'project_', perm:null},
+                        {label:'Absences', route:'absence_page', match:'absence_page', perm:null},
+                        {label:'Relances', route:'reminders_page', match:'reminders_', perm:'manage:reminders'},
+                        {label:'Organisation', route:'organization_admin', match:'organization_admin', perm:'manage:organization'},
+                        {label:'Profils', route:'pricing_admin', match:'pricing_admin', perm:'manage:pricing'},
+                        {label:'Admin — Périodes', route:'period_admin', match:'period_', perm:'manage:periods'}
+                    ] %}
+                    {% for it in items %}
+                        {% if it.perm is null or is_granted(it.perm) %}
+                            {% set active = r starts with it.match %}
+                            <a href="{{ path(it.route) }}"
+                               class="flex min-h-11 items-center gap-3 rounded px-3 text-[13px] {{ active ? 'bg-primary font-medium text-white' : 'hover:bg-white/5 hover:text-white' }}"
+                               {% if active %}aria-current="page"{% endif %}>
+                                <span aria-hidden="true" class="grid h-5 w-5 place-items-center rounded-sm bg-white/10 text-[10px]">•</span>
+                                <span>{{ it.label }}</span>
                             </a>
-                        </li>
-
-                        {# Saisie — ROLE_USER (tous collaborateurs authentifiés) #}
-                        <li>
-                            <a href="{{ path('timesheet_week') }}"
-                               class="app-nav-link{{ currentRoute starts with 'timesheet_' ? ' is-active' : '' }}"
-                               {% if currentRoute starts with 'timesheet_' %}aria-current="page"{% endif %}>
-                                <svg class="app-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
-                                </svg>
-                                <span>Saisie</span>
-                            </a>
-                        </li>
-
-                        {# Validation — masqué si pas de permission validate:time.
-                           Affiche un lien vide sans VALIDATE_TIME (voir cartographie nav). #}
-                        {% if is_granted('validate:time') %}
-                        <li>
-                            <a href="{{ path('timesheet_validation') }}"
-                               class="app-nav-link{{ currentRoute == 'timesheet_validation' ? ' is-active' : '' }}"
-                               {% if currentRoute == 'timesheet_validation' %}aria-current="page"{% endif %}>
-                                <svg class="app-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <polyline points="20 6 9 17 4 12"/>
-                                </svg>
-                                <span>Validation</span>
-                            </a>
-                        </li>
                         {% endif %}
-
-                        {# Complétude — ROLE_USER (scope adaptatif côté serveur) #}
-                        <li>
-                            <a href="{{ path('completeness_page') }}"
-                               class="app-nav-link{{ currentRoute == 'completeness_page' ? ' is-active' : '' }}"
-                               {% if currentRoute == 'completeness_page' %}aria-current="page"{% endif %}>
-                                <svg class="app-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
-                                </svg>
-                                <span>Complétude</span>
-                            </a>
-                        </li>
-
-                        {# Valorisation — VIEW_PROJECT_FINANCIALS requis (ensureCan → 403 sans) #}
-                        {% if is_granted('view:project_financials') %}
-                        <li>
-                            <a href="{{ path('valuation_dashboard') }}"
-                               class="app-nav-link{{ currentRoute == 'valuation_dashboard' ? ' is-active' : '' }}"
-                               {% if currentRoute == 'valuation_dashboard' %}aria-current="page"{% endif %}>
-                                <svg class="app-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                                </svg>
-                                <span>Valorisation</span>
-                            </a>
-                        </li>
-                        {% endif %}
-
-                        {# Projets — VIEW_PROJECT (universel dans la matrice — tous les rôles) #}
-                        <li>
-                            <a href="{{ path('project_index') }}"
-                               class="app-nav-link{{ currentRoute starts with 'project_' ? ' is-active' : '' }}"
-                               {% if currentRoute starts with 'project_' %}aria-current="page"{% endif %}>
-                                <svg class="app-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-                                </svg>
-                                <span>Projets</span>
-                            </a>
-                        </li>
-
-                        {# Absences — ROLE_USER (périmètre propre au user courant) #}
-                        <li>
-                            <a href="{{ path('absence_page') }}"
-                               class="app-nav-link{{ currentRoute == 'absence_page' ? ' is-active' : '' }}"
-                               {% if currentRoute == 'absence_page' %}aria-current="page"{% endif %}>
-                                <svg class="app-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/>
-                                </svg>
-                                <span>Absences</span>
-                            </a>
-                        </li>
-
-                        {# Relances — MANAGE_REMINDERS requis (ensureCan → 403 sans) #}
-                        {% if is_granted('manage:reminders') %}
-                        <li>
-                            <a href="{{ path('reminders_page') }}"
-                               class="app-nav-link{{ currentRoute starts with 'reminders_' ? ' is-active' : '' }}"
-                               {% if currentRoute starts with 'reminders_' %}aria-current="page"{% endif %}>
-                                <svg class="app-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                                </svg>
-                                <span>Relances</span>
-                            </a>
-                        </li>
-                        {% endif %}
-
-                        {# Organisation — MANAGE_ORGANIZATION requis (admin tenant uniquement) #}
-                        {% if is_granted('manage:organization') %}
-                        <li>
-                            <a href="{{ path('organization_admin') }}"
-                               class="app-nav-link{{ currentRoute == 'organization_admin' ? ' is-active' : '' }}"
-                               {% if currentRoute == 'organization_admin' %}aria-current="page"{% endif %}>
-                                <svg class="app-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                                </svg>
-                                <span>Organisation</span>
-                            </a>
-                        </li>
-                        {% endif %}
-
-                        {# Profils — MANAGE_PRICING requis (admin tenant uniquement) #}
-                        {% if is_granted('manage:pricing') %}
-                        <li>
-                            <a href="{{ path('pricing_admin') }}"
-                               class="app-nav-link{{ currentRoute == 'pricing_admin' ? ' is-active' : '' }}"
-                               {% if currentRoute == 'pricing_admin' %}aria-current="page"{% endif %}>
-                                <svg class="app-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="2"/>
-                                </svg>
-                                <span>Profils</span>
-                            </a>
-                        </li>
-                        {% endif %}
-
-                        {# Administration — Périodes : MANAGE_PERIODS requis (admin tenant) #}
-                        {% if is_granted('manage:periods') %}
-                        <li>
-                            <a href="{{ path('period_admin') }}"
-                               class="app-nav-link{{ currentRoute starts with 'period_' ? ' is-active' : '' }}"
-                               {% if currentRoute starts with 'period_' %}aria-current="page"{% endif %}>
-                                <svg class="app-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-                                </svg>
-                                <span>Admin — Périodes</span>
-                            </a>
-                        </li>
-                        {% endif %}
-
-                    </ul>
+                    {% endfor %}
                 </nav>
                 {% endif %}
             </aside>
 
-            {# ── Overlay mobile (ferme le drawer au clic) ──────────────────────── #}
-            <button type="button"
-                    class="app-sidebar-overlay"
-                    id="app-sidebar-overlay"
-                    data-sidebar-toggle-target="overlay"
-                    data-action="click->sidebar-toggle#closeOverlay"
-                    aria-label="Fermer le menu"
-                    tabindex="-1">
-            </button>
+            {# Overlay mobile #}
+            <button type="button" data-sidebar-toggle-target="overlay" data-action="click->sidebar-toggle#closeOverlay"
+                    aria-label="Fermer le menu" tabindex="-1"
+                    class="fixed inset-0 z-20 hidden bg-black/50 md:hidden"></button>
 
-            {# ── Colonne principale (topbar + contenu) ───────────────────────────── #}
-            <div class="app-main">
-
-                {# ── Topbar ──────────────────────────────────────────────────────── #}
-                <header class="app-topbar" role="banner">
-                    <div class="app-topbar-left">
-
-                        {# Bouton hamburger — visible uniquement sur mobile (< 768px) #}
-                        <button type="button"
-                                class="app-sidebar-toggle"
-                                aria-label="Ouvrir le menu"
-                                aria-expanded="false"
-                                aria-controls="app-sidebar"
-                                data-sidebar-toggle-target="button"
-                                data-action="click->sidebar-toggle#toggle">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
-                            </svg>
-                        </button>
-
-                        {# Titre de page (section + titre) #}
-                        <div class="app-topbar-title">
-                            <span class="app-topbar-section">{% block page_section '' %}</span>
-                            <span class="app-topbar-page">{% block page_title '' %}</span>
+            {# ── Colonne principale ──────────────────────────────────────── #}
+            <div class="flex min-w-0 flex-1 flex-col">
+                <header role="banner" class="flex h-[70px] shrink-0 items-center justify-between border-b border-border bg-surface px-6">
+                    <div class="flex items-center gap-3">
+                        <button type="button" data-sidebar-toggle-target="button" data-action="click->sidebar-toggle#toggle"
+                                aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="app-sidebar"
+                                class="grid h-10 w-10 place-items-center rounded border border-border text-muted md:hidden">≡</button>
+                        <div class="flex flex-col">
+                            <span class="text-xs text-muted">{% block page_section '' %}</span>
+                            <span class="text-base font-semibold text-ink">{% block page_title '' %}</span>
                         </div>
                     </div>
-
-                    <div class="app-topbar-right">
-                        {# Actions contextuelles (optionnel — réservé aux pages) #}
+                    <div class="flex items-center gap-3.5">
                         {% block topbar_actions %}{% endblock %}
-
-                        {# Bascule thème clair/sombre — T-063-04 #}
-                        <button type="button"
-                                class="app-theme-toggle"
+                        <button type="button" data-controller="theme-toggle" data-action="click->theme-toggle#toggle"
                                 aria-label="Basculer le thème"
-                                data-controller="theme-toggle"
-                                data-action="click->theme-toggle#toggle">
-                            {# Icône initialisée par le contrôleur Stimulus au connect() #}
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-                            </svg>
-                        </button>
-
-                        {# Avatar utilisateur #}
+                                class="grid h-9 w-9 place-items-center rounded border border-border text-muted hover:text-ink">☾</button>
                         {% if app.user %}
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="app-user-avatar" aria-hidden="true">
-                                {{ app.user.getUserIdentifier()|slice(0,1)|upper }}
-                            </span>
-                            <span class="app-user-email">{{ app.user.getUserIdentifier() }}</span>
+                        <div class="flex items-center gap-2.5">
+                            <span aria-hidden="true" class="grid h-9 w-9 place-items-center rounded-full bg-primary-surface text-xs font-semibold text-white">{{ app.user.getUserIdentifier()|slice(0,1)|upper }}</span>
+                            <span class="text-xs text-body">{{ app.user.getUserIdentifier() }}</span>
                         </div>
                         {% endif %}
                     </div>
                 </header>
 
-                {# ── Zone de contenu principal ────────────────────────────────────── #}
-                <main class="app-content" id="main-content" tabindex="-1" role="main">
-
-                    {# Messages flash : rendus par chaque page (app.flashes est un itérateur
-                       consommateur — les centraliser ici les viderait avant la page). La
-                       centralisation dans le layout (composant ds-alert) est portée par le
-                       reskin US-064, une fois les pages migrées. #}
-
-                    {# Contenu de page — rétrocompatibilité avec {% block body %} #}
+                <main id="main-content" role="main" tabindex="-1" class="flex-1 overflow-auto bg-bg p-6">
                     {% block body %}{% endblock %}
-
                 </main>
-
-            </div>{# /.app-main #}
-
-        </div>{# /.app-layout #}
-
+            </div>
+        </div>
     </body>
 </html>

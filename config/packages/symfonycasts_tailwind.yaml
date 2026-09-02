@@ -1,0 +1,4 @@
+symfonycasts_tailwind:
+    binary_version: v4.3.3
+    # Spike : input dédié (n'affecte pas le setup Bootstrap existant).
+    input_css: 'assets/styles/tailwind.css'
