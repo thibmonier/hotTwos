@@ -39,6 +39,7 @@ final readonly class ManageProjectLots
         if (!$project instanceof Project) {
             throw new ProjectException('Projet introuvable.');
         }
+        $project->assertModifiable();
 
         if (null !== $parentLotId) {
             $parent = $this->lots->find($tenant, $parentLotId);
@@ -71,6 +72,11 @@ final readonly class ManageProjectLots
         $lot = $this->lots->find($tenant, $lotId);
         if (!$lot instanceof ProjectLot) {
             throw new ProjectException('Lot introuvable.');
+        }
+
+        $project = $this->projects->find($tenant, $lot->projectId());
+        if ($project instanceof Project) {
+            $project->assertModifiable();
         }
 
         $lot->reallocateTo($budgetDays, $budgetCents);

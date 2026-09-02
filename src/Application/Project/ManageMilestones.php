@@ -39,6 +39,7 @@ final readonly class ManageMilestones
         if (!$project instanceof Project) {
             throw new ProjectException('Projet introuvable.');
         }
+        $project->assertModifiable();
         $this->guardWithinPeriod($project, $dueDate);
 
         $milestone = new ProjectMilestone($tenant, $projectId, $name, $dueDate, $billingTriggerCents);
@@ -57,6 +58,11 @@ final readonly class ManageMilestones
         $milestone = $this->milestones->find($tenant, $milestoneId);
         if (!$milestone instanceof ProjectMilestone) {
             throw new ProjectException('Jalon introuvable.');
+        }
+
+        $project = $this->projects->find($tenant, $milestone->projectId());
+        if ($project instanceof Project) {
+            $project->assertModifiable();
         }
 
         $milestone->markReached($at);

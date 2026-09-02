@@ -174,6 +174,20 @@ class Project implements TenantOwned
         return ProjectStatus::CLOTURE === $this->status;
     }
 
+    /**
+     * Garantit qu'une modification structurelle (lot, jalon, affectation, ouverture) est permise :
+     * un projet clôturé est en lecture seule (US-038/CA-2, RG-PRJ-5). La réouverture (4-eyes) ne
+     * rouvre que l'imputation de temps, pas l'édition structurelle.
+     */
+    public function assertModifiable(): void
+    {
+        if (!$this->isClosed()) {
+            return;
+        }
+        $at = $this->closedAt instanceof DateTimeImmutable ? sprintf(' le %s', $this->closedAt->format('d/m/Y')) : '';
+        throw new ProjectException(sprintf('Projet clôturé%s — modification impossible (lecture seule, RG-PRJ-5).', $at));
+    }
+
     public function closedAt(): ?DateTimeImmutable
     {
         return $this->closedAt;
