@@ -59,6 +59,10 @@ services:
     App\Domain\Project\ProjectRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineProjectRepository'
     App\Domain\Timesheet\TimeEntryRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineTimeEntryRepository'
 
+    # Ports structure de projet (US-031, DIP).
+    App\Domain\Project\ProjectLotRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineProjectLotRepository'
+    App\Domain\Project\ProjectMilestoneRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineProjectMilestoneRepository'
+
     # Port utilisateur (lecture, US-010 — validation d'appartenance tenant).
     App\Domain\User\UserRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineUserRepository'
 

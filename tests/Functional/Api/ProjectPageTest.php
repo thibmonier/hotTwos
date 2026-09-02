@@ -7,6 +7,8 @@ namespace App\Tests\Functional\Api;
 use App\Application\Authorization\InitializeDefaultRoles;
 use App\Domain\Authorization\Role;
 use App\Domain\Project\Project;
+use App\Domain\Project\ProjectLot;
+use App\Domain\Project\ProjectMilestone;
 use App\Domain\Project\ProjectStatus;
 use App\Domain\Tenant\Tenant;
 use App\Domain\Tenant\TenantId;
@@ -42,6 +44,8 @@ final class ProjectPageTest extends WebTestCase
             $this->em->getClassMetadata(User::class),
             $this->em->getClassMetadata(Role::class),
             $this->em->getClassMetadata(Project::class),
+            $this->em->getClassMetadata(ProjectLot::class),
+            $this->em->getClassMetadata(ProjectMilestone::class),
         ];
         $tool = new SchemaTool($this->em);
         $tool->dropSchema($this->schema);

@@ -11,6 +11,10 @@ use App\Domain\Authorization\Permission;
 use App\Domain\Project\ContractType;
 use App\Domain\Project\Project;
 use App\Domain\Project\ProjectException;
+use App\Domain\Project\ProjectLot;
+use App\Domain\Project\ProjectLotRepository;
+use App\Domain\Project\ProjectMilestone;
+use App\Domain\Project\ProjectMilestoneRepository;
 use App\Domain\Project\ProjectRepository;
 use App\Domain\Project\ProjectStatus;
 use App\Domain\User\User;
@@ -35,6 +39,8 @@ final class ProjectPageController extends AbstractController
         private readonly ProjectRepository $projects,
         private readonly CreateProject $createProject,
         private readonly ChangeProjectStatus $changeProjectStatus,
+        private readonly ProjectLotRepository $lots,
+        private readonly ProjectMilestoneRepository $milestones,
     ) {
     }
 
@@ -119,7 +125,61 @@ final class ProjectPageController extends AbstractController
                 $project->status()->allowedTransitions(),
             ),
             'canEdit' => $this->authorizer->can($user, Permission::EDIT_PROJECT),
+            'structure' => $this->structureView($user->tenantId(), $project->id(), $project->budgetCents()),
+            'milestones' => array_map(
+                static fn (ProjectMilestone $m): array => [
+                    'name' => $m->name(),
+                    'due' => $m->dueDate()->format('d/m/Y'),
+                    'status' => $m->status()->label(),
+                    'reached' => $m->reachedDate()?->format('d/m/Y'),
+                    'billing' => null !== $m->billingTriggerCents() ? intdiv($m->billingTriggerCents(), 100) : null,
+                    'id' => $m->id(),
+                    'triggered' => $m->billingTriggeredAt() instanceof DateTimeImmutable,
+                ],
+                $this->milestones->findForProject($user->tenantId(), $project->id()),
+            ),
         ]);
+    }
+
+    /**
+     * Arbre des lots (racines + sous-lots) et synthèse budget vs budget projet (écart signalé).
+     *
+     * @return array<string, mixed>
+     */
+    private function structureView(\App\Domain\Tenant\TenantId $tenant, string $projectId, ?int $projectBudgetCents): array
+    {
+        $lots = $this->lots->findForProject($tenant, $projectId);
+        $rootSumCents = 0;
+        $rootSumDays = 0;
+        $roots = [];
+        foreach ($lots as $lot) {
+            if (!$lot->isRoot()) {
+                continue;
+            }
+            $rootSumCents += $lot->budgetCents();
+            $rootSumDays += $lot->budgetDays();
+            $roots[] = [
+                'id' => $lot->id(),
+                'name' => $lot->name(),
+                'days' => $lot->budgetDays(),
+                'euros' => intdiv($lot->budgetCents(), 100),
+                'children' => array_map(
+                    static fn (ProjectLot $c): array => ['name' => $c->name(), 'days' => $c->budgetDays(), 'euros' => intdiv($c->budgetCents(), 100)],
+                    array_values(array_filter($lots, static fn (ProjectLot $c): bool => $c->parentLotId() === $lot->id())),
+                ),
+            ];
+        }
+
+        $budgetEuros = null !== $projectBudgetCents ? intdiv($projectBudgetCents, 100) : null;
+        $gapEuros = null !== $projectBudgetCents ? intdiv($rootSumCents - $projectBudgetCents, 100) : null;
+
+        return [
+            'roots' => $roots,
+            'sumDays' => $rootSumDays,
+            'sumEuros' => intdiv($rootSumCents, 100),
+            'budgetEuros' => $budgetEuros,
+            'gapEuros' => $gapEuros,
+        ];
     }
 
     #[Route('/projets/{id}/statut', name: 'project_change_status', requirements: ['id' => '[0-9a-f-]{36}'], methods: ['POST'])]
