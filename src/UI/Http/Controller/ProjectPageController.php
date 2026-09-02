@@ -12,6 +12,7 @@ use App\Domain\Project\ContractType;
 use App\Domain\Project\Project;
 use App\Domain\Project\ExceptionalImputationOpening;
 use App\Domain\Project\ExceptionalImputationOpeningRepository;
+use App\Domain\Project\ExternalCommitmentRepository;
 use App\Domain\Project\ProjectAssignment;
 use App\Domain\Project\ProjectAssignmentRepository;
 use App\Domain\Project\ProjectException;
@@ -47,6 +48,7 @@ final class ProjectPageController extends AbstractController
         private readonly ProjectMilestoneRepository $milestones,
         private readonly ProjectAssignmentRepository $assignments,
         private readonly ExceptionalImputationOpeningRepository $openings,
+        private readonly ExternalCommitmentRepository $commitments,
     ) {
     }
 
@@ -164,7 +166,33 @@ final class ProjectPageController extends AbstractController
                 ],
                 $this->openings->findForProject($user->tenantId(), $project->id()),
             ),
+            'commitments' => $this->commitmentsView($user->tenantId(), $project->id()),
+            'commitmentTypes' => \App\Domain\Project\CommitmentType::cases(),
+            'commitmentStatuses' => \App\Domain\Project\CommitmentStatus::cases(),
         ]);
+    }
+
+    /**
+     * Engagements externes du projet + total des coûts externes (marge partielle — US-033 dégradé).
+     *
+     * @return array<string, mixed>
+     */
+    private function commitmentsView(\App\Domain\Tenant\TenantId $tenant, string $projectId): array
+    {
+        $rows = [];
+        $totalCents = 0;
+        foreach ($this->commitments->findForProject($tenant, $projectId) as $commitment) {
+            $totalCents += $commitment->amountCents();
+            $rows[] = [
+                'type' => $commitment->type()->label(),
+                'label' => $commitment->label(),
+                'supplier' => $commitment->supplier(),
+                'status' => $commitment->status()->label(),
+                'euros' => intdiv($commitment->amountCents(), 100),
+            ];
+        }
+
+        return ['rows' => $rows, 'totalEuros' => intdiv($totalCents, 100)];
     }
 
     /**

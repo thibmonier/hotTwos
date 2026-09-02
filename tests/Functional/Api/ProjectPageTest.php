@@ -7,6 +7,7 @@ namespace App\Tests\Functional\Api;
 use App\Application\Authorization\InitializeDefaultRoles;
 use App\Domain\Authorization\Role;
 use App\Domain\Project\ExceptionalImputationOpening;
+use App\Domain\Project\ExternalCommitment;
 use App\Domain\Project\Project;
 use App\Domain\Project\ProjectAssignment;
 use App\Domain\Project\ProjectLot;
@@ -50,6 +51,7 @@ final class ProjectPageTest extends WebTestCase
             $this->em->getClassMetadata(ProjectMilestone::class),
             $this->em->getClassMetadata(ProjectAssignment::class),
             $this->em->getClassMetadata(ExceptionalImputationOpening::class),
+            $this->em->getClassMetadata(ExternalCommitment::class),
         ];
         $tool = new SchemaTool($this->em);
         $tool->dropSchema($this->schema);

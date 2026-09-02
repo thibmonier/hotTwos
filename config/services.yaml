@@ -67,6 +67,9 @@ services:
     App\Domain\Project\ProjectAssignmentRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineProjectAssignmentRepository'
     App\Domain\Project\ExceptionalImputationOpeningRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineExceptionalImputationOpeningRepository'
 
+    # Port engagements externes (US-034, DIP).
+    App\Domain\Project\ExternalCommitmentRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineExternalCommitmentRepository'
+
     # Port utilisateur (lecture, US-010 — validation d'appartenance tenant).
     App\Domain\User\UserRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineUserRepository'
 

@@ -202,7 +202,43 @@
             </section>
             <section class="project-tabpanel" id="panel-commitments" role="tabpanel" aria-labelledby="tab-commitments" data-tabs-target="panel" hidden>
                 <h2>Engagements externes</h2>
-                <p class="hint">Sera disponible avec US-034.</p>
+                {% if commitments.rows is empty %}
+                    <p>Aucun engagement externe.</p>
+                {% else %}
+                    <table class="project-list">
+                        <caption class="visually-hidden">Engagements externes du projet</caption>
+                        <thead><tr><th scope="col">Type</th><th scope="col">Libellé</th><th scope="col">Fournisseur</th><th scope="col">Statut</th><th scope="col">Montant</th></tr></thead>
+                        <tbody>
+                            {% for c in commitments.rows %}
+                                <tr>
+                                    <td>{{ c.type }}</td><td>{{ c.label }}</td><td>{{ c.supplier }}</td><td>{{ c.status }}</td>
+                                    <td>{{ c.euros|number_format(0, ',', ' ') }} €</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <p>Total coûts externes : {{ commitments.totalEuros|number_format(0, ',', ' ') }} € <span class="hint">(marge complète avec budget de vente : US-033)</span></p>
+                {% endif %}
+
+                {% if canEdit and project.status != 'Clôturé' %}
+                    <h3>Ajouter un engagement</h3>
+                    <form method="post" action="{{ path('project_commitment_add', { id: project.id }) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('project_commitment') }}">
+                        <label for="c-type">Type</label>
+                        <select id="c-type" name="type">{% for t in commitmentTypes %}<option value="{{ t.value }}">{{ t.label }}</option>{% endfor %}</select>
+                        <label for="c-label">Libellé</label>
+                        <input type="text" id="c-label" name="label" required>
+                        <label for="c-supplier">Fournisseur</label>
+                        <input type="text" id="c-supplier" name="supplier" required>
+                        <label for="c-amount">Montant (€ HT)</label>
+                        <input type="number" id="c-amount" name="amountEuros" min="1" inputmode="numeric" required>
+                        <label for="c-status">Statut</label>
+                        <select id="c-status" name="status">{% for s in commitmentStatuses %}<option value="{{ s.value }}">{{ s.label }}</option>{% endfor %}</select>
+                        <button type="submit">Ajouter l'engagement</button>
+                    </form>
+                {% elseif project.status == 'Clôturé' %}
+                    <p class="hint">Projet clôturé : aucun nouvel engagement (RG-PRJ-5).</p>
+                {% endif %}
             </section>
             <section class="project-tabpanel" id="panel-closure" role="tabpanel" aria-labelledby="tab-closure" data-tabs-target="panel" hidden>
                 <h2>Clôture</h2>
