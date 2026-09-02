@@ -80,11 +80,11 @@ final readonly class ManageProjectClosure
         return $reopening;
     }
 
-    public function approveReopening(User $admin, string $reopeningId, DateTimeImmutable $openUntil): void
+    public function approveReopening(User $admin, string $projectId, string $reopeningId, DateTimeImmutable $openUntil): void
     {
         $this->authorizer->ensureCan($admin, Permission::MANAGE_ORGANIZATION);
         $reopening = $this->reopenings->find($admin->tenantId(), $reopeningId);
-        if (!$reopening instanceof ProjectReopening) {
+        if (!$reopening instanceof ProjectReopening || $reopening->projectId() !== $projectId) {
             throw new ProjectException('Demande de réouverture introuvable.');
         }
 

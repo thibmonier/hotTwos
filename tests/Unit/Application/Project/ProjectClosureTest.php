@@ -88,7 +88,7 @@ final class ProjectClosureTest extends TestCase
         $reopening = $this->closure()->requestReopening($this->admin, $this->projectId, 'Régularisation');
 
         $this->expectException(ProjectException::class);
-        $this->closure()->approveReopening($this->admin, $reopening->id(), new DateTimeImmutable('2026-12-31', new DateTimeZone('UTC')));
+        $this->closure()->approveReopening($this->admin, $this->projectId, $reopening->id(), new DateTimeImmutable('2026-12-31', new DateTimeZone('UTC')));
     }
 
     public function testAdminApprovesReopeningWindow(): void
@@ -96,7 +96,7 @@ final class ProjectClosureTest extends TestCase
         $this->closure()->close($this->marc, $this->projectId, false);
         $reopening = $this->closure()->requestReopening($this->marc, $this->projectId, 'Régularisation');
 
-        $this->closure()->approveReopening($this->admin, $reopening->id(), new DateTimeImmutable('2026-12-31', new DateTimeZone('UTC')));
+        $this->closure()->approveReopening($this->admin, $this->projectId, $reopening->id(), new DateTimeImmutable('2026-12-31', new DateTimeZone('UTC')));
 
         $stored = $this->reopenings->find($this->tenant, $reopening->id());
         self::assertInstanceOf(ProjectReopening::class, $stored);

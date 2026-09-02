@@ -18,7 +18,6 @@ use App\Domain\Project\ProjectReopeningRepository;
 use App\Domain\Project\ProjectAssignment;
 use App\Domain\Project\ProjectAssignmentRepository;
 use App\Domain\Project\ProjectException;
-use App\Domain\Project\ProjectLot;
 use App\Domain\Project\ProjectLotRepository;
 use App\Domain\Project\ProjectMilestone;
 use App\Domain\Project\ProjectMilestoneRepository;
@@ -219,6 +218,15 @@ final class ProjectPageController extends AbstractController
     private function structureView(\App\Domain\Tenant\TenantId $tenant, string $projectId, ?int $projectBudgetCents): array
     {
         $lots = $this->lots->findForProject($tenant, $projectId);
+
+        // Pré-groupe les sous-lots par lot parent en une passe (évite un O(n²) de présentation).
+        $childrenByParent = [];
+        foreach ($lots as $lot) {
+            if (!$lot->isRoot()) {
+                $childrenByParent[(string) $lot->parentLotId()][] = ['name' => $lot->name(), 'days' => $lot->budgetDays(), 'euros' => intdiv($lot->budgetCents(), 100)];
+            }
+        }
+
         $rootSumCents = 0;
         $rootSumDays = 0;
         $roots = [];
@@ -233,10 +241,7 @@ final class ProjectPageController extends AbstractController
                 'name' => $lot->name(),
                 'days' => $lot->budgetDays(),
                 'euros' => intdiv($lot->budgetCents(), 100),
-                'children' => array_map(
-                    static fn (ProjectLot $c): array => ['name' => $c->name(), 'days' => $c->budgetDays(), 'euros' => intdiv($c->budgetCents(), 100)],
-                    array_values(array_filter($lots, static fn (ProjectLot $c): bool => $c->parentLotId() === $lot->id())),
-                ),
+                'children' => $childrenByParent[$lot->id()] ?? [],
             ];
         }
 

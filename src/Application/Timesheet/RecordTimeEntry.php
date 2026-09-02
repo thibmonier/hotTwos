@@ -48,6 +48,12 @@ final readonly class RecordTimeEntry
         int $minutes,
         ?string $comment = null,
     ): void {
+        // Borne basse défensive : une durée nulle ou négative n'est pas une imputation valide
+        // (évite tout contournement du plafond journalier par cumul de valeurs négatives).
+        if ($minutes <= 0) {
+            throw new TimesheetException('La durée imputée doit être strictement positive.');
+        }
+
         // Verrou de clôture (US-057, CA-4) : aucune saisie/révision sur une période clôturée (423).
         $this->periodGuard->ensureModifiable($tenant, $userId, $workDate);
 

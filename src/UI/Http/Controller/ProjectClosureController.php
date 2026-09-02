@@ -79,7 +79,7 @@ final class ProjectClosureController extends AbstractController
         }
 
         try {
-            $this->closure->approveReopening($user, $reopeningId, $openUntil);
+            $this->closure->approveReopening($user, $id, $reopeningId, $openUntil);
             $this->addFlash('success', 'Réouverture approuvée.');
         } catch (ProjectException $exception) {
             $this->addFlash('error', $exception->getMessage());
