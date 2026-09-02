@@ -3,7 +3,7 @@ project: HotOnes
 track: enterprise
 initialized_at: 2026-08-31T00:00:00Z
 current_phase: implementation
-last_sync: 2026-09-01  # Sprint 4 mergé (PR #6) + Railway redéployé ; Sprint 5 démarré
+last_sync: 2026-09-02  # S5 & S6 mergés (PR #8) + correctifs #9/#10/#11 ; EPIC-012 (design/ergonomie) créé + conçu (PR #12)
 
 # Source du besoin : cahier des charges fonctionnel complet
 source_of_truth: project-management/cdc/
@@ -59,10 +59,10 @@ phases:
       dependencies_matrix: project-management/backlog/dependencies-matrix.md
       index: project-management/backlog/index.md
     metrics:
-      epics: 12
-      user_stories_detaillees: 36
+      epics: 13   # +EPIC-012 (design/ergonomie, transverse) créé le 2026-09-02
+      user_stories_detaillees: 46   # +US-061→066 (EPIC-012)
       story_points_lot1: 183
-      scope: "Lot 1 détaillé (REF+PRJ+TMP+socle) ; lots 2-5 au niveau EPIC"
+      scope: "Lot 1 détaillé (REF+PRJ+TMP+socle) ; lots 2-5 au niveau EPIC ; EPIC-012 transverse fast-track"
     open_items:
       - "Rééquilibrage des sprints : le tag Sprint 1 par défaut totalise 79 pts (>vélocité 20-40) — arbitrer en /workflow:start"
       - "Détailler les EPIC-004..011 en US lot par lot (affinage progressif)"
@@ -98,7 +98,7 @@ reusable_assets:
     misalignments: "Symfony 7.1 (cible 8.1), Webpack Encore (cible Reprise+Vite ADR-5), Bootstrap générique (design system cdc/11 prime), Turbo absent"
   implementation:
     status: in_progress
-    current_sprint:
+    sprint_0:
       id: 0
       name: sprint-000-fondations
       goal: "Installer le socle : squelette Symfony 8 worker + archi, env conteneurisé, staging, outillage qualité/sécurité"
@@ -106,7 +106,7 @@ reusable_assets:
       committed_points: 28
       stories: [US-006, US-007, US-004, US-008, US-009]
       path: project-management/sprints/sprint-000-fondations/
-      status: in_progress
+      status: done
       tasks: "45 tâches / ~101h (tasks/ + task-board.md)"
       progress: >
         US-006 (squelette + API Platform DTO + Twig/Turbo), US-007 (PostgreSQL 16 + pgvector),
@@ -174,21 +174,58 @@ reusable_assets:
       retro_actions: "1) garde de parité RLS pour handlers async (DoD S5) ; 2) lot sprintf→set_config (3 sites) ; 3) tracer dépendance US-057 (stub clôture global)."
       staging: "Railway redéployé sur main : /health 200, /valorisation & /api/valorisation/recompute & /profils → 401 (déployés + sécurisés)."
       path: project-management/sprints/sprint-004-valorisation/
-    current_sprint:
+    sprint_5:
       id: 5
       name: sprint-005-completude_cloture
       goal: "Le cycle de saisie du temps est complet et clôturable : complétude (web+mobile), relances, absences, et clôture de période verrouillante et tracée"
       committed_points: 22
+      delivered_points: 22
       stories: [US-057, US-054, US-058, US-056, US-052, US-059]
-      decision_po: "Finir EPIC-003 (Temps & activité). US-057 prioritaire : lève le stub de clôture global d'US-060 (action rétro S4). Prérequis : tout le code fonctionnel commité + mergé (PR #6) + Railway redéployé — fait."
-      blocker: "aucun (dépendances US-050/051/055/060 livrées)"
+      status: done
+      commit: "2322fca (feat(sprint-5)) — mergé sur main"
+      delivered: "US-057 clôture de période verrouillante + traçabilité (lève le stub de clôture global d'US-060, action rétro S4) ; US-054 absences (déclaration/validation/compteurs) ; US-058 tableau de complétude ; US-056 relances automatiques ; US-052 saisie mobile ; US-059 synthèse d'activité."
       path: project-management/sprints/sprint-005-completude_cloture/
-      note: "Lot de hardening sprintf→set_config (action rétro S4) à traiter en tech-debt avant US-057. US-053 (préremplissage IA) exclue (dépend EPIC-010)."
+      note: "US-053 (préremplissage IA) exclue (dépend EPIC-010)."
+    sprint_6:
+      id: 6
+      name: sprint-006-projets_delivery
+      goal: "Cycle de vie projet complet : création, structure en lots/jalons, affectation & restriction d'imputation, engagements externes, clôture opérationnelle (EPIC-002)"
+      committed_points: 21
+      delivered_points: 21
+      stories: [US-030, US-031, US-037, US-034, US-038]
+      status: done
+      pr: "https://github.com/thibmonier/hotTwos/pull/8 (MERGED → main)"
+      followups: "Correctifs recette : #9 (lecture seule sur projet clôturé), #10 (recompile assets en dev), #11 (base UI sobre + ouverture chantier F-S5-4)."
+      path: project-management/sprints/sprint-006-projets_delivery/
+    current_focus:
+      type: chantier_transverse
+      ref: EPIC-012
+      name: "Intégration du design et de l'ergonomie définitive"
+      lot: "transverse (fast-track, hors cadence sprint)"
+      goal: "Poser le design system (Skote + tokens) et l'ergonomie définitive avant d'étendre le dev front"
+      status: conception_done
+      user_stories: [US-061, US-062, US-063, US-064, US-065, US-066]
+      committed_points: "~31 (à affiner en affinage)"
+      conception:
+        adr: docs/adr/0018-integration-design-system-skote.md
+        design_system: project-management/architecture/design-system.md
+        ux_conception: project-management/architecture/ux-conception-lot1.md
+        maquettes: "project-management/architecture/design-canvas/ (canevas claude-design publié en Artifact)"
+      pr: "https://github.com/thibmonier/hotTwos/pull/12 (docs/epic-012-user-stories)"
+      decisions:
+        - "Intégration Skote en CSS Bootstrap compilé + tokens CSS custom properties, sans build Sass (ADR-0018, précise ADR-0005)"
+        - "F-S5-4 → collaborateurs identifiés par e-mail (résolveur tenant-aware), aucun identifiant technique affiché (F1)"
+        - "F-S5-5 → statuts texte+icône+couleur (jamais la couleur seule, WCAG 1.4.1)"
+      open_items:
+        - "US-063 : breakpoint 640px existant vs 768px Bootstrap ; chargement police Poppins (absente de base.html.twig)"
+        - "PO : checklist de validation UX non négociable vs pression fast-track (à arbitrer)"
+        - "Lot tech-debt sprintf→set_config (action rétro S4) toujours en attente"
+      path: project-management/backlog/epics/EPIC-012-integration-design.md
     quality_gates:
       prd: "95% ✅"
       tech_spec: "96% ✅"
       backlog: "6/6 ✅"
       report: project-management/quality-gates-report.md
 
-next_action: "Sprint 5 démarré (branche feature/sprint-5-planning). Décomposer en tâches (/project:decompose-tasks 005), puis traiter le lot tech-debt sprintf→set_config avant US-057 (clôture de période)."
-next_command: "/project:decompose-tasks 005"
+next_action: "S5 et S6 livrés/mergés (EPIC-003 achevé, EPIC-002 delivery livré). Chantier EPIC-012 (design/ergonomie) : backlog + conception faits, PR #12 ouverte. Suite : (1) merger PR #12 ; (2) décider entre implémenter EPIC-012 (US-061 charte/tokens → US-063 layout) via un sprint dédié, ou reprendre la cadence lots (EPIC-004 planification / EPIC-005 finance) ; (3) résorber le tech-debt sprintf→set_config."
+next_command: "/workflow:start 7"
