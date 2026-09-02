@@ -12,4 +12,5 @@ import './stimulus_bootstrap.js';
 import './styles/vendor/bootstrap.min.css';
 import './styles/tokens.css';
 import './styles/components.css';
+import './styles/layout.css';
 import './styles/app.css';

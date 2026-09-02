@@ -1,0 +1,390 @@
+/**
+ * Layout Skote — HotOnes (US-063, T-063-01/03)
+ *
+ * Structure : sidebar 250px (sombre invariant) + topbar 70px sticky + zone contenu fluide.
+ * Tous les tokens sont définis dans tokens.css — ce fichier ne redéfinit aucun token.
+ *
+ * Responsive : drawer mobile < 768px. Les media queries 640px des composants
+ * existants (day-submit-bar, summary-dialog) sont conservées sans modification.
+ *
+ * Z-index map :
+ *   1040 topbar sticky
+ *   1044 sidebar overlay
+ *   1045 sidebar drawer (mobile)
+ *   1050+ modales Bootstrap
+ */
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* 1. TOKENS SIDEBAR (invariants — sidebar toujours sombre, quel que soit le thème) */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+/* Ces tokens sont définis dans les trois contextes de thème pour garantir
+   que la sidebar reste sombre (fond #2a3042) en mode clair comme en mode sombre.
+   Ne jamais utiliser --color-surface pour le fond sidebar en mode clair. */
+:root,
+[data-theme="light"],
+[data-theme="dark"] {
+    --sidebar-bg:          #2a3042;
+    --sidebar-border:      #32394e;
+    --sidebar-text:        #a6b0cf;
+    --sidebar-text-muted:  #79829c;
+    --sidebar-link:        #a6b0cf;
+    --sidebar-link-hover:  #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --sidebar-bg:          #2a3042;
+        --sidebar-border:      #32394e;
+        --sidebar-text:        #a6b0cf;
+        --sidebar-text-muted:  #79829c;
+        --sidebar-link:        #a6b0cf;
+        --sidebar-link-hover:  #ffffff;
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* 2. STRUCTURE RACINE                                                          */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+.app-layout {
+    display: flex;
+    flex-direction: row;
+    min-height: 100dvh;
+    background: var(--color-bg);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* 3. SIDEBAR                                                                   */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+.app-sidebar {
+    width: var(--sidebar-width); /* 250px */
+    flex-shrink: 0;
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: var(--sidebar-border) transparent;
+    /* Priorité z-index sur desktop : pas de z-index nécessaire (dans le flux) */
+}
+
+/* Brand / logo (70px, aligne avec la topbar) */
+.app-sidebar-brand {
+    height: var(--header-height); /* 70px */
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 0 var(--space-3);
+    border-bottom: 1px solid var(--sidebar-border);
+    text-decoration: none;
+}
+
+.app-sidebar-brand:focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+}
+
+.app-sidebar-brand-icon {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+}
+
+.app-sidebar-brand-name {
+    color: var(--palette-white);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-lg);
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+}
+
+/* Section label */
+.app-sidebar-label {
+    padding: 14px var(--space-3) 6px;
+    font-size: var(--font-size-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--sidebar-text-muted);
+    user-select: none;
+}
+
+/* Navigation principale */
+.app-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0 var(--space-2);
+    list-style: none;
+    margin: 0;
+}
+
+.app-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px; /* WCAG 2.5.5 : cible ≥ 44px */
+    padding: 0 var(--space-3);
+    border-radius: var(--radius-md);
+    color: var(--sidebar-link);
+    text-decoration: none;
+    font-size: var(--font-size-base);
+    transition: color 150ms ease-out, background-color 150ms ease-out;
+}
+
+.app-nav-link:hover {
+    color: var(--sidebar-link-hover);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.app-nav-link.is-active,
+.app-nav-link[aria-current="page"] {
+    background-color: var(--color-primary-surface); /* #556ee6 */
+    color: #ffffff;
+    font-weight: var(--font-weight-medium);
+}
+
+.app-nav-link:focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+}
+
+.app-nav-icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* 4. COLONNE PRINCIPALE                                                        */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+.app-main {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0; /* indispensable pour overflow-x: auto dans les enfants */
+    background: var(--color-bg);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* 5. TOPBAR                                                                    */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+.app-topbar {
+    height: var(--header-height); /* 70px */
+    flex-shrink: 0;
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--space-4);
+    position: sticky;
+    top: 0;
+    z-index: 1040; /* sous les modales Bootstrap (1050+) */
+}
+
+.app-topbar-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.app-topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+/* Titre de page (section + page) */
+.app-topbar-title {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.app-topbar-section {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    line-height: var(--line-height-sm);
+}
+
+.app-topbar-page {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-ink);
+    line-height: var(--line-height-sm);
+}
+
+/* Bouton de bascule thème */
+.app-theme-toggle {
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--color-border-subtle);
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-muted);
+    transition: border-color 150ms;
+    flex-shrink: 0;
+}
+
+.app-theme-toggle:hover {
+    border-color: var(--color-border-strong);
+    color: var(--color-text);
+}
+
+.app-theme-toggle:focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+}
+
+/* Avatar utilisateur */
+.app-user-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--color-primary-surface);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    flex-shrink: 0;
+    text-transform: uppercase;
+    user-select: none;
+}
+
+.app-user-email {
+    font-size: var(--font-size-sm);
+    color: var(--color-text);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* 6. ZONE DE CONTENU                                                           */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+.app-content {
+    flex: 1;
+    padding: var(--space-4); /* 24px — identique à la maquette */
+    overflow-x: hidden;
+    background: var(--color-bg);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* 7. HAMBURGER (masqué sur desktop)                                            */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+.app-sidebar-toggle {
+    display: none; /* visible uniquement en mobile via media query */
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* 8. OVERLAY MOBILE (masqué sur desktop)                                       */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+.app-sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1044;
+    cursor: pointer;
+    border: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* 9. RESPONSIVE — breakpoint 768px (Bootstrap md)                             */
+/*    Note : les media queries 640px des composants existants (.day-submit-bar, */
+/*    .summary-dialog) sont dans app.css et components.css — ne pas y toucher.  */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 767px) {
+    /* Layout : sidebar sort du flux, pleine largeur pour .app-main */
+    .app-layout {
+        flex-direction: column;
+    }
+
+    /* Sidebar devient un drawer fixé à gauche */
+    .app-sidebar {
+        position: fixed;
+        inset-block: 0;
+        left: 0;
+        z-index: 1045;
+        transform: translateX(-100%);
+        transition: transform 300ms ease-out;
+        height: 100dvh;
+        /* width reste 250px */
+    }
+
+    .app-sidebar.is-open {
+        transform: translateX(0);
+    }
+
+    /* Overlay de fond (drawer ouvert) */
+    .app-sidebar-overlay.is-open {
+        display: block;
+    }
+
+    /* Colonne main : pleine largeur */
+    .app-main {
+        min-height: 100dvh;
+        width: 100%;
+    }
+
+    /* Contenu : padding réduit */
+    .app-content {
+        padding: var(--space-3); /* 16px */
+    }
+
+    /* Bouton hamburger visible */
+    .app-sidebar-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        border: 1px solid var(--color-border-subtle);
+        background: var(--color-surface);
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        color: var(--color-text-muted);
+        flex-shrink: 0;
+        transition: border-color 150ms;
+    }
+
+    .app-sidebar-toggle:hover {
+        border-color: var(--color-border-strong);
+    }
+
+    .app-sidebar-toggle:focus-visible {
+        outline: var(--focus-ring-width) solid var(--color-focus);
+        outline-offset: var(--focus-ring-offset);
+    }
+
+    /* Email utilisateur masqué (manque de place) */
+    .app-user-email {
+        display: none;
+    }
+
+    /* Topbar : padding réduit */
+    .app-topbar {
+        padding: 0 var(--space-3);
+    }
+}
