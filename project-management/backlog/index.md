@@ -10,7 +10,7 @@
 | Type | 🔴 To Do | 🟡 In Progress | ⏸️ Blocked | 🟢 Done | Total |
 |------|----------|----------------|------------|---------|-------|
 | EPICs | 13 | 0 | 0 | 0 | 13 |
-| User Stories | 46 | 0 | 0 | 0 | 46 |
+| User Stories | 48 | 0 | 0 | 0 | 48 |
 | Tasks | 0 | 0 | 0 | 0 | 0 |
 
 **Périmètre détaillé :** Sprint 0 (fondations) + Lot 1 (Walking Skeleton + modules REF, PRJ, TMP). Lots 2 à 5 au niveau EPIC (à affiner par lot). Total exigences CDC : 248 EF.
@@ -22,7 +22,7 @@
 
 | ID | Nom | Module | Lot | Statut | Prio | US | Points |
 |----|-----|--------|-----|--------|------|-----|--------|
-| EPIC-000 | Socle & Walking Skeleton | transverse | 0/1 | 🔴 | M | 9 | 57 |
+| EPIC-000 | Socle & Walking Skeleton | transverse | 0/1 | 🔴 | M | 11 | 68 |
 | EPIC-001 | Référentiels et paramétrage | REF | 1 | 🔴 | M | 11 | 51 |
 | EPIC-002 | Projets et delivery | PRJ | 1 | 🔴 | M | 9 | 45 |
 | EPIC-003 | Temps et activité | TMP | 1 | 🔴 | M | 11 | 53 |
@@ -75,7 +75,7 @@
 
 ## Backlog Priorisé
 
-### EPIC-000 — Socle & Walking Skeleton (57 pts)
+### EPIC-000 — Socle & Walking Skeleton (68 pts)
 
 | US | Titre | Points | Sprint | Prio |
 |----|-------|--------|--------|------|
@@ -88,6 +88,8 @@
 | US-002 | Authentification et cycle de vie des utilisateurs | 5 | 1 | M |
 | US-003 | Rôles et habilitations (RBAC + périmètre de données) | 8 | 1 | M |
 | US-005 | Modèle analytique en étoile et non-divergence | 8 | 1 | M |
+| US-067 | Enrichissement du profil utilisateur (nom et prénom) | 3 | Backlog | M |
+| US-068 | Écrans web d'authentification (login, mot de passe oublié, déconnexion, changement mdp) | 8 | Backlog | M |
 
 ### EPIC-001 — Référentiels et paramétrage (51 pts)
 
