@@ -320,14 +320,10 @@
                 {# ── Zone de contenu principal ────────────────────────────────────── #}
                 <main class="app-content" id="main-content" tabindex="-1" role="main">
 
-                    {# Messages flash #}
-                    {% for type, messages in app.flashes %}
-                        {% for message in messages %}
-                            <div class="ds-alert ds-alert-{{ type == 'error' ? 'danger' : type }}" role="alert">
-                                {{ message }}
-                            </div>
-                        {% endfor %}
-                    {% endfor %}
+                    {# Messages flash : rendus par chaque page (app.flashes est un itérateur
+                       consommateur — les centraliser ici les viderait avant la page). La
+                       centralisation dans le layout (composant ds-alert) est portée par le
+                       reskin US-064, une fois les pages migrées. #}
 
                     {# Contenu de page — rétrocompatibilité avec {% block body %} #}
                     {% block body %}{% endblock %}
