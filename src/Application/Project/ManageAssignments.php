@@ -39,6 +39,13 @@ final readonly class ManageAssignments
     {
         $this->authorizer->ensureCan($user, Permission::EDIT_PROJECT);
         $project = $this->requireProject($user, $projectId);
+        $project->assertModifiable();
+
+        // EF-PRJ-20 (US-037/CA-6) : la période d'affectation ne peut pas déborder la fin du projet.
+        $projectEnd = $project->endDate();
+        if ($endDate instanceof DateTimeImmutable && $projectEnd instanceof DateTimeImmutable && $endDate > $projectEnd) {
+            throw new ProjectException(sprintf('La période d\'affectation (jusqu\'au %s) dépasse la date de fin du projet (%s) — créez d\'abord un avenant de prolongation (EF-PRJ-20).', $endDate->format('d/m/Y'), $projectEnd->format('d/m/Y')));
+        }
 
         $assignment = new ProjectAssignment($project->tenantId(), $projectId, $userId, $role, $plannedDays, $startDate, $endDate);
         $this->assignments->save($assignment);
@@ -62,6 +69,7 @@ final readonly class ManageAssignments
     {
         $this->authorizer->ensureCan($user, Permission::EDIT_PROJECT);
         $project = $this->requireProject($user, $projectId);
+        $project->assertModifiable();
 
         $opening = new ExceptionalImputationOpening($project->tenantId(), $projectId, $userId, $weekStart, $reason, $user->id(), $this->clock->now());
         $this->openings->save($opening);
