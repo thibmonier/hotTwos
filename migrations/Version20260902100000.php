@@ -22,7 +22,11 @@ final class Version20260902100000 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
+        // Défaut « en_cours » uniquement pour backfiller les lignes existantes (projet système
+        // « Absence », jeux de démo), puis on le retire : l'application fixe toujours le statut à
+        // l'insertion et le mapping Doctrine ne déclare pas de défaut (sinon schema:validate diverge).
         $this->addSql("ALTER TABLE project ADD COLUMN status VARCHAR(30) NOT NULL DEFAULT 'en_cours'");
+        $this->addSql('ALTER TABLE project ALTER COLUMN status DROP DEFAULT');
         $this->addSql('ALTER TABLE project ADD COLUMN client_name VARCHAR(255) DEFAULT NULL');
         $this->addSql('ALTER TABLE project ADD COLUMN budget_cents INT DEFAULT NULL');
         $this->addSql('ALTER TABLE project ADD COLUMN contract_type VARCHAR(20) DEFAULT NULL');
