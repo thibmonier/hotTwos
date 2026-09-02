@@ -2,507 +2,279 @@
 
 {% block title %}Styleguide — HotOnes Design System{% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    <style>
-        /* Styles propres au styleguide — ne pas extraire dans app.css */
-        .sg-section {
-            margin-bottom: 3rem;
-        }
-        .sg-section-title {
-            font-size: var(--font-size-h3);
-            font-weight: var(--font-weight-semibold);
-            color: var(--color-ink);
-            border-bottom: 2px solid var(--color-border-subtle);
-            padding-bottom: var(--space-2);
-            margin-bottom: var(--space-3);
-        }
-        .sg-subsection-title {
-            font-size: var(--font-size-h5);
-            font-weight: var(--font-weight-medium);
-            color: var(--color-text-muted);
-            margin: var(--space-3) 0 var(--space-2);
-        }
-        .sg-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: var(--space-2);
-            align-items: center;
-            margin-bottom: var(--space-2);
-        }
-        .sg-color-swatch {
-            width: 80px;
-            height: 60px;
-            border-radius: var(--radius-md);
-            border: 1px solid var(--color-border-subtle);
-            display: flex;
-            align-items: flex-end;
-            padding: 4px;
-        }
-        .sg-color-label {
-            font-size: 0.65rem;
-            line-height: 1.2;
-            background: rgba(255,255,255,0.85);
-            padding: 1px 3px;
-            border-radius: 2px;
-            color: #111;
-            word-break: break-all;
-        }
-        .sg-token-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: var(--font-size-sm);
-        }
-        .sg-token-table th,
-        .sg-token-table td {
-            padding: var(--space-1) var(--space-2);
-            border-bottom: 1px solid var(--color-border-subtle);
-            text-align: left;
-        }
-        .sg-token-table th {
-            background: var(--color-surface-alt);
-            font-weight: var(--font-weight-semibold);
-        }
-        .sg-preview-box {
-            background: var(--color-surface);
-            border: 1px solid var(--color-border-subtle);
-            border-radius: var(--radius-md);
-            padding: var(--space-3);
-            margin-bottom: var(--space-2);
-        }
-        .sg-header {
-            background-color: var(--color-surface);
-            border-bottom: 1px solid var(--color-border-subtle);
-            padding: var(--space-3) var(--space-4);
-            margin: calc(-1 * var(--space-4)) calc(-1 * var(--space-4)) var(--space-4);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .sg-nav {
-            display: flex;
-            gap: var(--space-2);
-            flex-wrap: wrap;
-        }
-        .sg-nav a {
-            color: var(--color-text-muted);
-            text-decoration: none;
-            font-size: var(--font-size-sm);
-        }
-        .sg-nav a:hover {
-            color: var(--color-primary);
-        }
-        /* Bascule thème */
-        .sg-theme-toggle {
-            display: inline-flex;
-            align-items: center;
-            gap: var(--space-1);
-        }
-    </style>
-{% endblock %}
+{% block page_section %}Design System{% endblock %}
+{% block page_title %}Styleguide{% endblock %}
 
 {% block body %}
-<div style="max-width: 960px; margin: 0 auto;">
+<div class="mx-auto max-w-4xl">
 
-    {# En-tête styleguide #}
-    <div class="sg-header">
+    {# En-tête #}
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-md border border-border bg-surface px-4 py-3">
         <div>
-            <strong style="color: var(--color-ink); font-size: var(--font-size-lg);">HotOnes Design System</strong>
-            <span style="color: var(--color-text-muted); font-size: var(--font-size-sm); margin-left: var(--space-2);">v1.0 — US-061</span>
+            <strong class="text-base font-semibold text-ink">HotOnes Design System</strong>
+            <span class="ml-2 text-xs text-muted">Tailwind v4 — ADR-0019</span>
         </div>
-        <div class="sg-nav">
-            <a href="#tokens">Tokens</a>
-            <a href="#boutons">Boutons</a>
-            <a href="#badges">Badges</a>
-            <a href="#table">Table</a>
-            <a href="#formulaire">Formulaire</a>
-            <a href="#alertes">Alertes</a>
-            <a href="#typo">Typographie</a>
-            <a href="#theme">Thème</a>
-        </div>
+        <nav aria-label="Sections du styleguide" class="flex flex-wrap gap-3">
+            <a href="#tokens" class="text-xs text-muted hover:text-primary">Tokens</a>
+            <a href="#boutons" class="text-xs text-muted hover:text-primary">Boutons</a>
+            <a href="#badges" class="text-xs text-muted hover:text-primary">Badges</a>
+            <a href="#table" class="text-xs text-muted hover:text-primary">Table</a>
+            <a href="#formulaire" class="text-xs text-muted hover:text-primary">Formulaire</a>
+            <a href="#alertes" class="text-xs text-muted hover:text-primary">Alertes</a>
+            <a href="#typo" class="text-xs text-muted hover:text-primary">Typographie</a>
+            <a href="#theme" class="text-xs text-muted hover:text-primary">Thème</a>
+        </nav>
     </div>
 
     {# ── BASCULE DE THÈME ── #}
-    <div id="theme" class="sg-section">
-        <h2 class="sg-section-title">Bascule de thème</h2>
-        <p style="color: var(--color-text-muted); font-size: var(--font-size-sm);">
-            Le thème est contrôlé par l'attribut <code>data-theme</code> sur <code>&lt;html&gt;</code>.
-            En l'absence de cet attribut, <code>prefers-color-scheme</code> s'applique automatiquement.
+    <section id="theme" class="mb-10" aria-labelledby="theme-heading">
+        <h2 id="theme-heading" class="mb-3 border-b border-border pb-2 text-base font-semibold text-ink">Bascule de thème</h2>
+        <p class="mb-3 text-xs text-muted">
+            Le thème est contrôlé par l'attribut <code class="rounded bg-surface-alt px-1 py-0.5">data-theme</code> sur
+            <code class="rounded bg-surface-alt px-1 py-0.5">&lt;html&gt;</code>.
+            En l'absence de cet attribut, <code class="rounded bg-surface-alt px-1 py-0.5">prefers-color-scheme</code> s'applique automatiquement.
         </p>
-        <div class="sg-row">
-            <button class="btn btn-outline-secondary" onclick="document.documentElement.removeAttribute('data-theme')" type="button">
+        <div class="flex flex-wrap gap-2">
+            <button type="button"
+                    onclick="document.documentElement.removeAttribute('data-theme'); updateThemeDisplay()"
+                    class="inline-flex min-h-9 items-center rounded border border-border-strong px-3 text-xs font-semibold text-muted hover:bg-surface-alt hover:text-ink focus:outline-none focus:ring-2 focus:ring-focus">
                 Système (auto)
             </button>
-            <button class="btn btn-outline-secondary" onclick="document.documentElement.setAttribute('data-theme', 'light')" type="button">
+            <button type="button"
+                    onclick="document.documentElement.setAttribute('data-theme','light'); updateThemeDisplay()"
+                    class="inline-flex min-h-9 items-center rounded border border-border-strong px-3 text-xs font-semibold text-muted hover:bg-surface-alt hover:text-ink focus:outline-none focus:ring-2 focus:ring-focus">
                 ☀️ Clair
             </button>
-            <button class="btn btn-outline-secondary" onclick="document.documentElement.setAttribute('data-theme', 'dark')" type="button">
+            <button type="button"
+                    onclick="document.documentElement.setAttribute('data-theme','dark'); updateThemeDisplay()"
+                    class="inline-flex min-h-9 items-center rounded border border-border-strong px-3 text-xs font-semibold text-muted hover:bg-surface-alt hover:text-ink focus:outline-none focus:ring-2 focus:ring-focus">
                 🌙 Sombre
             </button>
         </div>
-        <p class="hint" style="margin-top: var(--space-2);">
-            Thème actif : <code id="sg-theme-display">système</code>
-            <script>
-                function updateThemeDisplay() {
-                    const t = document.documentElement.getAttribute('data-theme');
-                    document.getElementById('sg-theme-display').textContent = t || 'système (prefers-color-scheme)';
-                }
-                document.querySelectorAll('.sg-header ~ div button, div[id="theme"] button').forEach(b => b.addEventListener('click', updateThemeDisplay));
-                updateThemeDisplay();
-            </script>
+        <p class="mt-2 text-xs text-muted">
+            Thème actif : <code id="sg-theme-display" class="rounded bg-surface-alt px-1 py-0.5 text-ink">système</code>
         </p>
-    </div>
+        <script>
+            function updateThemeDisplay() {
+                var t = document.documentElement.getAttribute('data-theme');
+                document.getElementById('sg-theme-display').textContent = t || 'système (prefers-color-scheme)';
+            }
+            updateThemeDisplay();
+        </script>
+    </section>
 
     {# ── TOKENS DE COULEUR ── #}
-    <div id="tokens" class="sg-section">
-        <h2 class="sg-section-title">Tokens de couleur</h2>
+    <section id="tokens" class="mb-10" aria-labelledby="tokens-heading">
+        <h2 id="tokens-heading" class="mb-3 border-b border-border pb-2 text-base font-semibold text-ink">Tokens de couleur</h2>
 
-        <h3 class="sg-subsection-title">Surfaces &amp; Texte</h3>
-        <div class="sg-row">
-            <div class="sg-color-swatch" style="background: var(--color-bg);">
-                <span class="sg-color-label">--color-bg</span>
-            </div>
-            <div class="sg-color-swatch" style="background: var(--color-surface);">
-                <span class="sg-color-label">--color-surface</span>
-            </div>
-            <div class="sg-color-swatch" style="background: var(--color-surface-alt);">
-                <span class="sg-color-label">--color-surface-alt</span>
-            </div>
-            <div class="sg-color-swatch" style="background: var(--color-text);">
-                <span class="sg-color-label" style="background: rgba(255,255,255,0.9);">--color-text</span>
-            </div>
-            <div class="sg-color-swatch" style="background: var(--color-text-muted);">
-                <span class="sg-color-label" style="background: rgba(255,255,255,0.9);">--color-text-muted</span>
-            </div>
+        <h3 class="mb-2 mt-4 text-xs font-medium text-muted uppercase tracking-wider">Surfaces &amp; Texte</h3>
+        <div class="flex flex-wrap items-end gap-3">
+            {% set swatches_surface = [
+                {token: '--color-bg', label: 'bg'},
+                {token: '--color-surface', label: 'surface'},
+                {token: '--color-surface-alt', label: 'surface-alt'},
+                {token: '--color-ink', label: 'ink'},
+                {token: '--color-body', label: 'body'},
+                {token: '--color-muted', label: 'muted'},
+                {token: '--color-border', label: 'border'},
+                {token: '--color-border-strong', label: 'border-strong'},
+            ] %}
+            {% for s in swatches_surface %}
+                <div style="background: var({{ s.token }}); width: 72px; height: 52px; border-radius: 4px; border: 1px solid var(--color-border); display: flex; align-items: flex-end; padding: 3px;">
+                    <span style="font-size: 0.6rem; line-height: 1.2; background: rgba(255,255,255,0.85); padding: 1px 3px; border-radius: 2px; color: #111; word-break: break-all;">{{ s.label }}</span>
+                </div>
+            {% endfor %}
         </div>
 
-        <h3 class="sg-subsection-title">Marque &amp; Statuts</h3>
-        <div class="sg-row">
-            <div class="sg-color-swatch" style="background: var(--color-primary);">
-                <span class="sg-color-label" style="background: rgba(255,255,255,0.9);">--color-primary</span>
-            </div>
-            <div class="sg-color-swatch" style="background: var(--color-success);">
-                <span class="sg-color-label">--color-success</span>
-            </div>
-            <div class="sg-color-swatch" style="background: var(--color-warning);">
-                <span class="sg-color-label">--color-warning</span>
-            </div>
-            <div class="sg-color-swatch" style="background: var(--color-danger);">
-                <span class="sg-color-label">--color-danger</span>
-            </div>
-            <div class="sg-color-swatch" style="background: var(--color-info);">
-                <span class="sg-color-label">--color-info</span>
-            </div>
+        <h3 class="mb-2 mt-4 text-xs font-medium text-muted uppercase tracking-wider">Marque &amp; Statuts</h3>
+        <div class="flex flex-wrap items-end gap-3">
+            {% set swatches_status = [
+                {token: '--color-primary', label: 'primary'},
+                {token: '--color-success', label: 'success'},
+                {token: '--color-warning', label: 'warning'},
+                {token: '--color-danger', label: 'danger'},
+                {token: '--color-info', label: 'info'},
+                {token: '--color-focus', label: 'focus'},
+            ] %}
+            {% for s in swatches_status %}
+                <div style="background: var({{ s.token }}); width: 72px; height: 52px; border-radius: 4px; border: 1px solid var(--color-border); display: flex; align-items: flex-end; padding: 3px;">
+                    <span style="font-size: 0.6rem; line-height: 1.2; background: rgba(255,255,255,0.85); padding: 1px 3px; border-radius: 2px; color: #111; word-break: break-all;">{{ s.label }}</span>
+                </div>
+            {% endfor %}
         </div>
-
-        <h3 class="sg-subsection-title">Emphasis (texte accessible sur fond page)</h3>
-        <div class="sg-row">
-            <div class="sg-color-swatch" style="background: var(--color-success-emphasis);">
-                <span class="sg-color-label" style="background: rgba(255,255,255,0.9);">success-emphasis</span>
-            </div>
-            <div class="sg-color-swatch" style="background: var(--color-warning-emphasis);">
-                <span class="sg-color-label" style="background: rgba(255,255,255,0.9);">warning-emphasis</span>
-            </div>
-            <div class="sg-color-swatch" style="background: var(--color-danger-emphasis);">
-                <span class="sg-color-label" style="background: rgba(255,255,255,0.9);">danger-emphasis</span>
-            </div>
-            <div class="sg-color-swatch" style="background: var(--color-info-emphasis);">
-                <span class="sg-color-label" style="background: rgba(255,255,255,0.9);">info-emphasis</span>
-            </div>
-        </div>
-
-        <h3 class="sg-subsection-title">Bordures &amp; Focus</h3>
-        <div class="sg-row">
-            <div class="sg-color-swatch" style="background: var(--color-border-subtle); border-width: 2px;">
-                <span class="sg-color-label">border-subtle</span>
-            </div>
-            <div class="sg-color-swatch" style="background: var(--color-border-strong);">
-                <span class="sg-color-label" style="background: rgba(255,255,255,0.9);">border-strong</span>
-            </div>
-            <div class="sg-color-swatch" style="background: var(--color-focus);">
-                <span class="sg-color-label" style="background: rgba(255,255,255,0.9);">--color-focus</span>
-            </div>
-        </div>
-    </div>
+    </section>
 
     {# ── BOUTONS ── #}
-    <div id="boutons" class="sg-section">
-        <h2 class="sg-section-title">Boutons</h2>
-        <p class="hint">Texte blanc uniquement sur Primary. Texte foncé (<code>--color-on-status</code>) sur Success/Warning/Danger/Info (WCAG 2.2 AA vérifié — §5.2 du design system).</p>
+    <section id="boutons" class="mb-10" aria-labelledby="boutons-heading">
+        <h2 id="boutons-heading" class="mb-3 border-b border-border pb-2 text-base font-semibold text-ink">Boutons</h2>
+        <p class="mb-3 text-xs text-muted">Texte blanc sur Primary. Contraste WCAG 2.2 AA vérifié (5.08:1 sur --color-primary).</p>
 
-        <h3 class="sg-subsection-title">Remplis</h3>
-        <div class="sg-preview-box">
-            <div class="sg-row">
-                <button type="button" class="btn btn-primary">Primary</button>
-                <button type="button" class="btn btn-success">Success</button>
-                <button type="button" class="btn btn-warning">Warning</button>
-                <button type="button" class="btn btn-danger">Danger</button>
-                <button type="button" class="btn btn-info">Info</button>
-                <button type="button" class="btn btn-secondary">Secondary</button>
-            </div>
+        <h3 class="mb-2 mt-4 text-xs font-medium text-muted uppercase tracking-wider">Plein</h3>
+        <div class="flex flex-wrap gap-2 rounded-md border border-border bg-surface p-4">
+            <button type="button" class="inline-flex min-h-9 items-center rounded bg-primary px-4 text-xs font-semibold text-primary-fg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1">Primary</button>
+            <button type="button" class="inline-flex min-h-9 items-center rounded bg-success px-4 text-xs font-semibold text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-success focus:ring-offset-1">Success</button>
+            <button type="button" class="inline-flex min-h-9 items-center rounded bg-warning px-4 text-xs font-semibold text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-warning focus:ring-offset-1">Warning</button>
+            <button type="button" class="inline-flex min-h-9 items-center rounded bg-danger px-4 text-xs font-semibold text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-danger focus:ring-offset-1">Danger</button>
+            <button type="button" class="inline-flex min-h-9 items-center rounded bg-info px-4 text-xs font-semibold text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-info focus:ring-offset-1">Info</button>
         </div>
 
-        <h3 class="sg-subsection-title">Outline</h3>
-        <div class="sg-preview-box">
-            <div class="sg-row">
-                <button type="button" class="btn btn-outline-primary">Primary</button>
-                <button type="button" class="btn btn-outline-success">Success</button>
-                <button type="button" class="btn btn-outline-warning">Warning</button>
-                <button type="button" class="btn btn-outline-danger">Danger</button>
-                <button type="button" class="btn btn-outline-info">Info</button>
-                <button type="button" class="btn btn-outline-secondary">Secondary</button>
-            </div>
+        <h3 class="mb-2 mt-4 text-xs font-medium text-muted uppercase tracking-wider">Outline</h3>
+        <div class="flex flex-wrap gap-2 rounded-md border border-border bg-surface p-4">
+            <button type="button" class="inline-flex min-h-9 items-center rounded border border-primary px-4 text-xs font-semibold text-primary hover:bg-surface-alt focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1">Primary</button>
+            <button type="button" class="inline-flex min-h-9 items-center rounded border border-success px-4 text-xs font-semibold text-success hover:bg-surface-alt focus:outline-none focus:ring-2 focus:ring-success focus:ring-offset-1">Success</button>
+            <button type="button" class="inline-flex min-h-9 items-center rounded border border-danger px-4 text-xs font-semibold text-danger hover:bg-surface-alt focus:outline-none focus:ring-2 focus:ring-danger focus:ring-offset-1">Danger</button>
+            <button type="button" class="inline-flex min-h-9 items-center rounded border border-border-strong px-4 text-xs font-semibold text-muted hover:bg-surface-alt hover:text-ink focus:outline-none focus:ring-2 focus:ring-focus">Secondaire</button>
         </div>
 
-        <h3 class="sg-subsection-title">Tailles &amp; états</h3>
-        <div class="sg-preview-box">
-            <div class="sg-row">
-                <button type="button" class="btn btn-primary btn-sm">Petit</button>
-                <button type="button" class="btn btn-primary">Défaut</button>
-                <button type="button" class="btn btn-primary btn-lg">Grand</button>
-                <button type="button" class="btn btn-primary" disabled>Désactivé</button>
-            </div>
+        <h3 class="mb-2 mt-4 text-xs font-medium text-muted uppercase tracking-wider">États</h3>
+        <div class="flex flex-wrap items-center gap-2 rounded-md border border-border bg-surface p-4">
+            <button type="button" class="inline-flex min-h-9 items-center rounded bg-primary px-3 text-xs font-semibold text-primary-fg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1">Petit (sm)</button>
+            <button type="button" class="inline-flex min-h-11 items-center rounded bg-primary px-5 text-sm font-semibold text-primary-fg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1">Grand (lg)</button>
+            <button type="button" disabled class="inline-flex min-h-9 cursor-not-allowed items-center rounded bg-primary px-4 text-xs font-semibold text-primary-fg opacity-50">Désactivé</button>
         </div>
 
-        <h3 class="sg-subsection-title">Focus visible (Tab pour tester)</h3>
-        <div class="sg-preview-box">
-            <div class="sg-row">
-                <button type="button" class="btn btn-primary">Bouton focus-visible</button>
-                <a href="#boutons" class="btn btn-outline-secondary">Lien focus-visible</a>
-            </div>
-            <p class="hint">Appuyez sur <kbd>Tab</kbd> pour voir le contour focus (<code>--color-focus</code>, 3px).</p>
-        </div>
-    </div>
+        <p class="mt-2 text-xs text-muted">Appuyez sur <kbd class="rounded border border-border px-1 font-mono">Tab</kbd> pour voir l'anneau focus (<code>--color-focus</code>, 3px).</p>
+    </section>
 
     {# ── BADGES / STATUTS ── #}
-    <div id="badges" class="sg-section">
-        <h2 class="sg-section-title">Badges &amp; Statuts de projet</h2>
-        <p class="hint">Motif bordé (fond transparent) — garantit contraste ≥ 4.5:1 sur toutes surfaces. Règle WCAG 1.4.1 : le texte porte le sens, la couleur renforce.</p>
-
-        <div class="sg-preview-box">
-            <div class="sg-row">
-                <span class="status-badge status-badge-success">Soumis</span>
-                <span class="status-badge status-badge-warning">Partiel</span>
-                <span class="status-badge status-badge-danger">Vide / J+2</span>
-                <span class="status-badge status-badge-neutral">En cours</span>
-                <span class="status-badge status-badge-closed">Clôturé</span>
-            </div>
-
-            <div class="sg-row" style="margin-top: var(--space-2);">
-                <span class="project-status-badge project-status-active">Actif</span>
-                <span class="project-status-badge project-status-neutral">Neutre</span>
-                <span class="project-status-badge project-status-closed">Clôturé</span>
-                <span class="project-status-badge project-status-cancelled">Annulé</span>
-            </div>
-
-            <div class="sg-row" style="margin-top: var(--space-2);">
-                <span class="status-badge status-badge-success status-badge-pill">Pilule success</span>
-                <span class="status-badge status-badge-danger status-badge-pill">Pilule danger</span>
-                <span class="badge-escalated">Escaladé</span>
-            </div>
+    <section id="badges" class="mb-10" aria-labelledby="badges-heading">
+        <h2 id="badges-heading" class="mb-3 border-b border-border pb-2 text-base font-semibold text-ink">Badges &amp; Statuts</h2>
+        <p class="mb-3 text-xs text-muted">Motif bordé (fond transparent) — contraste ≥ 4.5:1 sur toutes surfaces. WCAG 1.4.1 : le texte porte le sens, la couleur renforce.</p>
+        <div class="flex flex-wrap items-center gap-2 rounded-md border border-border bg-surface p-4">
+            <span class="status-badge status-badge-success">Soumis</span>
+            <span class="status-badge status-badge-warning">Partiel</span>
+            <span class="status-badge status-badge-danger">Vide / J+2</span>
+            <span class="status-badge status-badge-neutral">En cours</span>
         </div>
-    </div>
+    </section>
 
     {# ── TABLE ── #}
-    <div id="table" class="sg-section">
-        <h2 class="sg-section-title">Table</h2>
-
-        <div class="sg-preview-box" style="overflow-x: auto;">
-            <table class="table table-hover">
+    <section id="table" class="mb-10" aria-labelledby="table-heading">
+        <h2 id="table-heading" class="mb-3 border-b border-border pb-2 text-base font-semibold text-ink">Table</h2>
+        <div class="overflow-x-auto rounded-md border border-border bg-surface">
+            <table class="w-full border-collapse text-left">
                 <caption class="visually-hidden">Exemple de tableau de données — démonstration design system</caption>
                 <thead>
-                    <tr>
-                        <th scope="col">Projet</th>
-                        <th scope="col">Statut</th>
-                        <th scope="col">Complétude</th>
-                        <th scope="col">Heures</th>
+                    <tr class="bg-surface-alt">
+                        <th scope="col" class="px-4 py-3 font-semibold text-body">Projet</th>
+                        <th scope="col" class="px-4 py-3 font-semibold text-body">Statut</th>
+                        <th scope="col" class="px-4 py-3 font-semibold text-body">Complétude</th>
+                        <th scope="col" class="px-4 py-3 font-semibold text-body">Heures</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td><a href="#">Projet Alpha</a></td>
-                        <td><span class="project-status-badge project-status-active">Actif</span></td>
-                        <td><span class="status-badge status-badge-success">Soumis</span></td>
-                        <td>8h</td>
+                    <tr class="border-t border-border">
+                        <td class="px-4 py-3 text-ink"><a href="#" class="text-primary hover:underline">Projet Alpha</a></td>
+                        <td class="px-4 py-3"><span class="status-badge status-badge-success">Actif</span></td>
+                        <td class="px-4 py-3"><span class="status-badge status-badge-success">Soumis</span></td>
+                        <td class="px-4 py-3 text-muted">8h</td>
                     </tr>
-                    <tr>
-                        <td><a href="#">Projet Beta</a></td>
-                        <td><span class="project-status-badge project-status-active">Actif</span></td>
-                        <td><span class="status-badge status-badge-warning">Partiel</span></td>
-                        <td>3h</td>
+                    <tr class="border-t border-border">
+                        <td class="px-4 py-3 text-ink"><a href="#" class="text-primary hover:underline">Projet Beta</a></td>
+                        <td class="px-4 py-3"><span class="status-badge status-badge-success">Actif</span></td>
+                        <td class="px-4 py-3"><span class="status-badge status-badge-warning">Partiel</span></td>
+                        <td class="px-4 py-3 text-muted">3h</td>
                     </tr>
-                    <tr>
-                        <td><a href="#">Projet Gamma</a></td>
-                        <td><span class="project-status-badge project-status-closed">Clôturé</span></td>
-                        <td><span class="status-badge status-badge-neutral">En cours</span></td>
-                        <td>—</td>
+                    <tr class="border-t border-border">
+                        <td class="px-4 py-3 text-ink"><a href="#" class="text-primary hover:underline">Projet Gamma</a></td>
+                        <td class="px-4 py-3"><span class="status-badge status-badge-neutral">Clôturé</span></td>
+                        <td class="px-4 py-3"><span class="status-badge status-badge-neutral">En cours</span></td>
+                        <td class="px-4 py-3 text-muted">—</td>
                     </tr>
                 </tbody>
             </table>
         </div>
-
-        <h3 class="sg-subsection-title">Densité compacte</h3>
-        <div class="sg-preview-box" style="overflow-x: auto;">
-            <table class="table table-compact">
-                <caption class="visually-hidden">Tableau compact — densité saisie de temps</caption>
-                <thead>
-                    <tr>
-                        <th scope="col">Date</th>
-                        <th scope="col">Projet</th>
-                        <th scope="col">Durée</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr><td>Lun 02/09</td><td>Alpha</td><td>2h</td></tr>
-                    <tr><td>Mar 03/09</td><td>Beta</td><td>4h</td></tr>
-                    <tr><td>Mer 04/09</td><td>Alpha</td><td>1h30</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+    </section>
 
     {# ── FORMULAIRE ── #}
-    <div id="formulaire" class="sg-section">
-        <h2 class="sg-section-title">Formulaire</h2>
-        <p class="hint">Bordure <code>--color-border-strong</code> (#74788d, 4.36:1) — corrigée vs. Skote par défaut (#ced4da, 1.49:1 — échec WCAG 1.4.11).</p>
-
-        <div class="sg-preview-box">
+    <section id="formulaire" class="mb-10" aria-labelledby="formulaire-heading">
+        <h2 id="formulaire-heading" class="mb-3 border-b border-border pb-2 text-base font-semibold text-ink">Formulaire</h2>
+        <p class="mb-3 text-xs text-muted">Bordure <code class="rounded bg-surface-alt px-1">--color-border-strong</code> (#74788d, 4.36:1 sur fond — WCAG 1.4.11).</p>
+        <div class="rounded-md border border-border bg-surface p-4">
             <form>
-                <div style="margin-bottom: var(--space-3);">
-                    <label for="sg-email" style="display: block; margin-bottom: var(--space-1); font-weight: var(--font-weight-medium);">Email</label>
-                    <input type="email" id="sg-email" class="form-control" placeholder="prenom.nom@exemple.fr" style="max-width: 30rem;">
-                    <span class="hint">Format : prénom.nom@domaine.fr</span>
+                <div class="mb-4">
+                    <label for="sg-email" class="mb-1 block text-xs font-medium text-body">Email</label>
+                    <input type="email" id="sg-email" placeholder="prenom.nom@exemple.fr"
+                           class="w-full max-w-sm rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-focus">
+                    <p class="mt-1 text-xs text-muted">Format : prénom.nom@domaine.fr</p>
                 </div>
-
-                <div style="margin-bottom: var(--space-3);">
-                    <label for="sg-projet" style="display: block; margin-bottom: var(--space-1); font-weight: var(--font-weight-medium);">Projet</label>
-                    <select id="sg-projet" class="form-select" style="max-width: 30rem;">
+                <div class="mb-4">
+                    <label for="sg-projet" class="mb-1 block text-xs font-medium text-body">Projet</label>
+                    <select id="sg-projet"
+                            class="w-full max-w-sm rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-focus">
                         <option>-- Sélectionner --</option>
                         <option>Projet Alpha</option>
                         <option>Projet Beta</option>
                     </select>
                 </div>
-
-                <div style="margin-bottom: var(--space-3);">
-                    <label for="sg-invalid" style="display: block; margin-bottom: var(--space-1); font-weight: var(--font-weight-medium);">Champ invalide</label>
-                    <input type="text" id="sg-invalid" class="form-control is-invalid" value="valeur incorrecte" aria-describedby="sg-invalid-error" style="max-width: 30rem;">
-                    <div id="sg-invalid-error" class="invalid-feedback">Ce champ est requis et doit être valide.</div>
+                <div class="mb-4 flex items-start gap-2">
+                    <input type="checkbox" id="sg-checkbox"
+                           class="mt-0.5 h-4 w-4 rounded border-border-strong text-primary focus:ring-focus">
+                    <label for="sg-checkbox" class="text-xs text-body">Case à cocher</label>
                 </div>
-
-                <div style="margin-bottom: var(--space-3);">
-                    <label for="sg-disabled" style="display: block; margin-bottom: var(--space-1); font-weight: var(--font-weight-medium);">Champ désactivé</label>
-                    <input type="text" id="sg-disabled" class="form-control" disabled value="Non modifiable" style="max-width: 30rem;">
-                </div>
-
-                <div class="sg-row">
-                    <button type="submit" class="btn btn-primary">Enregistrer</button>
-                    <button type="reset" class="btn btn-outline-secondary">Annuler</button>
+                <div class="flex gap-2">
+                    <button type="submit" class="inline-flex min-h-9 items-center rounded bg-primary px-4 text-xs font-semibold text-primary-fg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1">Enregistrer</button>
+                    <button type="reset" class="inline-flex min-h-9 items-center rounded border border-border-strong px-4 text-xs font-semibold text-muted hover:bg-surface-alt hover:text-ink focus:outline-none focus:ring-2 focus:ring-focus">Annuler</button>
                 </div>
             </form>
         </div>
-    </div>
+    </section>
 
-    {# ── ALERTES ── #}
-    <div id="alertes" class="sg-section">
-        <h2 class="sg-section-title">Alertes</h2>
-        <p class="hint">Motif : bordure gauche 4px solid + texte <code>-emphasis</code>. L'icône est optionnelle, jamais substitut au texte.</p>
+    {# ── ALERTES / FLASH ── #}
+    <section id="alertes" class="mb-10" aria-labelledby="alertes-heading">
+        <h2 id="alertes-heading" class="mb-3 border-b border-border pb-2 text-base font-semibold text-ink">Alertes &amp; Flash messages</h2>
+        <p class="mb-3 text-xs text-muted">Motif : bordure gauche 4px. Classes <code class="rounded bg-surface-alt px-1">.flash-success</code> et <code class="rounded bg-surface-alt px-1">.flash-error</code> assertées par les tests.</p>
 
-        <div class="ds-alert ds-alert-success" role="alert">
-            <strong>Succès.</strong> Saisie enregistrée avec succès pour le mois en cours.
-        </div>
-        <div class="ds-alert ds-alert-warning" role="alert">
-            <strong>Attention.</strong> La saisie de ce jour n'a pas encore été soumise.
-        </div>
-        <div class="ds-alert ds-alert-danger" role="alert">
-            <strong>Erreur.</strong> Une erreur est survenue lors de l'enregistrement. Réessayez.
-        </div>
-        <div class="ds-alert ds-alert-info" role="alert">
-            <strong>Information.</strong> Vous travaillez en mode hors-ligne. Les données seront synchronisées à la reconnexion.
-        </div>
-
-        <h3 class="sg-subsection-title">Flash messages (classes historiques)</h3>
-        <div class="sg-preview-box">
-            <div class="flash flash-success">Opération réussie.</div>
-            <div class="flash flash-error">Une erreur est survenue.</div>
-        </div>
-    </div>
+        <div class="flash flash-success mb-2" role="status"><strong>Succès.</strong> Saisie enregistrée avec succès.</div>
+        <div class="flash flash-error mb-2" role="alert"><strong>Erreur.</strong> Une erreur est survenue lors de l'enregistrement.</div>
+    </section>
 
     {# ── TYPOGRAPHIE ── #}
-    <div id="typo" class="sg-section">
-        <h2 class="sg-section-title">Typographie</h2>
-        <p class="hint">Police : Poppins (300/400/500/600) — taille de base 13px (Skote backoffice dense).</p>
-
-        <div class="sg-preview-box">
-            <h1 style="font-size: var(--font-size-h1); margin: 0 0 var(--space-2);">Titre H1 — 2.03rem</h1>
-            <h2 style="font-size: var(--font-size-h2); margin: 0 0 var(--space-2);">Titre H2 — 1.625rem</h2>
-            <h3 style="font-size: var(--font-size-h3); margin: 0 0 var(--space-2);">Titre H3 — 1.42rem</h3>
-            <h4 style="font-size: var(--font-size-h4); margin: 0 0 var(--space-2);">Titre H4 — 1.22rem</h4>
-            <h5 style="font-size: var(--font-size-h5); margin: 0 0 var(--space-2);">Titre H5 — 1.02rem</h5>
-            <p style="margin: var(--space-2) 0;">Texte de base (13px) — couleur <code>--color-text</code> (#495057, 8.09:1 sur fond page).</p>
-            <p style="color: var(--color-text-muted); margin: var(--space-2) 0;">Texte secondaire <code>--color-text-muted</code> (#555555, 6.96:1).</p>
-            <p style="font-weight: var(--font-weight-light); margin: var(--space-2) 0;">Poids léger (300)</p>
-            <p style="font-weight: var(--font-weight-normal); margin: var(--space-2) 0;">Poids normal (400)</p>
-            <p style="font-weight: var(--font-weight-medium); margin: var(--space-2) 0;">Poids medium (500)</p>
-            <p style="font-weight: var(--font-weight-semibold); margin: var(--space-2) 0;">Poids semi-gras (600)</p>
+    <section id="typo" class="mb-10" aria-labelledby="typo-heading">
+        <h2 id="typo-heading" class="mb-3 border-b border-border pb-2 text-base font-semibold text-ink">Typographie</h2>
+        <p class="mb-3 text-xs text-muted">Police : Poppins (300/400/500/600) — taille de base 13px.</p>
+        <div class="rounded-md border border-border bg-surface p-4">
+            <p class="mb-2 text-3xl font-semibold text-ink">Titre niveau 1 — text-3xl</p>
+            <p class="mb-2 text-2xl font-semibold text-ink">Titre niveau 2 — text-2xl</p>
+            <p class="mb-2 text-xl font-semibold text-ink">Titre niveau 3 — text-xl</p>
+            <p class="mb-2 text-base font-semibold text-ink">Titre niveau 4 — text-base</p>
+            <p class="mb-2 text-xs text-ink">Texte de base (13px / text-xs) — couleur <code>--color-ink</code></p>
+            <p class="mb-2 text-xs text-muted">Texte secondaire — couleur <code>--color-muted</code></p>
+            <p class="mb-2 text-xs font-light text-body">Poids léger (300)</p>
+            <p class="mb-2 text-xs font-normal text-body">Poids normal (400)</p>
+            <p class="mb-2 text-xs font-medium text-body">Poids medium (500)</p>
+            <p class="mb-2 text-xs font-semibold text-body">Poids semi-gras (600)</p>
         </div>
-    </div>
+    </section>
 
-    {# ── TOKENS DE MISE EN PAGE ── #}
-    <div class="sg-section">
-        <h2 class="sg-section-title">Espacements &amp; Rayons</h2>
-        <table class="sg-token-table">
-            <thead>
-                <tr>
-                    <th>Token</th>
-                    <th>Valeur</th>
-                    <th>Usage</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td><code>--space-1</code></td><td>0.25rem (4px)</td><td>Petits écarts, padding icônes</td></tr>
-                <tr><td><code>--space-2</code></td><td>0.5rem (8px)</td><td>Gap composant, padding compact</td></tr>
-                <tr><td><code>--space-3</code></td><td>1rem (16px)</td><td>Padding standard, margin section</td></tr>
-                <tr><td><code>--space-4</code></td><td>1.5rem (24px)</td><td>Padding page, gouttière grille</td></tr>
-                <tr><td><code>--space-5</code></td><td>3rem (48px)</td><td>Grandes sections</td></tr>
-                <tr><td><code>--radius-sm</code></td><td>0.2rem (3.2px)</td><td>Badges</td></tr>
-                <tr><td><code>--radius-md</code></td><td>0.25rem (4px)</td><td>Boutons, champs, cartes</td></tr>
-                <tr><td><code>--radius-lg</code></td><td>0.4rem (6.4px)</td><td>Modales, drawer</td></tr>
-                <tr><td><code>--radius-xl</code></td><td>1rem</td><td>Bottom-sheet coin supérieur</td></tr>
-                <tr><td><code>--radius-pill</code></td><td>50rem</td><td>Badges pilule</td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    {# ── VÉRIFICATION WCAG ── #}
-    <div class="sg-section">
-        <h2 class="sg-section-title">Contraste WCAG 2.2 AA — Synthèse</h2>
-        <p class="hint">Tous les ratios listés ci-dessous ont été vérifiés manuellement (design-system.md §5). Axe-core à intégrer en US-065.</p>
-        <table class="sg-token-table">
-            <thead>
-                <tr>
-                    <th>Paire</th>
-                    <th>Ratio</th>
-                    <th>Seuil</th>
-                    <th>Résultat</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>--color-text sur --color-bg</td><td>8.09:1</td><td>4.5:1</td><td>✅</td></tr>
-                <tr><td>--color-text-muted sur --color-bg</td><td>6.96:1</td><td>4.5:1</td><td>✅</td></tr>
-                <tr><td>--color-primary (texte) sur --color-bg</td><td>4.74:1</td><td>4.5:1</td><td>✅ (corrigé #4e65d4 ← #556ee6)</td></tr>
-                <tr><td>--color-on-primary (blanc) sur --color-primary</td><td>5.08:1</td><td>4.5:1</td><td>✅</td></tr>
-                <tr><td>--color-success-emphasis sur --color-bg</td><td>4.77:1</td><td>4.5:1</td><td>✅</td></tr>
-                <tr><td>--color-warning-emphasis sur --color-bg</td><td>8.02:1</td><td>4.5:1</td><td>✅ (introduit — jaune Skote brut : 1.4:1)</td></tr>
-                <tr><td>--color-danger-emphasis sur --color-bg</td><td>5.24:1</td><td>4.5:1</td><td>✅</td></tr>
-                <tr><td>--color-info-emphasis sur --color-bg</td><td>9.75:1</td><td>4.5:1</td><td>✅ (introduit — cyan Skote brut : 2.6:1)</td></tr>
-                <tr><td>--color-on-status sur --color-success</td><td>6.87:1</td><td>4.5:1</td><td>✅ (corrigé — texte blanc = 2.25:1)</td></tr>
-                <tr><td>--color-on-status sur --color-warning</td><td>8.35:1</td><td>4.5:1</td><td>✅</td></tr>
-                <tr><td>--color-on-status sur --color-danger</td><td>5.23:1</td><td>4.5:1</td><td>✅</td></tr>
-                <tr><td>--color-border-strong sur --color-surface</td><td>4.36:1</td><td>3:1 (non-texte)</td><td>✅ (corrigé — #ced4da = 1.49:1)</td></tr>
-                <tr><td>--color-focus sur blanc</td><td>5.13:1</td><td>3:1 (focus)</td><td>✅</td></tr>
-            </tbody>
-        </table>
-    </div>
+    {# ── TOKENS EN TABLE ── #}
+    <section class="mb-10" aria-labelledby="spacing-heading">
+        <h2 id="spacing-heading" class="mb-3 border-b border-border pb-2 text-base font-semibold text-ink">Tokens CSS disponibles</h2>
+        <div class="overflow-x-auto rounded-md border border-border bg-surface">
+            <table class="w-full border-collapse text-left text-xs">
+                <thead>
+                    <tr class="bg-surface-alt">
+                        <th scope="col" class="px-4 py-3 font-semibold text-body">Token</th>
+                        <th scope="col" class="px-4 py-3 font-semibold text-body">Valeur (clair)</th>
+                        <th scope="col" class="px-4 py-3 font-semibold text-body">Usage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="border-t border-border"><td class="px-4 py-2 font-mono text-ink">--color-primary</td><td class="px-4 py-2 text-muted">#4e65d4</td><td class="px-4 py-2 text-muted">Accent principal, boutons</td></tr>
+                    <tr class="border-t border-border"><td class="px-4 py-2 font-mono text-ink">--color-success</td><td class="px-4 py-2 text-muted">#2e7d32</td><td class="px-4 py-2 text-muted">États positifs</td></tr>
+                    <tr class="border-t border-border"><td class="px-4 py-2 font-mono text-ink">--color-warning</td><td class="px-4 py-2 text-muted">#60481e</td><td class="px-4 py-2 text-muted">Alertes modérées</td></tr>
+                    <tr class="border-t border-border"><td class="px-4 py-2 font-mono text-ink">--color-danger</td><td class="px-4 py-2 text-muted">#c62828</td><td class="px-4 py-2 text-muted">Erreurs, suppression</td></tr>
+                    <tr class="border-t border-border"><td class="px-4 py-2 font-mono text-ink">--color-bg</td><td class="px-4 py-2 text-muted">#f6f7f9</td><td class="px-4 py-2 text-muted">Fond de page</td></tr>
+                    <tr class="border-t border-border"><td class="px-4 py-2 font-mono text-ink">--color-surface</td><td class="px-4 py-2 text-muted">#ffffff</td><td class="px-4 py-2 text-muted">Fond de carte/panel</td></tr>
+                    <tr class="border-t border-border"><td class="px-4 py-2 font-mono text-ink">--color-ink</td><td class="px-4 py-2 text-muted">#212529</td><td class="px-4 py-2 text-muted">Texte principal</td></tr>
+                    <tr class="border-t border-border"><td class="px-4 py-2 font-mono text-ink">--color-muted</td><td class="px-4 py-2 text-muted">#555555</td><td class="px-4 py-2 text-muted">Texte secondaire/inactif</td></tr>
+                    <tr class="border-t border-border"><td class="px-4 py-2 font-mono text-ink">--color-border</td><td class="px-4 py-2 text-muted">#eff2f7</td><td class="px-4 py-2 text-muted">Bordures subtiles</td></tr>
+                    <tr class="border-t border-border"><td class="px-4 py-2 font-mono text-ink">--color-border-strong</td><td class="px-4 py-2 text-muted">#74788d</td><td class="px-4 py-2 text-muted">Champs de saisie (WCAG 1.4.11)</td></tr>
+                    <tr class="border-t border-border"><td class="px-4 py-2 font-mono text-ink">--color-focus</td><td class="px-4 py-2 text-muted">#0b5fff</td><td class="px-4 py-2 text-muted">Anneau focus (WCAG 2.4.7)</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
 
 </div>
 {% endblock %}

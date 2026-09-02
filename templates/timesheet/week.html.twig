@@ -5,131 +5,6 @@
 {% block page_section %}Temps & activité{% endblock %}
 {% block page_title %}Saisie des temps{% endblock %}
 
-{% block stylesheets %}
-<style>
-    /* ── Bannière relances ── */
-    .reminder-banner {
-        display: flex;
-        align-items: flex-start;
-        gap: var(--space-2, .5rem);
-        padding: var(--space-3, .75rem) var(--space-4, 1rem);
-        background-color: var(--color-warning-surface, #fdf6e9);
-        border: 1px solid var(--color-status-warning);
-        border-radius: var(--radius-md, .375rem);
-        color: var(--color-text);
-        margin-bottom: var(--space-4, 1rem);
-        font-size: .875rem;
-    }
-
-    /* ── Navigation semaine ── */
-    .week-nav-btn {
-        width: 40px;
-        height: 40px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border: 1px solid var(--color-border-strong);
-        border-radius: var(--radius-md, .375rem);
-        color: var(--color-text);
-        background: var(--color-surface);
-        text-decoration: none;
-        font-size: 1rem;
-    }
-    .week-nav-btn:hover {
-        background: var(--color-surface-alt);
-        color: var(--color-text);
-    }
-    .week-nav-label {
-        min-width: 220px;
-        text-align: center;
-        font-weight: var(--font-weight-semibold, 600);
-        color: var(--color-text);
-        font-size: .9rem;
-    }
-
-    /* ── Cellule de saisie ── */
-    .timesheet-cell-input {
-        width: 56px;
-        height: 44px;
-        text-align: center;
-        border: 1px solid var(--color-border-strong);
-        border-radius: var(--radius-md, .375rem);
-        background: var(--color-surface);
-        color: var(--color-text);
-        font-size: .875rem;
-        padding: 0 4px;
-    }
-    .timesheet-cell-input:focus-visible {
-        outline: var(--focus-ring-width, 3px) solid var(--color-focus);
-        outline-offset: 2px;
-        border-color: var(--color-primary);
-    }
-
-    /* ── Dialog synthèse ── */
-    .summary-dialog {
-        border: none;
-        border-radius: var(--radius-lg, .5rem);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, .18);
-        padding: 0;
-        max-width: 560px;
-        width: 90vw;
-        background: var(--color-surface);
-        color: var(--color-text);
-    }
-    .summary-dialog::backdrop {
-        background: rgba(0, 0, 0, .4);
-    }
-    .summary-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: var(--space-4, 1rem) var(--space-5, 1.25rem);
-        border-bottom: 1px solid var(--color-border-subtle);
-    }
-    .summary-header h2 {
-        margin: 0;
-        font-size: 1.05rem;
-        font-weight: var(--font-weight-semibold, 600);
-        color: var(--color-text);
-    }
-    .summary-close {
-        color: var(--color-text-muted);
-    }
-    .summary-body {
-        padding: var(--space-4, 1rem) var(--space-5, 1.25rem);
-    }
-
-    /* ── Barres de progression synthèse ── */
-    .summary-bar {
-        height: 6px;
-        background: var(--color-border-subtle);
-        border-radius: var(--radius-pill, 9999px);
-        overflow: hidden;
-        margin-top: var(--space-1, .25rem);
-    }
-    .summary-bar-fill {
-        display: block;
-        height: 100%;
-        background: var(--color-primary);
-        border-radius: var(--radius-pill, 9999px);
-    }
-    .summary-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-        gap: var(--space-3, .75rem);
-        font-size: .875rem;
-    }
-    .summary-planning {
-        border-top: 1px solid var(--color-border-subtle);
-        padding-top: var(--space-3, .75rem);
-        margin-top: var(--space-3, .75rem);
-    }
-</style>
-{% endblock %}
-
 {% block body %}
 <h1 class="visually-hidden">Saisie des temps</h1>
 
@@ -137,67 +12,80 @@
 
     {# Bannière relances — textes assertés : "désactivé les relances" et "en retard" #}
     {% if reminderLateWeeks %}
-        <p class="reminder-banner" role="status">
+        <p class="flex items-start gap-2 rounded-md border border-warning px-4 py-3 text-sm text-body mb-4" role="status">
             <span aria-hidden="true">⏳</span>
             Vous avez désactivé les relances automatiques. Il vous reste {{ reminderLateWeeks }} semaine{{ reminderLateWeeks > 1 ? 's' : '' }} en retard à compléter.
         </p>
     {% endif %}
 
     {# Barre de navigation + lien vue jour #}
-    <div class="d-flex align-items-center justify-content-between gap-3 mb-4 flex-wrap">
-        <nav class="d-flex align-items-center gap-2" aria-label="Navigation entre les semaines">
-            <a href="{{ path('timesheet_week', { date: prevDate }) }}" class="week-nav-btn" rel="prev" aria-label="Semaine précédente">←</a>
-            <span class="week-nav-label">{{ weekLabel }}</span>
-            <a href="{{ path('timesheet_week', { date: nextDate }) }}" class="week-nav-btn" rel="next" aria-label="Semaine suivante">→</a>
+    <div class="flex items-center justify-between gap-3 mb-4 flex-wrap">
+        <nav class="flex items-center gap-2" aria-label="Navigation entre les semaines">
+            <a href="{{ path('timesheet_week', { date: prevDate }) }}"
+               class="w-10 h-10 inline-flex items-center justify-center border border-border-strong rounded-md bg-surface text-body no-underline hover:bg-surface-alt hover:text-ink"
+               rel="prev" aria-label="Semaine précédente">←</a>
+            <span class="min-w-[220px] text-center font-semibold text-body text-sm">{{ weekLabel }}</span>
+            <a href="{{ path('timesheet_week', { date: nextDate }) }}"
+               class="w-10 h-10 inline-flex items-center justify-center border border-border-strong rounded-md bg-surface text-body no-underline hover:bg-surface-alt hover:text-ink"
+               rel="next" aria-label="Semaine suivante">→</a>
         </nav>
-        <a href="{{ path('timesheet_day', { date: weekStart }) }}" class="btn btn-outline-secondary btn-sm">Vue jour (mobile)</a>
+        <a href="{{ path('timesheet_day', { date: weekStart }) }}"
+           class="inline-flex min-h-9 items-center rounded border border-border-strong px-3 text-xs font-semibold text-muted hover:bg-surface-alt hover:text-ink">
+            Vue jour (mobile)
+        </a>
     </div>
 
     {# Bouton Ma synthèse + dialog — "Ma synthèse" asserté dans le HTML #}
     <div class="mb-4" data-controller="activity-summary">
-        <button type="button" class="btn btn-outline-primary btn-sm" data-activity-summary-target="trigger" data-action="activity-summary#open">
+        <button type="button"
+                class="inline-flex min-h-9 items-center rounded border border-primary px-3 text-xs font-semibold text-primary hover:bg-surface-alt"
+                data-activity-summary-target="trigger"
+                data-action="activity-summary#open">
             📊 Ma synthèse
         </button>
 
         {# dialog.summary-dialog asserté par TimesheetPageTest (count inputs = 0 à la fermeture) #}
         <dialog class="summary-dialog" aria-labelledby="summary-title" data-activity-summary-target="dialog">
-            <div class="summary-header">
-                <h2 id="summary-title">Ma synthèse</h2>
-                <button type="button" class="btn btn-link btn-sm summary-close" data-action="activity-summary#close" aria-label="Fermer la synthèse">✕ Fermer</button>
+            <div class="flex items-center justify-between pb-4 mb-4 border-b border-border">
+                <h2 id="summary-title" class="m-0 text-base font-semibold text-ink">Ma synthèse</h2>
+                <button type="button"
+                        class="text-sm text-muted hover:text-ink"
+                        data-action="activity-summary#close"
+                        aria-label="Fermer la synthèse">✕ Fermer</button>
             </div>
-            <div class="summary-body">
-                <p class="text-muted small mb-3">Période du {{ summary.periodStart }} au {{ summary.periodEnd }}.</p>
+            <div>
+                <p class="text-xs text-muted mb-3">Période du {{ summary.periodStart }} au {{ summary.periodEnd }}.</p>
 
                 {% if summary.empty %}
                     <p>Aucune saisie enregistrée sur cette période.</p>
                 {% else %}
                     {# "Taux d'occupation" asserté #}
                     <section aria-labelledby="summary-occupation" class="mb-4">
-                        <h3 id="summary-occupation" class="fs-6 fw-semibold mb-1">Taux d'occupation : {{ summary.occupationPercent }} %</h3>
-                        <p class="text-muted small mb-2">Part du temps de production déclaré sur les jours ouvrés de la période.</p>
-                        <div class="summary-bar">
-                            <span class="summary-bar-fill" style="width: {{ summary.occupationPercent > 100 ? 100 : summary.occupationPercent }}%" aria-hidden="true"></span>
+                        <h3 id="summary-occupation" class="text-sm font-semibold mb-1 text-ink">Taux d'occupation : {{ summary.occupationPercent }} %</h3>
+                        <p class="text-xs text-muted mb-2">Part du temps de production déclaré sur les jours ouvrés de la période.</p>
+                        <div class="h-1.5 bg-border rounded-full overflow-hidden mt-1">
+                            <span class="block h-full bg-primary rounded-full" style="width: {{ summary.occupationPercent > 100 ? 100 : summary.occupationPercent }}%" aria-hidden="true"></span>
                         </div>
                     </section>
 
                     <section aria-labelledby="summary-type" class="mb-4">
-                        <h3 id="summary-type" class="fs-6 fw-semibold mb-2">Répartition par type</h3>
-                        <ul class="summary-list">
+                        <h3 id="summary-type" class="text-sm font-semibold mb-2 text-ink">Répartition par type</h3>
+                        <ul class="list-none p-0 m-0 flex flex-col gap-3 text-sm">
                             <li>Production — {{ summary.productionDuration }} ({{ summary.productionPercent }} %)
-                                <div class="summary-bar"><span class="summary-bar-fill" style="width: {{ summary.productionPercent }}%" aria-hidden="true"></span></div>
+                                <div class="h-1.5 bg-border rounded-full overflow-hidden mt-1"><span class="block h-full bg-primary rounded-full" style="width: {{ summary.productionPercent }}%" aria-hidden="true"></span></div>
                             </li>
                             <li>Absence — {{ summary.absenceDuration }} ({{ summary.absencePercent }} %)
-                                <div class="summary-bar"><span class="summary-bar-fill" style="width: {{ summary.absencePercent }}%" aria-hidden="true"></span></div>
+                                <div class="h-1.5 bg-border rounded-full overflow-hidden mt-1"><span class="block h-full bg-primary rounded-full" style="width: {{ summary.absencePercent }}%" aria-hidden="true"></span></div>
                             </li>
                         </ul>
                     </section>
 
                     <section aria-labelledby="summary-projects" class="mb-4">
-                        <h3 id="summary-projects" class="fs-6 fw-semibold mb-2">Répartition par projet</h3>
-                        <ul class="summary-list">
+                        <h3 id="summary-projects" class="text-sm font-semibold mb-2 text-ink">Répartition par projet</h3>
+                        <ul class="list-none p-0 m-0 flex flex-col gap-3 text-sm">
                             {% for project in summary.projects %}
                                 <li>{{ project.label }} — {{ project.duration }} ({{ project.percent }} %)
-                                    <div class="summary-bar"><span class="summary-bar-fill" style="width: {{ project.percent }}%" aria-hidden="true"></span></div>
+                                    <div class="h-1.5 bg-border rounded-full overflow-hidden mt-1"><span class="block h-full bg-primary rounded-full" style="width: {{ project.percent }}%" aria-hidden="true"></span></div>
                                 </li>
                             {% endfor %}
                             {% if summary.othersCount > 0 %}
@@ -208,44 +96,42 @@
                 {% endif %}
 
                 {# "Planning à venir" asserté #}
-                <section aria-labelledby="summary-planning" class="summary-planning">
-                    <h3 id="summary-planning" class="fs-6 fw-semibold mb-1">Planning à venir</h3>
-                    <p class="text-muted small mb-0">Le module d'affectation n'est pas encore activé — le planning s'affichera ici prochainement.</p>
+                <section aria-labelledby="summary-planning" class="border-t border-border pt-3 mt-3">
+                    <h3 id="summary-planning" class="text-sm font-semibold mb-1 text-ink">Planning à venir</h3>
+                    <p class="text-xs text-muted mb-0">Le module d'affectation n'est pas encore activé — le planning s'affichera ici prochainement.</p>
                 </section>
             </div>
         </dialog>
     </div>
 
     {% if projects is empty %}
-        <div class="card">
-            <div class="card-body text-muted">
-                Aucun projet actif : demandez à un administrateur d'en créer un pour saisir votre temps.
-            </div>
+        <div class="rounded-md border border-border bg-surface p-4 text-muted">
+            Aucun projet actif : demandez à un administrateur d'en créer un pour saisir votre temps.
         </div>
     {% else %}
         {# Grille de saisie — "input[value=210]" asserté ; "inputmode=numeric" asserté dans day, mais grille inclut aussi ces attributs #}
-        <div class="card mb-3">
-            <div class="table-responsive">
-                <table class="table table-hover table-compact mb-0" data-timesheet-target="grid">
+        <div class="rounded-md border border-border bg-surface mb-3">
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse text-left" data-timesheet-target="grid">
                     <caption class="visually-hidden">Grille de saisie des temps — {{ weekLabel }}</caption>
                     <thead>
-                        <tr>
-                            <th scope="col">Projet</th>
+                        <tr class="bg-surface-alt">
+                            <th scope="col" class="px-4 py-3 font-semibold text-body">Projet</th>
                             {% for day in days %}
-                                <th scope="col" class="text-center">{{ day.label }}</th>
+                                <th scope="col" class="px-3 py-3 text-center font-semibold text-body">{{ day.label }}</th>
                             {% endfor %}
                         </tr>
                     </thead>
                     <tbody>
                         {% for project in projects %}
-                            <tr>
-                                <th scope="row" title="{{ project.code }}">{{ project.name }}</th>
+                            <tr class="border-t border-border">
+                                <th scope="row" class="px-4 py-2 font-normal text-ink" title="{{ project.code }}">{{ project.name }}</th>
                                 {% for day in days %}
                                     {% set minutes = grid[project.id][day.date] ?? null %}
-                                    <td class="text-center">
+                                    <td class="px-3 py-2 text-center">
                                         <input
                                             type="number"
-                                            class="timesheet-cell-input"
+                                            class="w-14 min-h-11 text-center border border-border-strong rounded-md bg-surface text-body text-sm px-1"
                                             min="0"
                                             max="1440"
                                             step="15"
@@ -266,17 +152,21 @@
             </div>
         </div>
 
-        <div class="d-flex align-items-center gap-3 flex-wrap mb-3">
-            <button type="button" class="btn btn-outline-secondary btn-sm" data-action="timesheet#duplicatePreviousWeek">
+        <div class="flex items-center gap-3 flex-wrap mb-3">
+            <button type="button"
+                    class="inline-flex min-h-9 items-center rounded border border-border-strong px-3 text-xs font-semibold text-muted hover:bg-surface-alt hover:text-ink"
+                    data-action="timesheet#duplicatePreviousWeek">
                 Dupliquer la semaine précédente
             </button>
-            <button type="button" class="btn btn-primary" data-action="timesheet#saveWeek">
+            <button type="button"
+                    class="inline-flex min-h-11 items-center rounded bg-primary px-4 text-sm font-semibold text-white hover:opacity-90"
+                    data-action="timesheet#saveWeek">
                 Enregistrer la semaine
             </button>
-            <span class="text-muted small">Entrée = valider et descendre · Tab = cellule suivante · saisie possible sans souris.</span>
+            <span class="text-xs text-muted">Entrée = valider et descendre · Tab = cellule suivante · saisie possible sans souris.</span>
         </div>
 
-        <p class="text-muted small" aria-live="polite" data-timesheet-target="status">
+        <p class="text-xs text-muted" aria-live="polite" data-timesheet-target="status">
             Saisissez les minutes par projet et par jour. L'enregistrement est automatique ; « Enregistrer la semaine » soumet tout en une fois.
         </p>
     {% endif %}

@@ -8,45 +8,45 @@
 {% block body %}
     <h1 class="visually-hidden">Périodes comptables</h1>
 
-    {#Messages flash — .flash-success et .flash-error assertés par PeriodAdminTest #}
+    {# Messages flash — .flash-success et .flash-error assertés par PeriodAdminTest #}
     {% for message in app.flashes('success') %}
-        <div class="ds-alert ds-alert-success flash-success mb-3" role="status">{{ message }}</div>
+        <div class="flash flash-success mb-3" role="status">{{ message }}</div>
     {% endfor %}
     {% for message in app.flashes('error') %}
-        <div class="ds-alert ds-alert-danger flash-error mb-3" role="alert">{{ message }}</div>
+        <div class="flash flash-error mb-3" role="alert">{{ message }}</div>
     {% endfor %}
 
-    {#Liste des périodes #}
-    <section aria-labelledby="periods-heading" class="mb-4">
-        <h2 id="periods-heading" class="fs-5 fw-semibold mb-3">Périodes</h2>
+    {# Liste des périodes #}
+    <section aria-labelledby="periods-heading" class="mb-6">
+        <h2 id="periods-heading" class="mb-3 text-base font-semibold text-ink">Périodes</h2>
 
         {% if periods is empty %}
             <p class="text-muted">Aucune période clôturée pour l'instant.</p>
         {% else %}
-            <div class="table-responsive">
-                <table class="table table-hover table-compact">
+            <div class="overflow-x-auto rounded-md border border-border bg-surface">
+                <table class="w-full border-collapse text-left">
                     <caption class="visually-hidden">Liste des périodes comptables et leur statut</caption>
                     <thead>
-                        <tr>
-                            <th scope="col">Période</th>
-                            <th scope="col">Statut</th>
-                            <th scope="col">Clôturée le</th>
+                        <tr class="bg-surface-alt">
+                            <th scope="col" class="px-4 py-3 font-semibold text-body">Période</th>
+                            <th scope="col" class="px-4 py-3 font-semibold text-body">Statut</th>
+                            <th scope="col" class="px-4 py-3 font-semibold text-body">Clôturée le</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for p in periods %}
-                            <tr>
-                                <td class="fw-medium">{{ p.period }}</td>
-                                <td>
+                            <tr class="border-t border-border">
+                                <td class="px-4 py-3 font-medium text-ink">{{ p.period }}</td>
+                                <td class="px-4 py-3">
                                     {% if p.status == 'closed' %}
-                                        <span class="status-badge status-badge-closed">Clôturée</span>
+                                        <span class="status-badge status-badge-neutral">Clôturée</span>
                                     {% elseif p.status == 'closing' %}
                                         <span class="status-badge status-badge-warning">En clôture</span>
                                     {% else %}
                                         <span class="status-badge status-badge-success">Ouverte</span>
                                     {% endif %}
                                 </td>
-                                <td class="text-muted">{{ p.closedAt ?? '—' }}</td>
+                                <td class="px-4 py-3 text-muted">{{ p.closedAt ?? '—' }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -55,41 +55,48 @@
         {% endif %}
     </section>
 
-    {#Formulaire de clôture #}
-    <section aria-labelledby="close-heading" class="mb-4">
-        <h2 id="close-heading" class="fs-5 fw-semibold mb-3">Clôturer une période</h2>
-        <div class="card">
-            <div class="card-body">
+    {# Formulaire de clôture #}
+    <section aria-labelledby="close-heading" class="mb-6">
+        <h2 id="close-heading" class="mb-3 text-base font-semibold text-ink">Clôturer une période</h2>
+
+        <div class="rounded-md border border-border bg-surface">
+            <div class="p-4">
                 <form method="post" action="{{ path('period_close') }}">
                     <input type="hidden" name="_token" value="{{ csrf_token('close_period') }}">
 
-                    <div class="mb-3">
-                        <label for="period-code" class="form-label">Période <span class="text-muted fw-normal">(YYYY-MM)</span></label>
-                        <input type="text" id="period-code" class="form-control" name="period" required
-                               pattern="\d{4}-(0[1-9]|1[0-2])" placeholder="2026-08">
+                    <div class="mb-4">
+                        <label for="period-code" class="mb-1 block text-xs font-medium text-body">
+                            Période <span class="font-normal text-muted">(YYYY-MM)</span>
+                        </label>
+                        <input type="text" id="period-code" name="period" required
+                               pattern="\d{4}-(0[1-9]|1[0-2])" placeholder="2026-08"
+                               class="w-full max-w-xs rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-focus">
                     </div>
 
-                    <div class="mb-3">
-                        <label for="period-confirmation" class="form-label">
+                    <div class="mb-4">
+                        <label for="period-confirmation" class="mb-1 block text-xs font-medium text-body">
                             Confirmation — ressaisir le code de la période
                         </label>
-                        <input type="text" id="period-confirmation" class="form-control"
-                               name="confirmation" required placeholder="2026-08"
-                               aria-describedby="confirm-help">
-                        <div id="confirm-help" class="form-text text-muted">
+                        <input type="text" id="period-confirmation" name="confirmation" required
+                               placeholder="2026-08" aria-describedby="confirm-help"
+                               class="w-full max-w-xs rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-focus">
+                        <p id="confirm-help" class="mt-1 text-xs text-muted">
                             Pour éviter une clôture accidentelle, ressaisissez le code exact de la période.
-                        </div>
+                        </p>
                     </div>
 
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="period-force"
-                               name="force" value="1">
-                        <label class="form-check-label" for="period-force">
+                    <div class="mb-4 flex items-start gap-2">
+                        <input type="checkbox" id="period-force" name="force" value="1"
+                               class="mt-0.5 h-4 w-4 rounded border-border-strong text-primary focus:ring-focus">
+                        <label for="period-force" class="text-xs text-body">
                             Clôturer malgré des imputations non finalisées
                         </label>
                     </div>
 
-                    <button type="submit" class="btn btn-danger btn-sm">Clôturer la période</button>
+                    <button type="submit"
+                            class="inline-flex min-h-9 items-center rounded bg-danger px-4 text-xs font-semibold text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-danger focus:ring-offset-1">
+                        Clôturer la période
+                    </button>
                 </form>
             </div>
         </div>

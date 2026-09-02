@@ -8,20 +8,20 @@
 {% block body %}
     <h1 class="visually-hidden">{{ appName }}</h1>
 
-    <div class="card">
-        <div class="card-header fw-semibold">Socle applicatif</div>
-        <div class="card-body">
-            <p class="text-muted mb-3">
+    <div class="rounded-md border border-border bg-surface">
+        <div class="border-b border-border px-4 py-3 font-semibold text-ink">Socle applicatif</div>
+        <div class="p-4">
+            <p class="mb-3 text-muted">
                 Rendu serveur opérationnel — Twig + Turbo + Stimulus.
             </p>
-            <ul class="list-unstyled mb-0 d-flex flex-column gap-2">
-                <li class="d-flex align-items-center gap-2">
+            <ul class="flex flex-col gap-2">
+                <li class="flex items-center gap-2">
                     <span class="text-muted">Santé API (DTO) :</span>
-                    <a href="/api/status" class="btn btn-link btn-sm p-0">/api/status</a>
+                    <a href="/api/status" class="text-primary hover:underline">/api/status</a>
                 </li>
-                <li class="d-flex align-items-center gap-2">
+                <li class="flex items-center gap-2">
                     <span class="text-muted">Santé applicative :</span>
-                    <a href="/health" class="btn btn-link btn-sm p-0">/health</a>
+                    <a href="/health" class="text-primary hover:underline">/health</a>
                 </li>
             </ul>
         </div>

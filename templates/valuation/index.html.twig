@@ -11,8 +11,8 @@
 
     {# ── Alerte valorisation incomplète ─────────────────────────────────────── #}
     {% if summary.hasIncompleteValuations %}
-        <div class="ds-alert ds-alert-warning d-flex align-items-start gap-3 mb-4" role="alert">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;margin-top:.1rem;"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+        <div class="mb-4 flex items-start gap-3 rounded border-l-4 border-warning bg-surface px-4 py-3 text-warning" role="alert">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="mt-0.5 shrink-0"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
             <div>
                 <strong>Valorisation incomplète</strong> —
                 {{ summary.missingRate }} imputation{{ summary.missingRate > 1 ? 's' : '' }} sans tarif.
@@ -22,81 +22,70 @@
     {% endif %}
 
     {# ── KPI row ─────────────────────────────────────────────────────────────── #}
-    <div class="row g-3 mb-4">
+    {# Grille 4 colonnes ; sans accès coût : CA(1 col) + Avancement(3 cols). #}
+    <div class="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-4">
 
         {# CA reconnu — toujours visible #}
-        <div class="col-sm-6 col-lg-3">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center justify-content-between mb-2">
-                        <span class="text-muted" style="font-size:.75rem;">CA reconnu</span>
-                        <span class="d-inline-flex align-items-center justify-content-center rounded"
-                              style="width:32px;height:32px;background:var(--color-primary-surface, #eef1fb);color:var(--color-primary);"
-                              aria-hidden="true">
-                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                        </span>
-                    </div>
-                    <div class="fw-semibold" style="font-size:1.4rem;">
-                        {{ (summary.revenueCents / 100)|number_format(2, ',', ' ') }} €
-                    </div>
+        <div class="sm:col-span-1">
+            <div class="flex h-full flex-col rounded-md border border-border bg-surface p-5">
+                <div class="mb-2 flex items-center justify-between">
+                    <span class="text-xs text-muted">CA reconnu</span>
+                    <span class="grid h-8 w-8 shrink-0 place-items-center rounded bg-primary-surface text-primary" aria-hidden="true">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    </span>
+                </div>
+                <div class="text-2xl font-semibold text-ink">
+                    {{ (summary.revenueCents / 100)|number_format(2, ',', ' ') }} €
                 </div>
             </div>
         </div>
 
-        {# Avancement — toujours visible #}
-        <div class="col-sm-6 col-lg-{% if canViewCost %}3{% else %}9{% endif %}">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="text-muted mb-1" style="font-size:.75rem;">Avancement valorisation</div>
-                    <div class="fw-semibold mb-2" style="font-size:1rem;">
-                        {{ summary.valued }} / {{ summary.total }} imputations valorisées
-                    </div>
-                    <div class="valuation-progress-bar" role="progressbar"
-                         aria-valuenow="{{ summary.valued }}"
-                         aria-valuemin="0"
-                         aria-valuemax="{{ summary.total ?: 1 }}"
-                         aria-label="Progression : {{ summary.valued }} sur {{ summary.total }} imputations valorisées">
-                        <div class="valuation-progress-fill" style="width:{{ summary.total ? ((summary.valued / summary.total) * 100)|round : 0 }}%;"></div>
-                    </div>
+        {# Avancement — toujours visible ; prend 3 colonnes quand le coût est masqué #}
+        <div class="{{ canViewCost ? 'sm:col-span-1' : 'sm:col-span-3' }}">
+            <div class="flex h-full flex-col rounded-md border border-border bg-surface p-5">
+                <div class="mb-1 text-xs text-muted">Avancement valorisation</div>
+                <div class="mb-3 font-semibold text-ink">
+                    {{ summary.valued }} / {{ summary.total }} imputations valorisées
+                </div>
+                <div class="mt-auto h-1.5 overflow-hidden rounded-full bg-border"
+                     role="progressbar"
+                     aria-valuenow="{{ summary.valued }}"
+                     aria-valuemin="0"
+                     aria-valuemax="{{ summary.total ?: 1 }}"
+                     aria-label="Progression : {{ summary.valued }} sur {{ summary.total }} imputations valorisées">
+                    <div class="h-full rounded-full bg-primary transition-all duration-300"
+                         style="width:{{ summary.total ? ((summary.valued / summary.total) * 100)|round : 0 }}%;"></div>
                 </div>
             </div>
         </div>
 
         {% if canViewCost %}
             {# Coût chargé — DG / contrôle de gestion #}
-            <div class="col-sm-6 col-lg-3">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <span class="text-muted" style="font-size:.75rem;">Coût chargé</span>
-                            <span class="d-inline-flex align-items-center justify-content-center rounded"
-                                  style="width:32px;height:32px;background:var(--color-surface-alt);color:var(--color-text-muted);"
-                                  aria-hidden="true">
-                                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-                            </span>
-                        </div>
-                        <div class="fw-semibold" style="font-size:1.4rem;">
-                            {{ (summary.costCents / 100)|number_format(2, ',', ' ') }} €
-                        </div>
+            <div class="sm:col-span-1">
+                <div class="flex h-full flex-col rounded-md border border-border bg-surface p-5">
+                    <div class="mb-2 flex items-center justify-between">
+                        <span class="text-xs text-muted">Coût chargé</span>
+                        <span class="grid h-8 w-8 shrink-0 place-items-center rounded bg-surface-alt text-muted" aria-hidden="true">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+                        </span>
+                    </div>
+                    <div class="text-2xl font-semibold text-ink">
+                        {{ (summary.costCents / 100)|number_format(2, ',', ' ') }} €
                     </div>
                 </div>
             </div>
 
             {# Marge brute — DG / contrôle de gestion #}
-            <div class="col-sm-6 col-lg-3">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <span class="text-muted" style="font-size:.75rem;">Marge brute</span>
-                            <span class="d-inline-flex align-items-center justify-content-center rounded"
-                                  style="width:32px;height:32px;background:var(--color-success-surface, #e9f5ec);color:var(--color-status-success);"
-                                  aria-hidden="true">
-                                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16M8 15l3-4 3 2 4-6"/></svg>
-                            </span>
-                        </div>
-                        <div class="fw-semibold" style="font-size:1.4rem;">
-                            {{ (summary.marginCents / 100)|number_format(2, ',', ' ') }} €
-                        </div>
+            <div class="sm:col-span-1">
+                <div class="flex h-full flex-col rounded-md border border-border bg-surface p-5">
+                    <div class="mb-2 flex items-center justify-between">
+                        <span class="text-xs text-muted">Marge brute</span>
+                        <span class="grid h-8 w-8 shrink-0 place-items-center rounded bg-surface-alt text-success" aria-hidden="true">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16M8 15l3-4 3 2 4-6"/></svg>
+                        </span>
+                    </div>
+                    <div class="text-2xl font-semibold text-ink">
+                        {{ (summary.marginCents / 100)|number_format(2, ',', ' ') }} €
                     </div>
                 </div>
             </div>
@@ -105,7 +94,7 @@
     </div>
 
     {# ── Fraîcheur ───────────────────────────────────────────────────────────── #}
-    <p class="text-muted mb-4 d-flex align-items-center gap-2" aria-live="polite" style="font-size:.8125rem;">
+    <p class="mb-4 flex items-center gap-2 text-xs text-muted" aria-live="polite">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
         {% if freshnessMinutes is null %}
             Aucune valorisation pour l'instant.
@@ -117,90 +106,57 @@
     {# ── Détail coût & marge — réservé DG / contrôle de gestion ─────────────── #}
     {% if canViewCost %}
         {% if auditTrail is not empty %}
-            <div class="card">
-                <div class="card-header fw-semibold">Audit trail — taux appliqués</div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover table-compact mb-0">
-                            <caption class="visually-hidden">Détail des taux appliqués par imputation valorisée</caption>
-                            <thead>
-                                <tr>
-                                    <th scope="col">Imputation</th>
-                                    <th scope="col">Valorisée le</th>
-                                    <th scope="col" class="text-end">CA (€)</th>
-                                    <th scope="col" class="text-end">Coût (€)</th>
-                                    <th scope="col">Taux appliqué</th>
+            <div class="rounded-md border border-border bg-surface">
+                <div class="border-b border-border px-4 py-3 font-semibold text-ink">Audit trail — taux appliqués</div>
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse text-left">
+                        <caption class="visually-hidden">Détail des taux appliqués par imputation valorisée</caption>
+                        <thead>
+                            <tr class="bg-surface-alt">
+                                <th scope="col" class="px-4 py-3 font-semibold text-body">Imputation</th>
+                                <th scope="col" class="px-4 py-3 font-semibold text-body">Valorisée le</th>
+                                <th scope="col" class="px-4 py-3 text-right font-semibold text-body">CA (€)</th>
+                                <th scope="col" class="px-4 py-3 text-right font-semibold text-body">Coût (€)</th>
+                                <th scope="col" class="px-4 py-3 font-semibold text-body">Taux appliqué</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for line in auditTrail %}
+                                <tr class="border-t border-border hover:bg-surface-alt">
+                                    <td class="px-4 py-3">
+                                        <code class="rounded bg-surface-alt px-1 py-0.5 font-mono text-xs text-body">{{ line.timeEntryId[:8] }}</code>
+                                    </td>
+                                    <td class="px-4 py-3 text-body">{{ line.valuedAt }}</td>
+                                    <td class="px-4 py-3 text-right text-body">{{ (line.revenueCents / 100)|number_format(2, ',', ' ') }}</td>
+                                    <td class="px-4 py-3 text-right text-body">{{ (line.costCents / 100)|number_format(2, ',', ' ') }}</td>
+                                    <td class="px-4 py-3">
+                                        <details>
+                                            <summary class="cursor-pointer list-none text-xs font-medium text-primary hover:underline [&::-webkit-details-marker]:hidden"
+                                                     aria-label="Afficher le détail du taux appliqué">Taux appliqué</summary>
+                                            <p class="mt-1 text-xs text-muted">
+                                                Vente : {{ (line.sellingRateCents / 100)|number_format(2, ',', ' ') }} €/j —
+                                                Coût : {{ (line.costRateCents / 100)|number_format(2, ',', ' ') }} €/j
+                                                {% if line.rateDate %}— en vigueur au {{ line.rateDate }}{% endif %}
+                                            </p>
+                                        </details>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {% for line in auditTrail %}
-                                    <tr>
-                                        <td><code>{{ line.timeEntryId[:8] }}</code></td>
-                                        <td>{{ line.valuedAt }}</td>
-                                        <td class="text-end">{{ (line.revenueCents / 100)|number_format(2, ',', ' ') }}</td>
-                                        <td class="text-end">{{ (line.costCents / 100)|number_format(2, ',', ' ') }}</td>
-                                        <td>
-                                            <details>
-                                                <summary class="btn btn-link btn-sm p-0" style="text-decoration:none;" aria-label="Afficher le détail du taux appliqué">Taux appliqué</summary>
-                                                <p class="mt-1 mb-0 text-muted" style="font-size:.8125rem;">
-                                                    Vente : {{ (line.sellingRateCents / 100)|number_format(2, ',', ' ') }} €/j —
-                                                    Coût : {{ (line.costRateCents / 100)|number_format(2, ',', ' ') }} €/j
-                                                    {% if line.rateDate %}— en vigueur au {{ line.rateDate }}{% endif %}
-                                                </p>
-                                            </details>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         {% else %}
-            <div class="card">
-                <div class="card-body">
-                    <p class="mb-0 text-muted">Aucune imputation valorisée à détailler.</p>
-                </div>
+            <div class="rounded-md border border-border bg-surface p-4">
+                <p class="m-0 text-muted">Aucune imputation valorisée à détailler.</p>
             </div>
         {% endif %}
     {% else %}
-        <div class="card">
-            <div class="card-body d-flex align-items-center gap-2">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                <p class="mb-0 text-muted">
-                    Le détail des coûts et des taux est réservé au contrôle de gestion.
-                </p>
-            </div>
+        <div class="flex items-center gap-2 rounded-md border border-border bg-surface p-4">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0 text-muted"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <p class="m-0 text-muted">
+                Le détail des coûts et des taux est réservé au contrôle de gestion.
+            </p>
         </div>
     {% endif %}
-{% endblock %}
-
-{% block stylesheets %}
-<style>
-    /* Barre de progression valorisation */
-    .valuation-progress-bar {
-        height: 6px;
-        border-radius: var(--radius-pill, 999px);
-        background-color: var(--color-border-subtle);
-        overflow: hidden;
-    }
-    .valuation-progress-fill {
-        height: 100%;
-        background-color: var(--color-primary);
-        border-radius: var(--radius-pill, 999px);
-        transition: width .3s ease;
-    }
-
-    /* details/summary — supprimer le marqueur natif */
-    details > summary {
-        cursor: pointer;
-        list-style: none;
-    }
-    details > summary::-webkit-details-marker {
-        display: none;
-    }
-    details[open] > summary {
-        color: var(--color-primary);
-    }
-</style>
 {% endblock %}
