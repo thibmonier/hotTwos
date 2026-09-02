@@ -1,0 +1,253 @@
+/**
+ * Design System — HotOnes — Tokens CSS (US-061, T-061-01)
+ *
+ * Source de vérité : project-management/architecture/design-system.md
+ * Décision d'architecture : ADR-0018 (CSS custom properties, sans build Sass)
+ *
+ * Ordre de priorité (cascade) :
+ *   1. :root / [data-theme="light"]  → thème clair par défaut
+ *   2. @media (prefers-color-scheme: dark) sans [data-theme]  → dark système
+ *   3. [data-theme="dark"]           → choix utilisateur explicite (prioritaire)
+ *   4. [data-theme="light"]          → verrouillage explicite sur clair (prioritaire)
+ */
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* 1. PRIMITIVES (usage interne uniquement — dériver les sémantiques ci-dessous) */
+/* ─────────────────────────────────────────────────────────────────────────── */
+:root {
+    /* Palette Skote — ne jamais utiliser directement dans les composants */
+    --palette-blue: #556ee6;
+    --palette-green: #34c38f;
+    --palette-yellow: #f1b44c;
+    --palette-red: #f46a6a;
+    --palette-cyan: #50a5f1;
+    --palette-orange: #f1734f;
+    --palette-indigo: #564ab1;
+
+    --palette-gray-100: #f8f9fa;
+    --palette-gray-200: #eff2f7;
+    --palette-gray-300: #f6f6f6;
+    --palette-gray-400: #ced4da;
+    --palette-gray-500: #adb5bd;
+    --palette-gray-600: #74788d;
+    --palette-gray-700: #495057;
+    --palette-gray-800: #343a40;
+    --palette-gray-900: #212529;
+    --palette-white: #ffffff;
+    --palette-black: #000000;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* 2. TOKENS IMMUABLES (indépendants du thème)                                */
+/* ─────────────────────────────────────────────────────────────────────────── */
+:root {
+    /* Typographie */
+    --font-family-base: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    --font-family-mono: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+    --font-size-base: 0.8125rem; /* 13px — taille de référence Skote */
+    --font-size-sm: 0.7109rem;   /* ~11.4px */
+    --font-size-lg: 1.0156rem;   /* ~16.25px */
+
+    --font-size-h6: var(--font-size-base);
+    --font-size-h5: 1.0156rem;
+    --font-size-h4: 1.2188rem;
+    --font-size-h3: 1.4219rem;
+    --font-size-h2: 1.625rem;
+    --font-size-h1: 2.03125rem;
+
+    --font-weight-light: 300;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+
+    --line-height-base: 1.5;
+    --line-height-sm: 1.25;
+    --line-height-lg: 2;
+
+    /* Espacements (Bootstrap $spacers) */
+    --space-0: 0;
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 1rem;
+    --space-4: 1.5rem;
+    --space-5: 3rem;
+    --grid-gutter: 24px;
+
+    /* Rayons */
+    --radius-sm: 0.2rem;
+    --radius-md: 0.25rem;
+    --radius-lg: 0.4rem;
+    --radius-xl: 1rem;
+    --radius-2xl: 2rem;
+    --radius-pill: 50rem;
+
+    /* Ombres */
+    --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    --shadow-md: 0 0.75rem 1.5rem rgba(18, 38, 63, 0.03);
+    --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+    --shadow-inset: inset 0 1px 2px rgba(0, 0, 0, 0.075);
+
+    /* Grille / breakpoints (tokens de référence — les classes Bootstrap utilisent les mêmes valeurs) */
+    --bp-sm: 576px;
+    --bp-md: 768px;
+    --bp-lg: 992px;
+    --bp-xl: 1200px;
+    --bp-xxl: 1400px;
+
+    /* Layout (US-063) */
+    --sidebar-width: 250px;
+    --sidebar-width-collapsed: 70px;
+    --header-height: 70px;
+    --footer-height: 60px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* 3. TOKENS SÉMANTIQUES — THÈME CLAIR (défaut)                               */
+/* Contraste WCAG 2.2 AA vérifié — cf. design-system.md §5                   */
+/* ─────────────────────────────────────────────────────────────────────────── */
+:root,
+[data-theme="light"] {
+    color-scheme: light;
+
+    /* Marque / actions primaires (corrigé : #4e65d4 → 5.08:1, vs. #556ee6 qui échoue à 4.41:1) */
+    --color-primary: #4e65d4;
+    --color-primary-surface: #556ee6; /* réservé grandes surfaces décoratives non-texte */
+    --color-on-primary: #ffffff;      /* texte sur --color-primary : 5.08:1 ✅ */
+
+    /* Statuts sémantiques */
+    --color-success: var(--palette-green);
+    --color-success-emphasis: #2e7d32;  /* 4.77:1 ✅ */
+    --color-warning: var(--palette-yellow);
+    --color-warning-emphasis: #60481e;  /* 8.02:1 ✅ */
+    --color-danger: var(--palette-red);
+    --color-danger-emphasis: #c62828;   /* 5.24:1 ✅ */
+    --color-info: var(--palette-cyan);
+    --color-info-emphasis: #204260;     /* 9.75:1 ✅ */
+
+    /* Texte sur fond plein success/warning/danger/info : FONCÉ (blanc échoue ≤ 2.95:1) */
+    --color-on-status: var(--palette-gray-900); /* 5.23:1 à 8.35:1 selon fond ✅ */
+
+    /* Alias métier */
+    --color-status-success: var(--color-success-emphasis);
+    --color-status-warning: var(--color-warning-emphasis);
+    --color-status-danger: var(--color-danger-emphasis);
+    --color-status-neutral: var(--palette-gray-600);
+    --color-status-neutral-emphasis: #555555;  /* 6.96:1 ✅ */
+
+    /* Surfaces */
+    --color-bg: #f6f7f9;
+    --color-surface: #ffffff;
+    --color-surface-alt: var(--palette-gray-100);
+
+    /* Bordures */
+    --color-border-subtle: var(--palette-gray-200);    /* décoratif uniquement */
+    --color-border-strong: var(--palette-gray-600);    /* fonctionnel : 4.36:1 ✅ */
+
+    /* Texte */
+    --color-text: var(--palette-gray-700);          /* 8.09:1 ✅ */
+    --color-text-muted: #555555;                    /* 6.96:1 ✅ */
+    --color-text-disabled: var(--palette-gray-600); /* exempté WCAG (état désactivé) */
+    --color-ink: var(--palette-gray-900);
+
+    /* Liens */
+    --color-link: var(--color-primary);
+    --color-link-hover: #3a4fb8;
+
+    /* Focus (WCAG 2.4.7 / 2.4.11) */
+    --color-focus: #0b5fff;        /* 5.13:1 sur blanc ✅ */
+    --focus-ring-width: 3px;
+    --focus-ring-offset: 2px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* 4. TOKENS SÉMANTIQUES — THÈME SOMBRE (préférence système)                  */
+/* ─────────────────────────────────────────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        color-scheme: dark;
+
+        --color-primary: #8092ec;          /* tint 25% de #556ee6, 5.12:1 ✅ */
+        --color-primary-surface: #556ee6;
+        --color-on-primary: #14183a;
+
+        --color-success: var(--palette-green);
+        --color-success-emphasis: #85dbbc;  /* tint 40% Skote, 9.12:1 ✅ */
+        --color-warning: var(--palette-yellow);
+        --color-warning-emphasis: #f7d294;
+        --color-danger: var(--palette-red);
+        --color-danger-emphasis: #f8a6a6;
+        --color-info: var(--palette-cyan);
+        --color-info-emphasis: #96c9f7;
+
+        --color-on-status: #14183a;
+
+        --color-status-success: var(--color-success-emphasis);
+        --color-status-warning: var(--color-warning-emphasis);
+        --color-status-danger: var(--color-danger-emphasis);
+        --color-status-neutral: #a6b0cf;
+        --color-status-neutral-emphasis: #c3cbe4;
+
+        --color-bg: #222736;
+        --color-surface: #2a3042;
+        --color-surface-alt: #262b3c;
+
+        --color-border-subtle: #32394e;
+        --color-border-strong: #7b839c;    /* 3.49:1 sur --color-surface ✅ */
+
+        --color-text: #a6b0cf;             /* 6.92:1 ✅ */
+        --color-text-muted: #c3cbe4;
+        --color-text-disabled: #6a7187;
+        --color-ink: #f6f6f6;
+
+        --color-link: var(--color-primary);
+        --color-link-hover: #a3b1f3;
+
+        --color-focus: #4c8bff;
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* 5. TOKENS SÉMANTIQUES — THÈME SOMBRE (choix explicite, prioritaire)        */
+/* ─────────────────────────────────────────────────────────────────────────── */
+[data-theme="dark"] {
+    color-scheme: dark;
+
+    --color-primary: #8092ec;
+    --color-primary-surface: #556ee6;
+    --color-on-primary: #14183a;
+
+    --color-success: var(--palette-green);
+    --color-success-emphasis: #85dbbc;
+    --color-warning: var(--palette-yellow);
+    --color-warning-emphasis: #f7d294;
+    --color-danger: var(--palette-red);
+    --color-danger-emphasis: #f8a6a6;
+    --color-info: var(--palette-cyan);
+    --color-info-emphasis: #96c9f7;
+
+    --color-on-status: #14183a;
+
+    --color-status-success: var(--color-success-emphasis);
+    --color-status-warning: var(--color-warning-emphasis);
+    --color-status-danger: var(--color-danger-emphasis);
+    --color-status-neutral: #a6b0cf;
+    --color-status-neutral-emphasis: #c3cbe4;
+
+    --color-bg: #222736;
+    --color-surface: #2a3042;
+    --color-surface-alt: #262b3c;
+
+    --color-border-subtle: #32394e;
+    --color-border-strong: #7b839c;
+
+    --color-text: #a6b0cf;
+    --color-text-muted: #c3cbe4;
+    --color-text-disabled: #6a7187;
+    --color-ink: #f6f6f6;
+
+    --color-link: var(--color-primary);
+    --color-link-hover: #a3b1f3;
+
+    --color-focus: #4c8bff;
+}

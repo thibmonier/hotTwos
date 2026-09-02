@@ -1,10 +1,15 @@
 import './stimulus_bootstrap.js';
-/*
- * Welcome to your app's main JavaScript file!
- *
- * This file will be included onto the page via the importmap() Twig function,
- * which should already be in your base.html.twig.
- */
-import './styles/app.css';
 
-console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');
+/**
+ * HotOnes — point d'entrée AssetMapper (US-061, T-061-02)
+ *
+ * Ordre de chargement CSS (important pour la cascade) :
+ *  1. Bootstrap 5 compilé (Skote)  → classes utilitaires, reset, grid
+ *  2. tokens.css                   → custom properties clair/sombre
+ *  3. components.css               → composants tokenisés
+ *  4. app.css                      → styles applicatifs migrés vers tokens
+ */
+import './styles/vendor/bootstrap.min.css';
+import './styles/tokens.css';
+import './styles/components.css';
+import './styles/app.css';
