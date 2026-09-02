@@ -221,11 +221,26 @@ reusable_assets:
         - "PO : checklist de validation UX non négociable vs pression fast-track (à arbitrer)"
         - "Lot tech-debt sprintf→set_config (action rétro S4) toujours en attente"
       path: project-management/backlog/epics/EPIC-012-integration-design.md
+    sprint_7:
+      id: 7
+      name: sprint-007-design-system
+      goal: "Le design system définitif (Skote + tokens accessibles) est posé et appliqué au lot 1 : charte, maquettes validées, layout intégré, écrans les plus utilisés reskinnés (EPIC-012 D1→D4)"
+      period: "2026-11-10 → 2026-11-21 (10 j ouvrés)"
+      committed_points: 23
+      stories: [US-061, US-062, US-063, US-064]
+      status: planned
+      decision_po: "Exécuter EPIC-012 (design/ergonomie) plutôt qu'étendre EPIC-001 : figer l'ergonomie avant d'étendre le dev front. US-065 (audit a11y) + US-066 (recette) → Sprint 8."
+      prereq: "Merge PR #12 (EPIC-012 backlog + conception) sur main."
+      critical_path: "US-061 (tokens) → US-063 (layout) → US-064 (reskin) ; US-062 (maquettes validées) bloque l'ouverture de US-064 écran par écran."
+      open_items:
+        - "US-063 : breakpoint 640 vs 768 px ; chargement Poppins"
+        - "Tech-debt sprintf→set_config (3 sites) à résorber en amont"
+      path: project-management/sprints/sprint-007-design-system/
     quality_gates:
       prd: "95% ✅"
       tech_spec: "96% ✅"
       backlog: "6/6 ✅"
       report: project-management/quality-gates-report.md
 
-next_action: "S5 et S6 livrés/mergés (EPIC-003 achevé, EPIC-002 delivery livré). Chantier EPIC-012 (design/ergonomie) : backlog + conception faits, PR #12 ouverte. Suite : (1) merger PR #12 ; (2) décider entre implémenter EPIC-012 (US-061 charte/tokens → US-063 layout) via un sprint dédié, ou reprendre la cadence lots (EPIC-004 planification / EPIC-005 finance) ; (3) résorber le tech-debt sprintf→set_config."
-next_command: "/workflow:start 7"
+next_action: "Sprint 7 planifié (EPIC-012 D1→D4 : US-061/062/063/064, 23 pts, but « design posé et appliqué au lot 1 »). Suite : (1) merger PR #12 ; (2) décomposer le Sprint 7 en tâches ; (3) résorber le tech-debt sprintf→set_config en amont, puis développer (US-061 en premier)."
+next_command: "/project:decompose-tasks 007"

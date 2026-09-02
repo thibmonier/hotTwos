@@ -69,7 +69,7 @@
 | Sprint 5 | Complétude & clôture du cycle temps (EPIC-003 achevé) | 22 | ✅ merged |
 | Sprint 6 | Projets & delivery (cycle de vie, structure, affectation, clôture — EPIC-002) | 21 | ✅ merged (#8) |
 
-Prochaine étape : merger la PR #12, puis planifier la suite (`/workflow:start 7` — implémentation EPIC-012 ou reprise de la cadence lots).
+**Sprint 7 planifié** (`sprints/sprint-007-design-system/`) : EPIC-012 D1→D4 (US-061/062/063/064, 23 pts) — but « design posé et appliqué au lot 1 ». Prochaine étape : merger la PR #12, puis décomposer le Sprint 7 (`/project:decompose-tasks 007`).
 
 ---
 
