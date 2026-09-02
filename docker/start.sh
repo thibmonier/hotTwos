@@ -30,5 +30,17 @@ else
     echo "[start] AVERTISSEMENT : migrations en échec — démarrage du serveur malgré tout (voir logs ci-dessus)."
 fi
 
+# En dev, le bind-mount du code (compose : .:/app) masque le public/assets/ compilé dans l'image ;
+# sans recompilation, tous les assets (CSS/JS) renvoient 404 et l'app tourne sans style. On recompile
+# donc au démarrage en dev uniquement. En prod/staging (Railway), les assets sont déjà dans l'image
+# (Dockerfile : asset-map:compile) et APP_ENV≠dev : on n'y touche pas.
+if [ "${APP_ENV:-}" = "dev" ]; then
+    echo "[start] APP_ENV=dev : (re)compilation des assets (le bind-mount masque ceux de l'image)…"
+    php bin/console importmap:install >/dev/null 2>&1 || true
+    if ! php bin/console asset-map:compile; then
+        echo "[start] AVERTISSEMENT : compilation des assets en échec — l'app peut s'afficher sans style."
+    fi
+fi
+
 echo "[start] Démarrage de FrankenPHP (mode worker)…"
 exec frankenphp run --config /etc/frankenphp/Caddyfile --adapter caddyfile
