@@ -1,6 +1,6 @@
 # Backlog Index — HotOnes
 
-> Dernière mise à jour: 2026-09-01
+> Dernière mise à jour: 2026-09-02
 > Source de vérité fonctionnelle : `project-management/cdc/` · PRD : `project-management/prd.md`
 
 ---
@@ -9,8 +9,8 @@
 
 | Type | 🔴 To Do | 🟡 In Progress | ⏸️ Blocked | 🟢 Done | Total |
 |------|----------|----------------|------------|---------|-------|
-| EPICs | 12 | 0 | 0 | 0 | 12 |
-| User Stories | 40 | 0 | 0 | 0 | 40 |
+| EPICs | 13 | 0 | 0 | 0 | 13 |
+| User Stories | 46 | 0 | 0 | 0 | 46 |
 | Tasks | 0 | 0 | 0 | 0 | 0 |
 
 **Périmètre détaillé :** Sprint 0 (fondations) + Lot 1 (Walking Skeleton + modules REF, PRJ, TMP). Lots 2 à 5 au niveau EPIC (à affiner par lot). Total exigences CDC : 248 EF.
@@ -34,25 +34,28 @@
 | EPIC-009 | Recrutement | REC | 4 | 🔴 | S/C | À affiner | — |
 | EPIC-010 | Socle IA mutualisé | transverse | 1→3 | 🔴 | M/S | 1re brique : US-053 | — |
 | EPIC-011 | Industrialisation SaaS | transverse | 5 | 🔴 | S | À affiner | — |
+| EPIC-012 | Intégration du design et de l'ergonomie | UX | transverse | 🔴 | H/M | 6 | ~31 |
 
 > Dépendances : voir `dependencies-matrix.md`. Ordre de données strict lots 1→2→3 (non parallélisables).
 
 ---
 
-## Sprint Actuel : Sprint 4 — Valorisation automatique du temps validé 🔄 en cours
+## Chantier actuel : EPIC-012 — Intégration du design et de l'ergonomie 🔄 conception faite
 
-**Goal :** Dès qu'un temps est validé, il est automatiquement valorisé (coût & taux en vigueur à la période) et le modèle analytique reflète la marge du projet.
-**Période :** 2026-09-29 → 2026-10-10 (10 j ouvrés) · **Détail :** `sprints/sprint-004-valorisation/`
-**Capacité (prévision) :** ~24 points (moy. S1-S3 : 29/20/23) · **Engagé : 21 pts**
+**But :** poser le design system (thème Skote + tokens) et l'ergonomie définitive **avant** d'étendre le développement front (chantier transverse, fast-track, hors cadence sprint).
+**Détail :** `backlog/epics/EPIC-012-integration-design.md` · **PR :** [#12](https://github.com/thibmonier/hotTwos/pull/12)
 
 | US | EPIC | Points | Statut |
 |----|------|--------|--------|
-| US-010 Structure organisationnelle et rattachements historisés | EPIC-001 | 5 | 🔴 |
-| US-011 Référentiel de profils avec coûts et taux historisés | EPIC-001 | 8 | 🔴 |
-| US-060 Valorisation automatique après validation (≤ 15 min) | EPIC-003 | 8 | 🔴 |
-| **Total engagé** | | **21** | |
+| US-061 Charte & design system (tokens + composants Skote) | EPIC-012 | 5 | 🔴 |
+| US-062 Conception UX/UI des écrans du lot 1 (maquettes validées) | EPIC-012 | 5 | 🔴 |
+| US-063 Intégration du layout Skote sur le socle Twig/Stimulus | EPIC-012 | 5 | 🔴 |
+| US-064 Reskin des écrans livrés (dont F-S5-4, F-S5-5) | EPIC-012 | 8 | 🔴 |
+| US-065 Audit & conformité accessibilité (WCAG 2.2 AA) | EPIC-012 | 5 | 🔴 |
+| US-066 Recette d'ergonomie et validation utilisateurs | EPIC-012 | 3 | 🔴 |
+| **Total indicatif** | | **~31** | |
 
-> Décision PO : chaîne complète org → taux → valorisation. Historisation à date d'effet, valorisation **figée** à la validation (`INV-2`/`ARC-113`). La sonde `RevenueRecognized` devient réelle.
+> Conception livrée : ADR-0018 (CSS Skote compilé + tokens, sans build Sass), `architecture/design-system.md` (contrastes WCAG AA vérifiés), `architecture/ux-conception-lot1.md`, maquettes `architecture/design-canvas/` (canevas claude-design). Décisions : F-S5-4 → e-mail, statuts texte+icône+couleur. À trancher en US-063 : breakpoint 640/768 px, chargement Poppins.
 
 ### Sprints livrés
 
@@ -62,8 +65,11 @@
 | Sprint 1 | Walking Skeleton (multi-tenant, auth/RBAC, analytique) | 29 | ✅ merged (#2) |
 | Sprint 2 | Consolidation technique (migrations, RLS runtime, worker, obs.) | 20 | ✅ merged (#3) |
 | Sprint 3 | Première saisie de temps (saisie ≤2min, validation par lot, RLS prod) | 23 | ✅ merged (#4) |
+| Sprint 4 | Valorisation automatique (org → taux → valorisation figée, marge) | 21 | ✅ merged (#6) |
+| Sprint 5 | Complétude & clôture du cycle temps (EPIC-003 achevé) | 22 | ✅ merged |
+| Sprint 6 | Projets & delivery (cycle de vie, structure, affectation, clôture — EPIC-002) | 21 | ✅ merged (#8) |
 
-Prochaine étape : décomposition Sprint 4 faite (`sprints/sprint-004-valorisation/task-board.md`), puis `/sprint:dev US-010`.
+**Sprint 7 planifié** (`sprints/sprint-007-design-system/`) : EPIC-012 D1→D4 (US-061/062/063/064, 23 pts) — but « design posé et appliqué au lot 1 ». Prochaine étape : merger la PR #12, puis décomposer le Sprint 7 (`/project:decompose-tasks 007`).
 
 ---
 
@@ -128,6 +134,19 @@ Prochaine étape : décomposition Sprint 4 faite (`sprints/sprint-004-valorisati
 | US-058 | Tableau de bord de complétude de saisie | 3 | S |
 | US-059 | Synthèse d'activité et planning depuis la saisie | 3 | S |
 | US-060 | Valorisation automatique après validation (≤ 15 min) | 8 | M |
+
+### EPIC-012 — Intégration du design et de l'ergonomie (~31 pts, fast-track)
+
+| US | Titre | Points | Prio |
+|----|-------|--------|------|
+| US-061 | Charte et design system (design.md → tokens + composants Skote) | 5 | M |
+| US-062 | Conception UX/UI des écrans du lot 1 (maquettes validées) | 5 | M |
+| US-063 | Intégration du layout Skote sur le socle Twig/Stimulus | 5 | M |
+| US-064 | Reskin des écrans livrés selon les maquettes | 8 | M |
+| US-065 | Audit et mise en conformité accessibilité (WCAG 2.2 AA) | 5 | M |
+| US-066 | Recette d'ergonomie et validation utilisateurs | 3 | M |
+
+> Ordre conseillé : US-061 → US-062 → US-063 → US-064, puis US-065 et US-066. Conception (US-062) prérequis du reskin (US-064) — consigne PO « UX/UI avant dev front ».
 
 ---
 
