@@ -1,0 +1,142 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    a { color: #4e65d4; text-decoration: none; } a:hover { color: #3a4fb8; }
+    .nav-item:hover { color: #ffffff; }
+    .cell:focus-within, input:focus-visible, button:focus-visible, a:focus-visible {
+      outline: 3px solid #0b5fff; outline-offset: 2px;
+    }
+  </style>
+</helmet>
+
+<div style="display:flex; width:1280px; height:860px; background:#f6f7f9; color:#495057; font-size:13px; line-height:1.5;">
+
+  <!-- Sidebar Skote (dark) -->
+  <aside style="width:250px; flex-shrink:0; background:#2a3042; color:#a6b0cf; display:flex; flex-direction:column;">
+    <div style="height:70px; flex-shrink:0; display:flex; align-items:center; gap:11px; padding:0 20px; border-bottom:1px solid #32394e;">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#556ee6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      <span style="color:#fff; font-weight:600; font-size:18px; letter-spacing:.3px;">HotOnes</span>
+    </div>
+    <div style="padding:14px 12px; font-size:11px; text-transform:uppercase; letter-spacing:.5px; color:#79829c;">Menu</div>
+    <nav style="display:flex; flex-direction:column; gap:2px; padding:0 12px;">
+      <a href="#" class="nav-item" style="display:flex; align-items:center; gap:12px; min-height:44px; padding:0 12px; border-radius:4px; color:#a6b0cf;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg><span>Tableau de bord</span></a>
+      <a href="#" style="display:flex; align-items:center; gap:12px; min-height:44px; padding:0 12px; border-radius:4px; background:#556ee6; color:#fff; font-weight:500;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Saisie des temps</span></a>
+      <a href="#" class="nav-item" style="display:flex; align-items:center; gap:12px; min-height:44px; padding:0 12px; border-radius:4px; color:#a6b0cf;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 9h18M9 3v18"/></svg><span>Complétude</span></a>
+      <a href="#" class="nav-item" style="display:flex; align-items:center; gap:12px; min-height:44px; padding:0 12px; border-radius:4px; color:#a6b0cf;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Projets</span></a>
+      <a href="#" class="nav-item" style="display:flex; align-items:center; gap:12px; min-height:44px; padding:0 12px; border-radius:4px; color:#a6b0cf;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span>Absences</span></a>
+      <a href="#" class="nav-item" style="display:flex; align-items:center; gap:12px; min-height:44px; padding:0 12px; border-radius:4px; color:#a6b0cf;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16M8 19v-6M12 19V9M16 19v-9M20 19V7"/></svg><span>Valorisation</span></a>
+      <a href="#" class="nav-item" style="display:flex; align-items:center; gap:12px; min-height:44px; padding:0 12px; border-radius:4px; color:#a6b0cf;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V5a2 2 0 0 1 2-2h6v18M13 21V9h6a2 2 0 0 1 2 2v10M7 7h.01M7 11h.01M7 15h.01"/></svg><span>Organisation</span></a>
+    </nav>
+  </aside>
+
+  <!-- Main column -->
+  <div style="display:flex; flex-direction:column; flex:1; min-width:0;">
+
+    <!-- Topbar -->
+    <header style="height:70px; flex-shrink:0; background:#fff; border-bottom:1px solid #eff2f7; display:flex; align-items:center; justify-content:space-between; padding:0 24px;">
+      <div style="display:flex; flex-direction:column;">
+        <span style="font-size:11px; color:#74788d;">Temps &amp; activité</span>
+        <span style="font-size:16px; font-weight:600; color:#212529;">Saisie des temps</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:14px;">
+        <div style="display:flex; align-items:center; gap:8px; height:38px; padding:0 12px; background:#f3f3f9; border-radius:4px; color:#74788d;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
+          <span style="font-size:12px;">Rechercher un projet…</span>
+        </div>
+        <button aria-label="Basculer le thème" style="width:38px; height:38px; border:1px solid #eff2f7; background:#fff; border-radius:4px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#74788d;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+        <div style="display:flex; align-items:center; gap:9px;">
+          <div style="width:34px; height:34px; border-radius:50%; background:#556ee6; color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600;">CM</div>
+          <span style="font-size:12px; color:#495057;">camille.martin@hotones.fr</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <main style="flex:1; padding:24px; overflow:auto;">
+
+      <!-- Action bar : navigation semaine + soumettre -->
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:18px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button aria-label="Semaine précédente" style="width:40px; height:40px; border:1px solid #74788d; background:#fff; border-radius:4px; cursor:pointer; color:#495057; display:flex; align-items:center; justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+          <div style="display:flex; flex-direction:column; align-items:center; min-width:230px;">
+            <span style="font-weight:600; color:#212529; font-size:14px;">Semaine 36</span>
+            <span style="font-size:12px; color:#74788d;">31 août – 4 septembre 2026</span>
+          </div>
+          <button aria-label="Semaine suivante" style="width:40px; height:40px; border:1px solid #74788d; background:#fff; border-radius:4px; cursor:pointer; color:#495057; display:flex; align-items:center; justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span style="display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border:1px solid #60481e; border-radius:4px; color:#60481e; font-size:12px; font-weight:600; background:#fdf6e9;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>Brouillon — non soumis</span>
+          <button style="height:44px; padding:0 20px; background:#4e65d4; color:#fff; border:none; border-radius:4px; font:inherit; font-weight:500; cursor:pointer; display:inline-flex; align-items:center; gap:8px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Soumettre la semaine</button>
+        </div>
+      </div>
+
+      <!-- Grille de saisie -->
+      <div style="background:#fff; border:1px solid #eff2f7; border-radius:6px; box-shadow:0 .125rem .25rem rgba(0,0,0,.04); overflow:hidden;">
+        <div style="display:grid; grid-template-columns:2.4fr repeat(5, 1fr) 0.9fr; align-items:stretch;">
+
+          <!-- Header row -->
+          <div style="background:#f8f9fa; padding:12px 16px; font-weight:600; color:#495057; border-bottom:1px solid #eff2f7;">Projet · Lot</div>
+          <div style="background:#f8f9fa; padding:12px 8px; text-align:center; border-bottom:1px solid #eff2f7;"><div style="font-weight:600; color:#495057;">Lun</div><div style="font-size:11px; color:#74788d;">31</div></div>
+          <div style="background:#f8f9fa; padding:12px 8px; text-align:center; border-bottom:1px solid #eff2f7;"><div style="font-weight:600; color:#495057;">Mar</div><div style="font-size:11px; color:#74788d;">01</div></div>
+          <div style="background:#f8f9fa; padding:12px 8px; text-align:center; border-bottom:1px solid #eff2f7;"><div style="font-weight:600; color:#495057;">Mer</div><div style="font-size:11px; color:#74788d;">02</div></div>
+          <div style="background:#f8f9fa; padding:12px 8px; text-align:center; border-bottom:1px solid #eff2f7;"><div style="font-weight:600; color:#495057;">Jeu</div><div style="font-size:11px; color:#74788d;">03</div></div>
+          <div style="background:#f8f9fa; padding:12px 8px; text-align:center; border-bottom:1px solid #eff2f7;"><div style="font-weight:600; color:#495057;">Ven</div><div style="font-size:11px; color:#74788d;">04</div></div>
+          <div style="background:#f8f9fa; padding:12px 8px; text-align:center; font-weight:600; color:#495057; border-bottom:1px solid #eff2f7;">Total</div>
+
+          <!-- Row 1 -->
+          <div style="padding:12px 16px; border-bottom:1px solid #f0f1f5; display:flex; flex-direction:column; justify-content:center;"><span style="font-weight:600; color:#212529;">Refonte SI Atoll</span><span style="font-size:11px; color:#74788d;">Lot 2 · Développement</span></div>
+          <div style="padding:8px; border-bottom:1px solid #f0f1f5; display:flex; align-items:center; justify-content:center;" class="cell"><div style="width:52px; height:44px; border:1px solid #74788d; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:14px; color:#212529;">7.0</div></div>
+          <div style="padding:8px; border-bottom:1px solid #f0f1f5; display:flex; align-items:center; justify-content:center;" class="cell"><div style="width:52px; height:44px; border:1px solid #74788d; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:14px; color:#212529;">7.0</div></div>
+          <div style="padding:8px; border-bottom:1px solid #f0f1f5; display:flex; align-items:center; justify-content:center;" class="cell"><div style="width:52px; height:44px; border:1px solid #74788d; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:14px; color:#212529;">4.0</div></div>
+          <div style="padding:8px; border-bottom:1px solid #f0f1f5; display:flex; align-items:center; justify-content:center;" class="cell"><div style="width:52px; height:44px; border:1px solid #74788d; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:14px; color:#212529;">7.0</div></div>
+          <div style="padding:8px; border-bottom:1px solid #f0f1f5; display:flex; align-items:center; justify-content:center;" class="cell"><div style="width:52px; height:44px; border:1px solid #74788d; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:14px; color:#212529;">3.5</div></div>
+          <div style="padding:8px; border-bottom:1px solid #f0f1f5; display:flex; align-items:center; justify-content:center; font-weight:600; color:#212529;">28.5</div>
+
+          <!-- Row 2 -->
+          <div style="padding:12px 16px; border-bottom:1px solid #f0f1f5; display:flex; flex-direction:column; justify-content:center;"><span style="font-weight:600; color:#212529;">Portail RH Néo</span><span style="font-size:11px; color:#74788d;">Lot 1 · Cadrage</span></div>
+          <div style="padding:8px; border-bottom:1px solid #f0f1f5; display:flex; align-items:center; justify-content:center;" class="cell"><div style="width:52px; height:44px; border:1px solid #74788d; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:14px; color:#212529;">—</div></div>
+          <div style="padding:8px; border-bottom:1px solid #f0f1f5; display:flex; align-items:center; justify-content:center;" class="cell"><div style="width:52px; height:44px; border:1px solid #74788d; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:14px; color:#212529;">—</div></div>
+          <div style="padding:8px; border-bottom:1px solid #f0f1f5; display:flex; align-items:center; justify-content:center;" class="cell"><div style="width:52px; height:44px; border:1px solid #74788d; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:14px; color:#212529;">3.0</div></div>
+          <div style="padding:8px; border-bottom:1px solid #f0f1f5; display:flex; align-items:center; justify-content:center;" class="cell"><div style="width:52px; height:44px; border:1px solid #74788d; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:14px; color:#212529;">—</div></div>
+          <div style="padding:8px; border-bottom:1px solid #f0f1f5; display:flex; align-items:center; justify-content:center;" class="cell"><div style="width:52px; height:44px; border:1px solid #74788d; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:14px; color:#212529;">3.5</div></div>
+          <div style="padding:8px; border-bottom:1px solid #f0f1f5; display:flex; align-items:center; justify-content:center; font-weight:600; color:#212529;">6.5</div>
+
+          <!-- Add row -->
+          <div style="grid-column:1 / -1; padding:12px 16px; border-bottom:1px solid #eff2f7;"><button style="display:inline-flex; align-items:center; gap:8px; height:40px; padding:0 14px; background:#fff; border:1px solid #74788d; border-radius:4px; color:#4e65d4; font:inherit; font-weight:500; cursor:pointer;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>Ajouter une imputation</button></div>
+
+          <!-- Totals row -->
+          <div style="padding:12px 16px; background:#f8f9fa; font-weight:600; color:#495057;">Total par jour</div>
+          <div style="padding:12px 8px; background:#f8f9fa; text-align:center; font-weight:600; color:#212529;">7.0</div>
+          <div style="padding:12px 8px; background:#f8f9fa; text-align:center; font-weight:600; color:#212529;">7.0</div>
+          <div style="padding:12px 8px; background:#f8f9fa; text-align:center; font-weight:600; color:#212529;">7.0</div>
+          <div style="padding:12px 8px; background:#f8f9fa; text-align:center; font-weight:600; color:#212529;">7.0</div>
+          <div style="padding:12px 8px; background:#f8f9fa; text-align:center; font-weight:600; color:#212529;">7.0</div>
+          <div style="padding:12px 8px; background:#eef1fb; text-align:center; font-weight:600; color:#212529;">35.0</div>
+        </div>
+      </div>
+
+      <!-- Barre de complétude de la semaine -->
+      <div style="display:flex; align-items:center; gap:16px; margin-top:16px; background:#fff; border:1px solid #eff2f7; border-radius:6px; padding:14px 18px;">
+        <div style="flex:1;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span style="font-weight:600; color:#212529;">Semaine complète — 35.0 h sur 35 h attendues</span><span style="color:#2e7d32; font-weight:600;">100 %</span></div>
+          <div style="height:8px; background:#eff2f7; border-radius:4px; overflow:hidden;"><div style="width:100%; height:100%; background:#2e7d32;"></div></div>
+        </div>
+        <span style="display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border:1px solid #2e7d32; border-radius:4px; color:#2e7d32; font-weight:600; font-size:12px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Prête à soumettre</span>
+      </div>
+
+    </main>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

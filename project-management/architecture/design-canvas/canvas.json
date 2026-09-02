@@ -1,0 +1,11 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "title": "Saisie hebdomadaire", "x": 0, "y": 0, "w": 1280, "h": 860 },
+    { "file": "Completude.dc.html", "title": "Complétude de saisie", "x": 1360, "y": 0, "w": 1280, "h": 860 },
+    { "file": "Valorisation.dc.html", "title": "Valorisation", "x": 2720, "y": 0, "w": 1280, "h": 860 }
+  ],
+  "annotations": [
+    { "id": "intent", "x": 0, "y": -150, "w": 620, "text": "EPIC-012 — maquettes lot 1 inspirées du thème Skote, alignées sur design-system.md (tokens, contrastes WCAG 2.2 AA vérifiés).\nShell Skote (sidebar 250px + topbar 70px) intégré dans chaque écran. Statuts : texte + icône + couleur (jamais la couleur seule). Collaborateurs identifiés par e-mail (F-S5-4)." }
+  ],
+  "launch": { "view": "canvas" }
+}

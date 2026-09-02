@@ -1,0 +1,4 @@
+# Canevas claude-design seedé (généré depuis les *.dc.html + canvas.json, ~2 Mo).
+# Régénérable via seed-canvas.mjs ; publié comme Artifact. On ne versionne que les sources.
+*.html
+!*.dc.html
