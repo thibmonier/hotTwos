@@ -1,6 +1,6 @@
 # Backlog Index — HotOnes
 
-> Dernière mise à jour: 2026-09-01
+> Dernière mise à jour: 2026-09-02
 > Source de vérité fonctionnelle : `project-management/cdc/` · PRD : `project-management/prd.md`
 
 ---
@@ -9,8 +9,8 @@
 
 | Type | 🔴 To Do | 🟡 In Progress | ⏸️ Blocked | 🟢 Done | Total |
 |------|----------|----------------|------------|---------|-------|
-| EPICs | 12 | 0 | 0 | 0 | 12 |
-| User Stories | 40 | 0 | 0 | 0 | 40 |
+| EPICs | 13 | 0 | 0 | 0 | 13 |
+| User Stories | 46 | 0 | 0 | 0 | 46 |
 | Tasks | 0 | 0 | 0 | 0 | 0 |
 
 **Périmètre détaillé :** Sprint 0 (fondations) + Lot 1 (Walking Skeleton + modules REF, PRJ, TMP). Lots 2 à 5 au niveau EPIC (à affiner par lot). Total exigences CDC : 248 EF.
@@ -34,6 +34,7 @@
 | EPIC-009 | Recrutement | REC | 4 | 🔴 | S/C | À affiner | — |
 | EPIC-010 | Socle IA mutualisé | transverse | 1→3 | 🔴 | M/S | 1re brique : US-053 | — |
 | EPIC-011 | Industrialisation SaaS | transverse | 5 | 🔴 | S | À affiner | — |
+| EPIC-012 | Intégration du design et de l'ergonomie | UX | transverse | 🔴 | H/M | 6 | ~31 |
 
 > Dépendances : voir `dependencies-matrix.md`. Ordre de données strict lots 1→2→3 (non parallélisables).
 
@@ -128,6 +129,19 @@ Prochaine étape : décomposition Sprint 4 faite (`sprints/sprint-004-valorisati
 | US-058 | Tableau de bord de complétude de saisie | 3 | S |
 | US-059 | Synthèse d'activité et planning depuis la saisie | 3 | S |
 | US-060 | Valorisation automatique après validation (≤ 15 min) | 8 | M |
+
+### EPIC-012 — Intégration du design et de l'ergonomie (~31 pts, fast-track)
+
+| US | Titre | Points | Prio |
+|----|-------|--------|------|
+| US-061 | Charte et design system (design.md → tokens + composants Skote) | 5 | M |
+| US-062 | Conception UX/UI des écrans du lot 1 (maquettes validées) | 5 | M |
+| US-063 | Intégration du layout Skote sur le socle Twig/Stimulus | 5 | M |
+| US-064 | Reskin des écrans livrés selon les maquettes | 8 | M |
+| US-065 | Audit et mise en conformité accessibilité (WCAG 2.2 AA) | 5 | M |
+| US-066 | Recette d'ergonomie et validation utilisateurs | 3 | M |
+
+> Ordre conseillé : US-061 → US-062 → US-063 → US-064, puis US-065 et US-066. Conception (US-062) prérequis du reskin (US-064) — consigne PO « UX/UI avant dev front ».
 
 ---
 
