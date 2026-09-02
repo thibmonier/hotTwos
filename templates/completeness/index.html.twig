@@ -1,61 +1,123 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Complétude de saisie{% endblock %}
+{% block page_section %}Temps & activité{% endblock %}
+{% block page_title %}Complétude de saisie{% endblock %}
 
 {% set labels = {
-    'submitted': '✅ Complète',
-    'partial': '⚠️ Partielle',
-    'empty_late': '❌ En retard',
-    'in_progress': '⏳ En cours'
+    'submitted': 'Soumis',
+    'partial': 'Partiel',
+    'empty_late': 'Vide',
+    'in_progress': 'En cours'
+} %}
+
+{% set badge_classes = {
+    'submitted': 'status-badge-success',
+    'partial': 'status-badge-warning',
+    'empty_late': 'status-badge-danger',
+    'in_progress': 'status-badge-neutral'
 } %}
 
 {% block body %}
-    <main class="container">
-        <h1>Complétude de saisie</h1>
+    <h1 class="visually-hidden">Complétude de saisie</h1>
 
-        <p>{{ team ? 'Périmètre équipe' : 'Vos semaines' }} — 4 dernières semaines.
-            <a href="{{ path('api_completeness_export') }}{{ team ? '?scope=team' : '' }}">Exporter en CSV</a>
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+        <p class="mb-0 text-muted">
+            {{ team ? 'Périmètre équipe' : 'Vos semaines' }} — 4 dernières semaines.
         </p>
+        <a href="{{ path('api_completeness_export') }}{{ team ? '?scope=team' : '' }}"
+           class="btn btn-outline-secondary btn-sm">
+            Exporter en CSV
+        </a>
+    </div>
 
-        <section aria-labelledby="legend-heading">
-            <h2 id="legend-heading" class="visually-hidden">Légende</h2>
-            <ul class="completeness-legend">
-                {% for state, label in labels %}
-                    <li class="state-{{ state }}">{{ label }}</li>
-                {% endfor %}
-            </ul>
-        </section>
+    <section aria-labelledby="legend-heading" class="mb-3">
+        <h2 id="legend-heading" class="visually-hidden">Légende</h2>
+        <div class="completeness-legend-bar d-flex align-items-center flex-wrap gap-2">
+            <span class="completeness-legend-title">Légende</span>
+            <span class="status-badge status-badge-success">Soumis</span>
+            <span class="status-badge status-badge-warning">Partiel</span>
+            <span class="status-badge status-badge-danger">Vide</span>
+            <span class="status-badge status-badge-neutral">En cours</span>
+        </div>
+    </section>
 
-        {% if rows is empty %}
-            <p>Aucune donnée de saisie disponible pour votre périmètre. Les premières saisies apparaîtront ici.</p>
-        {% else %}
-            <table class="completeness-grid">
+    {% if rows is empty %}
+        <div class="card">
+            <div class="card-body text-muted">
+                Aucune donnée de saisie disponible pour votre périmètre. Les premières saisies apparaîtront ici.
+            </div>
+        </div>
+    {% else %}
+        <div class="table-responsive">
+            <table class="table table-hover table-compact">
+                <caption class="visually-hidden">Grille de complétude de saisie par collaborateur et par semaine</caption>
                 <thead>
                     <tr>
                         <th scope="col">Collaborateur</th>
                         {% for week in weeks %}
-                            <th scope="col">Sem. {{ week }}</th>
+                            <th scope="col" class="text-center">Sem. {{ week }}</th>
                         {% endfor %}
                     </tr>
                 </thead>
                 <tbody>
                     {% for userId, cells in rows %}
                         <tr>
-                            <th scope="row"><code>{{ userId[:8] }}</code></th>
+                            <th scope="row" class="completeness-user-cell">{{ userId[:8] }}</th>
                             {% for week in weeks %}
                                 {% set cell = cells[week] ?? null %}
-                                <td class="{{ cell ? 'state-' ~ cell.state : '' }}">
+                                <td class="text-center">
                                     {% if cell %}
-                                        <span aria-label="{{ labels[cell.state]|replace({'✅ ': '', '⚠️ ': '', '❌ ': '', '⏳ ': ''}) }} ({{ cell.rate }}%)">
-                                            {{ labels[cell.state] }} <small>{{ cell.rate }}%</small>
+                                        {% set stateLabel = labels[cell.state] ?? cell.state %}
+                                        {% set stateClass = badge_classes[cell.state] ?? 'status-badge-neutral' %}
+                                        <span class="status-badge {{ stateClass }}"
+                                              aria-label="{{ stateLabel }} ({{ cell.rate }}%)">
+                                            {{ stateLabel }}
+                                            <span class="completeness-rate">{{ cell.rate }}%</span>
                                         </span>
-                                    {% else %}—{% endif %}
+                                    {% else %}
+                                        <span class="text-muted" aria-label="Aucune donnée">—</span>
+                                    {% endif %}
                                 </td>
                             {% endfor %}
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
-        {% endif %}
-    </main>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .completeness-legend-bar {
+        padding: 10px 16px;
+        background: var(--color-surface-alt);
+        border: 1px solid var(--color-border-subtle);
+        border-radius: var(--radius-md);
+    }
+
+    .completeness-legend-title {
+        font-size: 11px;
+        font-weight: var(--font-weight-semibold);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--color-text-muted);
+        margin-right: 4px;
+    }
+
+    .completeness-user-cell {
+        font-weight: var(--font-weight-normal);
+        color: var(--color-text);
+        max-width: 180px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .completeness-rate {
+        font-size: 10px;
+        opacity: 0.75;
+        margin-left: 3px;
+    }
+</style>
 {% endblock %}

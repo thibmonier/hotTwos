@@ -2,82 +2,155 @@
 
 {% block title %}Profils & tarifs{% endblock %}
 
-{% block body %}
-    <main class="container" data-controller="pricing">
-        <h1>Profils de tarification</h1>
+{% block page_section %}Administration{% endblock %}
+{% block page_title %}Profils de tarification{% endblock %}
 
-        <section aria-labelledby="profiles-heading">
-            <h2 id="profiles-heading">Profils</h2>
+{% block body %}
+    <h1 class="visually-hidden">Profils de tarification</h1>
+
+    <div data-controller="pricing">
+
+        {#Liste des profils #}
+        <section aria-labelledby="profiles-heading" class="mb-4">
+            <h2 id="profiles-heading" class="fs-5 fw-semibold mb-3">Profils</h2>
+
             {% if rows is empty %}
-                <p>Aucun profil pour l'instant. Créez le premier ci-dessous.</p>
+                <p class="text-muted">Aucun profil pour l'instant. Créez le premier ci-dessous.</p>
             {% else %}
-                <ul class="profile-list">
-                    {% for row in rows %}
-                        <li>
-                            <span class="{{ row.active ? '' : 'profile-inactive' }}">
-                                {{ row.name }} <em>({{ row.mode }})</em>{{ row.active ? '' : ' — désactivé' }}
-                            </span>
-                            <button type="button" data-action="pricing#showHistory" data-profile-id="{{ row.id }}"
-                                    aria-label="Voir l'historique tarifaire de {{ row.name }}">Historique</button>
-                            {% if row.active %}
-                                <button type="button" data-action="pricing#deactivate" data-profile-id="{{ row.id }}"
-                                        aria-label="Désactiver le profil {{ row.name }}">Désactiver</button>
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
+                <div class="card">
+                    <ul class="list-group list-group-flush">
+                        {% for row in rows %}
+                            <li class="list-group-item d-flex align-items-center justify-content-between gap-2 flex-wrap">
+                                <span class="{{ row.active ? 'fw-medium' : 'text-muted fst-italic' }}">
+                                    {{ row.name }}
+                                    <em class="text-muted fw-normal">({{ row.mode }})</em>
+                                    {% if not row.active %}
+                                        <span class="status-badge status-badge-neutral ms-1">Désactivé</span>
+                                    {% endif %}
+                                </span>
+                                <span class="d-flex gap-1">
+                                    <button type="button"
+                                            class="btn btn-outline-secondary btn-sm"
+                                            data-action="pricing#showHistory"
+                                            data-profile-id="{{ row.id }}"
+                                            aria-label="Voir l'historique tarifaire de {{ row.name }}">
+                                        Historique
+                                    </button>
+                                    {% if row.active %}
+                                        <button type="button"
+                                                class="btn btn-outline-secondary btn-sm"
+                                                data-action="pricing#deactivate"
+                                                data-profile-id="{{ row.id }}"
+                                                aria-label="Désactiver le profil {{ row.name }}">
+                                            Désactiver
+                                        </button>
+                                    {% endif %}
+                                </span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
             {% endif %}
         </section>
 
-        <section aria-labelledby="create-profile-heading">
-            <h2 id="create-profile-heading">Ajouter un profil</h2>
-            <form data-action="submit->pricing#createProfile">
-                <label>Nom <input type="text" required data-pricing-target="profileName" placeholder="ex. Développeur senior"></label>
-                <label>Mode de calcul du coût
-                    <select data-pricing-target="profileMode">
-                        <option value="direct">Direct</option>
-                        <option value="loaded">Chargé</option>
-                        <option value="full">Complet</option>
-                    </select>
-                </label>
-                <button type="submit">Créer le profil</button>
-            </form>
+        {#Ajouter un profil #}
+        <section aria-labelledby="create-profile-heading" class="mb-4">
+            <h2 id="create-profile-heading" class="fs-5 fw-semibold mb-3">Ajouter un profil</h2>
+            <div class="card">
+                <div class="card-body">
+                    <form data-action="submit->pricing#createProfile">
+                        <div class="mb-3">
+                            <label for="pricing-profile-name" class="form-label">Nom</label>
+                            <input type="text" id="pricing-profile-name" class="form-control" required
+                                   data-pricing-target="profileName"
+                                   placeholder="ex. Développeur senior">
+                        </div>
+                        <div class="mb-3">
+                            <label for="pricing-profile-mode" class="form-label">Mode de calcul du coût</label>
+                            <select id="pricing-profile-mode" class="form-select"
+                                    data-pricing-target="profileMode">
+                                <option value="direct">Direct</option>
+                                <option value="loaded">Chargé</option>
+                                <option value="full">Complet</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm">Créer le profil</button>
+                    </form>
+                </div>
+            </div>
         </section>
 
-        <section aria-labelledby="define-rate-heading">
-            <h2 id="define-rate-heading">Définir un tarif</h2>
-            <form data-action="submit->pricing#defineRate">
-                <label>Profil
-                    <select required data-pricing-target="rateProfile">
-                        {% for row in rows %}
-                            <option value="{{ row.id }}">{{ row.name }}</option>
-                        {% endfor %}
-                    </select>
-                </label>
-                <label>À partir du <input type="date" required data-pricing-target="rateFrom"></label>
-                <label>Jusqu'au (optionnel) <input type="date" data-pricing-target="rateTo"></label>
-                <label>Coût de revient (centimes) <input type="number" min="1" required data-pricing-target="rateCost"></label>
-                <label>Taux de vente (centimes) <input type="number" min="1" required data-pricing-target="rateSelling"></label>
-                <label><input type="checkbox" data-pricing-target="rateConfirm"> Confirmer une saisie rétroactive</label>
-                <button type="submit">Enregistrer le tarif</button>
-            </form>
+        {#Définir un tarif #}
+        <section aria-labelledby="define-rate-heading" class="mb-4">
+            <h2 id="define-rate-heading" class="fs-5 fw-semibold mb-3">Définir un tarif</h2>
+            <div class="card">
+                <div class="card-body">
+                    <form data-action="submit->pricing#defineRate">
+                        <div class="mb-3">
+                            <label for="pricing-rate-profile" class="form-label">Profil</label>
+                            <select id="pricing-rate-profile" class="form-select" required
+                                    data-pricing-target="rateProfile">
+                                {% for row in rows %}
+                                    <option value="{{ row.id }}">{{ row.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="pricing-rate-from" class="form-label">À partir du</label>
+                                <input type="date" id="pricing-rate-from" class="form-control" required
+                                       data-pricing-target="rateFrom">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="pricing-rate-to" class="form-label">Jusqu'au <span class="text-muted fw-normal">(optionnel)</span></label>
+                                <input type="date" id="pricing-rate-to" class="form-control"
+                                       data-pricing-target="rateTo">
+                            </div>
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="pricing-rate-cost" class="form-label">Coût de revient <span class="text-muted fw-normal">(centimes)</span></label>
+                                <input type="number" id="pricing-rate-cost" class="form-control" min="1" required
+                                       data-pricing-target="rateCost">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="pricing-rate-selling" class="form-label">Taux de vente <span class="text-muted fw-normal">(centimes)</span></label>
+                                <input type="number" id="pricing-rate-selling" class="form-control" min="1" required
+                                       data-pricing-target="rateSelling">
+                            </div>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="pricing-rate-confirm"
+                                   data-pricing-target="rateConfirm">
+                            <label class="form-check-label" for="pricing-rate-confirm">
+                                Confirmer une saisie rétroactive
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm">Enregistrer le tarif</button>
+                    </form>
+                </div>
+            </div>
         </section>
 
-        <section aria-labelledby="history-heading">
-            <h2 id="history-heading">Historique tarifaire</h2>
-            <table class="rate-history">
-                <thead>
-                    <tr>
-                        <th scope="col">À partir du</th>
-                        <th scope="col">Jusqu'au</th>
-                        <th scope="col">Coût (cts)</th>
-                        <th scope="col">Vente (cts)</th>
-                    </tr>
-                </thead>
-                <tbody data-pricing-target="history"></tbody>
-            </table>
+        {#Historique tarifaire #}
+        <section aria-labelledby="history-heading" class="mb-4">
+            <h2 id="history-heading" class="fs-5 fw-semibold mb-3">Historique tarifaire</h2>
+            <div class="table-responsive">
+                <table class="table table-hover table-compact">
+                    <caption class="visually-hidden">Historique des tarifs par profil</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">À partir du</th>
+                            <th scope="col">Jusqu'au</th>
+                            <th scope="col">Coût (cts)</th>
+                            <th scope="col">Vente (cts)</th>
+                        </tr>
+                    </thead>
+                    <tbody data-pricing-target="history"></tbody>
+                </table>
+            </div>
         </section>
 
-        <p class="hint" aria-live="polite" data-pricing-target="status"></p>
-    </main>
+        <p class="text-muted small" aria-live="polite" data-pricing-target="status"></p>
+    </div>
 {% endblock %}

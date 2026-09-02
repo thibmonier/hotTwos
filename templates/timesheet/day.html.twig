@@ -2,69 +2,191 @@
 
 {% block title %}Saisie du jour — {{ dayLabel }}{% endblock %}
 
+{% block page_section %}Temps & activité{% endblock %}
+{% block page_title %}Saisie du jour{% endblock %}
+
+{% block stylesheets %}
+<style>
+    /* ── Navigation journalière ── */
+    .day-nav-btn {
+        width: 44px;
+        height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--color-border-strong);
+        border-radius: var(--radius-md, .375rem);
+        color: var(--color-text);
+        background: var(--color-surface);
+        text-decoration: none;
+        font-size: 1.1rem;
+    }
+    .day-nav-btn:hover {
+        background: var(--color-surface-alt);
+        color: var(--color-text);
+    }
+    .day-nav-label {
+        font-weight: var(--font-weight-semibold, 600);
+        color: var(--color-text);
+        font-size: .9rem;
+        text-decoration: none;
+    }
+    .day-nav-label:hover {
+        color: var(--color-primary);
+    }
+
+    /* ── Total journalier ── */
+    .day-total {
+        font-size: 1rem;
+        font-weight: var(--font-weight-semibold, 600);
+        color: var(--color-text);
+        min-height: 1.5rem;
+    }
+
+    /* ── Bannières hors-ligne ── */
+    .offline-banner {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2, .5rem);
+        padding: var(--space-3, .75rem) var(--space-4, 1rem);
+        background-color: var(--color-surface-alt);
+        border: 1px solid var(--color-border-subtle);
+        border-radius: var(--radius-md, .375rem);
+        color: var(--color-text-muted);
+        font-size: .875rem;
+        margin-bottom: var(--space-3, .75rem);
+    }
+
+    /* ── Carte de saisie journalière ── */
+    .day-entry-card {
+        list-style: none;
+    }
+    .day-entries {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3, .75rem);
+        padding: 0;
+        margin: 0;
+    }
+    .day-entry-header {
+        font-weight: var(--font-weight-semibold, 600);
+        color: var(--color-text);
+        margin-bottom: var(--space-2, .5rem);
+    }
+    .day-entry-header small {
+        font-weight: 400;
+        color: var(--color-text-muted);
+        font-size: .8rem;
+        margin-left: var(--space-2, .5rem);
+    }
+
+    /* ── Champ durée (numérique compact) ── */
+    .day-entry-duration {
+        width: 100px;
+        text-align: center;
+    }
+
+    /* ── Barre de soumission ── */
+    .day-submit-bar {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3, .75rem);
+        flex-wrap: wrap;
+        margin-top: var(--space-4, 1rem);
+    }
+</style>
+{% endblock %}
+
 {% block body %}
-    <main class="container day-view"
-          data-controller="timesheet-day"
-          data-timesheet-day-date-value="{{ date }}"
-          data-timesheet-day-prev-value="{{ prevDate }}"
-          data-timesheet-day-next-value="{{ nextDate }}">
-        <h1>Saisie du jour</h1>
+{# data-controller="timesheet-day" asserté par TimesheetDayPageTest #}
+<div data-controller="timesheet-day"
+     data-timesheet-day-date-value="{{ date }}"
+     data-timesheet-day-prev-value="{{ prevDate }}"
+     data-timesheet-day-next-value="{{ nextDate }}">
 
-        <nav class="day-nav" aria-label="Navigation entre les jours">
-            <a href="{{ path('timesheet_day', { date: prevDate }) }}" class="day-nav-btn" rel="prev" aria-label="Jour précédent">←</a>
-            <a href="{{ path('timesheet_day', { date: todayDate }) }}" class="day-nav-label">{{ dayLabel }} — semaine {{ weekNumber }}</a>
-            <a href="{{ path('timesheet_day', { date: nextDate }) }}" class="day-nav-btn" rel="next" aria-label="Jour suivant">→</a>
-        </nav>
+    <h1 class="visually-hidden">Saisie du jour</h1>
 
-        <p class="day-total" data-timesheet-day-target="total" aria-live="polite"></p>
+    {# Navigation entre les jours #}
+    <nav class="d-flex align-items-center gap-2 mb-4" aria-label="Navigation entre les jours">
+        <a href="{{ path('timesheet_day', { date: prevDate }) }}" class="day-nav-btn" rel="prev" aria-label="Jour précédent">←</a>
+        <a href="{{ path('timesheet_day', { date: todayDate }) }}" class="day-nav-label">{{ dayLabel }} — semaine {{ weekNumber }}</a>
+        <a href="{{ path('timesheet_day', { date: nextDate }) }}" class="day-nav-btn" rel="next" aria-label="Jour suivant">→</a>
+    </nav>
 
-        <p class="offline-banner" role="status" aria-live="polite" hidden data-timesheet-day-target="offlineBanner">
-            <span aria-hidden="true">📴</span> Pas de connexion — vos saisies sont conservées sur cet appareil.
-        </p>
-        <p class="offline-banner" role="status" aria-live="polite" hidden data-timesheet-day-target="resyncBanner">
-            <span aria-hidden="true">🔄</span> Saisies en attente de synchronisation.
-            <button type="button" data-action="timesheet-day#resync">Resynchroniser</button>
-        </p>
+    {# Total journalier (mis à jour par Stimulus) #}
+    <p class="day-total mb-3" data-timesheet-day-target="total" aria-live="polite"></p>
 
-        {% if projects is empty %}
-            <p>Aucun projet actif : demandez à un administrateur d'en créer un pour saisir votre temps.</p>
-        {% else %}
-            <p>
-                <button type="button" data-action="timesheet-day#duplicatePrevious">Reprendre la saisie de la veille</button>
-            </p>
+    {# Bannières hors-ligne #}
+    <p class="offline-banner" role="status" aria-live="polite" hidden data-timesheet-day-target="offlineBanner">
+        <span aria-hidden="true">📴</span> Pas de connexion — vos saisies sont conservées sur cet appareil.
+    </p>
+    <p class="offline-banner" role="status" aria-live="polite" hidden data-timesheet-day-target="resyncBanner">
+        <span aria-hidden="true">🔄</span> Saisies en attente de synchronisation.
+        <button type="button" class="btn btn-link btn-sm p-0 ms-1" data-action="timesheet-day#resync">Resynchroniser</button>
+    </p>
 
-            <ul class="day-entries">
-                {% for project in projects %}
-                    {% set minutes = minutesByProject[project.id] ?? null %}
-                    <li class="day-entry-card">
-                        <div class="day-entry-header">{{ project.name }} <small>{{ project.code }}</small></div>
-
-                        <label class="day-entry-field" for="duration-{{ loop.index }}">Durée (minutes)</label>
-                        <input type="number" id="duration-{{ loop.index }}" class="day-entry-duration"
-                               inputmode="numeric" min="0" max="1440" step="15"
-                               value="{{ minutes }}"
-                               data-timesheet-day-target="entry"
-                               data-project-id="{{ project.id }}"
-                               data-previous-minutes="{{ previousMinutesByProject[project.id] ?? '' }}"
-                               data-action="input->timesheet-day#recalculate"
-                               aria-describedby="duration-help">
-
-                        <label class="day-entry-field" for="comment-{{ loop.index }}">Commentaire (optionnel)</label>
-                        <input type="text" id="comment-{{ loop.index }}" class="day-entry-comment"
-                               maxlength="500" data-timesheet-day-target="comment" data-project-id="{{ project.id }}">
-                    </li>
-                {% endfor %}
-            </ul>
-            <p id="duration-help" class="hint">Durée en minutes, par pas de 15 (ex. 90 pour 1h30).</p>
-
-            <div class="day-submit-bar">
-                <button type="button" class="day-submit-btn" data-timesheet-day-target="submit" data-action="timesheet-day#submitDay">
-                    Enregistrer la journée
-                </button>
-                <span class="hint" role="status" aria-live="polite" data-timesheet-day-target="status"></span>
+    {% if projects is empty %}
+        <div class="card">
+            <div class="card-body text-muted">
+                Aucun projet actif : demandez à un administrateur d'en créer un pour saisir votre temps.
             </div>
-        {% endif %}
+        </div>
+    {% else %}
+        <div class="mb-3">
+            <button type="button" class="btn btn-outline-secondary btn-sm" data-action="timesheet-day#duplicatePrevious">
+                Reprendre la saisie de la veille
+            </button>
+        </div>
 
-        <p><a href="{{ path('timesheet_week', { date: date }) }}">Vue semaine (bureau)</a></p>
-    </main>
+        <ul class="day-entries mb-2" aria-label="Saisie des temps par projet">
+            {% for project in projects %}
+                {% set minutes = minutesByProject[project.id] ?? null %}
+                <li class="day-entry-card card">
+                    <div class="card-body pb-3">
+                        <div class="day-entry-header">
+                            {{ project.name }} <small>{{ project.code }}</small>
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="form-label mb-1" for="duration-{{ loop.index }}">Durée (minutes)</label>
+                            <input type="number" id="duration-{{ loop.index }}"
+                                   class="form-control day-entry-duration"
+                                   inputmode="numeric" min="0" max="1440" step="15"
+                                   value="{{ minutes }}"
+                                   data-timesheet-day-target="entry"
+                                   data-project-id="{{ project.id }}"
+                                   data-previous-minutes="{{ previousMinutesByProject[project.id] ?? '' }}"
+                                   data-action="input->timesheet-day#recalculate"
+                                   aria-describedby="duration-help">
+                        </div>
+
+                        <div>
+                            <label class="form-label mb-1" for="comment-{{ loop.index }}">Commentaire (optionnel)</label>
+                            <input type="text" id="comment-{{ loop.index }}"
+                                   class="form-control"
+                                   maxlength="500"
+                                   data-timesheet-day-target="comment"
+                                   data-project-id="{{ project.id }}">
+                        </div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <p id="duration-help" class="text-muted small mb-3">Durée en minutes, par pas de 15 (ex. 90 pour 1h30).</p>
+
+        {# "Enregistrer la journée" asserté par TimesheetDayPageTest #}
+        <div class="day-submit-bar">
+            <button type="button" class="btn btn-primary" data-timesheet-day-target="submit" data-action="timesheet-day#submitDay">
+                Enregistrer la journée
+            </button>
+            <span class="text-muted small" role="status" aria-live="polite" data-timesheet-day-target="status"></span>
+        </div>
+    {% endif %}
+
+    <div class="mt-4">
+        <a href="{{ path('timesheet_week', { date: date }) }}" class="btn btn-link btn-sm ps-0">← Vue semaine (bureau)</a>
+    </div>
+
+</div>
 {% endblock %}

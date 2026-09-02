@@ -2,141 +2,365 @@
 
 {% block title %}{{ project.code }} — {{ project.name }}{% endblock %}
 
+{% block page_section %}Projets{% endblock %}
+{% block page_title %}{{ project.code }} — {{ project.name }}{% endblock %}
+
+{% block stylesheets %}
+<style>
+    /* Fil d'Ariane */
+    .project-breadcrumb {
+        font-size: 0.875rem;
+        margin-bottom: var(--space-3);
+    }
+    .project-breadcrumb a {
+        color: var(--color-link);
+    }
+
+    /* En-tête du projet */
+    .project-header {
+        margin-bottom: var(--space-4);
+    }
+    .project-header h1 {
+        font-size: 1.25rem;
+        font-weight: var(--font-weight-semibold);
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        flex-wrap: wrap;
+        margin-bottom: var(--space-2);
+    }
+    .project-meta {
+        font-size: 0.875rem;
+        color: var(--color-text-muted);
+    }
+
+    /* Onglets */
+    .project-tabs {
+        display: flex;
+        gap: 0;
+        border-bottom: 2px solid var(--color-border-subtle);
+        margin-bottom: var(--space-4);
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .project-tab {
+        flex-shrink: 0;
+        padding: var(--space-2) var(--space-4);
+        border: none;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -2px;
+        background: none;
+        color: var(--color-text-muted);
+        font-size: 0.875rem;
+        font-weight: var(--font-weight-semibold);
+        cursor: pointer;
+        min-height: 44px;
+        transition: color 0.15s, border-color 0.15s;
+    }
+    .project-tab:hover {
+        color: var(--color-text);
+        border-bottom-color: var(--color-border-strong);
+    }
+    .project-tab[aria-selected="true"] {
+        color: var(--color-primary);
+        border-bottom-color: var(--color-primary);
+    }
+    .project-tab:focus-visible {
+        outline: var(--focus-ring-width) solid var(--color-focus);
+        outline-offset: var(--focus-ring-offset);
+        border-radius: var(--radius-sm);
+    }
+
+    /* Panneaux */
+    .project-tabpanel {
+        animation: fadeIn 0.15s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* Transitions de statut */
+    .project-transitions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        margin-top: var(--space-3);
+    }
+    .project-transitions form {
+        display: inline;
+    }
+
+    /* Arbre de lots / jalons */
+    .project-lot-tree {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 var(--space-3);
+    }
+    .project-lot-item {
+        padding: var(--space-2) 0;
+        border-bottom: 1px solid var(--color-border-subtle);
+        font-size: 0.875rem;
+    }
+    .project-lot-item:last-child {
+        border-bottom: none;
+    }
+    .project-lot-name {
+        font-weight: var(--font-weight-semibold);
+    }
+    .project-milestone-list {
+        list-style: none;
+        padding-left: var(--space-4);
+        margin: var(--space-1) 0 0;
+    }
+
+    /* Écart budget */
+    .project-budget-gap {
+        font-size: 0.875rem;
+        color: var(--color-status-warning);
+        font-weight: var(--font-weight-semibold);
+    }
+
+    /* Formulaires en ligne dans les panneaux */
+    .panel-form {
+        max-width: 540px;
+        margin-top: var(--space-3);
+    }
+    .panel-form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-3);
+    }
+    @media (max-width: 575px) {
+        .panel-form-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Checkbox inline */
+    .form-check-confirm {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-2);
+        margin-bottom: var(--space-3);
+    }
+    .form-check-confirm input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+        margin-top: 2px;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
 {% block body %}
-    <main class="container">
-        <p><a href="{{ path('project_index') }}">← Projets</a></p>
-        <h1>{{ project.code }} — {{ project.name }}
+    <p class="project-breadcrumb">
+        <a href="{{ path('project_index') }}">← Projets</a>
+    </p>
+
+    <div class="project-header">
+        <h1>
+            {{ project.code }} — {{ project.name }}
             <span class="project-status-badge project-status-{{ project.statusFamily }}">{{ project.status }}</span>
         </h1>
-        <p class="hint">
-            Client : {{ project.client ?? '—' }} · Contractualisation : {{ project.contractType ?? '—' }}
-            · Budget : {{ project.budgetEuros is not null ? (project.budgetEuros|number_format(0, ',', ' ') ~ ' €') : '—' }}
-            {% if project.startDate %} · Du {{ project.startDate }}{% if project.endDate %} au {{ project.endDate }}{% endif %}{% endif %}
+        <p class="project-meta">
+            Client&nbsp;: {{ project.client ?? '—' }}
+            &nbsp;·&nbsp; Contractualisation&nbsp;: {{ project.contractType ?? '—' }}
+            &nbsp;·&nbsp; Budget&nbsp;: {{ project.budgetEuros is not null ? (project.budgetEuros|number_format(0, ',', ' ') ~ ' €') : '—' }}
+            {% if project.startDate %}
+                &nbsp;·&nbsp; Du {{ project.startDate }}{% if project.endDate %} au {{ project.endDate }}{% endif %}
+            {% endif %}
         </p>
+    </div>
 
-        {% for label, messages in app.flashes %}
-            {% for message in messages %}
-                <p class="flash flash-{{ label }}" role="{{ label == 'error' ? 'alert' : 'status' }}">{{ message }}</p>
-            {% endfor %}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="ds-alert ds-alert-{{ label == 'error' ? 'danger' : label }} flash-{{ label }}"
+                 role="{{ label == 'error' ? 'alert' : 'status' }}">{{ message }}</div>
         {% endfor %}
+    {% endfor %}
 
-        <div data-controller="tabs">
-            <div class="project-tabs" role="tablist" aria-label="Sections du projet">
-                <button class="project-tab" role="tab" id="tab-lifecycle" aria-controls="panel-lifecycle" aria-selected="true" data-tabs-target="tab" data-action="tabs#select keydown->tabs#keydown">Cycle de vie</button>
-                <button class="project-tab" role="tab" id="tab-structure" aria-controls="panel-structure" aria-selected="false" tabindex="-1" data-tabs-target="tab" data-action="tabs#select keydown->tabs#keydown">Structure</button>
-                <button class="project-tab" role="tab" id="tab-team" aria-controls="panel-team" aria-selected="false" tabindex="-1" data-tabs-target="tab" data-action="tabs#select keydown->tabs#keydown">Équipe</button>
-                <button class="project-tab" role="tab" id="tab-commitments" aria-controls="panel-commitments" aria-selected="false" tabindex="-1" data-tabs-target="tab" data-action="tabs#select keydown->tabs#keydown">Engagements</button>
-                <button class="project-tab" role="tab" id="tab-closure" aria-controls="panel-closure" aria-selected="false" tabindex="-1" data-tabs-target="tab" data-action="tabs#select keydown->tabs#keydown">Clôture</button>
-            </div>
+    <div data-controller="tabs">
+        <div class="project-tabs" role="tablist" aria-label="Sections du projet">
+            <button class="project-tab" role="tab" id="tab-lifecycle" aria-controls="panel-lifecycle"
+                    aria-selected="true" data-tabs-target="tab"
+                    data-action="tabs#select keydown->tabs#keydown">Cycle de vie</button>
+            <button class="project-tab" role="tab" id="tab-structure" aria-controls="panel-structure"
+                    aria-selected="false" tabindex="-1" data-tabs-target="tab"
+                    data-action="tabs#select keydown->tabs#keydown">Structure</button>
+            <button class="project-tab" role="tab" id="tab-team" aria-controls="panel-team"
+                    aria-selected="false" tabindex="-1" data-tabs-target="tab"
+                    data-action="tabs#select keydown->tabs#keydown">Équipe</button>
+            <button class="project-tab" role="tab" id="tab-commitments" aria-controls="panel-commitments"
+                    aria-selected="false" tabindex="-1" data-tabs-target="tab"
+                    data-action="tabs#select keydown->tabs#keydown">Engagements</button>
+            <button class="project-tab" role="tab" id="tab-closure" aria-controls="panel-closure"
+                    aria-selected="false" tabindex="-1" data-tabs-target="tab"
+                    data-action="tabs#select keydown->tabs#keydown">Clôture</button>
+        </div>
 
-            <section class="project-tabpanel" id="panel-lifecycle" role="tabpanel" aria-labelledby="tab-lifecycle" data-tabs-target="panel">
-                <h2>Cycle de vie</h2>
-                <p>Statut actuel : <strong>{{ project.status }}</strong>.</p>
-                {% if canEdit and transitions is not empty %}
-                    <p>Actions disponibles :</p>
-                    <div class="project-transitions">
-                        {% for t in transitions %}
-                            <form method="post" action="{{ path('project_change_status', { id: project.id }) }}">
-                                <input type="hidden" name="_token" value="{{ csrf_token('change_project_status') }}">
-                                <input type="hidden" name="status" value="{{ t.value }}">
-                                <button type="submit">Passer à « {{ t.label }} »</button>
-                            </form>
-                        {% endfor %}
-                    </div>
-                {% elseif transitions is empty %}
-                    <p class="hint">Aucune transition disponible depuis ce statut.</p>
-                {% endif %}
-            </section>
+        {# ── Cycle de vie ── #}
+        <section class="project-tabpanel" id="panel-lifecycle" role="tabpanel"
+                 aria-labelledby="tab-lifecycle" data-tabs-target="panel">
+            <h2 class="fs-6 fw-semibold mb-3">Cycle de vie</h2>
+            <p>Statut actuel&nbsp;: <strong>{{ project.status }}</strong>.</p>
+            {% if canEdit and transitions is not empty %}
+                <p class="text-muted" style="font-size:0.875rem;">Actions disponibles&nbsp;:</p>
+                <div class="project-transitions">
+                    {% for t in transitions %}
+                        <form method="post" action="{{ path('project_change_status', { id: project.id }) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('change_project_status') }}">
+                            <input type="hidden" name="status" value="{{ t.value }}">
+                            <button type="submit" class="btn btn-outline-secondary btn-sm">Passer à « {{ t.label }} »</button>
+                        </form>
+                    {% endfor %}
+                </div>
+            {% elseif transitions is empty %}
+                <p class="form-text text-muted">Aucune transition disponible depuis ce statut.</p>
+            {% endif %}
+        </section>
 
-            <section class="project-tabpanel" id="panel-structure" role="tabpanel" aria-labelledby="tab-structure" data-tabs-target="panel" hidden>
-                <h2>Structure — lots</h2>
-                {% if structure.roots is empty %}
-                    <p>Aucun lot défini.</p>
-                {% else %}
-                    <ul class="project-lot-tree">
-                        {% for lot in structure.roots %}
-                            <li class="project-lot-item">
-                                <span class="project-lot-name">{{ lot.name }}</span> — {{ lot.days }} j / {{ lot.euros|number_format(0, ',', ' ') }} €
-                                {% if lot.children is not empty %}
-                                    <ul class="project-milestone-list">
-                                        {% for child in lot.children %}
-                                            <li>{{ child.name }} — {{ child.days }} j / {{ child.euros|number_format(0, ',', ' ') }} €</li>
-                                        {% endfor %}
-                                    </ul>
-                                {% endif %}
-                            </li>
-                        {% endfor %}
-                    </ul>
-                    <p>Total lots : {{ structure.sumDays }} j / {{ structure.sumEuros|number_format(0, ',', ' ') }} €
-                        {% if structure.budgetEuros is not null %} — Budget projet : {{ structure.budgetEuros|number_format(0, ',', ' ') }} €{% endif %}
-                    </p>
-                    {% if structure.gapEuros is not null and structure.gapEuros != 0 %}
-                        <p class="project-budget-gap">Écart lots/budget : {{ structure.gapEuros > 0 ? '+' : '' }}{{ structure.gapEuros|number_format(0, ',', ' ') }} €</p>
+        {# ── Structure ── #}
+        <section class="project-tabpanel" id="panel-structure" role="tabpanel"
+                 aria-labelledby="tab-structure" data-tabs-target="panel" hidden>
+            <h2 class="fs-6 fw-semibold mb-3">Structure — lots</h2>
+            {% if structure.roots is empty %}
+                <p class="text-muted">Aucun lot défini.</p>
+            {% else %}
+                <ul class="project-lot-tree">
+                    {% for lot in structure.roots %}
+                        <li class="project-lot-item">
+                            <span class="project-lot-name">{{ lot.name }}</span>
+                            — {{ lot.days }}&nbsp;j / {{ lot.euros|number_format(0, ',', ' ') }}&nbsp;€
+                            {% if lot.children is not empty %}
+                                <ul class="project-milestone-list">
+                                    {% for child in lot.children %}
+                                        <li>{{ child.name }} — {{ child.days }}&nbsp;j / {{ child.euros|number_format(0, ',', ' ') }}&nbsp;€</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+                <p class="form-text text-muted">
+                    Total lots&nbsp;: {{ structure.sumDays }}&nbsp;j / {{ structure.sumEuros|number_format(0, ',', ' ') }}&nbsp;€
+                    {% if structure.budgetEuros is not null %}
+                        — Budget projet&nbsp;: {{ structure.budgetEuros|number_format(0, ',', ' ') }}&nbsp;€
                     {% endif %}
+                </p>
+                {% if structure.gapEuros is not null and structure.gapEuros != 0 %}
+                    <p class="project-budget-gap">
+                        Écart lots/budget&nbsp;: {{ structure.gapEuros > 0 ? '+' : '' }}{{ structure.gapEuros|number_format(0, ',', ' ') }}&nbsp;€
+                    </p>
                 {% endif %}
+            {% endif %}
 
-                {% if canEdit %}
-                    <h3>Ajouter un lot</h3>
-                    <form method="post" action="{{ path('project_lot_add', { id: project.id }) }}">
-                        <input type="hidden" name="_token" value="{{ csrf_token('project_structure') }}">
-                        <label for="lot-name">Nom du lot</label>
-                        <input type="text" id="lot-name" name="name" required>
-                        <label for="lot-days">Charge (jours)</label>
-                        <input type="number" id="lot-days" name="budgetDays" min="0" inputmode="numeric" required>
-                        <label for="lot-euros">Montant (€)</label>
-                        <input type="number" id="lot-euros" name="budgetEuros" min="0" inputmode="numeric" required>
-                        <label for="lot-parent">Lot parent (optionnel — pour un sous-lot)</label>
-                        <select id="lot-parent" name="parentLotId">
+            {% if canEdit %}
+                <h3 class="fs-6 fw-semibold mt-4 mb-2">Ajouter un lot</h3>
+                <form method="post" action="{{ path('project_lot_add', { id: project.id }) }}" class="panel-form">
+                    <input type="hidden" name="_token" value="{{ csrf_token('project_structure') }}">
+                    <div class="mb-3">
+                        <label for="lot-name" class="form-label">Nom du lot</label>
+                        <input type="text" class="form-control" id="lot-name" name="name" required>
+                    </div>
+                    <div class="panel-form-grid mb-3">
+                        <div>
+                            <label for="lot-days" class="form-label">Charge (jours)</label>
+                            <input type="number" class="form-control" id="lot-days" name="budgetDays"
+                                   min="0" inputmode="numeric" required>
+                        </div>
+                        <div>
+                            <label for="lot-euros" class="form-label">Montant (€)</label>
+                            <input type="number" class="form-control" id="lot-euros" name="budgetEuros"
+                                   min="0" inputmode="numeric" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="lot-parent" class="form-label">Lot parent (optionnel — pour un sous-lot)</label>
+                        <select class="form-select" id="lot-parent" name="parentLotId">
                             <option value="">— Lot racine —</option>
                             {% for lot in structure.roots %}<option value="{{ lot.id }}">{{ lot.name }}</option>{% endfor %}
                         </select>
-                        <label><input type="checkbox" name="confirmOverrun" value="1"> Confirmer un éventuel dépassement du budget projet</label>
-                        <button type="submit">Ajouter le lot</button>
-                    </form>
-                {% endif %}
+                    </div>
+                    <div class="form-check-confirm mb-3">
+                        <input type="checkbox" id="confirm-overrun" name="confirmOverrun" value="1">
+                        <label for="confirm-overrun" class="form-label mb-0">
+                            Confirmer un éventuel dépassement du budget projet
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Ajouter le lot</button>
+                </form>
+            {% endif %}
 
-                <h2>Jalons</h2>
-                {% if milestones is empty %}
-                    <p>Aucun jalon défini.</p>
-                {% else %}
-                    <ul class="project-lot-tree">
-                        {% for m in milestones %}
-                            <li class="project-lot-item">
-                                <strong>{{ m.name }}</strong> — {{ m.due }} — {{ m.status }}{% if m.reached %} (atteint le {{ m.reached }}){% endif %}
-                                {% if m.billing is not null %} — <span aria-hidden="true">💰</span> facturation {{ m.billing|number_format(0, ',', ' ') }} €{% endif %}
-                                {% if canEdit and not m.triggered and m.status != 'Atteint' %}
-                                    <form method="post" action="{{ path('project_milestone_reach', { id: project.id, milestoneId: m.id }) }}">
-                                        <input type="hidden" name="_token" value="{{ csrf_token('project_structure') }}">
-                                        <button type="submit">Marquer atteint</button>
-                                    </form>
+            <h2 class="fs-6 fw-semibold mt-5 mb-3">Jalons</h2>
+            {% if milestones is empty %}
+                <p class="text-muted">Aucun jalon défini.</p>
+            {% else %}
+                <ul class="project-lot-tree">
+                    {% for m in milestones %}
+                        <li class="project-lot-item d-flex align-items-start justify-content-between flex-wrap gap-2">
+                            <div>
+                                <strong>{{ m.name }}</strong> — {{ m.due }} —
+                                <span class="status-badge status-badge-{{ m.status == 'Atteint' ? 'success' : 'neutral' }}">{{ m.status }}</span>
+                                {% if m.reached %} (atteint le {{ m.reached }}){% endif %}
+                                {% if m.billing is not null %}
+                                    — <span aria-hidden="true">💰</span>
+                                    facturation {{ m.billing|number_format(0, ',', ' ') }}&nbsp;€
                                 {% endif %}
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
+                            </div>
+                            {% if canEdit and not m.triggered and m.status != 'Atteint' %}
+                                <form method="post" action="{{ path('project_milestone_reach', { id: project.id, milestoneId: m.id }) }}">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('project_structure') }}">
+                                    <button type="submit" class="btn btn-success btn-sm">Marquer atteint</button>
+                                </form>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
 
-                {% if canEdit %}
-                    <h3>Ajouter un jalon</h3>
-                    <form method="post" action="{{ path('project_milestone_add', { id: project.id }) }}">
-                        <input type="hidden" name="_token" value="{{ csrf_token('project_structure') }}">
-                        <label for="ms-name">Nom du jalon</label>
-                        <input type="text" id="ms-name" name="name" required>
-                        <label for="ms-due">Date prévisionnelle</label>
-                        <input type="date" id="ms-due" name="dueDate" required>
-                        <label for="ms-billing">Déclencheur de facturation (€, optionnel)</label>
-                        <input type="number" id="ms-billing" name="billingEuros" min="0" inputmode="numeric">
-                        <button type="submit">Ajouter le jalon</button>
-                    </form>
-                {% endif %}
-            </section>
-            <section class="project-tabpanel" id="panel-team" role="tabpanel" aria-labelledby="tab-team" data-tabs-target="panel" hidden>
-                <h2>Équipe — affectations</h2>
-                {% if assignments is empty %}
-                    <p>Aucune affectation. Tant qu'aucun collaborateur n'est affecté, le projet reste ouvert à la saisie ; dès la première affectation, seuls les affectés peuvent imputer.</p>
-                {% else %}
-                    <table class="project-list">
+            {% if canEdit %}
+                <h3 class="fs-6 fw-semibold mt-4 mb-2">Ajouter un jalon</h3>
+                <form method="post" action="{{ path('project_milestone_add', { id: project.id }) }}" class="panel-form">
+                    <input type="hidden" name="_token" value="{{ csrf_token('project_structure') }}">
+                    <div class="mb-3">
+                        <label for="ms-name" class="form-label">Nom du jalon</label>
+                        <input type="text" class="form-control" id="ms-name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ms-due" class="form-label">Date prévisionnelle</label>
+                        <input type="date" class="form-control" id="ms-due" name="dueDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ms-billing" class="form-label">Déclencheur de facturation (€, optionnel)</label>
+                        <input type="number" class="form-control" id="ms-billing" name="billingEuros"
+                               min="0" inputmode="numeric">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Ajouter le jalon</button>
+                </form>
+            {% endif %}
+        </section>
+
+        {# ── Équipe ── #}
+        <section class="project-tabpanel" id="panel-team" role="tabpanel"
+                 aria-labelledby="tab-team" data-tabs-target="panel" hidden>
+            <h2 class="fs-6 fw-semibold mb-3">Équipe — affectations</h2>
+            {% if assignments is empty %}
+                <p class="text-muted">
+                    Aucune affectation. Tant qu'aucun collaborateur n'est affecté, le projet reste ouvert
+                    à la saisie ; dès la première affectation, seuls les affectés peuvent imputer.
+                </p>
+            {% else %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-compact">
                         <caption class="visually-hidden">Collaborateurs affectés au projet</caption>
-                        <thead><tr><th scope="col">Collaborateur</th><th scope="col">Rôle</th><th scope="col">Charge (j)</th><th scope="col">Période</th>{% if canEdit %}<th scope="col">Action</th>{% endif %}</tr></thead>
+                        <thead>
+                            <tr>
+                                <th scope="col">Collaborateur</th>
+                                <th scope="col">Rôle</th>
+                                <th scope="col">Charge (j)</th>
+                                <th scope="col">Période</th>
+                                {% if canEdit %}<th scope="col">Action</th>{% endif %}
+                            </tr>
+                        </thead>
                         <tbody>
                             {% for a in assignments %}
                                 <tr>
@@ -148,7 +372,7 @@
                                         <td>
                                             <form method="post" action="{{ path('project_assignment_remove', { id: project.id, assignmentId: a.id }) }}">
                                                 <input type="hidden" name="_token" value="{{ csrf_token('project_team') }}">
-                                                <button type="submit">Retirer</button>
+                                                <button type="submit" class="btn btn-outline-danger btn-sm">Retirer</button>
                                             </form>
                                         </td>
                                     {% endif %}
@@ -156,137 +380,224 @@
                             {% endfor %}
                         </tbody>
                     </table>
-                {% endif %}
+                </div>
+            {% endif %}
 
-                {% if canEdit %}
-                    <h3>Affecter un collaborateur</h3>
-                    <form method="post" action="{{ path('project_assignment_add', { id: project.id }) }}">
-                        <input type="hidden" name="_token" value="{{ csrf_token('project_team') }}">
-                        <label for="a-user">Collaborateur (identifiant)</label>
-                        <input type="text" id="a-user" name="userId" required>
-                        <label for="a-role">Rôle</label>
-                        <input type="text" id="a-role" name="role" required>
-                        <label for="a-days">Charge prévisionnelle (jours)</label>
-                        <input type="number" id="a-days" name="plannedDays" min="0" inputmode="numeric" required>
-                        <label for="a-start">Début (optionnel)</label>
-                        <input type="date" id="a-start" name="startDate">
-                        <label for="a-end">Fin (optionnel)</label>
-                        <input type="date" id="a-end" name="endDate">
-                        <button type="submit">Affecter</button>
-                    </form>
-                {% endif %}
+            {% if canEdit %}
+                <h3 class="fs-6 fw-semibold mt-4 mb-2">Affecter un collaborateur</h3>
+                <form method="post" action="{{ path('project_assignment_add', { id: project.id }) }}" class="panel-form">
+                    <input type="hidden" name="_token" value="{{ csrf_token('project_team') }}">
+                    <div class="mb-3">
+                        <label for="a-user" class="form-label">Collaborateur (identifiant)</label>
+                        <input type="text" class="form-control" id="a-user" name="userId" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="a-role" class="form-label">Rôle</label>
+                        <input type="text" class="form-control" id="a-role" name="role" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="a-days" class="form-label">Charge prévisionnelle (jours)</label>
+                        <input type="number" class="form-control" id="a-days" name="plannedDays"
+                               min="0" inputmode="numeric" required>
+                    </div>
+                    <div class="panel-form-grid mb-3">
+                        <div>
+                            <label for="a-start" class="form-label">Début (optionnel)</label>
+                            <input type="date" class="form-control" id="a-start" name="startDate">
+                        </div>
+                        <div>
+                            <label for="a-end" class="form-label">Fin (optionnel)</label>
+                            <input type="date" class="form-control" id="a-end" name="endDate">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Affecter</button>
+                </form>
+            {% endif %}
 
-                <h2>Ouvertures exceptionnelles</h2>
-                {% if openings is empty %}
-                    <p class="hint">Aucune ouverture exceptionnelle.</p>
-                {% else %}
-                    <ul class="project-lot-tree">
-                        {% for o in openings %}
-                            <li class="project-lot-item"><code>{{ o.userId[:8] }}</code> — semaine du {{ o.week }} — {{ o.reason }} <span class="hint">(accordée par {{ o.grantedBy[:8] }})</span></li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-                {% if canEdit %}
-                    <h3>Accorder une ouverture exceptionnelle</h3>
-                    <form method="post" action="{{ path('project_opening_grant', { id: project.id }) }}">
-                        <input type="hidden" name="_token" value="{{ csrf_token('project_team') }}">
-                        <label for="o-user">Collaborateur (identifiant)</label>
-                        <input type="text" id="o-user" name="userId" required>
-                        <label for="o-week">Semaine (un jour de la semaine)</label>
-                        <input type="date" id="o-week" name="weekStart" required>
-                        <label for="o-reason">Motif</label>
-                        <input type="text" id="o-reason" name="reason" maxlength="500" required>
-                        <button type="submit">Accorder</button>
-                    </form>
-                {% endif %}
-            </section>
-            <section class="project-tabpanel" id="panel-commitments" role="tabpanel" aria-labelledby="tab-commitments" data-tabs-target="panel" hidden>
-                <h2>Engagements externes</h2>
-                {% if commitments.rows is empty %}
-                    <p>Aucun engagement externe.</p>
-                {% else %}
-                    <table class="project-list">
+            <h2 class="fs-6 fw-semibold mt-5 mb-3">Ouvertures exceptionnelles</h2>
+            {% if openings is empty %}
+                <p class="text-muted">Aucune ouverture exceptionnelle.</p>
+            {% else %}
+                <ul class="project-lot-tree">
+                    {% for o in openings %}
+                        <li class="project-lot-item">
+                            <code>{{ o.userId[:8] }}</code> — semaine du {{ o.week }}
+                            — {{ o.reason }}
+                            <span class="text-muted">(accordée par {{ o.grantedBy[:8] }})</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            {% if canEdit %}
+                <h3 class="fs-6 fw-semibold mt-4 mb-2">Accorder une ouverture exceptionnelle</h3>
+                <form method="post" action="{{ path('project_opening_grant', { id: project.id }) }}" class="panel-form">
+                    <input type="hidden" name="_token" value="{{ csrf_token('project_team') }}">
+                    <div class="mb-3">
+                        <label for="o-user" class="form-label">Collaborateur (identifiant)</label>
+                        <input type="text" class="form-control" id="o-user" name="userId" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="o-week" class="form-label">Semaine (un jour de la semaine)</label>
+                        <input type="date" class="form-control" id="o-week" name="weekStart" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="o-reason" class="form-label">Motif</label>
+                        <input type="text" class="form-control" id="o-reason" name="reason" maxlength="500" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Accorder</button>
+                </form>
+            {% endif %}
+        </section>
+
+        {# ── Engagements ── #}
+        <section class="project-tabpanel" id="panel-commitments" role="tabpanel"
+                 aria-labelledby="tab-commitments" data-tabs-target="panel" hidden>
+            <h2 class="fs-6 fw-semibold mb-3">Engagements externes</h2>
+            {% if commitments.rows is empty %}
+                <p class="text-muted">Aucun engagement externe.</p>
+            {% else %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-compact">
                         <caption class="visually-hidden">Engagements externes du projet</caption>
-                        <thead><tr><th scope="col">Type</th><th scope="col">Libellé</th><th scope="col">Fournisseur</th><th scope="col">Statut</th><th scope="col">Montant</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th scope="col">Type</th>
+                                <th scope="col">Libellé</th>
+                                <th scope="col">Fournisseur</th>
+                                <th scope="col">Statut</th>
+                                <th scope="col" class="text-end">Montant</th>
+                            </tr>
+                        </thead>
                         <tbody>
                             {% for c in commitments.rows %}
                                 <tr>
-                                    <td>{{ c.type }}</td><td>{{ c.label }}</td><td>{{ c.supplier }}</td><td>{{ c.status }}</td>
-                                    <td>{{ c.euros|number_format(0, ',', ' ') }} €</td>
+                                    <td>{{ c.type }}</td>
+                                    <td>{{ c.label }}</td>
+                                    <td>{{ c.supplier }}</td>
+                                    <td>{{ c.status }}</td>
+                                    <td class="text-end">{{ c.euros|number_format(0, ',', ' ') }}&nbsp;€</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
                     </table>
-                    <p>Total coûts externes : {{ commitments.totalEuros|number_format(0, ',', ' ') }} € <span class="hint">(marge complète avec budget de vente : US-033)</span></p>
-                {% endif %}
+                </div>
+                <p class="form-text text-muted">
+                    Total coûts externes&nbsp;: <strong>{{ commitments.totalEuros|number_format(0, ',', ' ') }}&nbsp;€</strong>
+                    <span>(marge complète avec budget de vente&nbsp;: US-033)</span>
+                </p>
+            {% endif %}
 
-                {% if canEdit and project.status != 'Clôturé' %}
-                    <h3>Ajouter un engagement</h3>
-                    <form method="post" action="{{ path('project_commitment_add', { id: project.id }) }}">
-                        <input type="hidden" name="_token" value="{{ csrf_token('project_commitment') }}">
-                        <label for="c-type">Type</label>
-                        <select id="c-type" name="type">{% for t in commitmentTypes %}<option value="{{ t.value }}">{{ t.label }}</option>{% endfor %}</select>
-                        <label for="c-label">Libellé</label>
-                        <input type="text" id="c-label" name="label" required>
-                        <label for="c-supplier">Fournisseur</label>
-                        <input type="text" id="c-supplier" name="supplier" required>
-                        <label for="c-amount">Montant (€ HT)</label>
-                        <input type="number" id="c-amount" name="amountEuros" min="1" inputmode="numeric" required>
-                        <label for="c-status">Statut</label>
-                        <select id="c-status" name="status">{% for s in commitmentStatuses %}<option value="{{ s.value }}">{{ s.label }}</option>{% endfor %}</select>
-                        <button type="submit">Ajouter l'engagement</button>
+            {% if canEdit and project.status != 'Clôturé' %}
+                <h3 class="fs-6 fw-semibold mt-4 mb-2">Ajouter un engagement</h3>
+                <form method="post" action="{{ path('project_commitment_add', { id: project.id }) }}" class="panel-form">
+                    <input type="hidden" name="_token" value="{{ csrf_token('project_commitment') }}">
+                    <div class="mb-3">
+                        <label for="c-type" class="form-label">Type</label>
+                        <select class="form-select" id="c-type" name="type">
+                            {% for t in commitmentTypes %}<option value="{{ t.value }}">{{ t.label }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="c-label" class="form-label">Libellé</label>
+                        <input type="text" class="form-control" id="c-label" name="label" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="c-supplier" class="form-label">Fournisseur</label>
+                        <input type="text" class="form-control" id="c-supplier" name="supplier" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="c-amount" class="form-label">Montant (€ HT)</label>
+                        <input type="number" class="form-control" id="c-amount" name="amountEuros"
+                               min="1" inputmode="numeric" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="c-status" class="form-label">Statut</label>
+                        <select class="form-select" id="c-status" name="status">
+                            {% for s in commitmentStatuses %}<option value="{{ s.value }}">{{ s.label }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Ajouter l'engagement</button>
+                </form>
+            {% elseif project.status == 'Clôturé' %}
+                <p class="form-text text-muted">Projet clôturé : aucun nouvel engagement (RG-PRJ-5).</p>
+            {% endif %}
+        </section>
+
+        {# ── Clôture ── #}
+        <section class="project-tabpanel" id="panel-closure" role="tabpanel"
+                 aria-labelledby="tab-closure" data-tabs-target="panel" hidden>
+            <h2 class="fs-6 fw-semibold mb-3">Clôture opérationnelle</h2>
+            {% if closed %}
+                <p>
+                    <span class="project-status-badge project-status-closed">
+                        Clôturé{% if closedAt %} le {{ closedAt }}{% endif %}
+                    </span>
+                </p>
+                <p class="form-text text-muted mt-2">
+                    Le projet reste consultable en lecture seule. Les imputations sont fermées,
+                    sauf réouverture formelle approuvée par un administrateur.
+                </p>
+
+                {% if canEdit %}
+                    <h3 class="fs-6 fw-semibold mt-4 mb-2">Demander une réouverture exceptionnelle</h3>
+                    <form method="post" action="{{ path('project_reopening_request', { id: project.id }) }}" class="panel-form">
+                        <input type="hidden" name="_token" value="{{ csrf_token('project_closure') }}">
+                        <div class="mb-3">
+                            <label for="r-reason" class="form-label">Motif</label>
+                            <input type="text" class="form-control" id="r-reason" name="reason"
+                                   maxlength="500" required>
+                        </div>
+                        <button type="submit" class="btn btn-outline-secondary">Demander la réouverture</button>
                     </form>
-                {% elseif project.status == 'Clôturé' %}
-                    <p class="hint">Projet clôturé : aucun nouvel engagement (RG-PRJ-5).</p>
                 {% endif %}
-            </section>
-            <section class="project-tabpanel" id="panel-closure" role="tabpanel" aria-labelledby="tab-closure" data-tabs-target="panel" hidden>
-                <h2>Clôture opérationnelle</h2>
-                {% if closed %}
-                    <p><span class="project-status-badge project-status-closed">Clôturé{% if closedAt %} le {{ closedAt }}{% endif %}</span></p>
-                    <p class="hint">Le projet reste consultable en lecture seule. Les imputations sont fermées, sauf réouverture formelle approuvée par un administrateur.</p>
 
-                    {% if canEdit %}
-                        <h3>Demander une réouverture exceptionnelle</h3>
-                        <form method="post" action="{{ path('project_reopening_request', { id: project.id }) }}">
-                            <input type="hidden" name="_token" value="{{ csrf_token('project_closure') }}">
-                            <label for="r-reason">Motif</label>
-                            <input type="text" id="r-reason" name="reason" maxlength="500" required>
-                            <button type="submit">Demander la réouverture</button>
-                        </form>
-                    {% endif %}
-
-                    {% if reopenings is not empty %}
-                        <h3>Réouvertures</h3>
-                        <ul class="project-lot-tree">
-                            {% for r in reopenings %}
-                                <li class="project-lot-item">
-                                    <code>{{ r.requestedBy[:8] }}</code> — {{ r.reason }} —
-                                    {% if r.approved %}approuvée{% if r.openUntil %}, ouverte jusqu'au {{ r.openUntil }}{% endif %}{% else %}en attente d'approbation{% endif %}
-                                    {% if canManage and not r.approved %}
-                                        <form method="post" action="{{ path('project_reopening_approve', { id: project.id, reopeningId: r.id }) }}">
-                                            <input type="hidden" name="_token" value="{{ csrf_token('project_closure') }}">
-                                            <label for="ou-{{ r.id }}">Ouvrir jusqu'au</label>
-                                            <input type="date" id="ou-{{ r.id }}" name="openUntil" required>
-                                            <button type="submit">Approuver (4-eyes)</button>
-                                        </form>
-                                    {% endif %}
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                {% else %}
-                    <p>Le projet n'est pas clôturé.</p>
-                    {% if canEdit %}
-                        <form method="post" action="{{ path('project_close', { id: project.id }) }}">
-                            <input type="hidden" name="_token" value="{{ csrf_token('project_closure') }}">
-                            <p class="hint">La clôture est bloquée s'il reste des imputations non validées. Les jalons non atteints et engagements non soldés nécessitent une confirmation.</p>
-                            <label><input type="checkbox" name="confirmWarnings" value="1"> Confirmer la clôture malgré d'éventuels éléments en cours (jalons/engagements)</label>
-                            <button type="submit">Clôturer le projet</button>
-                        </form>
-                    {% endif %}
+                {% if reopenings is not empty %}
+                    <h3 class="fs-6 fw-semibold mt-4 mb-2">Réouvertures</h3>
+                    <ul class="project-lot-tree">
+                        {% for r in reopenings %}
+                            <li class="project-lot-item">
+                                <code>{{ r.requestedBy[:8] }}</code> — {{ r.reason }} —
+                                {% if r.approved %}
+                                    <span class="status-badge status-badge-success">Approuvée</span>
+                                    {% if r.openUntil %}, ouverte jusqu'au {{ r.openUntil }}{% endif %}
+                                {% else %}
+                                    <span class="status-badge status-badge-neutral">En attente d'approbation</span>
+                                {% endif %}
+                                {% if canManage and not r.approved %}
+                                    <form method="post"
+                                          action="{{ path('project_reopening_approve', { id: project.id, reopeningId: r.id }) }}"
+                                          class="d-inline-flex align-items-center gap-2 mt-2">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('project_closure') }}">
+                                        <label for="ou-{{ r.id }}" class="form-label mb-0 text-nowrap">Ouvrir jusqu'au</label>
+                                        <input type="date" class="form-control form-control-sm" id="ou-{{ r.id }}"
+                                               name="openUntil" required>
+                                        <button type="submit" class="btn btn-success btn-sm text-nowrap">Approuver (4-eyes)</button>
+                                    </form>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
                 {% endif %}
-            </section>
-        </div>
-    </main>
+            {% else %}
+                <p class="text-muted">Le projet n'est pas clôturé.</p>
+                {% if canEdit %}
+                    <form method="post" action="{{ path('project_close', { id: project.id }) }}" class="panel-form mt-3">
+                        <input type="hidden" name="_token" value="{{ csrf_token('project_closure') }}">
+                        <p class="form-text text-muted mb-3">
+                            La clôture est bloquée s'il reste des imputations non validées.
+                            Les jalons non atteints et engagements non soldés nécessitent une confirmation.
+                        </p>
+                        <div class="form-check-confirm mb-3">
+                            <input type="checkbox" id="confirm-warnings" name="confirmWarnings" value="1">
+                            <label for="confirm-warnings" class="form-label mb-0">
+                                Confirmer la clôture malgré d'éventuels éléments en cours (jalons/engagements)
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-danger">Clôturer le projet</button>
+                    </form>
+                {% endif %}
+            {% endif %}
+        </section>
+    </div>
 {% endblock %}

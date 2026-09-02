@@ -2,24 +2,56 @@
 
 {% block title %}Projets{% endblock %}
 
+{% block page_section %}Projets{% endblock %}
+{% block page_title %}Projets{% endblock %}
+
+{% block topbar_actions %}
+    {% if canCreate %}
+        <a href="{{ path('project_new') }}" class="btn btn-primary btn-sm">+ Nouveau projet</a>
+    {% endif %}
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .project-list-name a {
+        color: var(--color-link);
+        font-weight: var(--font-weight-semibold);
+        text-decoration: none;
+    }
+    .project-list-name a:hover {
+        text-decoration: underline;
+    }
+    .project-empty-state {
+        padding: var(--space-6) var(--space-4);
+        text-align: center;
+        color: var(--color-text-muted);
+        background: var(--color-surface);
+        border: 1px dashed var(--color-border-subtle);
+        border-radius: var(--radius-md);
+    }
+</style>
+{% endblock %}
+
 {% block body %}
-    <main class="container">
-        <h1>Projets</h1>
+    <h1 class="visually-hidden">Projets</h1>
 
-        {% for label, messages in app.flashes %}
-            {% for message in messages %}
-                <p class="flash flash-{{ label }}" role="{{ label == 'error' ? 'alert' : 'status' }}">{{ message }}</p>
-            {% endfor %}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="ds-alert ds-alert-{{ label == 'error' ? 'danger' : label }} flash-{{ label }}"
+                 role="{{ label == 'error' ? 'alert' : 'status' }}">{{ message }}</div>
         {% endfor %}
+    {% endfor %}
 
-        {% if canCreate %}
-            <p><a href="{{ path('project_new') }}">+ Nouveau projet</a></p>
-        {% endif %}
-
-        {% if projects is empty %}
-            <p>Aucun projet pour le moment.{% if canCreate %} <a href="{{ path('project_new') }}">Créer le premier projet</a>.{% endif %}</p>
-        {% else %}
-            <table class="project-list">
+    {% if projects is empty %}
+        <div class="project-empty-state">
+            <p class="mb-1">Aucun projet pour le moment.</p>
+            {% if canCreate %}
+                <a href="{{ path('project_new') }}" class="btn btn-outline-primary btn-sm mt-2">Créer le premier projet</a>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="table-responsive">
+            <table class="table table-hover table-compact">
                 <caption class="visually-hidden">Liste des projets du cabinet</caption>
                 <thead>
                     <tr>
@@ -34,14 +66,20 @@
                     {% for p in projects %}
                         <tr>
                             <th scope="row"><code>{{ p.code }}</code></th>
-                            <td class="project-list-name"><a href="{{ path('project_show', { id: p.id }) }}">{{ p.name }}</a></td>
+                            <td class="project-list-name">
+                                <a href="{{ path('project_show', { id: p.id }) }}">{{ p.name }}</a>
+                            </td>
                             <td>{{ p.client ?? '—' }}</td>
-                            <td><span class="project-status-badge project-status-{{ p.statusFamily }}">{{ p.status }}</span></td>
-                            <td>{{ p.budgetEuros is not null ? (p.budgetEuros|number_format(0, ',', ' ') ~ ' €') : '—' }}</td>
+                            <td>
+                                <span class="project-status-badge project-status-{{ p.statusFamily }}">{{ p.status }}</span>
+                            </td>
+                            <td class="text-end">
+                                {{ p.budgetEuros is not null ? (p.budgetEuros|number_format(0, ',', ' ') ~ ' €') : '—' }}
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
-        {% endif %}
-    </main>
+        </div>
+    {% endif %}
 {% endblock %}

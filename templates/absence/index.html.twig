@@ -1,75 +1,202 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Mes absences{% endblock %}
+{% block page_section %}Absences{% endblock %}
+{% block page_title %}Mes absences{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .absence-counters-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+        gap: var(--space-3);
+    }
+    .absence-counters-grid dt {
+        font-size: var(--font-size-sm);
+        color: var(--color-text-muted);
+        margin-bottom: var(--space-1);
+    }
+    .absence-counters-grid dd {
+        font-size: var(--font-size-lg);
+        font-weight: var(--font-weight-semibold);
+        margin: 0;
+        color: var(--color-text);
+    }
+</style>
+{% endblock %}
 
 {% block body %}
-    <main class="container" data-controller="absence">
-        <h1>Mes absences</h1>
+<div data-controller="absence">
+    <h1 class="visually-hidden">Mes absences</h1>
 
-        <section aria-labelledby="counters-heading" class="absence-counters">
-            <h2 id="counters-heading">Mes compteurs</h2>
-            <dl>
-                <dt>Acquis</dt><dd>{{ counters.acquired }} j</dd>
-                <dt>Pris</dt><dd>{{ counters.taken }} j</dd>
-                <dt>En attente</dt><dd>{{ counters.pending }} j</dd>
-                <dt>Solde</dt><dd>{{ counters.balance }} j</dd>
-                <dt>Solde projeté <span class="hint" title="Si toutes les demandes en attente sont approuvées">ℹ️</span></dt>
-                <dd>{{ counters.projected }} j</dd>
+    {# ── Compteurs ───────────────────────────────────────────────── #}
+    <section aria-labelledby="counters-heading" class="card mb-4">
+        <div class="card-header d-flex align-items-center">
+            <h2 id="counters-heading" class="mb-0 fs-6 fw-semibold">Mes compteurs</h2>
+        </div>
+        <div class="card-body">
+            <dl class="absence-counters-grid">
+                <div>
+                    <dt>Acquis</dt>
+                    <dd>{{ counters.acquired }} j</dd>
+                </div>
+                <div>
+                    <dt>Pris</dt>
+                    <dd>{{ counters.taken }} j</dd>
+                </div>
+                <div>
+                    <dt>En attente</dt>
+                    <dd>{{ counters.pending }} j</dd>
+                </div>
+                <div>
+                    <dt>Solde</dt>
+                    <dd>{{ counters.balance }} j</dd>
+                </div>
+                <div>
+                    <dt>
+                        Solde projeté
+                        <span title="Si toutes les demandes en attente sont approuvées"
+                              aria-label="Si toutes les demandes en attente sont approuvées">
+                            <span aria-hidden="true">ℹ️</span>
+                        </span>
+                    </dt>
+                    <dd>{{ counters.projected }} j</dd>
+                </div>
             </dl>
-        </section>
+        </div>
+    </section>
 
-        <section aria-labelledby="declare-heading">
-            <h2 id="declare-heading">Déclarer une absence</h2>
-            <form data-action="submit->absence#declare">
-                <label>Type
-                    <select required data-absence-target="type">
+    {# ── Déclarer une absence ────────────────────────────────────── #}
+    <section aria-labelledby="declare-heading" class="card mb-4">
+        <div class="card-header">
+            <h2 id="declare-heading" class="mb-0 fs-6 fw-semibold">Déclarer une absence</h2>
+        </div>
+        <div class="card-body">
+            <form data-action="submit->absence#declare" aria-labelledby="declare-heading" novalidate>
+                <div class="mb-3">
+                    <label for="absence-type" class="form-label">
+                        Type
+                        <span aria-hidden="true" class="text-danger">*</span>
+                        <span class="visually-hidden">(obligatoire)</span>
+                    </label>
+                    <select id="absence-type" class="form-select" required
+                            data-absence-target="type">
                         <option value="">— Choisir un type —</option>
                         {% for type in types %}
                             <option value="{{ type.id }}">{{ type.label }}</option>
                         {% endfor %}
                     </select>
-                </label>
-                <label>Du <input type="date" required data-absence-target="startDate"></label>
-                <label>Au <input type="date" required data-absence-target="endDate"></label>
-                <label><input type="checkbox" checked data-absence-target="startsMorning"> Commence le matin</label>
-                <label><input type="checkbox" checked data-absence-target="endsAfternoon"> Finit l'après-midi</label>
-                <label>Commentaire (optionnel) <input type="text" maxlength="500" data-absence-target="comment" placeholder="ex. Vacances d'été" aria-describedby="comment-warning"></label>
-                <p id="comment-warning" class="hint">⚠️ Ne renseignez <strong>aucune donnée de santé</strong> (motif médical, diagnostic) — RGPD.</p>
-                <button type="submit">Soumettre la demande</button>
-            </form>
-            <p class="hint" aria-live="polite" data-absence-target="status"></p>
-        </section>
+                </div>
 
-        <section aria-labelledby="list-heading">
-            <h2 id="list-heading">Mes demandes</h2>
+                <div class="row g-3 mb-3">
+                    <div class="col-sm-6">
+                        <label for="absence-start" class="form-label">
+                            Du
+                            <span aria-hidden="true" class="text-danger">*</span>
+                            <span class="visually-hidden">(obligatoire)</span>
+                        </label>
+                        <input type="date" id="absence-start" class="form-control" required
+                               data-absence-target="startDate">
+                    </div>
+                    <div class="col-sm-6">
+                        <label for="absence-end" class="form-label">
+                            Au
+                            <span aria-hidden="true" class="text-danger">*</span>
+                            <span class="visually-hidden">(obligatoire)</span>
+                        </label>
+                        <input type="date" id="absence-end" class="form-control" required
+                               data-absence-target="endDate">
+                    </div>
+                </div>
+
+                <div class="mb-3 d-flex flex-wrap gap-3">
+                    <div class="form-check">
+                        <input type="checkbox" id="absence-starts-morning" class="form-check-input"
+                               checked data-absence-target="startsMorning">
+                        <label class="form-check-label" for="absence-starts-morning">
+                            Commence le matin
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" id="absence-ends-afternoon" class="form-check-input"
+                               checked data-absence-target="endsAfternoon">
+                        <label class="form-check-label" for="absence-ends-afternoon">
+                            Finit l'après-midi
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="absence-comment" class="form-label">
+                        Commentaire
+                        <span class="text-muted fw-normal">(optionnel)</span>
+                    </label>
+                    <input type="text" id="absence-comment" class="form-control"
+                           maxlength="500" data-absence-target="comment"
+                           placeholder="ex. Vacances d'été" aria-describedby="comment-warning">
+                    <p id="comment-warning" class="form-text mt-1">
+                        <span aria-hidden="true">⚠️</span>
+                        Ne renseignez <strong>aucune donnée de santé</strong>
+                        (motif médical, diagnostic) — RGPD.
+                    </p>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Soumettre la demande</button>
+            </form>
+
+            <p class="mt-3 form-text" aria-live="polite" data-absence-target="status"></p>
+        </div>
+    </section>
+
+    {# ── Mes demandes ────────────────────────────────────────────── #}
+    <section aria-labelledby="list-heading" class="card">
+        <div class="card-header">
+            <h2 id="list-heading" class="mb-0 fs-6 fw-semibold">Mes demandes</h2>
+        </div>
+        <div class="card-body {% if requests is not empty %}p-0{% endif %}">
             {% if requests is empty %}
-                <p>Aucune demande d'absence pour l'instant.</p>
+                <p class="text-muted mb-0">Aucune demande d'absence pour l'instant.</p>
             {% else %}
-                <table class="absence-list">
-                    <thead>
-                        <tr>
-                            <th scope="col">Du</th>
-                            <th scope="col">Au</th>
-                            <th scope="col">Statut</th>
-                            <th scope="col">Motif de refus</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for r in requests %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-compact mb-0"
+                           aria-labelledby="list-heading">
+                        <caption class="visually-hidden">Liste de vos demandes d'absence</caption>
+                        <thead>
                             <tr>
-                                <td>{{ r.from }}</td>
-                                <td>{{ r.to }}</td>
-                                <td>
-                                    {% if r.status == 'validated' %}<span aria-hidden="true">✅</span> Validée
-                                    {% elseif r.status == 'rejected' %}<span aria-hidden="true">❌</span> Refusée
-                                    {% else %}<span aria-hidden="true">⏳</span> En attente{% endif %}
-                                </td>
-                                <td>{{ r.reason ?? '—' }}</td>
+                                <th scope="col">Du</th>
+                                <th scope="col">Au</th>
+                                <th scope="col">Statut</th>
+                                <th scope="col">Motif de refus</th>
                             </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {% for r in requests %}
+                                <tr>
+                                    <td>{{ r.from }}</td>
+                                    <td>{{ r.to }}</td>
+                                    <td>
+                                        {% if r.status == 'validated' %}
+                                            <span class="status-badge status-badge-success">
+                                                <span aria-hidden="true">✅</span> Validée
+                                            </span>
+                                        {% elseif r.status == 'rejected' %}
+                                            <span class="status-badge status-badge-danger">
+                                                <span aria-hidden="true">❌</span> Refusée
+                                            </span>
+                                        {% else %}
+                                            <span class="status-badge status-badge-warning">
+                                                <span aria-hidden="true">⏳</span> En attente
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ r.reason ?? '—' }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             {% endif %}
-        </section>
-    </main>
+        </div>
+    </section>
+</div>
 {% endblock %}
