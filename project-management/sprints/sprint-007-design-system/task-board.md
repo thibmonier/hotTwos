@@ -50,7 +50,13 @@
 ## 🚫 Bloqué
 | ID | US | Raison | Action |
 |----|-----|--------|--------|
-| T-064-* | US-064 | Attend la **validation PO des maquettes** (T-062-04) | Gate humain avant reskin |
+| — | — | Aucun blocage | — |
+
+> **Gate maquettes levé (PO 2026-09-02, process assoupli)** : direction design pré-approuvée pour **tous** les
+> écrans du lot 1 (3 validés sur maquette + 8 en direction). **Tout US-064 est débloqué**, à reskiner en appliquant
+> directement la charte + le layout US-063, puis validation PO **en lot**. Séquencement : après US-063 (layout).
+> T-062-01 (produire les maquettes hi-fi) devient optionnel. Plancher DoD conservé : WCAG 2.2 AA + états
+> « sans-permission » sur les écrans à données sensibles.
 
 ## Métriques
 - **Tâches** : 27 total · 0 terminées (0 %)
