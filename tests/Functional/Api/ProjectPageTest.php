@@ -9,6 +9,7 @@ use App\Domain\Authorization\Role;
 use App\Domain\Project\ExceptionalImputationOpening;
 use App\Domain\Project\ExternalCommitment;
 use App\Domain\Project\Project;
+use App\Domain\Project\ProjectReopening;
 use App\Domain\Project\ProjectAssignment;
 use App\Domain\Project\ProjectLot;
 use App\Domain\Project\ProjectMilestone;
@@ -52,6 +53,7 @@ final class ProjectPageTest extends WebTestCase
             $this->em->getClassMetadata(ProjectAssignment::class),
             $this->em->getClassMetadata(ExceptionalImputationOpening::class),
             $this->em->getClassMetadata(ExternalCommitment::class),
+            $this->em->getClassMetadata(ProjectReopening::class),
         ];
         $tool = new SchemaTool($this->em);
         $tool->dropSchema($this->schema);

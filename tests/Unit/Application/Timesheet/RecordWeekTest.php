@@ -48,6 +48,7 @@ final class RecordWeekTest extends TestCase
             new InMemoryAbsenceRequestRepository(),
             new \App\Tests\Support\Project\InMemoryProjectAssignmentRepository(),
             new \App\Tests\Support\Project\InMemoryExceptionalImputationOpeningRepository(),
+            new \App\Tests\Support\Project\InMemoryProjectReopeningRepository(),
         ));
 
         $project = new Project($this->tenant, 'PRJ-1', 'Refonte');

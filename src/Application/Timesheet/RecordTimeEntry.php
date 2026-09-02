@@ -10,6 +10,7 @@ use App\Domain\Absence\AbsenceRequestRepository;
 use App\Domain\Project\ExceptionalImputationOpeningRepository;
 use App\Domain\Project\Project;
 use App\Domain\Project\ProjectAssignmentRepository;
+use App\Domain\Project\ProjectReopeningRepository;
 use App\Domain\Project\ProjectRepository;
 use App\Domain\Tenant\TenantId;
 use App\Domain\Timesheet\TimeEntry;
@@ -35,6 +36,7 @@ final readonly class RecordTimeEntry
         private AbsenceRequestRepository $absences,
         private ProjectAssignmentRepository $assignments,
         private ExceptionalImputationOpeningRepository $openings,
+        private ProjectReopeningRepository $reopenings,
     ) {
     }
 
@@ -61,8 +63,16 @@ final readonly class RecordTimeEntry
 
         // Cycle de vie du projet (US-030, CA-2) : l'imputation n'est ouverte qu'« En cours ».
         // Le projet système « Absence » est « En cours » par défaut : il reste imputable.
+        // Exception (US-038, CA-3/CA-7) : un projet clôturé redevient imputable pendant une fenêtre de
+        // réouverture formelle approuvée par un ADMIN (4-eyes).
         if (!$project->allowsImputation()) {
-            throw new TimesheetException(sprintf('Imputations non autorisées : projet « %s ».', $project->status()->label()));
+            if ($project->isClosed() && $this->reopenings->hasActiveOn($tenant, $projectId, $workDate)) {
+                // Réouverture active : imputation autorisée sur la fenêtre.
+            } elseif ($project->isClosed()) {
+                throw new TimesheetException('Imputations fermées : projet clôturé — une réouverture formelle validée par un administrateur est requise (RG-TMP-6).');
+            } else {
+                throw new TimesheetException(sprintf('Imputations non autorisées : projet « %s ».', $project->status()->label()));
+            }
         }
 
         // Affectation (US-037, CA-1) : dès qu'un projet a des affectations, seuls les collaborateurs

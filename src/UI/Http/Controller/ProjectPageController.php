@@ -13,6 +13,8 @@ use App\Domain\Project\Project;
 use App\Domain\Project\ExceptionalImputationOpening;
 use App\Domain\Project\ExceptionalImputationOpeningRepository;
 use App\Domain\Project\ExternalCommitmentRepository;
+use App\Domain\Project\ProjectReopening;
+use App\Domain\Project\ProjectReopeningRepository;
 use App\Domain\Project\ProjectAssignment;
 use App\Domain\Project\ProjectAssignmentRepository;
 use App\Domain\Project\ProjectException;
@@ -49,6 +51,7 @@ final class ProjectPageController extends AbstractController
         private readonly ProjectAssignmentRepository $assignments,
         private readonly ExceptionalImputationOpeningRepository $openings,
         private readonly ExternalCommitmentRepository $commitments,
+        private readonly ProjectReopeningRepository $reopenings,
     ) {
     }
 
@@ -133,6 +136,7 @@ final class ProjectPageController extends AbstractController
                 $project->status()->allowedTransitions(),
             ),
             'canEdit' => $this->authorizer->can($user, Permission::EDIT_PROJECT),
+            'canManage' => $this->authorizer->can($user, Permission::MANAGE_ORGANIZATION),
             'structure' => $this->structureView($user->tenantId(), $project->id(), $project->budgetCents()),
             'milestones' => array_map(
                 static fn (ProjectMilestone $m): array => [
@@ -169,6 +173,18 @@ final class ProjectPageController extends AbstractController
             'commitments' => $this->commitmentsView($user->tenantId(), $project->id()),
             'commitmentTypes' => \App\Domain\Project\CommitmentType::cases(),
             'commitmentStatuses' => \App\Domain\Project\CommitmentStatus::cases(),
+            'closed' => $project->isClosed(),
+            'closedAt' => $project->closedAt()?->format('d/m/Y'),
+            'reopenings' => array_map(
+                static fn (ProjectReopening $r): array => [
+                    'id' => $r->id(),
+                    'requestedBy' => $r->requestedBy(),
+                    'reason' => $r->reason(),
+                    'approved' => $r->isApproved(),
+                    'openUntil' => $r->openUntil()?->format('d/m/Y'),
+                ],
+                $this->reopenings->findForProject($user->tenantId(), $project->id()),
+            ),
         ]);
     }
 

@@ -39,6 +39,12 @@ class Project implements TenantOwned
     #[ORM\Column(length: 255)]
     private string $name;
 
+    #[ORM\Column(name: 'closed_at', type: 'datetime_immutable', nullable: true)]
+    private ?DateTimeImmutable $closedAt = null;
+
+    #[ORM\Column(name: 'closed_by', type: 'guid', nullable: true)]
+    private ?string $closedBy = null;
+
     public function __construct(
         TenantId $tenantId,
         string $code,
@@ -147,6 +153,30 @@ class Project implements TenantOwned
     public function isResponsible(string $userId): bool
     {
         return null !== $this->responsibleUserId && $this->responsibleUserId === $userId;
+    }
+
+    /**
+     * Clôture opérationnelle (US-038) : ferme les imputations. Les prérequis (imputations non
+     * validées bloquantes, jalons/engagements en cours) sont vérifiés par le cas d'usage.
+     */
+    public function close(string $closedBy, DateTimeImmutable $at): void
+    {
+        if (ProjectStatus::CLOTURE === $this->status) {
+            throw new ProjectException('Le projet est déjà clôturé.');
+        }
+        $this->status = ProjectStatus::CLOTURE;
+        $this->closedAt = $at;
+        $this->closedBy = $closedBy;
+    }
+
+    public function isClosed(): bool
+    {
+        return ProjectStatus::CLOTURE === $this->status;
+    }
+
+    public function closedAt(): ?DateTimeImmutable
+    {
+        return $this->closedAt;
     }
 
     public function status(): ProjectStatus

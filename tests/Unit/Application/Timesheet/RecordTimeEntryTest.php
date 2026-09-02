@@ -36,6 +36,7 @@ final class RecordTimeEntryTest extends TestCase
     private InMemoryAbsenceRequestRepository $absences;
     private \App\Tests\Support\Project\InMemoryProjectAssignmentRepository $assignments;
     private \App\Tests\Support\Project\InMemoryExceptionalImputationOpeningRepository $openings;
+    private \App\Tests\Support\Project\InMemoryProjectReopeningRepository $reopenings;
     private string $projectId;
 
     protected function setUp(): void
@@ -57,6 +58,7 @@ final class RecordTimeEntryTest extends TestCase
             $this->absences,
             $this->assignments = new \App\Tests\Support\Project\InMemoryProjectAssignmentRepository(),
             $this->openings = new \App\Tests\Support\Project\InMemoryExceptionalImputationOpeningRepository(),
+            $this->reopenings = new \App\Tests\Support\Project\InMemoryProjectReopeningRepository(),
         );
 
         $project = new Project($this->tenant, 'PRJ-1', 'Refonte');
@@ -144,6 +146,30 @@ final class RecordTimeEntryTest extends TestCase
         // … sauf ouverture exceptionnelle sur la semaine (CA-2).
         $this->openings->save(new \App\Domain\Project\ExceptionalImputationOpening($this->tenant, $this->projectId, 'thomas', $day, 'Renfort', 'marc', new DateTimeImmutable('2026-09-14 09:00:00')));
         $this->record->record($this->tenant, 'thomas', $this->projectId, $day, 120);
+        self::assertCount(1, $this->entries->entries);
+    }
+
+    public function testClosedProjectBlocksImputationUnlessReopened(): void
+    {
+        // Projet métier clôturé (US-038, CA-7) : imputation fermée…
+        $project = Project::createBusiness($this->tenant, 'PRJ-0009', 'Refonte', 'Acme', 'marc', 5_000_000, \App\Domain\Project\ContractType::FORFAIT, null, null);
+        $project->close('marc', new DateTimeImmutable('2026-09-10 10:00:00'));
+        $this->projects->save($project);
+        $day = new DateTimeImmutable('2026-09-15');
+
+        try {
+            $this->record->record($this->tenant, 'camille', $project->id(), $day, 120);
+            self::fail('Un projet clôturé ne doit pas accepter d\'imputation.');
+        } catch (TimesheetException) {
+            // attendu
+        }
+
+        // … sauf pendant une fenêtre de réouverture approuvée (4-eyes, CA-3).
+        $reopening = new \App\Domain\Project\ProjectReopening($this->tenant, $project->id(), 'marc', 'Régularisation', new DateTimeImmutable('2026-09-14 09:00:00'));
+        $reopening->approve('admin', new DateTimeImmutable('2026-09-14 10:00:00'), new DateTimeImmutable('2026-09-30'));
+        $this->reopenings->save($reopening);
+
+        $this->record->record($this->tenant, 'camille', $project->id(), $day, 120);
         self::assertCount(1, $this->entries->entries);
     }
 

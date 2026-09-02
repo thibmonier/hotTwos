@@ -241,8 +241,51 @@
                 {% endif %}
             </section>
             <section class="project-tabpanel" id="panel-closure" role="tabpanel" aria-labelledby="tab-closure" data-tabs-target="panel" hidden>
-                <h2>Clôture</h2>
-                <p class="hint">Sera disponible avec US-038.</p>
+                <h2>Clôture opérationnelle</h2>
+                {% if closed %}
+                    <p><span class="project-status-badge project-status-closed">Clôturé{% if closedAt %} le {{ closedAt }}{% endif %}</span></p>
+                    <p class="hint">Le projet reste consultable en lecture seule. Les imputations sont fermées, sauf réouverture formelle approuvée par un administrateur.</p>
+
+                    {% if canEdit %}
+                        <h3>Demander une réouverture exceptionnelle</h3>
+                        <form method="post" action="{{ path('project_reopening_request', { id: project.id }) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('project_closure') }}">
+                            <label for="r-reason">Motif</label>
+                            <input type="text" id="r-reason" name="reason" maxlength="500" required>
+                            <button type="submit">Demander la réouverture</button>
+                        </form>
+                    {% endif %}
+
+                    {% if reopenings is not empty %}
+                        <h3>Réouvertures</h3>
+                        <ul class="project-lot-tree">
+                            {% for r in reopenings %}
+                                <li class="project-lot-item">
+                                    <code>{{ r.requestedBy[:8] }}</code> — {{ r.reason }} —
+                                    {% if r.approved %}approuvée{% if r.openUntil %}, ouverte jusqu'au {{ r.openUntil }}{% endif %}{% else %}en attente d'approbation{% endif %}
+                                    {% if canManage and not r.approved %}
+                                        <form method="post" action="{{ path('project_reopening_approve', { id: project.id, reopeningId: r.id }) }}">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('project_closure') }}">
+                                            <label for="ou-{{ r.id }}">Ouvrir jusqu'au</label>
+                                            <input type="date" id="ou-{{ r.id }}" name="openUntil" required>
+                                            <button type="submit">Approuver (4-eyes)</button>
+                                        </form>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% else %}
+                    <p>Le projet n'est pas clôturé.</p>
+                    {% if canEdit %}
+                        <form method="post" action="{{ path('project_close', { id: project.id }) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('project_closure') }}">
+                            <p class="hint">La clôture est bloquée s'il reste des imputations non validées. Les jalons non atteints et engagements non soldés nécessitent une confirmation.</p>
+                            <label><input type="checkbox" name="confirmWarnings" value="1"> Confirmer la clôture malgré d'éventuels éléments en cours (jalons/engagements)</label>
+                            <button type="submit">Clôturer le projet</button>
+                        </form>
+                    {% endif %}
+                {% endif %}
             </section>
         </div>
     </main>

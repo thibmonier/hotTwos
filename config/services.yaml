@@ -70,6 +70,9 @@ services:
     # Port engagements externes (US-034, DIP).
     App\Domain\Project\ExternalCommitmentRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineExternalCommitmentRepository'
 
+    # Port réouverture de projet (US-038, DIP).
+    App\Domain\Project\ProjectReopeningRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineProjectReopeningRepository'
+
     # Port utilisateur (lecture, US-010 — validation d'appartenance tenant).
     App\Domain\User\UserRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineUserRepository'
 
