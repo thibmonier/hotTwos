@@ -44,6 +44,17 @@ jobs:
       - name: Installer les dépendances
         run: composer install --prefer-dist --no-interaction --no-progress
 
+      # Front : Tailwind v4 via binaire autonome (ADR-0019) — aucun Node.js.
+      # Le binaire (~110 Mo) est mis en cache ; le CSS buildé est requis par asset() au rendu.
+      - name: Cache du binaire Tailwind
+        uses: actions/cache@v4
+        with:
+          path: var/tailwind
+          key: tailwind-v4.3.3-${{ runner.os }}
+
+      - name: Build Tailwind CSS
+        run: php bin/console tailwind:build --minify
+
       - name: Préparer le conteneur (phpstan-symfony)
         run: php bin/console cache:warmup --env=dev
 
