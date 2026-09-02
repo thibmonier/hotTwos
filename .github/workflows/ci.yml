@@ -31,7 +31,7 @@ jobs:
       # Tolérance zéro aux dépréciations (ARC-51) — étape 7.
       SYMFONY_DEPRECATIONS_HELPER: max
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup PHP 8.4
         uses: shivammathur/setup-php@v2
@@ -47,7 +47,7 @@ jobs:
       # Front : Tailwind v4 via binaire autonome (ADR-0019) — aucun Node.js.
       # Le binaire (~110 Mo) est mis en cache ; le CSS buildé est requis par asset() au rendu.
       - name: Cache du binaire Tailwind
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: var/tailwind
           key: tailwind-v4.3.3-${{ runner.os }}
@@ -115,10 +115,10 @@ jobs:
     name: Détection de secrets
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: gitleaks
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
