@@ -10,6 +10,10 @@ use App\Application\Project\CreateProject;
 use App\Domain\Authorization\Permission;
 use App\Domain\Project\ContractType;
 use App\Domain\Project\Project;
+use App\Domain\Project\ExceptionalImputationOpening;
+use App\Domain\Project\ExceptionalImputationOpeningRepository;
+use App\Domain\Project\ProjectAssignment;
+use App\Domain\Project\ProjectAssignmentRepository;
 use App\Domain\Project\ProjectException;
 use App\Domain\Project\ProjectLot;
 use App\Domain\Project\ProjectLotRepository;
@@ -41,6 +45,8 @@ final class ProjectPageController extends AbstractController
         private readonly ChangeProjectStatus $changeProjectStatus,
         private readonly ProjectLotRepository $lots,
         private readonly ProjectMilestoneRepository $milestones,
+        private readonly ProjectAssignmentRepository $assignments,
+        private readonly ExceptionalImputationOpeningRepository $openings,
     ) {
     }
 
@@ -137,6 +143,26 @@ final class ProjectPageController extends AbstractController
                     'triggered' => $m->billingTriggeredAt() instanceof DateTimeImmutable,
                 ],
                 $this->milestones->findForProject($user->tenantId(), $project->id()),
+            ),
+            'assignments' => array_map(
+                static fn (ProjectAssignment $a): array => [
+                    'id' => $a->id(),
+                    'userId' => $a->userId(),
+                    'role' => $a->role(),
+                    'plannedDays' => $a->plannedDays(),
+                    'start' => $a->startDate()?->format('d/m/Y'),
+                    'end' => $a->endDate()?->format('d/m/Y'),
+                ],
+                $this->assignments->findForProject($user->tenantId(), $project->id()),
+            ),
+            'openings' => array_map(
+                static fn (ExceptionalImputationOpening $o): array => [
+                    'userId' => $o->userId(),
+                    'week' => $o->weekStart()->format('d/m/Y'),
+                    'reason' => $o->reason(),
+                    'grantedBy' => $o->grantedBy(),
+                ],
+                $this->openings->findForProject($user->tenantId(), $project->id()),
             ),
         ]);
     }

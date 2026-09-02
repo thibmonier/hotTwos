@@ -63,6 +63,10 @@ services:
     App\Domain\Project\ProjectLotRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineProjectLotRepository'
     App\Domain\Project\ProjectMilestoneRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineProjectMilestoneRepository'
 
+    # Ports affectation de projet (US-037, DIP).
+    App\Domain\Project\ProjectAssignmentRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineProjectAssignmentRepository'
+    App\Domain\Project\ExceptionalImputationOpeningRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineExceptionalImputationOpeningRepository'
+
     # Port utilisateur (lecture, US-010 — validation d'appartenance tenant).
     App\Domain\User\UserRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineUserRepository'
 

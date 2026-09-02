@@ -34,6 +34,8 @@ final class RecordTimeEntryTest extends TestCase
     private RecordTimeEntry $record;
     private InMemoryAccountingPeriodRepository $periods;
     private InMemoryAbsenceRequestRepository $absences;
+    private \App\Tests\Support\Project\InMemoryProjectAssignmentRepository $assignments;
+    private \App\Tests\Support\Project\InMemoryExceptionalImputationOpeningRepository $openings;
     private string $projectId;
 
     protected function setUp(): void
@@ -53,6 +55,8 @@ final class RecordTimeEntryTest extends TestCase
                 new MockClock(new DateTimeImmutable('2026-10-01 00:00:00')),
             ),
             $this->absences,
+            $this->assignments = new \App\Tests\Support\Project\InMemoryProjectAssignmentRepository(),
+            $this->openings = new \App\Tests\Support\Project\InMemoryExceptionalImputationOpeningRepository(),
         );
 
         $project = new Project($this->tenant, 'PRJ-1', 'Refonte');
@@ -121,6 +125,25 @@ final class RecordTimeEntryTest extends TestCase
 
         $draft->changeStatus(\App\Domain\Project\ProjectStatus::EN_COURS);
         $this->record->record($this->tenant, 'camille', $draft->id(), new DateTimeImmutable('2026-09-15'), 120);
+        self::assertCount(1, $this->entries->entries);
+    }
+
+    public function testRefusesImputationWhenNotAssignedButProjectHasAssignments(): void
+    {
+        // Dès qu'une affectation existe (US-037, CA-1), un non-affecté ne peut pas imputer…
+        $this->assignments->save(new \App\Domain\Project\ProjectAssignment($this->tenant, $this->projectId, 'julie', 'Développeuse', 40));
+        $day = new DateTimeImmutable('2026-09-15');
+
+        try {
+            $this->record->record($this->tenant, 'thomas', $this->projectId, $day, 120);
+            self::fail('Un collaborateur non affecté ne doit pas pouvoir imputer.');
+        } catch (TimesheetException) {
+            // attendu
+        }
+
+        // … sauf ouverture exceptionnelle sur la semaine (CA-2).
+        $this->openings->save(new \App\Domain\Project\ExceptionalImputationOpening($this->tenant, $this->projectId, 'thomas', $day, 'Renfort', 'marc', new DateTimeImmutable('2026-09-14 09:00:00')));
+        $this->record->record($this->tenant, 'thomas', $this->projectId, $day, 120);
         self::assertCount(1, $this->entries->entries);
     }
 

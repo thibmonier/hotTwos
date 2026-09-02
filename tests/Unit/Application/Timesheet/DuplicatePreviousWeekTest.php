@@ -42,6 +42,8 @@ final class DuplicatePreviousWeekTest extends TestCase
                 new MockClock(),
             ),
             new InMemoryAbsenceRequestRepository(),
+            new \App\Tests\Support\Project\InMemoryProjectAssignmentRepository(),
+            new \App\Tests\Support\Project\InMemoryExceptionalImputationOpeningRepository(),
         )));
 
         $project = new Project($tenant, 'PRJ-1', 'Refonte');

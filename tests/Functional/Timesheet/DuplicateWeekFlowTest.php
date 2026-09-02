@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Timesheet;
 
 use App\Domain\Project\Project;
+use App\Domain\Project\ProjectAssignment;
 use App\Domain\Tenant\Tenant;
 use App\Domain\Tenant\TenantId;
 use App\Domain\Absence\AbsenceRequest;
@@ -44,6 +45,7 @@ final class DuplicateWeekFlowTest extends WebTestCase
             $this->em->getClassMetadata(User::class),
             $this->em->getClassMetadata(Project::class),
             $this->em->getClassMetadata(TimeEntry::class),
+            $this->em->getClassMetadata(ProjectAssignment::class),
             $this->em->getClassMetadata(AccountingPeriod::class),
             $this->em->getClassMetadata(AbsenceRequest::class),
         ];

@@ -130,8 +130,75 @@
                 {% endif %}
             </section>
             <section class="project-tabpanel" id="panel-team" role="tabpanel" aria-labelledby="tab-team" data-tabs-target="panel" hidden>
-                <h2>Équipe</h2>
-                <p class="hint">Sera disponible avec US-037.</p>
+                <h2>Équipe — affectations</h2>
+                {% if assignments is empty %}
+                    <p>Aucune affectation. Tant qu'aucun collaborateur n'est affecté, le projet reste ouvert à la saisie ; dès la première affectation, seuls les affectés peuvent imputer.</p>
+                {% else %}
+                    <table class="project-list">
+                        <caption class="visually-hidden">Collaborateurs affectés au projet</caption>
+                        <thead><tr><th scope="col">Collaborateur</th><th scope="col">Rôle</th><th scope="col">Charge (j)</th><th scope="col">Période</th>{% if canEdit %}<th scope="col">Action</th>{% endif %}</tr></thead>
+                        <tbody>
+                            {% for a in assignments %}
+                                <tr>
+                                    <td><code>{{ a.userId[:8] }}</code></td>
+                                    <td>{{ a.role }}</td>
+                                    <td>{{ a.plannedDays }}</td>
+                                    <td>{{ a.start ?? '—' }}{% if a.end %} → {{ a.end }}{% endif %}</td>
+                                    {% if canEdit %}
+                                        <td>
+                                            <form method="post" action="{{ path('project_assignment_remove', { id: project.id, assignmentId: a.id }) }}">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('project_team') }}">
+                                                <button type="submit">Retirer</button>
+                                            </form>
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+
+                {% if canEdit %}
+                    <h3>Affecter un collaborateur</h3>
+                    <form method="post" action="{{ path('project_assignment_add', { id: project.id }) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('project_team') }}">
+                        <label for="a-user">Collaborateur (identifiant)</label>
+                        <input type="text" id="a-user" name="userId" required>
+                        <label for="a-role">Rôle</label>
+                        <input type="text" id="a-role" name="role" required>
+                        <label for="a-days">Charge prévisionnelle (jours)</label>
+                        <input type="number" id="a-days" name="plannedDays" min="0" inputmode="numeric" required>
+                        <label for="a-start">Début (optionnel)</label>
+                        <input type="date" id="a-start" name="startDate">
+                        <label for="a-end">Fin (optionnel)</label>
+                        <input type="date" id="a-end" name="endDate">
+                        <button type="submit">Affecter</button>
+                    </form>
+                {% endif %}
+
+                <h2>Ouvertures exceptionnelles</h2>
+                {% if openings is empty %}
+                    <p class="hint">Aucune ouverture exceptionnelle.</p>
+                {% else %}
+                    <ul class="project-lot-tree">
+                        {% for o in openings %}
+                            <li class="project-lot-item"><code>{{ o.userId[:8] }}</code> — semaine du {{ o.week }} — {{ o.reason }} <span class="hint">(accordée par {{ o.grantedBy[:8] }})</span></li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                {% if canEdit %}
+                    <h3>Accorder une ouverture exceptionnelle</h3>
+                    <form method="post" action="{{ path('project_opening_grant', { id: project.id }) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('project_team') }}">
+                        <label for="o-user">Collaborateur (identifiant)</label>
+                        <input type="text" id="o-user" name="userId" required>
+                        <label for="o-week">Semaine (un jour de la semaine)</label>
+                        <input type="date" id="o-week" name="weekStart" required>
+                        <label for="o-reason">Motif</label>
+                        <input type="text" id="o-reason" name="reason" maxlength="500" required>
+                        <button type="submit">Accorder</button>
+                    </form>
+                {% endif %}
             </section>
             <section class="project-tabpanel" id="panel-commitments" role="tabpanel" aria-labelledby="tab-commitments" data-tabs-target="panel" hidden>
                 <h2>Engagements externes</h2>
