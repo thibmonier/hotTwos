@@ -57,8 +57,8 @@ final class TimesheetPageTest extends WebTestCase
         self::assertResponseIsSuccessful();
         $body = $client->getResponse()->getContent() ?: '';
         self::assertStringContainsString('Refonte SI', $body);
-        // La cellule du lundi porte la valeur déjà saisie.
-        self::assertGreaterThan(0, $crawler->filter('input[value="210"]')->count());
+        // La cellule du lundi porte la valeur déjà saisie, en heures décimales (210 min = 3,5 h).
+        self::assertGreaterThan(0, $crawler->filter('input[value="3.5"]')->count());
 
         // US-059 : panneau « Ma synthèse » rendu (SSR) dans la page de saisie, lecture seule.
         self::assertStringContainsString('Ma synthèse', $body);

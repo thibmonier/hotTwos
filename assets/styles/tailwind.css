@@ -57,6 +57,12 @@
 @theme {
     --font-sans: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 
+    /* Ombres — reportées depuis design-system.md §3.4 (jusqu'ici absentes de @theme : les classes
+       shadow-sm/shadow-md retombaient sur l'échelle Tailwind par défaut, non tokenisée). Surcharge
+       native Tailwind v4 : --shadow-* dans @theme remplace directement les utilitaires shadow-*. */
+    --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    --shadow-md: 0 0.75rem 1.5rem rgba(18, 38, 63, 0.03);
+
     --color-primary: var(--ds-primary);
     --color-primary-fg: var(--ds-primary-fg);
     --color-primary-surface: var(--ds-primary-surface);

@@ -19,7 +19,7 @@
                     Aucune unité pour l'instant. Créez la première ci-dessous.
                 </p>
             {% else %}
-                <div class="rounded-md border border-border bg-surface">
+                <div class="rounded-md border border-border bg-surface shadow-sm">
                     <ul role="list">
                         {% for row in rows %}
                             <li class="flex items-center justify-between gap-2 border-b border-border px-4 py-3 last:border-b-0"
@@ -46,7 +46,7 @@
         {# Ajouter une unité #}
         <section aria-labelledby="create-heading" class="mb-6">
             <h2 id="create-heading" class="mb-3 text-base font-semibold text-ink">Ajouter une unité</h2>
-            <div class="rounded-md border border-border bg-surface">
+            <div class="rounded-md border border-border bg-surface shadow-sm">
                 <div class="p-4">
                     <form data-action="submit->organization#createUnit">
                         <div class="mb-4">
@@ -79,7 +79,7 @@
         {# Rattacher un collaborateur #}
         <section aria-labelledby="attach-heading" class="mb-6">
             <h2 id="attach-heading" class="mb-3 text-base font-semibold text-ink">Rattacher un collaborateur</h2>
-            <div class="rounded-md border border-border bg-surface">
+            <div class="rounded-md border border-border bg-surface shadow-sm">
                 <div class="p-4">
                     <form data-action="submit->organization#attach">
                         <div class="mb-4">
