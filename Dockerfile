@@ -28,6 +28,7 @@ RUN composer install --no-dev --no-scripts --no-interaction --prefer-dist --opti
  && composer dump-autoload --no-dev --optimize \
  && mkdir -p var/cache var/log \
  && php bin/console importmap:install \
+ && php bin/console tailwind:build --minify \
  && php bin/console asset-map:compile \
  && php bin/console cache:clear
 
