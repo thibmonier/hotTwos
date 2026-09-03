@@ -44,7 +44,7 @@
                                     </th>
                                     <th scope="col" class="px-4 py-3 font-semibold text-body">Projet</th>
                                     <th scope="col" class="px-4 py-3 font-semibold text-body">Jour</th>
-                                    <th scope="col" class="px-4 py-3 text-right font-semibold text-body">Minutes</th>
+                                    <th scope="col" class="px-4 py-3 text-right font-semibold text-body">Durée</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -59,7 +59,8 @@
                                         </td>
                                         <td class="px-4 py-3 text-body">{{ row.project }}</td>
                                         <td class="px-4 py-3 text-body">{{ row.date }}</td>
-                                        <td class="px-4 py-3 text-right text-body">{{ row.minutes }}</td>
+                                        {# Durée en heures (cohérence avec la saisie décimale, US-070/F3) ; domaine en minutes. #}
+                                        <td class="px-4 py-3 text-right text-body">{{ (row.minutes // 60) }}h{{ '%02d'|format(row.minutes % 60) }}</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>

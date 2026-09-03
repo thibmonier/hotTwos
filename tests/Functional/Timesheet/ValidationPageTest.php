@@ -113,6 +113,9 @@ final class ValidationPageTest extends WebTestCase
         $body = (string) $client->getResponse()->getContent();
         self::assertStringContainsString('Projet indisponible', $body);
         self::assertStringNotContainsString($ghostProjectId, $body);
+        // US-070 (T-070-02) : durée affichée en heures (240 min = 4h00), pas en minutes brutes.
+        self::assertStringContainsString('4h00', $body);
+        self::assertStringNotContainsString('>240<', $body);
 
         $tool->dropSchema($schema);
         $em->close();
