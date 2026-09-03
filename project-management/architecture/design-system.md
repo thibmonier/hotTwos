@@ -1,191 +1,207 @@
 # Design System — HotOnes
 
-**Statut :** faisant autorité (source unique de vérité pour US-061).
+**Statut :** faisant autorité (source unique de vérité pour US-061, réinjectée dans `@theme`).
 **Périmètre :** tokens (couleurs, typographie, espacements, rayons, ombres, grille) et inventaire des
-composants de base. Ne couvre pas le reskin des écrans (US-064) ni le layout Skote (US-063) — ce document
-est leur contrat visuel.
-**Dépend de :** ADR-0018 (intégration CSS Bootstrap/Skote compilé + custom properties, sans build Sass).
-**Réfs :** EPIC-012, US-061 (CA-1 à CA-5).
+composants de base. Ne couvre pas le détail du reskin écran par écran (US-064) — ce document est leur
+contrat visuel.
+**Dépend de :** [ADR-0019](../../docs/adr/0019-frontend-tailwind-assetmapper.md) — Tailwind CSS v4
+CSS-first via `symfonycasts/tailwind-bundle` (binaire autonome, **sans Node.js**), composants TailAdmin
+(MIT). **Supersede** [ADR-0018](../../docs/adr/0018-integration-design-system-skote.md) (Bootstrap/Skote
+précompilé), abandonné.
+**Implémentation de référence :** `assets/styles/tailwind.css` — en cas d'écart entre ce document et ce
+fichier, **`tailwind.css` fait foi** pour les valeurs exactes ; ce document doit être mis à jour en
+conséquence.
+**Réfs :** EPIC-012, US-061 (CA-1 à CA-5), US-063 (layout), US-064 (reskin), US-065 (contrastes).
 
 ---
 
 ## 1. Objet, portée, principe d'intégration
 
-### 1.1 Principe d'intégration (ADR-0018)
+### 1.1 Principe d'intégration (ADR-0019)
 
-Le socle reste **100 % Symfony AssetMapper**, sans étape de compilation Sass/npm :
+Le socle reste **100 % Symfony AssetMapper**, mais la mécanique de style est désormais **Tailwind CSS v4
+CSS-first**, sans Node.js :
 
-- Le CSS **compilé** de Skote/Bootstrap (`Skote_Symfony_v2.2.0/.../dist` ou équivalent importmap) est
-  chargé tel quel — ses classes utilitaires (`.btn`, `.badge`, `.table`, `.card`, `.form-control`, `.offcanvas`,
-  breakpoints `sm/md/lg/xl/xxl`…) sont **figées** : on ne peut pas les recompiler avec des `$variables`
-  Sass modifiées.
-- Une **couche de tokens** en CSS custom properties (`--variables`), définie dans `assets/styles/app.css`
-  (ou un fichier dédié `assets/styles/tokens.css` importé avant le reste), **dérive** ses valeurs des
-  variables Skote (couleurs, typo, espacements, rayons, ombres) mais les exprime nativement en CSS.
-- Les tokens sont la **seule source de vérité** pour toute valeur de style ajoutée par l'application
-  (pas de hex en dur dans les templates/CSS applicatifs — CA-1, CA-4).
-- Là où un token corrige une valeur Skote non conforme WCAG (§5), c'est le **token corrigé** qui fait foi,
-  pas la variable Sass d'origine (le Sass n'est de toute façon plus recompilé).
+- `symfonycasts/tailwind-bundle` télécharge et met en cache un **binaire Tailwind autonome** (version
+  pinée), qui buide `assets/styles/tailwind.css` en JIT (purge) vers `var/tailwind/tailwind.built.css`,
+  swappé par AssetMapper (`asset('styles/tailwind.css')`, fingerprinté).
+- Le design system est déclaré **dans le CSS lui-même**, en trois temps (voir `assets/styles/tailwind.css`) :
+  1. `@import "tailwindcss";` — charge le moteur et l'échelle par défaut (espacements, rayons, breakpoints,
+     graisses… **non redéfinis** ici, donc **la valeur par défaut Tailwind v4 fait foi**, cf. §3).
+  2. Des **tokens de thème** `--ds-*` en `:root` (clair) et `[data-theme="dark"]` (sombre) — couleurs
+     contraste-vérifiées WCAG 2.2 AA (US-065).
+  3. Un bloc `@theme { --color-*: var(--ds-*); … }` qui **mappe** ces tokens vers les variables de thème
+     Tailwind, ce qui génère automatiquement les utilitaires `bg-primary`, `text-body`, `border-border`,
+     etc. — theme-aware (basculent avec `[data-theme="dark"]`) sans classe conditionnelle dans les templates.
+- **Purge JIT** via `@source "../../templates";` : seules les classes utilitaires réellement présentes dans
+  les templates Twig sont buildées (~17 Ko purgé vs 305 Ko pour l'ancien `bootstrap.min.css`, cf. ADR-0019).
+- **Thème sombre** piloté par l'attribut `data-theme="dark"` posé sur `<html>` (bascule Stimulus
+  `theme-toggle`, persistée en `localStorage`, anti-FOUC via un script inline dans `<head>`) et lu par
+  `@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));` pour l'usage ponctuel du
+  variant `dark:`.
+- Les tokens `--ds-*` sont la **seule source de vérité** pour toute couleur ajoutée par l'application (pas
+  de hex en dur dans les templates/CSS applicatifs — CA-1, CA-4). Une valeur non conforme WCAG n'est **jamais**
+  introduite : les tokens ci-dessous sont déjà les valeurs corrigées (plus de distinction « brute Skote » vs
+  « corrigée », cf. §5).
+
+```css
+/* assets/styles/tailwind.css — structure de référence */
+@import "tailwindcss";
+
+@source "../../templates";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+:root {
+    --ds-primary: #4e65d4;
+    /* … tokens --ds-* clairs (§2) */
+}
+
+[data-theme="dark"] {
+    --ds-primary: #8092ec;
+    /* … tokens --ds-* sombres (§2) */
+}
+
+@theme {
+    --font-sans: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    --color-primary: var(--ds-primary);
+    /* … mapping vers les variables de thème Tailwind (§2-3) */
+}
+
+@layer components {
+    /* Hooks sémantiques minimaux : .visually-hidden, .flash*, .status-badge*, dialog.summary-dialog (§4) */
+}
+```
 
 ### 1.2 Ce que ce document fixe
 
-1. Tokens de couleurs (primitives + sémantiques), clair **et** sombre.
-2. Typographie, espacements, rayons, ombres, grille/breakpoints.
-3. Inventaire des composants de base (boutons, tables, badges, formulaires, drawer, alertes, sidebar).
+1. Tokens de couleurs `--ds-*` (mappés en variables de thème Tailwind `--color-*`), clair **et** sombre.
+2. Typographie, espacements, rayons, ombres, grille/breakpoints — ce qui est **surchargé** dans `@theme`
+   vs ce qui reste l'**échelle par défaut Tailwind v4** (à documenter explicitement pour éviter toute
+   confusion avec l'ancienne échelle Bootstrap/Skote).
+3. Inventaire des recettes de composants (boutons, tables, badges, formulaires, drawer, alertes, sidebar) —
+   exprimées en **classes utilitaires Tailwind**, avec les quelques classes sémantiques réellement
+   définies dans `@layer components`.
 4. Vérification de contraste WCAG 2.2 AA, avec corrections tracées.
-5. Table de migration depuis `assets/styles/app.css`.
+5. Références TailAdmin utilisées comme banque de composants.
 
 ---
 
 ## 2. Tokens de couleurs
 
-### 2.1 Primitives (dérivées de `_variables.scss` Skote)
+### 2.1 Principe
 
-Les primitives ne sont **jamais utilisées directement** dans les composants ou les templates — elles
-n'existent que pour dériver les tokens sémantiques (§2.2). C'est la règle CA-1 : *« chaque token est nommé
-de façon sémantique, pas `--red-500` en usage »*.
+Il n'y a plus de « primitives Skote » séparées des tokens sémantiques. Chaque token `--ds-*` **est**
+directement la valeur accessible retenue (US-065) — pas de valeur brute à corriger en aval. Les tokens sont
+définis une fois en CSS (`:root` / `[data-theme="dark"]`) puis exposés comme variables de thème Tailwind
+dans `@theme`, ce qui génère les utilitaires `bg-*`, `text-*`, `border-*` correspondants (ex. `--color-primary`
+→ `bg-primary`, `text-primary`, `border-primary`, `border-primary/20`, `bg-primary/5`, etc., y compris avec
+les modificateurs d'opacité Tailwind).
+
+### 2.2 Tokens — thème clair (`:root`)
 
 ```css
 :root {
-  /* Palette Skote — primitives, usage interne uniquement */
-  --palette-blue: #556ee6;
-  --palette-green: #34c38f;
-  --palette-yellow: #f1b44c;
-  --palette-red: #f46a6a;
-  --palette-cyan: #50a5f1;
-  --palette-orange: #f1734f;
-  --palette-indigo: #564ab1;
+    --ds-primary: #4e65d4;         /* 5.08:1 avec blanc */
+    --ds-primary-fg: #ffffff;
+    --ds-primary-surface: #556ee6; /* décoratif, non-texte */
+    --ds-success: #2e7d32;
+    --ds-warning: #60481e;
+    --ds-danger: #c62828;
+    --ds-info: #204260;
+    --ds-on-status: #212529;       /* texte foncé sur fond de statut plein */
 
-  --palette-gray-100: #f8f9fa;
-  --palette-gray-200: #eff2f7;
-  --palette-gray-300: #f6f6f6;
-  --palette-gray-400: #ced4da;
-  --palette-gray-500: #adb5bd;
-  --palette-gray-600: #74788d;
-  --palette-gray-700: #495057;
-  --palette-gray-800: #343a40;
-  --palette-gray-900: #212529;
-  --palette-white: #ffffff;
-  --palette-black: #000000;
+    --ds-bg: #f6f7f9;
+    --ds-surface: #ffffff;
+    --ds-surface-alt: #f8f9fa;
+    --ds-ink: #212529;
+    --ds-body: #495057;
+    --ds-muted: #555555;
+    --ds-border: #eff2f7;
+    --ds-border-strong: #74788d;
+    --ds-focus: #0b5fff;
 }
 ```
 
-### 2.2 Tokens sémantiques — thème clair (défaut)
-
-> **Correction importante (CA-5) :** plusieurs couleurs Skote telles quelles échouent au contrôle de
-> contraste WCAG 2.2 AA dans leurs usages courants (texte, bordure fonctionnelle, texte blanc sur fond
-> plein). Les valeurs ci-dessous sont **les valeurs corrigées** — voir le détail et les ratios au §5.
-
-```css
-:root,
-[data-theme="light"] {
-  color-scheme: light;
-
-  /* Marque / actions primaires — accessible : #556ee6 assombri de ~8 % (4.41:1 → 5.08:1) */
-  --color-primary: #4e65d4;
-  /* Teinte Skote d'origine — réservée aux grandes surfaces décoratives (sidebar active, focus-ring,
-     accents de graphique) : jamais comme couleur de texte ou de libellé de petit bouton. */
-  --color-primary-surface: #556ee6;
-  --color-on-primary: #ffffff; /* texte sur --color-primary : 5.08:1 */
-
-  /* Sémantiques de statut — base (fonds de badge/bouton, icônes) + emphasis (texte accessible) */
-  --color-success: var(--palette-green);
-  --color-success-emphasis: #2e7d32; /* repris de app.css, 4.77:1 sur fond page, 5.11:1 sur blanc */
-  --color-warning: var(--palette-yellow);
-  --color-warning-emphasis: #60481e; /* shade 60% de #f1b44c, 8.02:1 sur fond page */
-  --color-danger: var(--palette-red);
-  --color-danger-emphasis: #c62828; /* repris de app.css, 5.24:1 sur fond page */
-  --color-info: var(--palette-cyan);
-  --color-info-emphasis: #204260; /* shade 60% de #50a5f1, 9.75:1 sur fond page */
-
-  /* Texte sur fond plein (boutons solides success/warning/danger/info) : texte FONCÉ, pas blanc — voir
-     §5.2, le blanc échoue le contraste sur ces 4 couleurs à pleine saturation. Primary fait exception
-     (texte blanc, cf. --on-primary). */
-  --color-on-status: var(--palette-gray-900); /* #212529, 5.2:1 à 8.4:1 selon la couleur de fond */
-
-  /* Alias explicites pour les statuts métier (complétude, statut projet) — mêmes valeurs que les
-     tokens sémantiques ci-dessus, nommage dédié pour la lisibilité dans les composants métier. */
-  --color-status-success: var(--color-success-emphasis);
-  --color-status-warning: var(--color-warning-emphasis);
-  --color-status-danger: var(--color-danger-emphasis);
-  --color-status-neutral: var(--palette-gray-600);   /* usage non-texte / état désactivé, cf. §5.2 */
-  --color-status-neutral-emphasis: #555555;          /* variante texte, accessible (6.96:1) */
-
-  /* Surfaces */
-  --color-bg: #f6f7f9;         /* fond de page — repris tel quel de app.css (PR #11) */
-  --color-surface: #ffffff;    /* cartes, panneaux, drawer */
-  --color-surface-alt: var(--palette-gray-100); /* en-têtes de tableau, zones alternées */
-
-  /* Bordures — deux niveaux, cf. §5.2 (le gris Skote par défaut échoue le contraste fonctionnel) */
-  --color-border-subtle: var(--palette-gray-200); /* décoratif uniquement (séparateurs, lignes de table) */
-  --color-border-strong: var(--palette-gray-600); /* fonctionnel : champs, boutons outline, sélecteurs (4.36:1) */
-
-  /* Texte */
-  --color-text: var(--palette-gray-700);       /* texte principal, 8.09:1 */
-  --color-text-muted: #555555;                 /* texte secondaire, repris de app.css, 6.96:1 */
-  --color-text-disabled: var(--palette-gray-600); /* exempté WCAG (état désactivé uniquement) */
-  --color-ink: var(--palette-gray-900);
-
-  /* Liens */
-  --color-link: var(--color-primary);
-  --color-link-hover: #3a4fb8;
-
-  /* Focus (WCAG 2.4.7 / 2.4.11) — conservé tel quel depuis app.css, volontairement distinct du bleu de
-     marque pour rester très saillant : 5.13:1 sur blanc, > 3:1 requis pour un indicateur de focus. */
-  --color-focus: #0b5fff;
-  --focus-ring-width: 3px;
-  --focus-ring-offset: 2px;
-}
-```
-
-### 2.3 Tokens sémantiques — thème sombre
-
-Même structure de noms, valeurs distinctes (CA-2). Activation par `[data-theme="dark"]` (bascule
-utilisateur explicite, prioritaire) ou `prefers-color-scheme: dark` en l'absence de préférence explicite.
+### 2.3 Tokens — thème sombre (`[data-theme="dark"]`)
 
 ```css
 [data-theme="dark"] {
-  color-scheme: dark;
+    --ds-primary: #8092ec;
+    --ds-primary-fg: #14183a;
+    --ds-success: #85dbbc;
+    --ds-warning: #f7d294;
+    --ds-danger: #f8a6a6;
+    --ds-info: #96c9f7;
+    --ds-on-status: #14183a;
 
-  --color-primary: #8092ec;         /* tint 25% de #556ee6, 5.12:1 sur fond page sombre */
-  --color-primary-surface: #556ee6;
-  --color-on-primary: #14183a;      /* texte foncé sur le bleu clair en mode sombre */
-
-  --color-success: var(--palette-green);
-  --color-success-emphasis: #85dbbc; /* tint 40% Skote (pattern *-text-emphasis-dark), 9.12:1 */
-  --color-warning: var(--palette-yellow);
-  --color-warning-emphasis: #f7d294; /* tint 40% Skote */
-  --color-danger: var(--palette-red);
-  --color-danger-emphasis: #f8a6a6;  /* tint 40% Skote */
-  --color-info: var(--palette-cyan);
-  --color-info-emphasis: #96c9f7;    /* tint 40% Skote */
-
-  --color-on-status: #14183a; /* texte foncé sur les fonds de statut clairs ci-dessus */
-
-  --color-status-success: var(--color-success-emphasis);
-  --color-status-warning: var(--color-warning-emphasis);
-  --color-status-danger: var(--color-danger-emphasis);
-  --color-status-neutral: #a6b0cf;
-  --color-status-neutral-emphasis: #c3cbe4;
-
-  --color-bg: #222736;          /* body-bg-dark Skote */
-  --color-surface: #2a3042;     /* body-secondary-bg-dark Skote (= sidebar-dark-bg) */
-  --color-surface-alt: #262b3c;
-
-  --color-border-subtle: #32394e;   /* border-color-dark Skote */
-  --color-border-strong: #7b839c;   /* corrigé — cf. §5.2, 3.49:1 mini sur surface sombre */
-
-  --color-text: #a6b0cf;        /* body-color-dark Skote, 6.92:1 */
-  --color-text-muted: #c3cbe4;  /* body-secondary-color-dark Skote, contraste supérieur au texte principal */
-  --color-text-disabled: #6a7187;
-  --color-ink: #f6f6f6;
-
-  --color-link: var(--color-primary);
-  --color-link-hover: #a3b1f3;
-
-  --color-focus: #4c8bff; /* variante plus claire du focus pour rester visible sur fond sombre */
+    --ds-bg: #222736;
+    --ds-surface: #2a3042;
+    --ds-surface-alt: #262b3c;
+    --ds-ink: #f6f6f6;
+    --ds-body: #a6b0cf;
+    --ds-muted: #c3cbe4;
+    --ds-border: #32394e;
+    --ds-border-strong: #7b839c;
+    --ds-focus: #4c8bff;
 }
 ```
+
+Activation : bascule utilisateur explicite (`data-theme="dark"|"light"` posé par le contrôleur Stimulus
+`theme-toggle`, persisté en `localStorage`, appliqué avant peinture via un script inline anti-FOUC dans
+`<head>`). Pas de fallback automatique sur `prefers-color-scheme` à ce stade.
+
+### 2.4 Mapping `@theme` → utilitaires Tailwind
+
+```css
+@theme {
+    --color-primary: var(--ds-primary);
+    --color-primary-fg: var(--ds-primary-fg);
+    --color-primary-surface: var(--ds-primary-surface);
+    --color-success: var(--ds-success);
+    --color-warning: var(--ds-warning);
+    --color-danger: var(--ds-danger);
+    --color-info: var(--ds-info);
+    --color-on-status: var(--ds-on-status);
+
+    --color-bg: var(--ds-bg);
+    --color-surface: var(--ds-surface);
+    --color-surface-alt: var(--ds-surface-alt);
+    --color-ink: var(--ds-ink);
+    --color-body: var(--ds-body);
+    --color-muted: var(--ds-muted);
+    --color-border: var(--ds-border);
+    --color-border-strong: var(--ds-border-strong);
+    --color-focus: var(--ds-focus);
+
+    /* Sidebar : sombre invariante (ne suit pas la bascule de thème). */
+    --color-sidebar: #2a3042;
+    --color-sidebar-alt: #32394e;
+    --color-sidebar-text: #a6b0cf;
+    --color-sidebar-label: #9aa3bf;   /* 5.26:1 sur #2a3042 */
+    --color-sidebar-icon: #6a7187;
+}
+```
+
+| Variable de thème | Utilitaires générés | Usage |
+|--------------------|----------------------|-------|
+| `--color-primary` | `bg-primary`, `text-primary`, `border-primary`, `border-primary/20`, `bg-primary/5` | Action principale, liens, éléments actifs |
+| `--color-primary-fg` | `text-primary-fg` | Texte sur fond `bg-primary` plein |
+| `--color-primary-surface` | `bg-primary-surface` | Avatars, icônes conteneur, décoratif large surface |
+| `--color-success` / `-warning` / `-danger` / `-info` | `text-success`, `border-warning`, … | Statuts, alertes, badges (texte/bordure — jamais fond plein, cf. §5.4) |
+| `--color-on-status` | `text-on-status` | Texte sur un fond de statut plein (rare, cf. §4.3) |
+| `--color-bg` | `bg-bg` | Fond de page (`<body>`, `<main>`) |
+| `--color-surface` / `-surface-alt` | `bg-surface`, `bg-surface-alt` | Cartes, tableaux, en-têtes de tableau |
+| `--color-ink` | `text-ink` | Texte fort (titres, valeurs chiffrées) |
+| `--color-body` | `text-body` | Texte courant |
+| `--color-muted` | `text-muted` | Texte secondaire, légendes |
+| `--color-border` / `-border-strong` | `border-border`, `border-border-strong` | Séparateurs décoratifs / bordures fonctionnelles (champs, boutons outline) |
+| `--color-focus` | utilisé en dur dans `@layer components` (`outline: 3px solid var(--color-focus)`) | Indicateur de focus (§4.6) |
+| `--color-sidebar*` | `bg-sidebar`, `text-sidebar-text`, `bg-sidebar-alt`, `text-sidebar-label` | Sidebar (toujours sombre, quel que soit le thème) |
+
+> **Non-régression sémantique :** l'ancien couple « couleur de base / couleur `-emphasis` accessible »
+> (ADR-0018) a disparu : chaque token `--ds-{success,warning,danger,info}` **est** directement la valeur
+> accessible retenue par US-065 — il n'existe plus de variante « brute » à éviter en texte.
 
 ---
 
@@ -193,271 +209,319 @@ utilisateur explicite, prioritaire) ou `prefers-color-scheme: dark` en l'absence
 
 ### 3.1 Typographie
 
-Police Skote inchangée (`Poppins`), échelle et graisses dérivées de `_variables.scss`.
+Police **Poppins**, chargée via Google Fonts (`base.html.twig`, `preconnect` + `<link>`), déclarée comme
+police par défaut via `--font-sans` dans `@theme` — génère l'utilitaire `font-sans` (appliqué sur `<body>`).
 
 ```css
-:root {
-  --font-family-base: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  --font-family-mono: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-
-  --font-size-base: 0.8125rem; /* 13px — taille de référence Skote */
-  --font-size-sm: 0.7109rem;   /* ~11.4px */
-  --font-size-lg: 1.0156rem;   /* ~16.25px */
-
-  --font-size-h6: var(--font-size-base); /* 13px */
-  --font-size-h5: 1.0156rem;             /* 16.25px */
-  --font-size-h4: 1.2188rem;             /* 19.5px */
-  --font-size-h3: 1.4219rem;             /* 22.75px */
-  --font-size-h2: 1.625rem;              /* 26px */
-  --font-size-h1: 2.03125rem;            /* 32.5px */
-
-  --font-weight-light: 300;
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600; /* = "bold" Skote ($font-weight-bold: 600) */
-
-  --line-height-base: 1.5;
-  --line-height-sm: 1.25;
-  --line-height-lg: 2;
+@theme {
+    --font-sans: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 }
 ```
 
-> Note : `--font-size-base` (13px) est plus petit que le défaut Bootstrap (16px) — c'est un choix Skote
-> assumé pour un back-office dense. Les tailles de police des champs de saisie tactile (US-052, mobile)
-> restent à **16px minimum** pour éviter le zoom automatique iOS (déjà respecté dans `app.css`, cf. §6) ;
-> ce n'est **pas** un token typographique global mais une règle spécifique aux `<input>` sur mobile.
+**Échelle de tailles et graisses : non surchargée.** Tailwind v4 fournit nativement `text-xs` (12px) à
+`text-3xl` (30px) et `font-normal` (400) / `font-medium` (500) / `font-semibold` (600) / `font-bold` (700) ;
+ce sont ces utilitaires par défaut qui sont utilisés dans les templates (`text-xs`, `text-sm`, `text-base`,
+`text-lg`, `text-2xl`, `text-3xl`, `font-medium`, `font-semibold`, `font-bold`).
+
+**Exception documentée** : le corps de page (`<body>`) fixe une taille de référence **13px**, plus dense
+que le défaut Tailwind (16px), cohérente avec l'ancien choix de densité back-office :
+
+```html
+<body class="... font-sans text-[13px] leading-normal text-body ...">
+```
+
+C'est une valeur arbitraire Tailwind (`text-[13px]`), pas un token `@theme` — à ne pas dupliquer ailleurs ;
+les titres et éléments mis en avant utilisent l'échelle standard (`text-2xl`, `text-3xl`, etc.) au-dessus de
+cette base. **Règle mobile conservée** : les champs de saisie tactile utilisent `text-sm`/`text-base`
+(16px mini) pour éviter le zoom automatique iOS — dérogation locale au 13px de base, pas un token global.
 
 ### 3.2 Espacements
 
-Échelle Bootstrap `$spacers` (utilisée telle quelle par les classes utilitaires `.p-*`, `.m-*`, `.gap-*`
-du CSS compilé — ne pas en inventer une autre, elle ne matcherait pas les classes déjà livrées).
+**Non surchargés.** L'échelle d'espacement Tailwind v4 par défaut (`--spacing: 0.25rem`, soit une
+progression `p-1`=4px, `p-2`=8px, `p-3`=12px, `p-4`=16px, `p-5`=20px, `p-6`=24px, …) est utilisée telle
+quelle par `p-*`, `m-*`, `gap-*`, `space-*` dans tous les templates (`p-5` pour les cartes KPI, `gap-3`
+pour les barres d'actions, `px-4 py-3` pour les cellules de tableau, etc.). Aucun token `--spacing-*`
+personnalisé n'est déclaré dans `@theme` : il n'y a **pas** de portage direct de l'ancienne échelle
+Bootstrap (`$spacers` 4/8/16/24/48px) — la grille 4px de Tailwind la recouvre avec plus de granularité.
 
-```css
-:root {
-  --space-0: 0;
-  --space-1: 0.25rem;  /* 4px */
-  --space-2: 0.5rem;   /* 8px */
-  --space-3: 1rem;     /* 16px */
-  --space-4: 1.5rem;   /* 24px */
-  --space-5: 3rem;     /* 48px */
-
-  --grid-gutter: 24px;
-}
-```
-
-Pour les tableaux denses (saisie de temps, listes), une densité **compacte** est admise en alternative à
-la densité par défaut Skote (§4.2) : `--space-2` (8px vertical / horizontal) au lieu de la densité
-`--table-cell-padding-*` par défaut.
+Densité compacte (tableaux de saisie) : `px-3 py-2` (au lieu de `px-4 py-3`) — convention d'usage, pas un
+token dédié.
 
 ### 3.3 Rayons
 
-```css
-:root {
-  --radius-sm: 0.2rem;    /* 3.2px */
-  --radius-md: 0.25rem;   /* 4px — défaut boutons, champs, cartes, badges */
-  --radius-lg: 0.4rem;    /* 6.4px — modales, drawer */
-  --radius-xl: 1rem;
-  --radius-2xl: 2rem;
-  --radius-pill: 50rem;   /* badges pilule, boutons ronds */
-}
-```
+**Non surchargés.** Échelle Tailwind v4 par défaut, utilisée directement dans les templates :
+
+| Utilitaire | Valeur | Usage observé |
+|------------|-------:|----------------|
+| `rounded` | 0.25rem (4px) | Boutons, badges, petits éléments |
+| `rounded-md` | 0.375rem (6px) | Cartes KPI, tableaux, champs de formulaire, blocs de contenu |
+| `rounded-lg` | 0.5rem (8px) | Sidebar (icône logo), coins de drawer bottom-sheet (`rounded-lg rounded-lg 0 0`) |
+| `rounded-full` | 9999px | Avatars, barres de progression, pastilles |
 
 ### 3.4 Ombres
 
+**Deux valeurs surchargées** dans `@theme` (reprises des ratios validés US-065/CA-4) ; le reste de
+l'échelle Tailwind (`shadow`, `shadow-lg`, `shadow-xl`, …) reste la valeur **par défaut** du framework, non
+personnalisée :
+
 ```css
-:root {
-  --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-  --shadow-md: 0 0.75rem 1.5rem rgba(18, 38, 63, 0.03);
-  --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
-  --shadow-inset: inset 0 1px 2px rgba(0, 0, 0, 0.075);
+@theme {
+    --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    --shadow-md: 0 0.75rem 1.5rem rgba(18, 38, 63, 0.03);
 }
 ```
+
+Usage : `shadow-sm` sur les cartes (KPI, tableaux, panneaux) — cohérent avec l'esthétique TailAdmin
+(ombre douce, quasi imperceptible, jamais de « box-shadow » lourd). `shadow-md` réservé aux éléments
+survolés/flottants le cas échéant.
 
 ### 3.5 Grille et points de rupture
 
-Le CSS Bootstrap étant **compilé** (non recompilable sans build Sass), les points de rupture réels des
-classes utilitaires (`.d-md-none`, conteneurs, colonnes) sont ceux de Bootstrap par défaut :
+**Non surchargés.** Les breakpoints sont ceux de **Tailwind v4 par défaut** (et non plus ceux de
+Bootstrap) :
 
-```css
-:root {
-  --bp-sm: 576px;
-  --bp-md: 768px;
-  --bp-lg: 992px;
-  --bp-xl: 1200px;
-  --bp-xxl: 1400px;
-}
-```
+| Breakpoint | Largeur mini | Usage observé dans les templates |
+|------------|-------------:|-----------------------------------|
+| `sm` | 640px | `sm:grid-cols-4`, `sm:col-span-1` (grille KPI) |
+| `md` | 768px | `md:static md:translate-x-0` (sidebar toujours visible), `md:hidden` (overlay/bouton burger) |
+| `lg` | 1024px | Réservé pour les layouts larges à venir |
+| `xl` | 1280px | — |
+| `2xl` | 1536px | — |
 
-- Grille : 12 colonnes, gouttière `--grid-gutter` (24px).
-- Layout : `--sidebar-width: 250px` (`--sidebar-width-collapsed: 70px`), `--header-height: 70px`,
-  `--footer-height: 60px` (repris de Skote, utilisés par US-063).
-
-**Réconciliation avec le point de rupture 640px existant** (déjà utilisé en CSS applicatif brut, hors
-classes Bootstrap, dans `.day-submit-bar`, `.summary-dialog`) : ces media queries `@media (min-width: 640px)`
-ne dépendent pas des classes Bootstrap compilées — elles continuent de fonctionner sans modification. Pour
-les **nouveaux** composants custom (non issus des classes Bootstrap), privilégier `--bp-md` (768px) comme
-pivot mobile → desktop par cohérence avec le reste du thème ; les 640px déjà en place sont une exception
-tolérée et documentée (§6), pas un précédent à reproduire.
+Layout applicatif (non issu de Tailwind, dimensions fixes du gabarit) : sidebar `w-[250px]`, en-tête
+`h-[70px]` (classes arbitraires Tailwind, cf. `base.html.twig`) — pas de token `@theme` dédié à ce stade
+(un seul usage, YAGNI).
 
 ---
 
 ## 4. Inventaire des composants
 
-Pour chaque composant : anatomie, états, tokens utilisés, exigences a11y. Cibles tactiles ≥ 44×44px
-(F-S5-1) et parité tactile (aucune interaction seulement au survol) s'appliquent à tous les composants
-interactifs, sur tous les breakpoints — pas uniquement mobile.
+Recettes réellement utilisées dans les templates (`base.html.twig`, `valuation/index.html.twig`,
+`timesheet/week.html.twig`, etc.), en **classes utilitaires Tailwind** + tokens `--color-*` du §2. Cibles
+tactiles ≥ 44×44px (F-S5-1, via `min-h-11`/`h-11`/`w-11` — 11 × 4px = 44px) et parité tactile (aucune
+interaction seulement au survol) s'appliquent à tous les composants interactifs, sur tous les breakpoints.
+**Banque de composants visuels** : TailAdmin (MIT, `project-management/architecture/design-canvas/tailadmin-ref/`)
+— cartes à ombre douce et coins arrondis, hiérarchie typographique claire, sidebar sombre, badges pilule,
+tableaux aérés ; markup et classes réutilisables, adaptés aux tokens `--color-*` HotOnes (jamais les couleurs
+TailAdmin brutes).
 
-### 4.1 Bouton (`.btn`)
+### 4.1 Bouton
 
-**Catégorie** : Atom.
+**Catégorie** : Atom. Pas de classe `.btn` : chaque variante est une recette d'utilitaires Tailwind.
 
-| Variante | Fond | Texte | Usage |
-|----------|------|-------|-------|
-| `primary` | `--color-primary` | `--color-on-primary` (blanc) | Action principale |
-| `success` / `warning` / `danger` / `info` | `--color-{name}` | `--color-on-status` (foncé) | Actions sémantiques (valider, alerter, supprimer, information) |
-| `outline-*` | transparent | `--color-{name}-emphasis` + bordure `--color-{name}-emphasis` | Action secondaire |
-| `ghost` / `link` | transparent | `--color-link` | Action tertiaire |
-
-**Anatomie** : padding `0.47rem 0.75rem` (sm : `0.25rem 0.5rem` / lg : `0.5rem 1rem`), `--radius-md`,
-`font-weight: var(--font-weight-normal)`, hauteur mini tactile 44px (padding ajusté sur mobile si besoin,
-la hauteur calculée par défaut Skote ~36–38px est **augmentée** en dessous de `--bp-md`).
+| Variante | Recette | Usage |
+|----------|---------|-------|
+| Primaire | `inline-flex min-h-11 items-center rounded bg-primary px-4 text-sm font-semibold text-white hover:opacity-90` | Action principale (« Tout enregistrer ») |
+| Secondaire (outline) | `inline-flex min-h-9 items-center rounded border border-primary px-3 text-xs font-semibold text-primary hover:bg-surface-alt` | Action secondaire mise en avant (« Ma synthèse ») |
+| Tertiaire (neutre) | `inline-flex min-h-9 items-center rounded border border-border-strong px-3 text-xs font-semibold text-muted hover:bg-surface-alt hover:text-ink` | Action tertiaire (« Dupliquer la semaine précédente », « Vue jour ») |
+| Icône seule | `grid h-10 w-10 place-items-center rounded border border-border text-muted hover:text-ink` | Bouton burger, bascule de thème |
 
 **États** :
 
 | État | Traitement |
 |------|-----------|
-| `default` | Couleurs de variante ci-dessus |
-| `hover` | Fond assombri/éclairci ~15 % (`filter` ou couleur pré-calculée), `transition: 150ms ease-out` |
-| `focus-visible` | **Contour** `var(--focus-ring-width) solid var(--color-focus)`, `outline-offset: var(--focus-ring-offset)` — remplace le box-shadow de focus par défaut de Skote (désactivé côté Skote, `$input-focus-box-shadow: none`), donc **aucun conflit** : l'app fournit le seul traitement de focus. |
-| `active` | Fond assombri ~20 %, `box-shadow: var(--shadow-inset)` |
-| `disabled` | `opacity: 0.65`, `cursor: not-allowed`, pas de `hover`/`focus` |
-| `loading` | `disabled` + spinner (`currentColor`), libellé conservé (jamais l'icône seule) |
+| `default` | Couleurs de la recette ci-dessus |
+| `hover` | `hover:opacity-90` (plein) ou `hover:bg-surface-alt` (outline/tertiaire), transition implicite Tailwind |
+| `focus-visible` | Géré globalement (§4.6), pas de classe par bouton |
+| `disabled` | `disabled:opacity-65 disabled:cursor-not-allowed` (à ajouter systématiquement sur les boutons désactivables) |
+| `loading` | `disabled` + spinner `currentColor`, libellé conservé (jamais l'icône seule) |
 
-**Tokens** : `--color-primary`, `--color-{success,warning,danger,info}`, `--color-{...}-emphasis`,
-`--color-on-primary`, `--color-on-status`, `--radius-md`, `--space-2`, `--space-3`, `--color-focus`.
+**Tokens** : `--color-primary`, `--color-border`, `--color-border-strong`, `--color-surface-alt`,
+`--color-muted`, `--color-ink`.
 
-### 4.2 Table (`.table`)
+### 4.2 Table
 
-**Catégorie** : Organism.
+**Catégorie** : Organism. Pas de classe `.table` : `<table class="w-full border-collapse text-left">` +
+utilitaires sur les cellules.
 
-| Élément | Token |
-|---------|-------|
-| Fond d'en-tête | `--color-surface-alt` |
-| Bordure de ligne | `--color-border-subtle` |
-| Fond au survol de ligne | `--color-surface-alt` |
-| Texte | `--color-text` |
+| Élément | Recette |
+|---------|---------|
+| Conteneur | `rounded-md border border-border bg-surface` (+ `overflow-x-auto` sur un wrapper pour le scroll horizontal mobile) |
+| En-tête (`<thead><tr>`) | `bg-surface-alt` |
+| Cellule (`<th>`/`<td>`) | `px-4 py-3` (dense : `px-3 py-2`), `text-body` (en-têtes : `font-semibold text-body`) |
+| Ligne | `border-t border-border`, survol `hover:bg-surface-alt` |
+| Pied (total) | `border-t-2 border-border-strong bg-surface-alt font-semibold` |
 
-**Densités** :
-- **Défaut Skote** : `padding: 0.75rem` (`--space-3`).
-- **Compacte** (données de saisie de temps, listes denses — déjà en usage dans `.project-list`,
-  `.reminders-history`) : `padding: var(--space-2) calc(var(--space-2) * 1.2)` (~8px/10px), en alternative
-  explicitement admise par densité, pas une dérive.
-
-**A11y** : `<caption>` ou titre associé (peut être `.visually-hidden`), en-têtes `<th scope="col">`, pas
-de tableau utilisé pour la mise en page. Les lignes cliquables (navigation vers détail) doivent exposer
-un contrôle focusable (lien englobant le libellé principal), pas un `onclick` sur `<tr>` seul.
+**A11y** : `<caption class="visually-hidden">` obligatoire, `<th scope="col">` / `scope="row"` pour les
+en-têtes de ligne, aucun tableau utilisé pour la mise en page. Cellule cliquable → contrôle focusable réel
+(lien/bouton), jamais un gestionnaire sur `<tr>` seul.
 
 ### 4.3 Badge / pastille de statut
 
-**Catégorie** : Atom. Motif retenu : **bordé**, fond transparent/surface — pas de remplissage plein
-(voir §5.2 : le remplissage plein en teinte pastel est trop proche du seuil de contraste pour être une
-valeur par défaut sûre sur toutes les surfaces). Ce motif formalise le composant `.project-status-badge`
-déjà en place dans `app.css`.
+**Catégorie** : Atom. Seul composant coloré avec une classe sémantique dédiée, définie dans
+`@layer components` (motif **bordé**, texte porteur du sens, jamais la couleur seule — WCAG 1.4.1) :
 
-**Anatomie** : `padding: 0.15rem 0.55rem`, `border: 1px solid`, `--radius-md` (ou `--radius-pill` en
-variante « pilule »), `font-weight: var(--font-weight-semibold)`, `font-size: var(--font-size-sm)`.
+```css
+@layer components {
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.15rem 0.55rem;
+        border: 1px solid currentColor;
+        border-radius: 0.25rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    .status-badge-success { color: var(--color-success); }
+    .status-badge-warning { color: var(--color-warning); }
+    .status-badge-danger  { color: var(--color-danger); }
+    .status-badge-neutral { color: var(--color-muted); }
+}
+```
 
-**Règle absolue (WCAG 1.4.1)** : le badge porte **toujours un libellé texte** ; la couleur renforce, ne
-porte jamais seule le sens. Icône complémentaire optionnelle mais jamais substitut au texte.
+Usage type (`project/index.html.twig`) :
 
-| Statut | Token bordure/texte |
-|--------|----------------------|
-| Complétude — soumis | `--color-status-success` |
-| Complétude — partiel | `--color-status-warning` |
-| Complétude — vide / J+2 dépassé | `--color-status-danger` |
-| Complétude — en cours | `--color-status-neutral-emphasis` |
-| Projet — actif | `--color-status-success` |
-| Projet — neutre | `--color-status-neutral-emphasis` |
-| Projet — clôturé | `--color-status-neutral-emphasis` + fond `--color-surface-alt` |
-| Projet — annulé | `--color-status-danger` (seule exception rouge, cf. convention projet existante) |
+```twig
+<span class="status-badge status-badge-success">{{ p.status }}</span>
+```
 
-**États** : badges statiques = pas d'état interactif. Si le badge devient un **filtre cliquable** (futur),
-il doit respecter la cible tactile 44×44px et les états `hover`/`focus-visible`/`active` du bouton (§4.1).
+| Statut | Classe |
+|--------|--------|
+| Projet — actif | `status-badge-success` |
+| Projet — clôturé / neutre | `status-badge-neutral` |
+| Projet — annulé | `status-badge-danger` (seule exception rouge, convention métier existante) |
 
-### 4.4 Champ de formulaire (`.form-control`, `.form-select`)
+**Règle absolue (WCAG 1.4.1)** : le badge porte **toujours un libellé texte** ; icône complémentaire
+optionnelle mais jamais substitut au texte. Badges statiques = pas d'état interactif ; s'il devient un
+filtre cliquable, il doit respecter la cible tactile 44×44px et les états du bouton (§4.1).
 
-**Catégorie** : Molecule.
+### 4.4 Champ de formulaire
 
-**Anatomie** : padding `0.47rem 0.75rem`, `--radius-md`, bordure `1px solid var(--color-border-strong)`
-(**corrigé**, cf. §5.2 — la bordure Skote par défaut, gris `#ced4da`, est sous le seuil de contraste
-fonctionnel 3:1), fond `--color-surface`.
+**Catégorie** : Molecule. Pas de classe `.form-control` : recette utilitaire directe sur `<input>`/`<select>`.
 
-**États** :
+Recette de référence (`timesheet/week.html.twig`) :
+
+```
+w-14 min-h-11 text-center border border-border-strong rounded-md bg-surface text-body text-sm px-1
+```
 
 | État | Traitement |
 |------|-----------|
-| `default` | bordure `--color-border-strong` |
-| `hover` | bordure légèrement assombrie (décoratif, non porteur de sens) |
-| `focus-visible` | contour `var(--focus-ring-width) solid var(--color-focus)` (identique au bouton — Skote désactive son propre `box-shadow` de focus sur les champs, l'app est la seule source du traitement de focus) |
-| `disabled` | fond `--color-surface-alt`, texte `--color-text-disabled`, `cursor: not-allowed` |
-| `invalid` | bordure + texte d'erreur `--color-danger-emphasis`, message d'erreur explicite associé par `aria-describedby` (jamais la bordure rouge seule) |
-| `valid` (optionnel) | bordure + icône `--color-success-emphasis` |
+| `default` | `border border-border-strong bg-surface text-body` |
+| `focus-visible` | Géré globalement (§4.6) — même contour que les boutons |
+| `disabled` | `disabled:bg-surface-alt disabled:text-muted disabled:cursor-not-allowed` |
+| `invalid` | bordure + texte `border-danger text-danger`, message d'erreur explicite associé par `aria-describedby` (jamais la bordure seule) |
+| `valid` (optionnel) | bordure + icône `border-success text-success` |
 
-**Mobile / tactile** : hauteur mini **44px** sur les écrans de saisie principaux (déjà en place pour
-`.day-entry-duration`/`.day-entry-comment`/`.project-form-field input`), `font-size: 1rem` (16px) minimum
-sur mobile pour éviter le zoom automatique iOS — dérogation assumée à `--font-size-base` (13px), documentée
-comme règle spécifique aux champs de saisie tactile, pas comme un token global.
+**Mobile / tactile** : hauteur mini `min-h-11` (44px) sur les champs de saisie principaux, `inputmode`
+adapté (`numeric`/`decimal`) pour les claviers mobiles, taille de police `text-sm`/`text-base` (≥16px)
+pour éviter le zoom automatique iOS — dérogation assumée au texte de base 13px (§3.1).
 
-**Tokens** : `--color-border-strong`, `--color-focus`, `--color-surface`, `--color-surface-alt`,
-`--color-text-disabled`, `--color-danger-emphasis`, `--radius-md`.
+**Tokens** : `--color-border-strong`, `--color-focus` (focus global), `--color-surface`,
+`--color-surface-alt`, `--color-muted`, `--color-danger`, `--color-success`.
 
-### 4.5 Drawer / panneau latéral (`.offcanvas` + motif bottom-sheet)
+### 4.5 Drawer / panneau latéral (`dialog.summary-dialog`)
 
-**Catégorie** : Organism.
+**Catégorie** : Organism. Élément HTML natif `<dialog>`, motif bottom-sheet → panneau latéral, stylé via
+une classe sémantique définie dans `@layer components` (nom asserté par les tests, **ne pas renommer**) :
 
-Deux comportements responsive coexistent, tous deux tokenisés :
+```css
+@layer components {
+    dialog.summary-dialog {
+        width: 100%;
+        max-width: 100%;
+        max-height: 80vh;
+        margin: auto auto 0;
+        border: 1px solid var(--color-border);
+        border-radius: 0.4rem 0.4rem 0 0;
+        padding: 1rem;
+        background: var(--color-surface);
+        color: var(--color-body);
+        box-sizing: border-box;
+    }
+    dialog.summary-dialog::backdrop { background: rgba(0, 0, 0, 0.3); }
 
-1. **Offcanvas Skote standard** (panneaux de configuration, filtres) : largeur `400px` (horizontal),
-   padding `1rem`, fond `--color-surface`, bordure `--color-border-subtle`, ombre `--shadow-sm`,
-   fond de recouvrement `rgba(0, 0, 0, 0.5)`, transition `300ms`.
-2. **Bottom-sheet → panneau droit** (motif `.summary-dialog` existant, ex. « Ma synthèse ») : sur mobile,
-   ancré en bas (`border-radius: var(--radius-lg) var(--radius-lg) 0 0`) ; à partir de `--bp-md`,
-   panneau latéral droit pleine hauteur (`width: min(30rem, 92vw)`). Ce motif est **conservé tel quel**
-   (plus adapté à une UX mobile-first que l'offcanvas générique, qui n'a pas de mode bottom-sheet) mais
-   **restylé avec les tokens** (`--color-surface`, `--color-border-subtle`, `--shadow-lg`, `--radius-lg`)
-   au lieu des hex en dur (`#ccc`, `#fff`) actuels.
+    @media (min-width: 640px) {
+        dialog.summary-dialog {
+            margin: 0 0 0 auto;
+            width: min(30rem, 92vw);
+            max-height: 100vh;
+            height: 100%;
+            border-radius: 0;
+        }
+    }
+}
+```
 
-**États** : `open`/`closed` (transition `transform`/`opacity`, jamais de propriété qui déclenche un
-reflow coûteux), fermeture au clic sur le fond de recouvrement **et** via un bouton de fermeture ≥44px
-avec libellé accessible (`aria-label="Fermer"` a minima, texte visuellement masqué recommandé).
+Comportement responsive : **mobile** — ancré en bas de l'écran (bottom-sheet) ; **à partir de 640px** —
+panneau latéral droit pleine hauteur (`width: min(30rem, 92vw)`). Le contenu interne (titres de section,
+listes, barres de progression) utilise les utilitaires Tailwind standards (`text-sm font-semibold text-ink`,
+`h-1.5 bg-border rounded-full overflow-hidden` pour les barres, cf. §4.2/§3.4).
+
+**États** : `open`/`closed` piloté par Stimulus (`activity-summary` controller, `showModal()`/`close()`
+natifs de `<dialog>`) ; fermeture via le backdrop **et** un bouton de fermeture ≥44px avec libellé
+accessible (`aria-label="Fermer la synthèse"`).
 
 ### 4.6 Alerte / message flash
 
-**Catégorie** : Molecule. Même motif que le badge : fond teinté léger optionnel, texte et bordure en
-`-emphasis` (garantit le contraste, cf. §5.2), jamais fond plein + texte blanc.
+**Catégorie** : Molecule. Classes sémantiques asserties par les tests, définies dans `@layer components` :
 
-| Type | Tokens |
-|------|--------|
-| Succès | bordure/texte `--color-success-emphasis` |
-| Erreur | bordure/texte `--color-danger-emphasis` |
-| Avertissement | bordure/texte `--color-warning-emphasis` |
-| Information | bordure/texte `--color-info-emphasis` |
+```css
+@layer components {
+    .flash {
+        border-left: 4px solid var(--color-border-strong);
+        border-radius: 0.25rem;
+        padding: 0.5rem 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+    .flash-success { border-left-color: var(--color-success); color: var(--color-success); }
+    .flash-error   { border-left-color: var(--color-danger);  color: var(--color-danger); }
+}
+```
 
-**Anatomie** : `padding: 0.75rem 1.25rem`, `border-left: 4px solid`, `--radius-md`, fond `--color-surface`
-ou une nuance très légère de la couleur (à vérifier au cas par cas si un fond teinté est introduit, cf.
-avertissement §5.2 sur la marge de contraste serrée des fonds teintés).
+Pour les alertes contextuelles hors flash PRG (ex. bandeau « Valorisation incomplète »), la même logique
+est reproduite en utilitaires directs plutôt qu'une classe dédiée (usage unique, YAGNI) :
 
-### 4.7 Navigation / sidebar (Skote)
+```twig
+<div class="mb-4 flex items-start gap-3 rounded border-l-4 border-warning bg-surface px-4 py-3 text-warning" role="alert">
+```
 
-**Catégorie** : Organism (US-063, référencé ici pour les tokens).
+| Type | Token couleur |
+|------|---------------|
+| Succès | `--color-success` |
+| Erreur | `--color-danger` |
+| Avertissement | `--color-warning` |
+| Information | `--color-info` |
 
-| Élément | Clair | Sombre |
-|---------|-------|--------|
-| Fond sidebar | `--color-surface` (blanc) | `--color-surface` (`#2a3042`) |
-| Item actif | `--color-primary-surface` (fond) + texte blanc (**large/gras**, contexte non-texte-fin, cf. §5.2) | idem |
-| Item icône | `--palette-gray-600` | `#6a7187` |
-| Item hover | `--color-ink` | `#ffffff` |
-| Largeur | `--sidebar-width` (250px), réduit `--sidebar-width-collapsed` (70px) | idem |
+### 4.7 Focus visible (transversal)
+
+**Catégorie** : règle globale, `@layer components`, s'applique à tous les éléments interactifs sans classe
+à poser par composant :
+
+```css
+@layer components {
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    [tabindex]:focus-visible {
+        outline: 3px solid var(--color-focus);
+        outline-offset: 2px;
+    }
+}
+```
+
+Valeurs `3px` / `2px` fixées directement dans la règle (pas de token `--focus-ring-width` séparé — un seul
+point d'usage, YAGNI). `--color-focus` reste le seul token variable (clair `#0b5fff` / sombre `#4c8bff`).
+
+### 4.8 Navigation / sidebar
+
+**Catégorie** : Organism (US-063). Sidebar **toujours sombre**, indépendante de la bascule de thème
+clair/sombre du contenu (tokens `--color-sidebar*` dédiés, §2.4).
+
+| Élément | Recette |
+|---------|---------|
+| Conteneur | `fixed inset-y-0 left-0 z-30 flex w-[250px] flex-col bg-sidebar text-sidebar-text md:static md:translate-x-0` |
+| En-tête (logo) | `flex h-[70px] items-center gap-3 border-b border-sidebar-alt px-5` |
+| Libellé de section | `px-5 pt-4 pb-1.5 text-xs font-semibold uppercase tracking-wider text-sidebar-label` |
+| Item de nav | `flex min-h-11 items-center gap-3 rounded px-3 text-[13px] hover:bg-white/5 hover:text-white` |
+| Item actif | ajoute `bg-primary font-medium text-white` + `aria-current="page"` |
+| Icône | `h-5 w-5 shrink-0` (SVG Heroicons outline inline, `stroke="currentColor"`) |
+
+**Icônes** : Heroicons (MIT, outline) inline en SVG — cohérent avec la recommandation §Iconographie de la
+charte UI générique, `currentColor` pour hériter de la couleur du texte parent.
 
 ---
 
@@ -470,97 +534,67 @@ Chaque paire texte/fond des composants ci-dessus atteint au minimum **WCAG 2.2 A
 - **3:1** pour le texte large et les composants d'interface non-textuels (bordures fonctionnelles,
   indicateurs de focus — SC 1.4.11).
 
-Les couleurs de fond servant de référence pour les vérifications ci-dessous sont les **surfaces réelles
-de l'application** (`--color-bg` = `#f6f7f9`, pas un blanc pur théorique), pour un contrôle réaliste.
+Les couleurs de fond servant de référence pour les vérifications ci-dessous sont les **surfaces réelles de
+l'application** (`--ds-bg` = `#f6f7f9` en clair), pas un blanc pur théorique.
 
-### 5.2 Tableau de vérification de contraste (thème clair)
+### 5.2 Tableau de vérification de contraste — thème clair
 
-| Paire | Ratio | Seuil requis | Résultat | Correction appliquée |
-|-------|------:|--------------|:--:|-----------------------|
-| `--color-text` (#495057) sur `--color-bg` (#f6f7f9) | **8.09:1** | 4.5:1 | ✅ | — |
-| `--color-text-muted` (#555555) sur `--color-bg` | **6.96:1** | 4.5:1 | ✅ | — (repris de `app.css`) |
-| `--color-primary` (#4e65d4, texte/bouton) sur `--color-bg` | **4.74:1** | 4.5:1 | ✅ | **Corrigé** — Skote `#556ee6` d'origine ne donnait que **4.41:1** (échec) ; assombri de ~8 % |
-| `--color-on-primary` (blanc) sur `--color-primary` (#4e65d4) | **5.08:1** | 4.5:1 | ✅ | idem |
-| `--color-primary-surface` (#556ee6, teinte Skote brute) sur blanc, **usage non-texte** (icônes/surfaces ≥ 3:1) | 4.41:1 | 3:1 | ✅ | Conservée telle quelle, réservée aux usages non-texte |
-| `--color-success-emphasis` (#2e7d32) sur `--color-bg` | **4.77:1** | 4.5:1 | ✅ | — (repris de `app.css`) |
-| `--color-danger-emphasis` (#c62828) sur `--color-bg` | **5.24:1** | 4.5:1 | ✅ | — (repris de `app.css`) |
-| `--color-warning-emphasis` (#60481e) sur `--color-bg` | **8.02:1** | 4.5:1 | ✅ | **Introduit** — le jaune Skote brut (#f1b44c) en texte donne 1.4:1 (échec massif) |
-| `--color-info-emphasis` (#204260) sur `--color-bg` | **9.75:1** | 4.5:1 | ✅ | **Introduit** — le cyan Skote brut donne 2.6:1 en texte blanc / 2.9:1 en texte direct sur blanc (échec) |
-| `--color-on-status` (#212529) sur `--color-success` (#34c38f) | **6.87:1** | 4.5:1 | ✅ | **Corrigé** — texte blanc sur ce fond ne fait que **2.25:1** (échec massif) |
-| `--color-on-status` sur `--color-warning` (#f1b44c) | **8.35:1** | 4.5:1 | ✅ | idem, texte blanc = **1.85:1** |
-| `--color-on-status` sur `--color-danger` (#f46a6a) | **5.23:1** | 4.5:1 | ✅ | idem, texte blanc = **2.95:1** |
-| `--color-on-status` sur `--color-info` (#50a5f1) | **5.87:1** | 4.5:1 | ✅ | idem, texte blanc = **2.63:1** |
-| `--color-border-strong` (#74788d) sur `--color-surface` (blanc) | **4.36:1** | 3:1 (non-texte) | ✅ | **Corrigé** — bordure de champ Skote par défaut (#ced4da) ne fait que **1.49:1** (échec, invisible fonctionnellement) |
-| `--color-focus` (#0b5fff) sur blanc | **5.13:1** | 3:1 (indicateur de focus) | ✅ | Conservé (déjà conforme dans `app.css`) |
-| Badge annulé : `--color-danger-emphasis` sur `--color-surface-alt` | ≥ 5.1:1 (surface plus claire que `--color-bg`) | 4.5:1 | ✅ | — |
+| Paire (tokens `--ds-*`) | Ratio | Seuil requis | Résultat |
+|---|---:|---|:--:|
+| `--ds-body` (#495057) sur `--ds-bg` (#f6f7f9) | **8.09:1** | 4.5:1 | ✅ |
+| `--ds-muted` (#555555) sur `--ds-bg` | **6.96:1** | 4.5:1 | ✅ |
+| `--ds-primary` (#4e65d4, texte/bouton) sur `--ds-bg` | **4.74:1** | 4.5:1 | ✅ |
+| `--ds-primary-fg` (blanc) sur `--ds-primary` (#4e65d4) | **5.08:1** | 4.5:1 | ✅ |
+| `--ds-primary-surface` (#556ee6), **usage non-texte** (icônes/avatars ≥ 3:1) sur blanc | 4.41:1 | 3:1 | ✅ (réservé au non-texte) |
+| `--ds-success` (#2e7d32) sur `--ds-bg` | **4.77:1** | 4.5:1 | ✅ |
+| `--ds-danger` (#c62828) sur `--ds-bg` | **5.24:1** | 4.5:1 | ✅ |
+| `--ds-warning` (#60481e) sur `--ds-bg` | **8.02:1** | 4.5:1 | ✅ |
+| `--ds-info` (#204260) sur `--ds-bg` | **9.75:1** | 4.5:1 | ✅ |
+| `--ds-border-strong` (#74788d) sur `--ds-surface` (blanc) | **4.36:1** | 3:1 (non-texte) | ✅ |
+| `--ds-focus` (#0b5fff) sur blanc | **5.13:1** | 3:1 (indicateur de focus) | ✅ |
 
-### 5.3 Tableau de vérification de contraste (thème sombre)
+### 5.3 Tableau de vérification de contraste — thème sombre
 
-| Paire | Ratio | Seuil requis | Résultat | Correction appliquée |
-|-------|------:|--------------|:--:|-----------------------|
-| `--color-text` (#a6b0cf) sur `--color-bg` (#222736) | **6.92:1** | 4.5:1 | ✅ | — (défaut Skote, déjà conforme) |
-| `--color-primary` (#8092ec) sur `--color-bg` | **5.12:1** | 4.5:1 | ✅ | **Introduit** — le bleu de marque non retinté ne fait que **3.37:1** en texte sur fond sombre (échec) |
-| `--color-success/warning/danger/info-emphasis` (tint 40 % Skote) sur `--color-bg` | **9.1 – 10.5:1** (vérifié sur success, tendance confirmée sur les 3 autres) | 4.5:1 | ✅ | Motif `*-text-emphasis-dark` déjà présent dans les variables Skote, réutilisé tel quel |
-| `--color-border-strong` (#7b839c) sur `--color-surface` (#2a3042, cas le plus défavorable) | **3.49:1** | 3:1 | ✅ | **Introduit** — la bordure translucide Skote (#353d55) ne fait que **1.22:1** sur cette même surface (échec) |
+| Paire (tokens `--ds-*`) | Ratio | Seuil requis | Résultat |
+|---|---:|---|:--:|
+| `--ds-body` (#a6b0cf) sur `--ds-bg` (#222736) | **6.92:1** | 4.5:1 | ✅ |
+| `--ds-primary` (#8092ec) sur `--ds-bg` | **5.12:1** | 4.5:1 | ✅ |
+| `--ds-success` / `-warning` / `-danger` / `-info` (tints clairs) sur `--ds-bg` | **9.1 – 10.5:1** | 4.5:1 | ✅ |
+| `--ds-border-strong` (#7b839c) sur `--ds-surface` (#2a3042, cas le plus défavorable) | **3.49:1** | 3:1 | ✅ |
 
-### 5.4 Enseignements clés
+### 5.4 Enseignements clés (conservés, désormais actés dans les tokens eux-mêmes)
 
-1. **Aucun bouton/badge à fond plein success/warning/danger/info avec texte blanc n'est accessible** avec
-   les couleurs Skote à pleine saturation. Règle retenue : texte **foncé** (`--color-on-status`) sur ces
-   quatre fonds ; le bleu de marque reste la seule couleur utilisée avec du texte blanc (après léger
-   assombrissement).
-2. **Les bordures de champs de formulaire Skote par défaut sont fonctionnellement invisibles** (1.49:1,
-   très en dessous du seuil de 3:1 pour un composant d'interface). Un token de bordure plus soutenu
-   (`--color-border-strong`) est introduit spécifiquement pour cet usage, distinct des séparateurs
-   purement décoratifs qui restent avec la teinte claire Skote.
-3. Le motif « badge/alerte bordé, texte `-emphasis` sur surface claire » retenu au §4 est celui qui offre
-   la **plus grande marge** de contraste (5:1 à 10:1 selon la couleur) — préféré au remplissage pastel
-   plein, dont la marge s'est révélée trop juste (~4.57:1 mesuré sur un exemple de fond teinté vert clair)
-   pour être une valeur par défaut sûre sur toutes les surfaces de l'application.
+1. **Aucun badge/alerte à fond plein coloré avec texte blanc** : le motif retenu (§4.3, §4.6) est
+   **bordé/texte coloré sur surface neutre**, jamais un remplissage plein. Les tokens `--ds-{success,
+   warning,danger,info}` sont donc utilisés directement en `text-*`/`border-*`, jamais en `bg-*` plein pour
+   du texte.
+2. **`--ds-border-strong` est réservé aux bordures fonctionnelles** (champs, boutons outline) ; `--ds-border`
+   (plus clair, non garanti ≥3:1) reste purement décoratif (séparateurs, lignes de tableau).
+3. Le token `--color-on-status` (`--ds-on-status`) n'a plus d'usage courant dans les templates actuels (plus
+   de fond de statut plein) — conservé dans `@theme` pour un futur composant qui en aurait besoin (ex. badge
+   plein sur une surface dédiée), pas de suppression prématurée tant qu'aucune régression n'est constatée.
 
 ---
 
-## 6. Migration depuis `assets/styles/app.css`
+## 6. Références
 
-| Valeur actuelle (`app.css`) | Usage | Token cible | Remarque |
-|------------------------------|-------|-------------|----------|
-| `background-color: #f6f7f9` (body) | Fond de page | `--color-bg` | Valeur identique, aucune régression |
-| `color: #1f2328` (body) | Texte principal | `--color-text` (#495057) | Léger changement de teinte (plus proche de Skote), contraste conservé ≥ AA |
-| `color: #555` (`.hint`, `.reminder-banner`, `.summary-planning`) | Texte secondaire | `--color-text-muted` | Valeur reprise à l'identique |
-| `border-left-color: #2e7d32` (`.flash-success`) | Succès | `--color-success-emphasis` | Valeur reprise à l'identique |
-| `border-left-color: #c62828` (`.flash-error`) | Erreur | `--color-danger-emphasis` | Valeur reprise à l'identique |
-| `outline: 3px solid #0b5fff` (`:focus-visible`) | Focus | `--color-focus` + `--focus-ring-width` | Valeur reprise à l'identique |
-| `.project-status-active { border-color: #2e7d32; color: #2e7d32 }` | Statut projet actif | `--color-status-success` | Alias direct |
-| `.project-status-cancelled { border-color: #c62828; color: #c62828 }` | Statut projet annulé | `--color-status-danger` | Alias direct, conserve « seule exception rouge » |
-| `.project-status-neutral / .project-status-closed { color: #555 / #777 }` | Statuts neutre/clôturé | `--color-status-neutral-emphasis` | Légère harmonisation (#777 → #555, gain de contraste) |
-| `.badge-escalated { border: 1px solid #777 }` | Badge escaladé | `--color-status-neutral-emphasis` | idem |
-| `border-left-color: #b26a00` / `background: #fff8e6` (`.offline-banner`, `.project-budget-gap`) | Avertissement (décoratif, non porteur seul du sens) | bordure → `--color-warning-emphasis` ; fond → `--color-surface-alt` ou fond teinté à vérifier au cas par cas | **Attention** : `#b26a00` en tant que texte échouerait AA (4.24:1) — n'est utilisé ici qu'en bordure/fond, conforme ; ne pas le réutiliser comme couleur de texte |
-| `border: 1px solid #ddd` / `#eee` (cartes, tableaux, tabs) | Séparateurs décoratifs | `--color-border-subtle` | Aucune exigence de contraste (décoratif) |
-| `border: 1px solid #999` (day-nav-btn, badges) | Bordures fonctionnelles | `--color-border-strong` | Gain de contraste (#999 ≈ 2.5:1 → #74788d 4.36:1) |
-| `#0b5fff` (`.summary-bar-fill`) | Barre de progression | `--color-primary` (ou `--color-primary-surface` si contexte large/non-texte) | Le libellé texte adjacent porte déjà le sens (WCAG 1.4.1), pas de régression |
-| Rayons ad hoc (`4px`, `6px`, `12px`) | Cartes, boutons, drawer | `--radius-md` / `--radius-lg` / `--radius-lg` (bottom-sheet) | Valeurs déjà quasi identiques |
-| `min-height: 44px` / `min-width: 44px` (multiples endroits) | Cibles tactiles | Conservé tel quel (déjà conforme F-S5-1), pas de token dédié nécessaire au-delà d'une convention documentée ici | — |
-
-**Aucune régression de fond global** : `--color-bg` reprend exactement `#f6f7f9` posé par la PR #11 ; le
-placeholder `skyblue` reste éliminé. Les seuls changements de teinte (texte principal, statuts neutre/clôturé,
-bordures fonctionnelles) sont des **gains** de contraste, jamais des pertes.
-
----
-
-## 7. Références
-
-- **Thème Skote** : `project-management/Skote_Symfony_v2.2.0/Starterkit/assets/scss/_variables.scss`,
-  `_variables-dark.scss` (et équivalents `Admin/`).
-- **Base UI actuelle** : `assets/styles/app.css`.
+- **ADR-0019** — [Intégration front : Tailwind CSS v4 via AssetMapper](../../docs/adr/0019-frontend-tailwind-assetmapper.md)
+  (Tailwind v4 CSS-first, TailAdmin, sans Node.js — **fondation de ce document**).
+- **ADR-0018** — [Intégration Bootstrap/Skote précompilé](../../docs/adr/0018-integration-design-system-skote.md)
+  (**superseded** par ADR-0019, conservé pour historique uniquement).
+- **Implémentation** : `assets/styles/tailwind.css` — source de vérité pour les valeurs exactes de tokens.
+- **TailAdmin (MIT)** : banque de composants visuels de référence —
+  `project-management/architecture/design-canvas/tailadmin-ref/` (captures d'écran du thème).
+- **Templates de référence** : `templates/base.html.twig` (layout, sidebar, topbar), `templates/valuation/index.html.twig`
+  (cartes KPI, tableau, détails), `templates/timesheet/week.html.twig` (formulaire de saisie, drawer,
+  barres de progression).
 - **WCAG 2.2** : niveau AA — [w3.org/TR/WCAG22](https://www.w3.org/TR/WCAG22/), critères 1.4.1 (usage de
   la couleur), 1.4.3 (contraste minimum), 1.4.11 (contraste du contenu non textuel), 2.4.7 (focus visible),
   2.4.11 (focus non masqué), 2.5.5/2.5.8 (taille des cibles).
-- **ADR-0018** : intégration CSS Bootstrap/Skote compilé + custom properties, sans build Sass (décision
-  d'architecture actée, non remise en cause par ce document).
 - **EPIC-012 / US-061** : `project-management/backlog/epics/EPIC-012-integration-design.md`,
   `project-management/backlog/user-stories/US-061-charte-design-system.md`.
 
 ---
 
-**Date de création :** 2026-09-02
-**Auteur :** UI Designer (agent), pour EPIC-012 / US-061
+**Date de dernière mise à jour :** 2026-09-03
+**Auteur :** UI Designer (agent), pour EPIC-012 / US-061 — resynchronisation post-migration Tailwind (ADR-0019)
