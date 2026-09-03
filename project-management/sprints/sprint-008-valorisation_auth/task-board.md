@@ -8,7 +8,6 @@
 | ID | US | Tâche | Estimation |
 |----|-----|-------|------------|
 | T-070-03 | US-070 | [DB] Seed profils/tarifs + `make db-reset` | 4h |
-| T-060-01 | US-060 | [BE] Use case `AssignProfile` | 3h |
 | T-060-02 | US-060 | [FE-WEB] Écran d'affectation profil↔collaborateur | 3h |
 | T-060-03 | US-060 | [BE] Taux d'occupation | 4h |
 | T-060-04 | US-060 | [BE] Ventilation par projet | 4h |
@@ -45,12 +44,13 @@
 |----|-----|-------|---------|
 | T-070-01 | US-070 | [OPS] Dockerfile : `tailwind:build` avant `asset-map:compile` (build de zéro OK) | 2026-09-03 |
 | T-070-02 | US-070 | [FE-WEB] `/validation` : durée en heures (« 4h00 ») + test | 2026-09-03 |
+| T-060-01 | US-060 | [BE] Use case `AssignProfile` (affectation profil↔collaborateur) + 7 tests | 2026-09-03 |
 
 ## 🚫 Bloqué
 | ID | US | Raison | Action |
 |----|-----|--------|--------|
 
 ## Métriques
-- **Tâches** : 26 total · 2 terminées (8%)
-- **Heures** : 63h estimées · ~3h consommées · ~60h restantes
+- **Tâches** : 26 total · 3 terminées (12%)
+- **Heures** : 63h estimées · ~6h consommées · ~57h restantes
 - **Points** : 22 engagés (US-060 largement pré-implémentée → risque réduit)
