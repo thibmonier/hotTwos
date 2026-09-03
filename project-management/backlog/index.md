@@ -53,8 +53,9 @@
 | US-064 Reskin des écrans livrés (dont F-S5-4, F-S5-5) | EPIC-012 | 8 | 🔴 |
 | US-065 Audit & conformité accessibilité (WCAG 2.2 AA) | EPIC-012 | 5 | 🔴 |
 | US-066 Recette d'ergonomie et validation utilisateurs | EPIC-012 | 3 | 🔴 |
-| US-069 Correctifs d'ergonomie mineurs (suites recette US-066) | EPIC-012 | 2 | 🔴 |
-| **Total indicatif** | | **~33** | |
+| US-069 Correctifs d'ergonomie mineurs (suites recette US-066) | EPIC-012 | 2 | ✅ |
+| US-070 Suites de la recette US-069 (findings à traiter) | EPIC-012 | 3 | 🔴 |
+| **Total indicatif** | | **~36** | |
 
 > Conception livrée : ADR-0018 (CSS Skote compilé + tokens, sans build Sass), `architecture/design-system.md` (contrastes WCAG AA vérifiés), `architecture/ux-conception-lot1.md`, maquettes `architecture/design-canvas/` (canevas claude-design). Décisions : F-S5-4 → e-mail, statuts texte+icône+couleur. À trancher en US-063 : breakpoint 640/768 px, chargement Poppins.
 
