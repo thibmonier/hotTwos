@@ -70,10 +70,12 @@ THEN les états peuplés (lignes, totaux, statuts) sont vérifiés et tracés
 | T-069-01 | [FE-WEB] | Corriger le `match` de nav (« Saisie » ne capture plus `timesheet_validation`) | 🔴 | 1h |
 | T-069-02 | [FE-WEB] | Libellés d'en-tête de semaine humanisés (vue semaine + jour) | 🔴 | 2h |
 | T-069-03 | [TEST] | Passe recette complémentaire valorisation/validation sur données peuplées | 🔴 | 2h |
+| T-069-04 | [FE-WEB] | `aria-modal="true"` sur `dialog.summary-dialog` (`timesheet/week.html.twig`) — a11y WCAG AA | 🔴 | 0.5h |
+| T-069-05 | [BE] | `ValidationPageController` : libellé de repli + log si un projet disparaît entre deux requêtes (au lieu de l'UUID brut) | 🔴 | 1h |
 
 ## Progression
 
-0/3 tasks complétées (0%)
+0/5 tasks complétées (0%)
 
 ## Definition of Done
 
@@ -81,6 +83,8 @@ THEN les états peuplés (lignes, totaux, statuts) sont vérifiés et tracés
 - [ ] Un seul item de menu actif sur `/validation` (test de vue)
 - [ ] En-têtes de semaine humanisés (saisie semaine et jour)
 - [ ] Passe recette complémentaire sur données peuplées tracée dans `.recette/`
+- [ ] `aria-modal="true"` sur la dialog de synthèse (a11y)
+- [ ] Repli lisible + log si projet disparu (plus d'UUID brut affiché)
 - [ ] `make ci` vert
 
 ---
@@ -90,3 +94,8 @@ THEN les états peuplés (lignes, totaux, statuts) sont vérifiés et tracés
 Irritants **mineurs** issus de la recette US-066 (Sprint 7), priorisés « mineur » (non bloquants pour
 la clôture d'EPIC-012). Regroupés dans une US unique pour un correctif efficace, conformément à la CA-3
 de US-066. Aucune fonctionnalité nouvelle : confort de navigation et de lecture uniquement.
+
+Les tâches **T-069-04** (`aria-modal`) et **T-069-05** (repli projet disparu) proviennent de la **revue de
+clôture Sprint 7** (`symfony-reviewer`, score 88/100) : seuls irritants réels retenus après tri (les autres
+findings — arrondi JS sur entier de minutes, assertion anti-fuite de slug, `tabular-nums` natif Tailwind —
+étaient des faux positifs).

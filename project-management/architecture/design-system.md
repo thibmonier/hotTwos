@@ -188,8 +188,8 @@ Activation : bascule utilisateur explicite (`data-theme="dark"|"light"` posé pa
 | `--color-primary` | `bg-primary`, `text-primary`, `border-primary`, `border-primary/20`, `bg-primary/5` | Action principale, liens, éléments actifs |
 | `--color-primary-fg` | `text-primary-fg` | Texte sur fond `bg-primary` plein |
 | `--color-primary-surface` | `bg-primary-surface` | Avatars, icônes conteneur, décoratif large surface |
-| `--color-success` / `-warning` / `-danger` / `-info` | `text-success`, `border-warning`, … | Statuts, alertes, badges (texte/bordure — jamais fond plein, cf. §5.4) |
-| `--color-on-status` | `text-on-status` | Texte sur un fond de statut plein (rare, cf. §4.3) |
+| `--color-success` / `-warning` / `-danger` / `-info` | `text-success`, `border-warning`, … | Statuts, alertes, badges (texte/bordure) ; **fond plein au survol** des boutons d'action de statut (cf. §4.3) |
+| `--color-on-status` | `text-on-status` | Texte sur fond de statut plein — boutons Approuver/Rejeter au survol (`validation.html.twig`, cf. §4.3) |
 | `--color-bg` | `bg-bg` | Fond de page (`<body>`, `<main>`) |
 | `--color-surface` / `-surface-alt` | `bg-surface`, `bg-surface-alt` | Cartes, tableaux, en-têtes de tableau |
 | `--color-ink` | `text-ink` | Texte fort (titres, valeurs chiffrées) |
@@ -200,8 +200,10 @@ Activation : bascule utilisateur explicite (`data-theme="dark"|"light"` posé pa
 | `--color-sidebar*` | `bg-sidebar`, `text-sidebar-text`, `bg-sidebar-alt`, `text-sidebar-label` | Sidebar (toujours sombre, quel que soit le thème) |
 
 > **Non-régression sémantique :** l'ancien couple « couleur de base / couleur `-emphasis` accessible »
-> (ADR-0018) a disparu : chaque token `--ds-{success,warning,danger,info}` **est** directement la valeur
-> accessible retenue par US-065 — il n'existe plus de variante « brute » à éviter en texte.
+> (ADR-0018) a disparu — **simplification voulue** par le passage à un système *theme-aware* : chaque token
+> `--ds-{success,warning,danger,info}` **est** directement la valeur accessible retenue par US-065, et l'ancienne
+> variante `-emphasis` (teinte claire pour texte sur fond sombre) correspond désormais à la **valeur du mode
+> sombre** (`[data-theme="dark"]`). Un seul token par statut suffit donc, il bascule automatiquement clair/sombre.
 
 ---
 
@@ -564,15 +566,17 @@ l'application** (`--ds-bg` = `#f6f7f9` en clair), pas un blanc pur théorique.
 
 ### 5.4 Enseignements clés (conservés, désormais actés dans les tokens eux-mêmes)
 
-1. **Aucun badge/alerte à fond plein coloré avec texte blanc** : le motif retenu (§4.3, §4.6) est
-   **bordé/texte coloré sur surface neutre**, jamais un remplissage plein. Les tokens `--ds-{success,
-   warning,danger,info}` sont donc utilisés directement en `text-*`/`border-*`, jamais en `bg-*` plein pour
-   du texte.
+1. **Aucun badge/alerte à fond plein coloré avec texte _blanc_** : au repos, le motif retenu (§4.3, §4.6)
+   est **bordé/texte coloré sur surface neutre**. Le seul remplissage plein est **l'état survolé des boutons
+   d'action de statut** (Approuver/Rejeter, `validation.html.twig`) : `hover:bg-success`/`hover:bg-danger` +
+   `text-on-status` (texte foncé `#212529` clair / `#14183a` sombre — contraste AA garanti sur le fond plein),
+   jamais du texte blanc sur couleur de statut.
 2. **`--ds-border-strong` est réservé aux bordures fonctionnelles** (champs, boutons outline) ; `--ds-border`
    (plus clair, non garanti ≥3:1) reste purement décoratif (séparateurs, lignes de tableau).
-3. Le token `--color-on-status` (`--ds-on-status`) n'a plus d'usage courant dans les templates actuels (plus
-   de fond de statut plein) — conservé dans `@theme` pour un futur composant qui en aurait besoin (ex. badge
-   plein sur une surface dédiée), pas de suppression prématurée tant qu'aucune régression n'est constatée.
+3. Le token `--color-on-status` (`--ds-on-status`) est **utilisé** par les boutons d'action de statut au
+   survol (Approuver/Rejeter, `validation.html.twig` — `hover:text-on-status` sur `hover:bg-{success,danger}`).
+   Il fournit le texte à contraste AA sur le fond de statut plein et **ne doit pas être retiré** : sa
+   suppression casserait le contraste du libellé au survol de ces boutons.
 
 ---
 
