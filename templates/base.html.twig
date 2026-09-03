@@ -59,25 +59,39 @@
                 <p class="px-5 pt-4 pb-1.5 text-xs font-semibold uppercase tracking-wider text-sidebar-label">Menu</p>
                 <nav aria-label="Navigation principale" class="flex flex-col gap-0.5 px-3">
                     {% set items = [
-                        {label:'Accueil', route:'home', match:'home', perm:null},
-                        {label:'Saisie', route:'timesheet_week', match:'timesheet_', perm:null},
-                        {label:'Validation', route:'timesheet_validation', match:'timesheet_validation', perm:'validate:time'},
-                        {label:'Complétude', route:'completeness_page', match:'completeness_page', perm:null},
-                        {label:'Valorisation', route:'valuation_dashboard', match:'valuation_dashboard', perm:'view:project_financials'},
-                        {label:'Projets', route:'project_index', match:'project_', perm:null},
-                        {label:'Absences', route:'absence_page', match:'absence_page', perm:null},
-                        {label:'Relances', route:'reminders_page', match:'reminders_', perm:'manage:reminders'},
-                        {label:'Organisation', route:'organization_admin', match:'organization_admin', perm:'manage:organization'},
-                        {label:'Profils', route:'pricing_admin', match:'pricing_admin', perm:'manage:pricing'},
-                        {label:'Admin — Périodes', route:'period_admin', match:'period_', perm:'manage:periods'}
+                        {label:'Accueil', route:'home', match:'home', perm:null, icon:'home'},
+                        {label:'Saisie', route:'timesheet_week', match:'timesheet_', perm:null, icon:'pencil'},
+                        {label:'Validation', route:'timesheet_validation', match:'timesheet_validation', perm:'validate:time', icon:'check'},
+                        {label:'Complétude', route:'completeness_page', match:'completeness_page', perm:null, icon:'chart'},
+                        {label:'Valorisation', route:'valuation_dashboard', match:'valuation_dashboard', perm:'view:project_financials', icon:'euro'},
+                        {label:'Projets', route:'project_index', match:'project_', perm:null, icon:'folder'},
+                        {label:'Absences', route:'absence_page', match:'absence_page', perm:null, icon:'calendar'},
+                        {label:'Relances', route:'reminders_page', match:'reminders_', perm:'manage:reminders', icon:'bell'},
+                        {label:'Organisation', route:'organization_admin', match:'organization_admin', perm:'manage:organization', icon:'building'},
+                        {label:'Profils', route:'pricing_admin', match:'pricing_admin', perm:'manage:pricing', icon:'user'},
+                        {label:'Admin — Périodes', route:'period_admin', match:'period_', perm:'manage:periods', icon:'lock'}
                     ] %}
+                    {# Icônes Heroicons (outline, MIT) inline — cohérentes avec les SVG des KPI, remplacent la puce générique. #}
+                    {% set icons = {
+                        home: '<path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/>',
+                        pencil: '<path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"/>',
+                        check: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>',
+                        chart: '<path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/>',
+                        euro: '<path stroke-linecap="round" stroke-linejoin="round" d="M14.25 7.756a4.5 4.5 0 1 0 0 8.488M7.5 10.5h5.25m-5.25 3h5.25M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>',
+                        folder: '<path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"/>',
+                        calendar: '<path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/>',
+                        bell: '<path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"/>',
+                        building: '<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/>',
+                        user: '<path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>',
+                        lock: '<path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/>'
+                    } %}
                     {% for it in items %}
                         {% if it.perm is null or is_granted(it.perm) %}
                             {% set active = r starts with it.match %}
                             <a href="{{ path(it.route) }}"
                                class="flex min-h-11 items-center gap-3 rounded px-3 text-[13px] {{ active ? 'bg-primary font-medium text-white' : 'hover:bg-white/5 hover:text-white' }}"
                                {% if active %}aria-current="page"{% endif %}>
-                                <span aria-hidden="true" class="grid h-5 w-5 place-items-center rounded-sm bg-white/10 text-[10px]">•</span>
+                                <svg aria-hidden="true" class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">{{ icons[it.icon]|raw }}</svg>
                                 <span>{{ it.label }}</span>
                             </a>
                         {% endif %}

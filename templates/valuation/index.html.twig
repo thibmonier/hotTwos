@@ -22,19 +22,21 @@
     {% endif %}
 
     {# ── KPI row ─────────────────────────────────────────────────────────────── #}
-    {# Grille 4 colonnes ; sans accès coût : CA(1 col) + Avancement(3 cols). #}
-    <div class="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-4">
+    <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-muted">Indicateurs clés</h2>
 
-        {# CA reconnu — toujours visible #}
+    {# Grille 4 colonnes ; sans accès coût : CA(1 col) + Avancement(3 cols). #}
+    <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-4">
+
+        {# CA reconnu — indicateur vedette : mis en avant (teinte primary, chiffre plus grand) #}
         <div class="sm:col-span-1">
-            <div class="flex h-full flex-col rounded-md border border-border bg-surface p-5">
+            <div class="flex h-full flex-col rounded-md border border-primary/20 bg-primary/5 p-5 shadow-sm">
                 <div class="mb-2 flex items-center justify-between">
-                    <span class="text-xs text-muted">CA reconnu</span>
-                    <span class="grid h-8 w-8 shrink-0 place-items-center rounded bg-primary-surface text-primary" aria-hidden="true">
-                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    <span class="text-xs font-medium text-muted">CA reconnu</span>
+                    <span class="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-primary-surface text-primary" aria-hidden="true">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                     </span>
                 </div>
-                <div class="text-2xl font-semibold text-ink">
+                <div class="text-3xl font-semibold tabular-nums text-ink">
                     {{ (summary.revenueCents / 100)|number_format(2, ',', ' ') }} €
                 </div>
             </div>
@@ -42,12 +44,12 @@
 
         {# Avancement — toujours visible ; prend 3 colonnes quand le coût est masqué #}
         <div class="{{ canViewCost ? 'sm:col-span-1' : 'sm:col-span-3' }}">
-            <div class="flex h-full flex-col rounded-md border border-border bg-surface p-5">
-                <div class="mb-1 text-xs text-muted">Avancement valorisation</div>
-                <div class="mb-3 font-semibold text-ink">
+            <div class="flex h-full flex-col rounded-md border border-border bg-surface p-5 shadow-sm">
+                <div class="mb-1 text-xs font-medium text-muted">Avancement valorisation</div>
+                <div class="mb-3 font-semibold tabular-nums text-ink">
                     {{ summary.valued }} / {{ summary.total }} imputations valorisées
                 </div>
-                <div class="mt-auto h-1.5 overflow-hidden rounded-full bg-border"
+                <div class="mt-auto h-2 overflow-hidden rounded-full bg-border"
                      role="progressbar"
                      aria-valuenow="{{ summary.valued }}"
                      aria-valuemin="0"
@@ -62,14 +64,14 @@
         {% if canViewCost %}
             {# Coût chargé — DG / contrôle de gestion #}
             <div class="sm:col-span-1">
-                <div class="flex h-full flex-col rounded-md border border-border bg-surface p-5">
+                <div class="flex h-full flex-col rounded-md border border-border bg-surface p-5 shadow-sm">
                     <div class="mb-2 flex items-center justify-between">
-                        <span class="text-xs text-muted">Coût chargé</span>
-                        <span class="grid h-8 w-8 shrink-0 place-items-center rounded bg-surface-alt text-muted" aria-hidden="true">
-                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+                        <span class="text-xs font-medium text-muted">Coût chargé</span>
+                        <span class="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-surface-alt text-muted" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
                         </span>
                     </div>
-                    <div class="text-2xl font-semibold text-ink">
+                    <div class="text-2xl font-semibold tabular-nums text-ink">
                         {{ (summary.costCents / 100)|number_format(2, ',', ' ') }} €
                     </div>
                 </div>
@@ -77,14 +79,14 @@
 
             {# Marge brute — DG / contrôle de gestion #}
             <div class="sm:col-span-1">
-                <div class="flex h-full flex-col rounded-md border border-border bg-surface p-5">
+                <div class="flex h-full flex-col rounded-md border border-border bg-surface p-5 shadow-sm">
                     <div class="mb-2 flex items-center justify-between">
-                        <span class="text-xs text-muted">Marge brute</span>
-                        <span class="grid h-8 w-8 shrink-0 place-items-center rounded bg-surface-alt text-success" aria-hidden="true">
-                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16M8 15l3-4 3 2 4-6"/></svg>
+                        <span class="text-xs font-medium text-muted">Marge brute</span>
+                        <span class="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-surface-alt text-success" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16M8 15l3-4 3 2 4-6"/></svg>
                         </span>
                     </div>
-                    <div class="text-2xl font-semibold text-ink">
+                    <div class="text-2xl font-semibold tabular-nums text-ink">
                         {{ (summary.marginCents / 100)|number_format(2, ',', ' ') }} €
                     </div>
                 </div>
@@ -94,7 +96,7 @@
     </div>
 
     {# ── Fraîcheur ───────────────────────────────────────────────────────────── #}
-    <p class="mb-4 flex items-center gap-2 text-xs text-muted" aria-live="polite">
+    <p class="mb-6 flex items-center gap-2 text-xs text-muted" aria-live="polite">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
         {% if freshnessMinutes is null %}
             Aucune valorisation pour l'instant.
@@ -104,9 +106,10 @@
     </p>
 
     {# ── Détail coût & marge — réservé DG / contrôle de gestion ─────────────── #}
+    <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-muted">Détail des opérations</h2>
     {% if canViewCost %}
         {% if auditTrail is not empty %}
-            <div class="rounded-md border border-border bg-surface">
+            <div class="rounded-md border border-border bg-surface shadow-sm">
                 <div class="border-b border-border px-4 py-3 font-semibold text-ink">Audit trail — taux appliqués</div>
                 <div class="overflow-x-auto">
                     <table class="w-full border-collapse text-left">
