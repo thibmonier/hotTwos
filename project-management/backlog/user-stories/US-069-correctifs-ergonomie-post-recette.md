@@ -39,11 +39,14 @@ THEN seul l'item « Validation » est marqué actif
 ### CA-2 (Nominal) : En-têtes de semaine lisibles
 
 ```gherkin
-GIVEN j'affiche la vue semaine de saisie
-WHEN je lis l'en-tête de la période
-THEN il présente un libellé humain (ex. « Semaine du 10 au 16 août 2026 »)
+GIVEN j'affiche la grille de complétude (en-têtes de colonnes par semaine)
+WHEN je lis un en-tête de semaine
+THEN il présente un libellé humain (n° de semaine ISO + date de début courte, date complète en `title`)
   AND non un format technique (« Sem. 2026-08-10 »)
 ```
+
+> **Note :** l'irritant portait sur la **grille de complétude** (`completeness/index.html.twig`), où la clé
+> `week` (date ISO) était affichée telle quelle. La vue semaine de saisie affichait déjà un libellé humain.
 
 ### CA-3 (Alternatif) : Recette complémentaire sur données peuplées
 
@@ -67,15 +70,15 @@ THEN les états peuplés (lignes, totaux, statuts) sont vérifiés et tracés
 
 | ID | Type | Description | Statut | Estimation |
 |----|------|-------------|--------|------------|
-| T-069-01 | [FE-WEB] | Corriger le `match` de nav (« Saisie » ne capture plus `timesheet_validation`) | 🔴 | 1h |
-| T-069-02 | [FE-WEB] | Libellés d'en-tête de semaine humanisés (vue semaine + jour) | 🔴 | 2h |
+| T-069-01 | [FE-WEB] | Corriger le `match` de nav (« Saisie » ne capture plus `timesheet_validation`) | ✅ | 1h |
+| T-069-02 | [FE-WEB] | Libellés d'en-tête de semaine humanisés (grille de complétude : n° ISO + date courte) | ✅ | 2h |
 | T-069-03 | [TEST] | Passe recette complémentaire valorisation/validation sur données peuplées | 🔴 | 2h |
-| T-069-04 | [FE-WEB] | `aria-modal="true"` sur `dialog.summary-dialog` (`timesheet/week.html.twig`) — a11y WCAG AA | 🔴 | 0.5h |
-| T-069-05 | [BE] | `ValidationPageController` : libellé de repli + log si un projet disparaît entre deux requêtes (au lieu de l'UUID brut) | 🔴 | 1h |
+| T-069-04 | [FE-WEB] | `aria-modal="true"` sur `dialog.summary-dialog` (`timesheet/week.html.twig`) — a11y WCAG AA | ✅ | 0.5h |
+| T-069-05 | [BE] | `ValidationPageController` : libellé de repli + log si un projet disparaît entre deux requêtes (au lieu de l'UUID brut) | ✅ | 1h |
 
 ## Progression
 
-0/5 tasks complétées (0%)
+4/5 tasks complétées (80%) — reste T-069-03 (recette manuelle sur données peuplées)
 
 ## Definition of Done
 
