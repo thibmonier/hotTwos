@@ -6,12 +6,17 @@ namespace App\Tests\Functional\Cli;
 
 use App\Domain\Absence\AbsenceRequest;
 use App\Domain\Absence\AbsenceType;
+use App\Domain\Analytics\StoredEvent;
 use App\Domain\Authorization\Role;
+use App\Domain\Pricing\Profile;
+use App\Domain\Pricing\ProfileAssignment;
+use App\Domain\Pricing\ProfileRate;
 use App\Domain\Project\Project;
 use App\Domain\Reminder\ReminderRule;
 use App\Domain\Tenant\Tenant;
 use App\Domain\Timesheet\TimeEntry;
 use App\Domain\User\User;
+use App\Domain\Valuation\TimeEntryValuation;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -38,7 +43,7 @@ final class SeedDemoDataCommandTest extends KernelTestCase
 
         $this->schema = array_map(
             $this->em->getClassMetadata(...),
-            [Tenant::class, User::class, Role::class, Project::class, TimeEntry::class, AbsenceType::class, AbsenceRequest::class, ReminderRule::class],
+            [Tenant::class, User::class, Role::class, Project::class, TimeEntry::class, AbsenceType::class, AbsenceRequest::class, ReminderRule::class, Profile::class, ProfileRate::class, ProfileAssignment::class, TimeEntryValuation::class, StoredEvent::class],
         );
         $tool = new SchemaTool($this->em);
         $tool->dropSchema($this->schema);
@@ -67,6 +72,9 @@ final class SeedDemoDataCommandTest extends KernelTestCase
         self::assertGreaterThanOrEqual(8, $this->entityCount(TimeEntry::class), 'Des imputations sur plusieurs semaines.');
         // Projets : Alpha, Beta + le projet système « Absence ».
         self::assertGreaterThanOrEqual(3, $this->entityCount(Project::class));
+        // US-070 (T-070-03) : la valorisation est démontrable — les 5 imputations validées sont valorisées.
+        self::assertSame(1, $this->entityCount(Profile::class), 'Un profil de tarification de démo.');
+        self::assertSame(5, $this->entityCount(TimeEntryValuation::class), 'Les imputations validées sont valorisées.');
     }
 
     /**

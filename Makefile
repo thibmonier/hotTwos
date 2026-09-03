@@ -52,6 +52,11 @@ migrate: ## Applique les migrations Doctrine
 fixtures: ## Génère les jeux de données de test (3 tailles de tenant)
 	$(APP) php bin/console app:fixtures:load --no-interaction
 
+db-reset: ## Purge la base (hors migrations) et re-seed un tenant de démo unique
+	$(DC) exec -T database psql -U app -d app < docker/db-reset.sql
+	$(APP) php bin/console app:demo:seed
+	$(DC) restart app
+
 composer: ## Lance composer dans le conteneur (ex. make composer c="require foo/bar")
 	$(APP) composer $(c)
 
