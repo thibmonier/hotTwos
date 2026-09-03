@@ -1,0 +1,144 @@
+# Plan de recette d'ERGONOMIE — US-066 (EPIC-012, lot 1 reskinné Tailwind v4)
+# Généré le 2026-09-02. Recette navigateur via Claude in Chrome sur les parcours clés.
+# NATURE : recette d'utilisabilité (pas un pass/fail fonctionnel). On observe la FACILITÉ
+#          d'usage des écrans Tailwind reskinnés selon des heuristiques, on mesure la
+#          rapidité de saisie (objectif P1 ~2 min), et on collecte/priorise les irritants.
+session_hint: "REC-20260902-sprint7-ergo"
+
+scope:
+  type: story
+  id: US-066
+  epic: EPIC-012
+  ecrans_cibles: "lot 1 reskinné (ADR-0019 Tailwind v4) : saisie, complétude, valorisation, validation"
+  user_stories_couvertes: [US-064, US-065]   # écrans reskinnés + accessibilité AA
+base_url: "http://localhost:8080"
+
+prerequisites:
+  - id: PRE-1
+    action: "make up"
+    effet: "Démarre FrankenPHP :8080 (migrations jouées à l'entrypoint). NB: APP_SECRET fourni au conteneur app via compose.override.yaml (piège déjà résolu)."
+  - id: PRE-2
+    action: "docker compose exec app php bin/console app:demo:seed"
+    effet: "Sème tenant 'Démo Atoll Tourisme' + comptes + projets ALPHA/BETA + imputations de démo."
+  - id: PRE-3
+    action: "auth navigateur"
+    effet: "Pas de formulaire HTML : fetch('/api/login', {email,password}, credentials:include) via javascript_tool."
+  - id: PRE-4
+    action: "verrouiller le viewport"
+    effet: "Recette desktop à 1280px + passe mobile à 390px (parité tactile ≥44px, US-063 responsive)."
+
+# Comptes / personas (mdp: demo-1234-solide)
+personas:
+  P1: { compte: "camille@demo.test", role: "Collaboratrice (saisie)", enjeu: "saisir <2 min sans friction" }
+  P2: { compte: "marc@demo.test",    role: "Chef de projet",          enjeu: "piloter complétude/valorisation/validation" }
+  P3: { compte: "admin@demo.test",   role: "≈RM/dirigeant (pilotage large)", enjeu: "vue transverse, données sensibles" }
+
+# Dimensions d'évaluation ergonomique (grille appliquée à CHAQUE parcours)
+heuristiques:
+  H1_visibilite_etat: "L'état du système est-il visible (chargement, succès, période active, avancement) ?"
+  H2_langage_metier: "Vocabulaire aligné sur le métier (imputation, complétude, valorisation) sans jargon technique ?"
+  H3_controle_liberte: "Retour arrière / annulation / correction possibles sans impasse ?"
+  H4_coherence: "Cohérence visuelle et interactionnelle inter-écrans (mêmes composants, mêmes patterns) ?"
+  H5_prevention_erreur: "Les erreurs de saisie sont-elles prévenues (validation inline, contraintes claires) ?"
+  H6_reconnaissance: "Actions et options reconnaissables sans effort de mémoire (labels explicites, pas d'icônes seules) ?"
+  H7_efficacite: "Raccourcis / pré-remplissage / duplication accélèrent-ils l'utilisateur expert ?"
+  H8_esthetique_minimalisme: "Hiérarchie visuelle claire, densité maîtrisée, pas de bruit ?"
+  H9_recuperation_erreur: "Messages d'erreur clairs, en langage humain, avec la sortie ?"
+  H10_aide: "L'écran est-il auto-porteur (peu ou pas besoin d'aide externe) ?"
+  A11Y: "Touchpoints WCAG 2.2 AA : focus visible, ordre de tabulation, contraste, info non portée par la seule couleur, cibles ≥44px (US-065)."
+
+# Sévérité des retours (CA-3 / CA-4)
+severite:
+  bloquant: "Tâche non réalisable OU confusion majeure → renvoi conception US-062/US-064, bloque la validation (CA-4)."
+  majeur: "Irritant fort ralentissant nettement la tâche → à corriger avant clôture EPIC-012."
+  mineur: "Friction cosmétique/confort → versé au backlog des lots suivants."
+
+parcours:
+  # ============ P1 — SAISIE (le parcours critique : risque d'adoption RSQ-1) ============
+  - id: PC-SAISIE
+    persona: P1
+    ecrans: ["/saisie", "/saisie/jour"]
+    ca_ref: ["US-066/CA-1", "US-066/CA-2"]
+    objectif_ergo: "Camille saisit sa semaine sans y penser, en ≤2 min (critère de rejet P1)."
+    taches:
+      - id: T-SAISIE-1
+        titre: "Saisir une semaine complète (plusieurs projets/jours) et valider"
+        mesure: "CHRONOMÉTRER de l'arrivée sur /saisie à la confirmation de validation. Cible ≤ 2 min (CA-2)."
+        observer: [H1_visibilite_etat, H5_prevention_erreur, H7_efficacite, H8_esthetique_minimalisme, A11Y]
+      - id: T-SAISIE-2
+        titre: "Dupliquer la semaine précédente puis ajuster 2 lignes"
+        observer: [H7_efficacite, H3_controle_liberte, H6_reconnaissance]
+      - id: T-SAISIE-3
+        titre: "Saisie jour (/saisie/jour) — corriger une imputation erronée"
+        observer: [H3_controle_liberte, H5_prevention_erreur, H9_recuperation_erreur]
+      - id: T-SAISIE-4
+        titre: "Passe MOBILE 390px : refaire T-SAISIE-1 au doigt"
+        observer: [A11Y, H8_esthetique_minimalisme, H4_coherence]
+    signaux_alerte: "Scroll horizontal, cibles <44px, tabulation cassée, total de la semaine non visible, feedback de validation absent/ambigu."
+
+  # ============ COMPLÉTUDE (pilotage) ============
+  - id: PC-COMPLETUDE
+    persona: P2
+    ecrans: ["/completude"]
+    ca_ref: ["US-066/CA-1"]
+    objectif_ergo: "Marc identifie en un coup d'œil qui n'a pas saisi et relance sans détour."
+    taches:
+      - id: T-COMP-1
+        titre: "Repérer les collaborateurs en retard de saisie sur la période"
+        observer: [H1_visibilite_etat, H8_esthetique_minimalisme, H6_reconnaissance, A11Y]
+      - id: T-COMP-2
+        titre: "Déclencher une relance depuis l'écran de complétude"
+        observer: [H2_langage_metier, H7_efficacite, H9_recuperation_erreur]
+    signaux_alerte: "Statut porté par la seule couleur (WCAG 1.4.1), tableau illisible en densité, action de relance cachée."
+
+  # ============ VALORISATION (pilotage + données sensibles) ============
+  - id: PC-VALORISATION
+    persona: P2
+    ecrans: ["/valorisation"]
+    ca_ref: ["US-066/CA-1"]
+    objectif_ergo: "Marc lit le CA reconnu, la fraîcheur des données et l'avancement sans ambiguïté."
+    taches:
+      - id: T-VALO-1
+        titre: "Lire le CA cumulé, l'avancement (valued/total) et la fraîcheur (max valuedAt)"
+        observer: [H1_visibilite_etat, H2_langage_metier, H8_esthetique_minimalisme]
+      - id: T-VALO-2
+        titre: "Comprendre le bandeau d'alerte 'missing_rate' et l'audit trail du taux (<details>)"
+        observer: [H6_reconnaissance, H10_aide, A11Y]
+      - id: T-VALO-3
+        titre: "Passe SANS-PERMISSION : accès sans VIEW_PROJECT_FINANCIALS → message clair, pas de fuite (HAB-1)"
+        observer: [H9_recuperation_erreur, H2_langage_metier]
+    signaux_alerte: "Chiffres financiers sans libellé de fraîcheur, audit trail non atteignable au clavier, 403 brut/leak au lieu d'un message métier."
+
+  # ============ VALIDATION DES TEMPS (manager) ============
+  - id: PC-VALIDATION
+    persona: P2
+    ecrans: ["/validation"]
+    ca_ref: ["US-066/CA-1"]
+    objectif_ergo: "Marc valide/refuse des imputations en lot avec un feedback clair de l'action."
+    taches:
+      - id: T-VALID-1
+        titre: "Valider un lot d'imputations et vérifier le retour d'état"
+        observer: [H1_visibilite_etat, H3_controle_liberte, H7_efficacite]
+      - id: T-VALID-2
+        titre: "Refuser une imputation avec motif → traçabilité visible"
+        observer: [H5_prevention_erreur, H9_recuperation_erreur, H2_langage_metier]
+    signaux_alerte: "Action de masse sans confirmation ni annulation, refus sans motif obligatoire, aucun accusé d'action."
+
+# ---- Restitution attendue (CA-1 / CA-3) ----
+livrables:
+  - "Taux de réussite par tâche (réalisée sans blocage / avec aide / échouée)."
+  - "Temps de saisie mesuré vs objectif 2 min (CA-2) + recommandation si écart."
+  - "Registre des retours priorisés (bloquant/majeur/mineur) rattachés à l'écran (CA-3)."
+  - "Décision : ergonomie définitive VALIDÉE (procès-verbal) OU plan de correction priorisé (CA-1)."
+  - "Captures/GIF à l'appui des irritants majeurs/bloquants."
+
+# Règle d'Or : toute anomalie fonctionnelle détectée pendant la recette ergo →
+# classée (visual/interaction/validation/logic/security) → test @regression → correction TDD → re-vérif.
+# NB: les irritants purement ergonomiques (sans bug) alimentent le registre de retours, pas forcément un test.
+golden_rule: true
+regression_registry: ".recette/regression/registry.yaml"
+
+recap:
+  parcours: 4
+  taches: 11
+  focus: "utilisabilité + rapidité de saisie + accessibilité AA (US-065) + passes mobile & sans-permission"

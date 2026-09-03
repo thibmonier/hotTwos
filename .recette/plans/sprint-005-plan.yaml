@@ -1,0 +1,53 @@
+# Plan de recette — Sprint 5 (EPIC-003 : complétude & clôture)
+# Généré le 2026-09-02. Recette navigateur via Claude in Chrome.
+session_hint: "REC-20260902-sprint5"
+scope: { type: sprint, id: Sprint-5, user_stories: [US-057, US-054, US-058, US-056, US-052, US-059] }
+base_url: "http://localhost:8080"
+prerequisites:
+  - "App déjà up (:8080) + tenant démo (app:demo:seed) : camille (collab), marc (chef de projet), admin. mdp demo-1234-solide."
+  - "Auth navigateur : fetch POST /api/login (json_login). camille pour saisie/absences/synthèse/opt-out ; marc pour complétude/validation ; admin pour clôture période."
+  - "Données démo présentes : imputations camille, 1 absence (congés), règle de relance par défaut."
+
+# ✅ web · 🟡 partiel/à confirmer live · ⚪ hors-navigateur (canal notif non livré / async / API non-UI)
+tests:
+  # US-057 — Clôture de période (/administration/periodes, admin)
+  - { id: TC-057-01, ca: CA-1, titre: "Clôturer une période (code de confirmation) → verrou LOCKED + audit", testabilite: "🟡", note: "clôture+verrou+audit ✅ ; calculs aval async + notification ⚪" }
+  - { id: TC-057-04, ca: CA-4, titre: "PUT imputation LOCKED sans réouverture → 423 Locked", testabilite: "✅", note: "via fetch API saisie" }
+  - { id: TC-057-03, ca: CA-3, titre: "Clôture avec imputations non validées → avertissement + choix", testabilite: "✅" }
+  - { id: TC-057-02, ca: CA-2, titre: "Réouverture formelle tracée puis modification tracée (avant/après/motif)", testabilite: "🟡", note: "réouverture 4-eyes période ✅ ; reclôture auto 48h non vérifiable en direct" }
+  - { id: TC-057-05, ca: CA-5, titre: "Réouverture par rôle non habilité → 403", testabilite: "🟡", note: "login camille + API" }
+
+  # US-054 — Absences (/absences)
+  - { id: TC-054-01, ca: CA-1, titre: "Déclarer une absence → statut En attente + compteur", testabilite: "🟡", note: "création ✅ ; notification manager ⚪" }
+  - { id: TC-054-02, ca: CA-2, titre: "Absence validée bloque l'imputation de production (jour grisé, refus API 422)", testabilite: "✅", note: "absence démo de camille" }
+  - { id: TC-054-04, ca: CA-4, titre: "HAB-3 : aucun champ motif médical/diagnostic dans le formulaire", testabilite: "✅" }
+  - { id: TC-054-05, ca: CA-5, titre: "Refus de la demande → compteurs inchangés + période redevient saisissable", testabilite: "✅" }
+  - { id: TC-054-03, ca: CA-3, titre: "Compteurs acquis/pris/attente/solde + projeté", testabilite: "🟡", note: "widget à confirmer live" }
+
+  # US-058 — Complétude (/completude)
+  - { id: TC-058-01, ca: CA-1, titre: "Grille collaborateurs × semaines, 4 états couleur + légende + taux global", testabilite: "✅" }
+  - { id: TC-058-03, ca: CA-3, titre: "Filtre périmètre + export CSV (anti-injection)", testabilite: "✅", note: "vérifier neutralisation =/+/-/@ en tête de champ" }
+  - { id: TC-058-05, ca: CA-5, titre: "Collaborateur non habilité → vue limitée à soi + /api/completude?scope=team = 403", testabilite: "🟡", note: "login camille" }
+  - { id: TC-058-02, ca: CA-2, titre: "Infobulle retard + relance manuelle", testabilite: "🟡", note: "infobulle ✅ ; envoi relance ⚪" }
+  - { id: TC-058-04, ca: CA-4, titre: "Vue vide (aucune saisie) → message explicite sans erreur", testabilite: "⚪", note: "nécessite tenant vierge ; démo a des données" }
+
+  # US-056 — Relances (/relances)
+  - { id: TC-056-02, ca: CA-2, titre: "Opt-out individuel du collaborateur", testabilite: "✅", note: "préférence /api/me/reminder-preference" }
+  - { id: TC-056-05, ca: CA-5, titre: "Désactivation globale par l'admin", testabilite: "🟡", note: "config /relances à confirmer" }
+  - { id: TC-056-01, ca: "CA-1/3/4", titre: "Envoi auto, annulation après soumission, borne de fréquence", testabilite: "⚪", note: "moteur async + canal non livrés ; attestés par tests unitaires" }
+
+  # US-052 — Saisie mobile (/saisie/jour, viewport 390px)
+  - { id: TC-052-01, ca: "CA-1/CA-2", titre: "Vue quotidienne mobile : saisie + parité fonctionnelle (projet, durée, commentaire, dupliquer, soumettre)", testabilite: "✅" }
+  - { id: TC-052-05, ca: CA-5, titre: "Viewport 320px : pas d'overflow-x, zones ≥ 44px", testabilite: "✅" }
+  - { id: TC-052-03, ca: CA-3, titre: "Navigation entre jours (swipe)", testabilite: "🟡", note: "swipe difficile via CDP ; vérifier la nav jour" }
+  - { id: TC-052-04, ca: CA-4, titre: "Perte de connexion → sauvegarde locale", testabilite: "🟡", note: "offline difficile à simuler fidèlement" }
+
+  # US-059 — Synthèse & planning (/saisie)
+  - { id: TC-059-01, ca: CA-1, titre: "Panneau « Ma synthèse » en 1 clic (répartition projet, types, taux occupation)", testabilite: "✅" }
+  - { id: TC-059-04, ca: CA-4, titre: "/api/activity-summary?user_id=autre → 403 (cloisonnement)", testabilite: "✅" }
+  - { id: TC-059-02, ca: CA-2, titre: "Onglet planning à venir", testabilite: "🟡", note: "dépend affectations US-037 ; sinon dégradation gracieuse" }
+  - { id: TC-059-05, ca: CA-5, titre: "Panneau ne perturbe pas la saisie en cours", testabilite: "🟡" }
+
+golden_rule: true
+regression_registry: ".recette/regression/registry.yaml"
+recap: { total: 24, web: 12, partiel: 9, hors_navigateur: 3 }
