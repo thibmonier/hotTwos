@@ -52,14 +52,14 @@ final class CompletenessPageController extends AbstractController
         }
         ksort($weeks);
 
-        // F-S5-4 : identifier les collaborateurs par leur e-mail plutôt que par un identifiant technique.
-        $userEmails = $this->users->findEmailsByIds($user->tenantId(), array_keys($rows));
+        // F-S5-4 → US-067 : identifier les collaborateurs par leur nom d'affichage (repli e-mail).
+        $userDisplayNames = $this->users->findDisplayNamesByIds($user->tenantId(), array_keys($rows));
 
         return $this->render('completeness/index.html.twig', [
             'team' => $team,
             'weeks' => array_keys($weeks),
             'rows' => $rows,
-            'userEmails' => $userEmails,
+            'userDisplayNames' => $userDisplayNames,
         ]);
     }
 }

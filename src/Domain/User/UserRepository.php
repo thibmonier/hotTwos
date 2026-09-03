@@ -30,4 +30,13 @@ interface UserRepository
      * @return array<string, string> map userId => email (les ids inconnus ou hors tenant sont absents)
      */
     public function findEmailsByIds(TenantId $tenant, array $userIds): array;
+
+    /**
+     * Noms d'affichage « Prénom Nom » par identifiant (US-067), avec repli sur l'e-mail si non renseignés.
+     *
+     * @param list<string> $userIds
+     *
+     * @return array<string, string> id → nom d'affichage
+     */
+    public function findDisplayNamesByIds(TenantId $tenant, array $userIds): array;
 }

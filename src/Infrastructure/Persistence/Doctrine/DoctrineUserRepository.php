@@ -61,4 +61,28 @@ final readonly class DoctrineUserRepository implements UserRepository
 
         return $emails;
     }
+
+    public function findDisplayNamesByIds(TenantId $tenant, array $userIds): array
+    {
+        if ([] === $userIds) {
+            return [];
+        }
+
+        /** @var list<array{id: string, email: string, firstName: ?string, lastName: ?string}> $rows */
+        $rows = $this->entityManager->createQuery(
+            'SELECT u.id AS id, u.email AS email, u.firstName AS firstName, u.lastName AS lastName'
+            .' FROM '.User::class.' u WHERE u.tenantId = :tenant AND u.id IN (:ids)',
+        )
+            ->setParameter('tenant', $tenant->toString())
+            ->setParameter('ids', $userIds)
+            ->getResult();
+
+        $names = [];
+        foreach ($rows as $row) {
+            $name = trim(($row['firstName'] ?? '').' '.($row['lastName'] ?? ''));
+            $names[$row['id']] = '' !== $name ? $name : $row['email'];
+        }
+
+        return $names;
+    }
 }

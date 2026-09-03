@@ -65,7 +65,7 @@
                 <tbody>
                     {% for userId, cells in rows %}
                         <tr class="border-t border-border">
-                            <th scope="row" class="max-w-[180px] truncate px-4 py-3 font-normal text-ink">{{ userEmails[userId]|default(userId[:8]) }}</th>
+                            <th scope="row" class="max-w-[180px] truncate px-4 py-3 font-normal text-ink">{{ userDisplayNames[userId]|default(userId[:8]) }}</th>
                             {% for week in weeks %}
                                 {% set cell = cells[week] ?? null %}
                                 <td class="px-3 py-2 text-center">

@@ -118,6 +118,10 @@ final class SeedDemoDataCommand extends Command
             'marc' => new User($tenant, 'marc@demo.test', $hash, ['Chef de projet']),
             'admin' => new User($tenant, 'admin@demo.test', $hash, ['Administrateur']),
         ];
+        // US-067 : noms d'affichage renseignés (les écrans montrent « Prénom Nom », plus l'e-mail brut).
+        $users['camille']->rename('Camille', 'Martin');
+        $users['marc']->rename('Marc', 'Dubois');
+        $users['admin']->rename('Alex', 'Admin');
         foreach ($users as $user) {
             $this->em->persist($user);
         }

@@ -92,6 +92,24 @@ final class CompletenessPageTest extends WebTestCase
     }
 
     /**
+     * US-067 (T-067-05, CA-1) — un collaborateur nommé est affiché « Prénom Nom », plus par son e-mail.
+     */
+    public function testDisplayNameShownInsteadOfEmail(): void
+    {
+        $camille = $this->em->getRepository(User::class)->findOneBy(['email' => 'camille@agence.test']);
+        self::assertInstanceOf(User::class, $camille);
+        $camille->rename('Camille', 'Martin');
+        $this->em->flush();
+
+        $this->login('camille@agence.test');
+        $this->client->request('GET', '/completude');
+
+        self::assertResponseIsSuccessful();
+        $body = (string) $this->client->getResponse()->getContent();
+        self::assertStringContainsString('Camille Martin', $body);
+    }
+
+    /**
      * US-069 (T-069-02) — les en-têtes de semaine sont humanisés (n° de semaine ISO + date courte),
      * plus de date ISO technique « Sem. 2026-08-10 ».
      */

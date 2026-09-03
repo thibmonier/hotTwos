@@ -34,6 +34,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TenantO
     #[ORM\Column(length: 180)]
     private string $email;
 
+    #[ORM\Column(name: 'first_name', length: 100, nullable: true)]
+    private ?string $firstName = null;
+
+    #[ORM\Column(name: 'last_name', length: 100, nullable: true)]
+    private ?string $lastName = null;
+
     /**
      * @param list<string> $roles
      */
@@ -63,6 +69,54 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TenantO
     public function email(): string
     {
         return $this->email;
+    }
+
+    public function firstName(): ?string
+    {
+        return $this->firstName;
+    }
+
+    public function lastName(): ?string
+    {
+        return $this->lastName;
+    }
+
+    /**
+     * Nom d'affichage « Prénom Nom » (US-067). Retombe sur l'e-mail si aucun nom n'est renseigné
+     * (rétrocompatibilité CA-3 : jamais « null null », toujours identifiable).
+     */
+    public function displayName(): string
+    {
+        $name = trim(($this->firstName ?? '').' '.($this->lastName ?? ''));
+
+        return '' !== $name ? $name : $this->email;
+    }
+
+    /**
+     * Renseigne le prénom et le nom (US-067, CA-2/CA-4). Les valeurs sont nettoyées ; une valeur vide
+     * est stockée comme absente (null). Longueur maximale : 100 caractères par champ.
+     */
+    public function rename(?string $firstName, ?string $lastName): void
+    {
+        $this->firstName = $this->normalizeName($firstName);
+        $this->lastName = $this->normalizeName($lastName);
+    }
+
+    private function normalizeName(?string $value): ?string
+    {
+        if (null === $value) {
+            return null;
+        }
+
+        $trimmed = trim($value);
+        if ('' === $trimmed) {
+            return null;
+        }
+        if (mb_strlen($trimmed) > 100) {
+            throw new InvalidArgumentException('Le nom ne peut pas dépasser 100 caractères.');
+        }
+
+        return $trimmed;
     }
 
     public function getUserIdentifier(): string

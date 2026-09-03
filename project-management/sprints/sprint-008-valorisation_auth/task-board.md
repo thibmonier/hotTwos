@@ -14,12 +14,7 @@
 | T-060-06 | US-060 | [BE] Projection `fact_project_revenue` post-validation | 3h |
 | T-060-07 | US-060 | [TEST] Affectation, occupation, par-projet, SLA ≤ 15 min | 3h |
 | T-060-08 | US-060 | [REV] Revue de clôture | 1h |
-| T-067-01 | US-067 | [DB] Migration `first_name`/`last_name` | 1h |
-| T-067-02 | US-067 | [BE] `User.displayName()` + fallback email | 2h |
-| T-067-03 | US-067 | [BE] `findDisplayNamesByIds` | 1h |
-| T-067-04 | US-067 | [FE-WEB] Écran « Mon compte » | 3h |
-| T-067-05 | US-067 | [FE-WEB] Remplacer email par displayName | 2h |
-| T-067-06 | US-067 | [TEST] Fallback, édition, habilitation | 2h |
+| T-067-04 | US-067 | [FE-WEB] Écran « Mon compte » (à faire avec US-068 : écran partagé) | 3h |
 | T-068-01 | US-068 | [OPS] Mailer + reset-password-bundle | 2h |
 | T-068-02 | US-068 | [BE] `form_login` + `LoginController` web | 2h |
 | T-068-03 | US-068 | [FE-WEB] `login.html.twig` | 2h |
@@ -45,13 +40,19 @@
 | T-070-02 | US-070 | [FE-WEB] `/validation` : durée en heures (« 4h00 ») + test | 2026-09-03 |
 | T-060-01 | US-060 | [BE] Use case `AssignProfile` (affectation profil↔collaborateur) + 7 tests | 2026-09-03 |
 | T-070-03 | US-070 | [DB] Seed profils/tarifs/affectation + valorisation + `make db-reset` | 2026-09-03 |
+| T-067-01 | US-067 | [DB] Migration `first_name`/`last_name` (nullable) | 2026-09-03 |
+| T-067-02 | US-067 | [BE] `User.displayName()` + `rename()` + fallback email (5 tests) | 2026-09-03 |
+| T-067-03 | US-067 | [BE] `findDisplayNamesByIds` (repo + Doctrine + InMemory) | 2026-09-03 |
+| T-067-05 | US-067 | [FE-WEB] Email → nom d'affichage (base, complétude) + seed noms | 2026-09-03 |
+| T-067-06 | US-067 | [TEST] Affichage « Prénom Nom » (complétude) | 2026-09-03 |
 
 ## 🚫 Bloqué
 | ID | US | Raison | Action |
 |----|-----|--------|--------|
 
 ## Métriques
-- **Tâches** : 26 total · 4 terminées (15%)
-- **Heures** : 63h estimées · ~10h consommées · ~53h restantes
+- **Tâches** : 26 total · 9 terminées (35%)
+- **Heures** : 63h estimées · ~18h consommées · ~45h restantes
 - **F2 levé** : /valorisation démontrable (CA 3 600 €, 5/5 imputations valorisées sur le seed)
+- **US-067** : noms d'affichage « Prénom Nom » partout (repli e-mail) ; reste l'écran « Mon compte » (T-067-04, groupé avec US-068)
 - **Points** : 22 engagés (US-060 largement pré-implémentée → risque réduit)
