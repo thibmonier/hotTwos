@@ -6,10 +6,17 @@ namespace App\UI\Cli;
 
 use App\Application\Authorization\InitializeDefaultRoles;
 use App\Application\Timesheet\EnsureAbsenceProject;
+use App\Application\Timesheet\Message\TimeEntriesValidated;
+use App\Application\Valuation\ValueValidatedTimeHandler;
 use App\Domain\Absence\AbsenceRequest;
 use App\Domain\Absence\AbsenceType;
+use App\Domain\Pricing\CalculationMode;
+use App\Domain\Pricing\Profile;
+use App\Domain\Pricing\ProfileAssignment;
+use App\Domain\Pricing\ProfileRate;
 use App\Domain\Project\Project;
 use App\Domain\Reminder\ReminderRule;
+use App\Domain\Shared\EffectivePeriod;
 use App\Domain\Tenant\Tenant;
 use App\Domain\Tenant\TenantId;
 use App\Domain\Timesheet\TimeEntry;
@@ -47,6 +54,7 @@ final class SeedDemoDataCommand extends Command
         private readonly PasswordHasherFactoryInterface $hasherFactory,
         private readonly InitializeDefaultRoles $initializeDefaultRoles,
         private readonly EnsureAbsenceProject $ensureAbsenceProject,
+        private readonly ValueValidatedTimeHandler $valuationHandler,
         #[Autowire('%kernel.environment%')]
         private readonly string $environment,
     ) {
@@ -79,9 +87,13 @@ final class SeedDemoDataCommand extends Command
         $users = $this->seedUsers($tenant);
         $projects = $this->seedProjects($tenant, $users['marc']);
         $this->seedAbsence($tenant, $users['camille'], $users['marc']);
-        $this->seedTimeEntries($tenant, $users['camille'], $users['marc'], $projects);
+        $validatedIds = $this->seedTimeEntries($tenant, $users['camille'], $users['marc'], $projects);
         $this->em->persist(ReminderRule::default($tenant));
         $this->em->flush();
+
+        // Pricing + valorisation : profil, tarif et affectation de Camille, puis valorisation des
+        // imputations validées (US-060). Sans cela, /valorisation reste vide (finding F2).
+        $this->seedPricingAndValuation($tenant, $users['camille'], $validatedIds);
 
         $io->success('Tenant de démonstration créé.');
         $io->table(['Élément', 'Valeur'], [
@@ -146,13 +158,20 @@ final class SeedDemoDataCommand extends Command
     /**
      * @param array{alpha: string, beta: string} $projects
      */
-    private function seedTimeEntries(TenantId $tenant, User $camille, User $marc, array $projects): void
+    /**
+     * @param array{alpha: string, beta: string} $projects
+     *
+     * @return list<string> identifiants des imputations validées (à valoriser)
+     */
+    private function seedTimeEntries(TenantId $tenant, User $camille, User $marc, array $projects): array
     {
+        $validatedIds = [];
         // Semaine -3 : complète et validée (complétude « soumise »).
         for ($d = 0; $d < 5; ++$d) {
             $entry = new TimeEntry($tenant, $camille->id(), $projects['alpha'], $this->monday(3)->modify(sprintf('+%d days', $d)), self::FULL_DAY);
             $entry->validate($marc->id(), $this->monday(2));
             $this->em->persist($entry);
+            $validatedIds[] = $entry->id();
         }
         // Semaine -2 : partielle, soumise (lun/mar) ; mer/jeu = absence validée.
         $this->em->persist(new TimeEntry($tenant, $camille->id(), $projects['beta'], $this->monday(2), self::FULL_DAY));
@@ -161,6 +180,34 @@ final class SeedDemoDataCommand extends Command
         // Semaine courante : une journée saisie (en cours).
         $this->em->persist(new TimeEntry($tenant, $camille->id(), $projects['alpha'], $this->monday(0), self::FULL_DAY));
 
+        $this->em->flush();
+
+        return $validatedIds;
+    }
+
+    /**
+     * Profil + tarif + affectation de Camille, puis valorisation synchrone des imputations validées.
+     *
+     * @param list<string> $validatedIds
+     */
+    private function seedPricingAndValuation(TenantId $tenant, User $camille, array $validatedIds): void
+    {
+        // Période large couvrant les imputations passées (résolution profil + taux à la date de travail).
+        $period = EffectivePeriod::since($this->monday(6));
+
+        $profile = new Profile($tenant, 'Consultant confirmé', CalculationMode::LOADED);
+        $this->em->persist($profile);
+        // Coût chargé 480 €/j, taux de vente 720 €/j (en centimes, base journalière FULL_DAY).
+        $this->em->persist(new ProfileRate($tenant, $profile->id(), $period, 48_000, 72_000));
+        $this->em->persist(new ProfileAssignment($tenant, $camille->id(), $profile->id(), $period));
+        $this->em->flush();
+
+        if ([] === $validatedIds) {
+            return;
+        }
+
+        // Valorisation synchrone (pas de dépendance à un worker Messenger pour la démo).
+        ($this->valuationHandler)(new TimeEntriesValidated($tenant->toString(), $validatedIds, new DateTimeImmutable('now')));
         $this->em->flush();
     }
 
