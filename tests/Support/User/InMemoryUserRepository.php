@@ -55,6 +55,12 @@ final class InMemoryUserRepository implements UserRepository
         return $emails;
     }
 
+    public function findDisplayNamesByIds(TenantId $tenant, array $userIds): array
+    {
+        // Le test double ne porte pas de nom : repli sur l'e-mail (comportement US-067 CA-3).
+        return $this->findEmailsByIds($tenant, $userIds);
+    }
+
     private function key(TenantId $tenant, string $userId): string
     {
         return $tenant->toString().'|'.$userId;
