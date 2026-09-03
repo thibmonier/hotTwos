@@ -1,0 +1,179 @@
+# Registre de régression — recette Sprints 6 & 5 (Règle d'Or : un bug corrigé ne doit jamais réapparaître)
+# Généré le 2026-09-02. Sessions REC-20260902-sprint6 / REC-20260902-sprint5.
+entries:
+  # ---------- Sprint 5 (recette du 2026-09-02, session REC-20260902-sprint5) ----------
+  - id: REG-S5-001
+    finding: F-S5-1
+    severity: moyen
+    category: interaction / accessibilité mobile
+    ca: "US-052/CA-1 & CA-2, ENF-UX-3 (zones tactiles ≥ 44×44 px)"
+    resume: >-
+      Sur la vue de saisie quotidienne mobile (/saisie/jour), les champs (durée, commentaire) et les
+      boutons mesurent ~18–21 px de haut, très en dessous du minimum tactile de 44 px exigé.
+    repro_navigateur:
+      - "Se connecter (camille), redimensionner en viewport mobile (≤ 390 px), ouvrir /saisie/jour."
+      - "Mesurer la hauteur des input/button : 18–21 px ; aucun overflow-x (ce point est OK)."
+    attendu: "Chaque zone tactile (input, bouton) ≥ 44×44 px (min-height CSS sur la vue mobile)."
+    cause_reelle: >-
+      Le CSS mobile (.day-entry-duration/.day-entry-comment/.day-nav-btn/.day-submit-btn) portait DÉJÀ
+      min-height 44/48px — donc pas un défaut UI. En conteneur dev, le bind-mount .:/app masquait le
+      public/assets/ compilé dans l'image → TOUTE la CSS renvoyait 404 (app sans style), d'où les
+      cibles à 18–21px. Symptôme d'un problème d'assets dev, pas de la vue mobile.
+    correctif: >-
+      docker/start.sh recompile les assets au démarrage quand APP_ENV=dev (importmap:install +
+      asset-map:compile). Vérifié : CSS servi (2 feuilles), min-height 44px, input 44 / bouton 48 / nav 46.
+    statut: "✅ résolu (correctif d'environnement dev, pas de changement CSS)"
+
+  - id: REG-S5-002
+    finding: F-S5-2
+    severity: faible
+    category: interaction (UX)
+    ca: "US-054/CA-2 (cellule d'un jour d'absence grisée et non éditable)"
+    resume: >-
+      Dans la grille de saisie hebdomadaire, les cellules de production d'un jour couvert par une
+      absence validée ne sont pas grisées/désactivées (aucun input disabled). Le serveur refuse
+      correctement l'imputation (HTTP 422, RG-TMP-3), mais l'UI laisse saisir avant le refus.
+    repro_navigateur:
+      - "camille : /saisie?date=2026-08-19 (absence validée 19–20/08) ; les inputs production du 19/08 sont éditables."
+      - "POST /api/time-entries {projectId, 2026-08-19, minutes} → 422 (blocage serveur OK)."
+    attendu: "Griser/désactiver les cellules de production des jours d'absence validée (parité UI ↔ garde serveur)."
+    test: "(différé — test fonctionnel/visuel UI)"
+    statut: "🟡 ouvert (UX ; sécurité déjà assurée côté serveur)"
+
+  - id: REG-S5-003
+    finding: F-S5-3
+    severity: faible
+    category: visuel (placeholder scaffold)
+    resume: >-
+      Fond `skyblue` sur toute l'app — placeholder par défaut du scaffold Symfony AssetMapper
+      (`body { background-color: skyblue }`) jamais retiré.
+    correctif: >-
+      assets/styles/app.css : base sobre (fond #f6f7f9, police système, line-height, marges). Vérifié
+      navigateur : body = rgb(246,247,249), plus de skyblue.
+    statut: "✅ résolu"
+
+  - id: REG-S5-004
+    finding: F-S5-4
+    severity: moyen
+    category: utilisabilité
+    ca: "US-058 (identification des collaborateurs) ; impacte US-037/US-057"
+    resume: >-
+      /completude affiche les collaborateurs par les 8 premiers caractères d'UUID
+      (template completeness/index.html.twig:44 → userId[:8]) ; les UUID v7 démo partagent ce préfixe
+      → 3 lignes « 01a0613d » indistinguables. Aggravation de F1 (identifiants bruts).
+    correctif: "Chantier ouvert (non bloqué par US-014 ; passage par la phase UX/UI obligatoire)."
+    chantier: "project-management/chantiers/CHANTIER-F-S5-4-completude-noms-collaborateurs.md"
+    statut: "🟡 chantier ouvert"
+
+  - id: REG-S5-005
+    finding: F-S5-5
+    severity: faible
+    category: visuel
+    ca: "US-058/CA-1 (code couleur 4 états vert/orange/rouge/gris)"
+    resume: >-
+      Code couleur partiel sur /completude : l'état « Complète » a un fond vert, mais « En retard » /
+      « En cours » / « Partielle » reposent sur l'emoji seul (pas de remplissage rouge/gris/orange).
+      Accessible (icône + texte), mais pas pleinement conforme au « code couleur » de l'AC.
+    statut: "🟡 ouvert (mineur, à traiter avec la passe UX/UI)"
+
+  # ---------- Sprint 6 (recette + correctif du 2026-09-02, session REC-20260902-sprint6) ----------
+  - id: REG-S6-001
+    finding: F3
+    severity: majeur
+    category: logic / data-integrity
+    ca: "US-038/CA-2, RG-PRJ-5 (lecture seule après clôture)"
+    resume: >-
+      Un projet CLÔTURÉ n'est pas en lecture seule : lots, jalons, affectations et ouvertures
+      exceptionnelles restent créables/modifiables après clôture. Seuls l'imputation de temps
+      (garde RecordTimeEntry) et les engagements externes (formulaire retiré + garde domaine) sont bloqués.
+    repro_navigateur:
+      - "Créer un projet, le passer En cours, le clôturer (avec confirmWarnings)."
+      - "POST /projets/{id}/lots (resp. /jalons, /affectations, /ouvertures) avec le bon token CSRF."
+      - "Constat : les entités sont créées (HTTP 200, persistées) alors que le projet est Clôturé."
+    cause_code: >-
+      ManageProjectLots::addLot, ManageMilestones::addMilestone, ManageAssignments::assign et
+      ManageAssignments::grantOpening n'appellent jamais Project::isClosed() (méthode pourtant disponible).
+    attendu: "Chacune de ces opérations doit lever ProjectException sur un projet clôturé."
+    test: "tests/Unit/Application/Project/ClosedProjectReadOnlyTest.php"
+    statut: "✅ corrigé (TDD rouge→vert) — Project::assertModifiable() appelée dans addLot/reallocate/addMilestone/markReached/assign/grantOpening"
+
+  - id: REG-S6-002
+    finding: F2
+    severity: moyen
+    category: validation
+    ca: "US-037/CA-6 (EF-PRJ-20 : période d'affectation ≤ fin du projet)"
+    resume: >-
+      Une affectation dont la date de fin dépasse la date de fin contractuelle du projet est acceptée
+      sans refus ni avertissement (aucun avenant requis).
+    repro_navigateur:
+      - "Projet avec date de fin 2027-03-31, statut En cours."
+      - "POST /projets/{id}/affectations avec endDate=2027-06-30 → affectation créée (attendu : refus)."
+    cause_code: "ManageAssignments::assign ne compare pas endDate à Project endDate."
+    attendu: >-
+      assign() doit lever ProjectException quand endDate > date de fin du projet
+      (message type : « dépasse la date de fin du projet … avenant »).
+    test: "tests/Unit/Application/Project/AssignmentWithinProjectPeriodTest.php"
+    statut: "✅ corrigé (TDD rouge→vert) — garde endDate ≤ fin projet dans ManageAssignments::assign"
+
+  - id: REG-S6-003
+    finding: F1
+    severity: faible (UX)
+    category: usability
+    ca: "US-030/CA-1 (ergonomie création)"
+    resume: >-
+      Le champ « Responsable » (et l'affichage des collaborateurs affectés) attend/expose un UUID
+      utilisateur brut. Saisir un nom (« Marc Dupont ») fait échouer la création sans message d'erreur
+      explicite (seul un marqueur rouge discret) ; les collaborateurs sont listés par préfixe d'UUID.
+    repro_navigateur:
+      - "/projets/nouveau : Responsable = 'Marc Dupont' + champs valides → aucune création, pas de message clair."
+      - "Laisser Responsable vide → création OK (défaut = utilisateur courant)."
+    cause_code: >-
+      Pas de référentiel utilisateur exposé (US-014 clients / annuaire non livrés). Champ = identifiant libre.
+    attendu: >-
+      À défaut d'un sélecteur d'utilisateur, afficher un message d'erreur explicite quand
+      responsibleUserId ne correspond à aucun utilisateur, et résoudre l'affichage par nom/email.
+    test: "(différé — amélioration UX, pas de test unitaire de régression ; à traiter avec US-014)"
+    cible_fix: "n/a"
+
+  # ---------- Sprint 7 (recette d'ergonomie US-066 du 2026-09-02, session REC-20260902-sprint7-ergo) ----------
+  - id: REG-S7-001
+    finding: ANO-1 (M4)
+    severity: majeur
+    category: interaction / sécurité (mishandling exceptional conditions, OWASP 2025 #7 ; règle 11 §7)
+    ca: "US-066/CA-4 (présentation d'un refus) ; ARC-106 (VIEW_PROJECT_FINANCIALS)"
+    resume: >-
+      Un refus d'habilitation sur une route WEB (/valorisation sans VIEW_PROJECT_FINANCIALS) renvoyait
+      un JSON brut `{"error":"Permission refusée : view:project_financials"}` — impasse non habillée +
+      fuite du slug de permission interne au client.
+    repro_navigateur:
+      - "camille (Collaboratrice, sans VIEW_PROJECT_FINANCIALS) : naviguer vers /valorisation."
+      - "Constat (avant fix) : corps JSON nu avec le slug `view:project_financials`, aucune sortie."
+    cause_code: >-
+      AccessDeniedExceptionListener renvoyait JsonResponse(getMessage()) pour TOUTES les requêtes
+      (web comprise) et ré-émettait le message d'exception, qui contient le slug (Authorizer::ensureCan).
+    attendu: >-
+      Web → page 403 habillée (shell HotOnes, sortie possible) ; API/XHR → JSON 403 générique.
+      Aucun slug interne exposé (journalisé côté serveur uniquement).
+    correctif: >-
+      AccessDeniedExceptionListener négocie le format (prefersJson) : HTML via templates/error/403.html.twig
+      pour le web, JSON générique pour l'API ; le motif réel est loggé (warning) et jamais renvoyé.
+    test: "tests/Functional/Web/ValuationDashboardAccessTest.php (@group regression) + AuthorizationProbeTest ajusté"
+    statut: "✅ corrigé (TDD rouge→vert) — vérifié navigateur (page 403 habillée, leak=false) ; suite 419 tests verte"
+
+  - id: REG-S7-002
+    finding: V1
+    severity: faible (défense en profondeur)
+    category: sécurité / autorisation (deny-by-default, règle 11)
+    ca: "US-055 (validation par lot) ; parité nav `validate:time` ↔ route"
+    resume: >-
+      La page web /validation (ValidationPageController::pending) n'exigeait aucune habilitation : tout
+      utilisateur authentifié l'atteignait. Pas de fuite (liste scopée aux projets dont l'utilisateur est
+      responsable → vide pour un collaborateur ; mutation POST /api/time-entries/validate déjà gardée par
+      ensureCan(VALIDATE_TIME)), mais écart de défense en profondeur + incohérence avec /valorisation.
+    repro_navigateur:
+      - "camille (Collaboratrice) : GET /validation → 200 (écran « Ma responsabilité » vide) au lieu de 403."
+    cause_code: "ValidationPageController::pending n'appelait pas Authorizer::ensureCan."
+    attendu: "ensureCan(VALIDATE_TIME) en tête → 403 habillée pour les non-habilités (parité /valorisation)."
+    correctif: "ensureCan(VALIDATE_TIME) ajouté ; le refus emprunte la page 403 habillée (cf. REG-S7-001)."
+    test: "tests/Functional/Web/ValidationPageAccessTest.php (@regression) ; ValidationPageTest seed désormais les rôles"
+    statut: "✅ corrigé (TDD rouge→vert) — make ci vert (421 tests)"

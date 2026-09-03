@@ -1,0 +1,193 @@
+# Plan de recette — Sprint 6 (EPIC-002 : Projets & delivery)
+# Généré le 2026-09-02. Recette navigateur via Claude in Chrome sur /projets.
+session_hint: "REC-20260902-sprint6"
+scope:
+  type: sprint
+  id: Sprint-6
+  user_stories: [US-030, US-031, US-034, US-037, US-038]
+base_url: "http://localhost:8080"
+
+prerequisites:
+  - id: PRE-1
+    action: "make up"
+    effet: "Démarre FrankenPHP :8080 (l'entrypoint joue les migrations sur la base dev)."
+  - id: PRE-2
+    action: "docker compose exec app php bin/console app:demo:seed"
+    effet: "Sème tenant 'Démo Atoll Tourisme' + comptes camille/marc/admin@demo.test (mdp demo-1234-solide) + projets ALPHA/BETA."
+  - id: PRE-3
+    action: "auth navigateur"
+    effet: "Pas de formulaire HTML : fetch('/api/login', {email,password}, credentials:include) via javascript_tool. marc@demo.test (chef de projet) pour créer/gérer ; admin@demo.test pour l'approbation de réouverture (4-eyes)."
+
+# Classement de testabilité :
+#   ✅ web   : vérifiable de bout en bout dans le navigateur
+#   🟡 partiel : comportement livré testable, mais AC dégradée (module dépendant non livré) — on teste le livré et on note la lacune
+#   ⚪ hors-navigateur : facturation/plan de charge/marge complète/API directe non livrés ou non-UI → couverts par tests unit/fonctionnels, exclus du run Chrome
+
+tests:
+  # ---------- US-030 : création & cycle de vie ----------
+  - id: TC-030-01
+    ca: US-030/CA-1
+    titre: "Créer un projet métier complet → EN_PREPARATION + code PRJ-XXXX + présent en liste"
+    testabilite: "✅ web"
+    etapes: ["/projets/nouveau", "saisir client+responsable+budget+contractualisation+dates", "Créer", "assert statut='En préparation'", "assert code ~ /PRJ-\\d{4}/", "assert présent dans /projets"]
+  - id: TC-030-02
+    ca: US-030/CA-4
+    titre: "Création refusée sans client (RG-PRJ-1)"
+    testabilite: "✅ web"
+    etapes: ["/projets/nouveau", "laisser client vide, remplir le reste", "Créer", "assert erreur client obligatoire", "assert projet non créé"]
+  - id: TC-030-03
+    ca: US-030/CA-5
+    titre: "Création refusée sans budget (RG-PRJ-1)"
+    testabilite: "✅ web"
+    etapes: ["/projets/nouveau", "laisser budget vide, remplir le reste", "Créer", "assert erreur budget obligatoire"]
+  - id: TC-030-04
+    ca: US-030/CA-2
+    titre: "Le statut conditionne l'imputation : refus en 'En préparation', OK 'En cours'"
+    testabilite: "🟡 partiel"
+    note: "Gate d'imputation par statut livré. Vérif via l'onglet Cycle de vie (transitions autorisées) ; le refus effectif d'imputation dépend de l'accès /saisie au projet (non affecté) — sinon attesté par RecordTimeEntryTest."
+    etapes: ["ouvrir le projet créé (EN_PREPARATION)", "assert transitions proposées = seulement autorisées", "passer 'En cours'", "assert transition acceptée"]
+  - id: TC-030-05
+    ca: US-030/CA-3
+    titre: "Le statut conditionne la facturation"
+    testabilite: "⚪ hors-navigateur"
+    note: "Facturation (EPIC-005) non livrée — autorisation seulement, pas d'émission. Exclu du run."
+
+  # ---------- US-031 : lots & jalons ----------
+  - id: TC-031-01
+    ca: US-031/CA-1
+    titre: "Arborescence de lots 2 niveaux + somme affichée en regard du budget + écart signalé"
+    testabilite: "✅ web"
+    etapes: ["onglet Structure", "créer L1/L2 + sous-lots L2.1/L2.2/L3 (jours+€)", "assert arbre 2 niveaux", "assert somme lots vs budget", "assert indicateur d'écart visible"]
+  - id: TC-031-02
+    ca: US-031/CA-6
+    titre: "Refus d'enregistrement si somme lots > budget sans confirmation explicite (EF-PRJ-2)"
+    testabilite: "✅ web"
+    etapes: ["saisir des lots dont la somme dépasse le budget", "Enregistrer sans cocher la confirmation", "assert refus + message de dépassement", "assert rien persisté"]
+  - id: TC-031-03
+    ca: US-031/CA-4
+    titre: "Dépassement sauvegardable avec confirmation explicite ; écart visible"
+    testabilite: "✅ web"
+    etapes: ["cocher la confirmation de dépassement", "Enregistrer", "assert enregistré", "assert écart affiché"]
+  - id: TC-031-04
+    ca: US-031/CA-3
+    titre: "Réallocation de budget entre lots (total projet inchangé) tracée avec motif"
+    testabilite: "🟡 partiel"
+    note: "Réallocation avec motif implémentée (ManageProjectLots) — testable si l'UI expose l'action ; sinon attestée par ProjectStructureTest."
+    etapes: ["déplacer un montant de L1 vers L3 avec motif", "assert L1/L3 mis à jour", "assert total projet inchangé"]
+  - id: TC-031-05
+    ca: US-031/CA-5
+    titre: "Jalon sans déclencheur → 'Atteint' ne crée aucune facture"
+    testabilite: "✅ web"
+    etapes: ["créer un jalon dans la période, sans déclencheur", "passer 'Atteint'", "assert statut Atteint + date d'atteinte", "assert aucune facture"]
+  - id: TC-031-06
+    ca: US-031/CA-7 (1re partie)
+    titre: "Jalon daté hors période projet refusé"
+    testabilite: "✅ web"
+    etapes: ["créer un jalon avec date hors période projet", "Enregistrer", "assert refus + message période"]
+  - id: TC-031-07
+    ca: US-031/CA-2 + CA-7 (2e partie)
+    titre: "Jalon déclencheur → facture émise + notif ; pas de double facturation (idempotence)"
+    testabilite: "⚪ hors-navigateur"
+    note: "Émission de facture + notification non livrées (EPIC-005). L'idempotence de l'intention est attestée par ProjectStructureTest/ManageMilestones."
+
+  # ---------- US-037 : affectation & restriction ----------
+  - id: TC-037-01
+    ca: US-037/CA-4
+    titre: "Affecter un collaborateur (rôle, période, charge prév.) → visible dans l'onglet Équipe"
+    testabilite: "✅ web"
+    etapes: ["onglet Équipe", "affecter camille (rôle, 2026-10-01→2027-01-31, charge)", "assert affectation listée"]
+  - id: TC-037-02
+    ca: US-037/CA-2
+    titre: "Ouverture exceptionnelle d'imputation tracée (auteur, semaine, motif)"
+    testabilite: "✅ web"
+    etapes: ["accorder une ouverture exceptionnelle à un non-affecté pour une semaine + motif", "assert ouverture tracée et listée"]
+  - id: TC-037-03
+    ca: US-037/CA-1
+    titre: "Un non-affecté ne voit pas / ne peut pas imputer le projet en saisie"
+    testabilite: "🟡 partiel"
+    note: "La restriction d'imputation (guard) est livrée. Le filtrage de la LISTE /saisie par affectation est à vérifier live ; à défaut, le refus est attesté par RecordTimeEntryTest (affectation)."
+    etapes: ["se connecter en collaborateur non affecté", "/saisie", "assert projet absent de la liste OU imputation refusée"]
+  - id: TC-037-04
+    ca: US-037/CA-5 + CA-6
+    titre: "Refus : imputation hors période d'affectation ; affectation inactif / au-delà de la fin projet"
+    testabilite: "🟡 partiel"
+    note: "À confirmer live selon ce que ManageAssignments valide (inactif, dépassement date fin projet). Comportement livré testé ; messages exacts vérifiés à l'exécution."
+    etapes: ["tenter une affectation dépassant la date de fin du projet", "assert refus", "(si applicable) tenter imputation hors période d'affectation → refus"]
+  - id: TC-037-05
+    ca: US-037/CA-3
+    titre: "L'affectation alimente le plan de charge + alerte surcharge"
+    testabilite: "⚪ hors-navigateur"
+    note: "Plan de charge (EPIC-004) non livré — la charge est stockée, l'agrégation ne l'est pas."
+
+  # ---------- US-034 : engagements externes ----------
+  - id: TC-034-01
+    ca: US-034/CA-2
+    titre: "Créer un engagement externe (type, montant, fournisseur, statut, date) → onglet Engagements"
+    testabilite: "✅ web"
+    etapes: ["onglet Engagements", "créer engagement (Sous-traitance, 6000€, DevShop SAS, Engagé)", "assert listé + coût externe agrégé"]
+  - id: TC-034-02
+    ca: US-034/CA-6
+    titre: "Refus si montant ou fournisseur absent (validation)"
+    testabilite: "✅ web"
+    etapes: ["créer un engagement sans montant ni fournisseur", "Enregistrer", "assert messages de validation + rien créé"]
+  - id: TC-034-03
+    ca: US-034/CA-5
+    titre: "Refus de rattachement sur un projet clôturé (RG-PRJ-5)"
+    testabilite: "✅ web"
+    note: "Dépend de la clôture (US-038) — exécuté après avoir clôturé un projet."
+    etapes: ["sur un projet clôturé, tenter de créer un engagement", "assert refus RG-PRJ-5", "assert engagements existants en lecture seule"]
+  - id: TC-034-04
+    ca: US-034/CA-3 + CA-4
+    titre: "Filtre par type/statut ; engagement rattaché à un lot"
+    testabilite: "🟡 partiel"
+    note: "Rattachement au lot livré ; filtres UI et marge par lot à vérifier live / dégradés (US-033)."
+    etapes: ["rattacher un engagement à un lot", "assert visible sous le lot", "(si UI) filtrer par type"]
+  - id: TC-034-05
+    ca: US-034/CA-1
+    titre: "Marge projet = vente − internes − externes"
+    testabilite: "⚪ hors-navigateur"
+    note: "Budget de vente / marge complète dégradés (US-033 non livrée). Coûts externes agrégés livrés."
+
+  # ---------- US-038 : clôture opérationnelle ----------
+  - id: TC-038-01
+    ca: US-038/CA-4
+    titre: "Prérequis de clôture : jalons non atteints / engagements non soldés = avertissements à confirmer"
+    testabilite: "✅ web"
+    etapes: ["onglet Clôture sur un projet avec jalon en attente + engagement engagé", "déclencher la clôture", "assert liste d'avertissements", "assert confirmation explicite requise"]
+  - id: TC-038-02
+    ca: US-038/CA-1 + CA-2
+    titre: "Après clôture : badge 'Clôturé', lecture seule, imputation refusée"
+    testabilite: "✅ web"
+    etapes: ["confirmer la clôture", "assert badge Clôturé + fiche en lecture seule", "tenter une imputation → assert refus 'projet clôturé'"]
+  - id: TC-038-03
+    ca: US-038/CA-3
+    titre: "Réouverture 4-eyes : marc demande, admin (distinct) approuve → imputation possible sur la fenêtre"
+    testabilite: "✅ web"
+    etapes: ["marc: demander une réouverture (motif, fenêtre)", "assert demande tracée", "se reconnecter en admin@demo.test", "approuver", "assert 'Réouvert temporairement' + fenêtre", "assert imputation possible sur la fenêtre"]
+  - id: TC-038-04
+    ca: US-038/CA-6
+    titre: "Clôture bloquée si des imputations non validées existent (RG-PRJ-5)"
+    testabilite: "🟡 partiel"
+    note: "Blocage findPendingForProjects livré ; nécessite des imputations 'soumises' (flux de soumission US-050/validation US-055). Monté si l'état de démo le permet, sinon attesté par ProjectClosureTest."
+    etapes: ["projet avec imputations soumises non validées", "déclencher la clôture", "assert blocage + liste des imputations en attente"]
+  - id: TC-038-05
+    ca: US-038/CA-7
+    titre: "Imputation refusée après clôture sans réouverture (UI) + audit log"
+    testabilite: "🟡 partiel"
+    note: "Refus via UI testable (recouvre TC-038-02) ; la voie API directe et l'entrée d'audit sont hors-navigateur (fonctionnel)."
+  - id: TC-038-06
+    ca: US-038/CA-5
+    titre: "Suivi financier maintenu après clôture (facture reçue rattachée)"
+    testabilite: "⚪ hors-navigateur"
+    note: "Facturation fournisseur (EPIC-005) non livrée."
+
+# Règle d'Or : toute anomalie détectée en recette → classée (visual/interaction/validation/logic/security)
+# → génère un test de régression (unit/fonctionnel/feature) taggé @regression → correction TDD → re-vérification.
+golden_rule: true
+regression_registry: ".recette/regression/registry.yaml"
+
+recap:
+  total: 21
+  web: 12          # ✅
+  partiel: 6       # 🟡
+  hors_navigateur: 3  # ⚪ (exclus du run Chrome, attestés par la suite de tests)
