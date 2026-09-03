@@ -19,6 +19,17 @@
 > sans régression, et les écrans les plus utilisés (saisie, complétude, valorisation) sont **reskinnés** —
 > figeant l'ergonomie définitive avant d'étendre le développement front. »
 
+> **🔄 Pivot technique en cours de sprint (2026-09-02) — ADR-0018 → ADR-0019.** Le socle de style n'est
+> **plus Bootstrap précompilé + thème Skote** mais **Tailwind CSS v4** (`symfonycasts/tailwind-bundle`,
+> binaire autonome **sans Node.js**, via AssetMapper ; composants **TailAdmin MIT**). Motifs : poids
+> (305 KB → 17 KB purgé), un seul système (utilitaires + `@theme` **sont** le design system), personnalisation
+> débloquée, **risque licence Skote éliminé**. **L'intention du Sprint Goal est inchangée** — design system
+> définitif posé + appliqué au lot 1, sans régression — **seule la technologie d'implémentation change**.
+> Le layout et le reskin (US-063/064) ont été **refaits en Tailwind** ; réutilisés : tokens (→ `@theme`),
+> maquettes, contrôleurs Stimulus, **tout le backend** (PermissionVoter, F-S5-4), les tests, la méthodo
+> axe-core. Livré et **mergé (PR #14)**. Cf. `docs/adr/0019-frontend-tailwind-assetmapper.md` et le
+> `task-board.md` réconcilié.
+
 Ce sprint **exécute EPIC-012** (D1→D4). La phase de conception est déjà livrée (ADR-0018, `design-system.md`,
 `ux-conception-lot1.md`, maquettes `design-canvas/` — PR #12) : Sprint 7 transforme ces artefacts en code.
 Il applique la consigne PO — **conception UX/UI validée avant tout dev front** — puisque les maquettes

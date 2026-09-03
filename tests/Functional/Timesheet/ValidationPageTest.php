@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Timesheet;
 
+use App\Application\Authorization\InitializeDefaultRoles;
+use App\Domain\Authorization\Role;
 use App\Domain\Project\Project;
 use App\Domain\Tenant\Tenant;
 use App\Domain\Tenant\TenantId;
@@ -11,6 +13,7 @@ use App\Domain\Absence\AbsenceRequest;
 use App\Domain\Period\AccountingPeriod;
 use App\Domain\Timesheet\TimeEntry;
 use App\Domain\User\User;
+use App\Infrastructure\Persistence\Doctrine\DoctrineRoleRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -31,6 +34,7 @@ final class ValidationPageTest extends WebTestCase
         $schema = [
             $em->getClassMetadata(Tenant::class),
             $em->getClassMetadata(User::class),
+            $em->getClassMetadata(Role::class),
             $em->getClassMetadata(Project::class),
             $em->getClassMetadata(TimeEntry::class),
             $em->getClassMetadata(AccountingPeriod::class),
@@ -41,6 +45,8 @@ final class ValidationPageTest extends WebTestCase
         $tool->createSchema($schema);
 
         $tenant = TenantId::generate();
+        // La page /validation exige VALIDATE_TIME : les rôles doivent être résolubles (habilitation réelle).
+        new InitializeDefaultRoles(new DoctrineRoleRepository($em))->forTenant($tenant);
         $chef = new User($tenant, 'marc@agence.test', new SodiumPasswordHasher()->hash('x'), ['Chef de projet']);
         $project = new Project($tenant, 'PRJ-1', 'Ma responsabilité', true, $chef->id());
         $em->persist(new Tenant($tenant, 'Agence A'));

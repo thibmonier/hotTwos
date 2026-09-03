@@ -83,7 +83,9 @@ final class AuthorizationProbeTest extends WebTestCase
         self::assertResponseStatusCodeSame(403);
         $payload = json_decode((string) $this->client->getResponse()->getContent(), true, flags: JSON_THROW_ON_ERROR);
         self::assertIsArray($payload);
-        self::assertSame('Permission refusée : view:collaborator_cost', $payload['error'] ?? null);
+        // Le refus est présenté génériquement : le slug de permission interne ne fuit pas (règle 11 §7, ANO-1).
+        self::assertArrayHasKey('error', $payload);
+        self::assertStringNotContainsString('collaborator_cost', (string) $this->client->getResponse()->getContent());
     }
 
     public function testProbeRequiresAuthentication(): void
