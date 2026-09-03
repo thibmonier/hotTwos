@@ -35,7 +35,7 @@ export default class extends Controller {
 
     recalculate() {
         const total = this.entryTargets.reduce((sum, input) => {
-            const minutes = Number.parseInt(input.value, 10);
+            const minutes = this.#toMinutes(input.value);
             return sum + (Number.isInteger(minutes) && minutes > 0 ? minutes : 0);
         }, 0);
         if (this.hasTotalTarget) {
@@ -100,8 +100,8 @@ export default class extends Controller {
             return;
         }
         this.entryTargets.forEach((input) => {
-            const previous = input.dataset.previousMinutes;
-            input.value = previous && Number.parseInt(previous, 10) > 0 ? previous : '';
+            const previous = Number.parseInt(input.dataset.previousMinutes, 10);
+            input.value = Number.isInteger(previous) && previous > 0 ? Math.round((previous / 60) * 100) / 100 : '';
         });
         this.recalculate();
         this.#status('Saisie de la veille reprise — pensez à enregistrer.');
@@ -111,7 +111,7 @@ export default class extends Controller {
         const comments = new Map(this.commentTargets.map((c) => [c.dataset.projectId, c.value.trim()]));
         return this.entryTargets
             .map((input) => {
-                const minutes = Number.parseInt(input.value, 10);
+                const minutes = this.#toMinutes(input.value);
                 const comment = comments.get(input.dataset.projectId) || null;
                 return { projectId: input.dataset.projectId, date: this.dateValue, minutes, comment };
             })
@@ -196,6 +196,12 @@ export default class extends Controller {
         } else {
             this.submitTarget.setAttribute('aria-busy', 'true');
         }
+    }
+
+    // Heures décimales saisies (« 1,5 » ou « 1.5 ») → minutes entières attendues par l'API.
+    #toMinutes(value) {
+        const hours = Number.parseFloat(String(value).replace(',', '.'));
+        return Number.isFinite(hours) ? Math.round(hours * 60) : NaN;
     }
 
     #format(minutes) {

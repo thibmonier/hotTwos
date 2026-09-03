@@ -53,12 +53,13 @@ final class TimesheetDayPageTest extends WebTestCase
         $body = $client->getResponse()->getContent() ?: '';
         self::assertStringContainsString('Refonte SI', $body);
         self::assertStringContainsString('data-controller="timesheet-day"', $body);
-        self::assertStringContainsString('inputmode="numeric"', $body);
+        self::assertStringContainsString('inputmode="decimal"', $body);
         self::assertStringContainsString('Enregistrer la journée', $body);
         self::assertStringContainsString('name="viewport"', $body);
         // Alternative accessible au swipe : flèches jour précédent/suivant.
         self::assertStringContainsString('/saisie/jour/2026-08-31', $body);
-        self::assertStringContainsString('value="210"', $body);
+        // Saisie en heures décimales : 210 min = 3,5 h.
+        self::assertStringContainsString('value="3.5"', $body);
 
         $tool->dropSchema($schema);
         $em->close();

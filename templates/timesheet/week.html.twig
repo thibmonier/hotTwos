@@ -120,6 +120,7 @@
                             {% for day in days %}
                                 <th scope="col" class="px-3 py-3 text-center font-semibold text-body">{{ day.label }}</th>
                             {% endfor %}
+                            <th scope="col" class="px-3 py-3 text-right font-semibold text-body">Total</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -133,21 +134,34 @@
                                             type="number"
                                             class="w-14 min-h-11 text-center border border-border-strong rounded-md bg-surface text-body text-sm px-1"
                                             min="0"
-                                            max="1440"
-                                            step="15"
-                                            inputmode="numeric"
-                                            aria-label="{{ project.name }} — {{ day.label }} (minutes)"
-                                            value="{{ minutes }}"
+                                            max="24"
+                                            step="0.25"
+                                            inputmode="decimal"
+                                            aria-label="{{ project.name }} — {{ day.label }} (heures)"
+                                            value="{{ minutes is not null ? (minutes / 60)|round(2) : '' }}"
                                             data-timesheet-target="cell"
                                             data-project-id="{{ project.id }}"
                                             data-date="{{ day.date }}"
-                                            data-action="change->timesheet#save"
+                                            data-action="change->timesheet#save input->timesheet#recomputeTotals"
                                         >
                                     </td>
                                 {% endfor %}
+                                <td class="px-3 py-2 text-right font-semibold text-ink tabular-nums"
+                                    data-timesheet-target="rowTotal" data-project-id="{{ project.id }}" aria-label="Total {{ project.name }}">—</td>
                             </tr>
                         {% endfor %}
                     </tbody>
+                    <tfoot>
+                        <tr class="border-t-2 border-border-strong bg-surface-alt">
+                            <th scope="row" class="px-4 py-2 text-right font-semibold text-body">Total</th>
+                            {% for day in days %}
+                                <td class="px-3 py-2 text-center font-semibold text-ink tabular-nums"
+                                    data-timesheet-target="dayTotal" data-date="{{ day.date }}" aria-label="Total {{ day.label }}">—</td>
+                            {% endfor %}
+                            <td class="px-3 py-2 text-right font-bold text-primary tabular-nums"
+                                data-timesheet-target="grandTotal" aria-label="Total de la semaine">—</td>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
         </div>
@@ -161,13 +175,13 @@
             <button type="button"
                     class="inline-flex min-h-11 items-center rounded bg-primary px-4 text-sm font-semibold text-white hover:opacity-90"
                     data-action="timesheet#saveWeek">
-                Enregistrer la semaine
+                Tout enregistrer
             </button>
             <span class="text-xs text-muted">Entrée = valider et descendre · Tab = cellule suivante · saisie possible sans souris.</span>
         </div>
 
         <p class="text-xs text-muted" aria-live="polite" data-timesheet-target="status">
-            Saisissez les minutes par projet et par jour. L'enregistrement est automatique ; « Enregistrer la semaine » soumet tout en une fois.
+            Saisissez les heures par projet et par jour (ex. 7,5 = 7h30). Vos modifications sont enregistrées automatiquement ; « Tout enregistrer » force l'envoi de toute la grille.
         </p>
     {% endif %}
 
