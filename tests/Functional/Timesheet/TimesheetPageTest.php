@@ -66,6 +66,8 @@ final class TimesheetPageTest extends WebTestCase
         self::assertStringContainsString('Planning à venir', $body);
         // CA-5 : le panneau est en lecture seule — aucun champ de formulaire dans le <dialog>.
         self::assertSame(0, $crawler->filter('dialog.summary-dialog input')->count());
+        // US-069 (T-069-04) : la dialog signale son rôle modal aux technologies d'assistance (a11y).
+        self::assertSame(1, $crawler->filter('dialog.summary-dialog[aria-modal="true"]')->count());
 
         $tool->dropSchema($schema);
         $em->close();

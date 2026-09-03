@@ -7,9 +7,9 @@ namespace App\UI\Http\Controller;
 use App\Application\Authorization\Authorizer;
 use App\Domain\Authorization\Permission;
 use App\Domain\Project\ProjectRepository;
-use App\Domain\Timesheet\TimeEntry;
 use App\Domain\Timesheet\TimeEntryRepository;
 use App\Domain\User\User;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -29,6 +29,7 @@ final class ValidationPageController extends AbstractController
         private readonly Authorizer $authorizer,
         private readonly ProjectRepository $projects,
         private readonly TimeEntryRepository $entries,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -45,15 +46,24 @@ final class ValidationPageController extends AbstractController
 
         $pending = $this->entries->findPendingForProjects($user->tenantId(), array_keys($projectNames));
 
-        $rows = array_map(
-            static fn (TimeEntry $entry): array => [
+        $rows = [];
+        foreach ($pending as $entry) {
+            $projectName = $projectNames[$entry->projectId()] ?? null;
+            if (null === $projectName) {
+                // Course rare : projet supprimé entre la résolution des projets et des imputations.
+                // On trace l'anomalie côté serveur et on n'expose jamais l'identifiant technique brut.
+                $this->logger->warning('Projet introuvable pour une imputation en attente de validation', [
+                    'projectId' => $entry->projectId(),
+                    'entryId' => $entry->id(),
+                ]);
+            }
+            $rows[] = [
                 'id' => $entry->id(),
-                'project' => $projectNames[$entry->projectId()] ?? $entry->projectId(),
+                'project' => $projectName ?? 'Projet indisponible',
                 'date' => $entry->workDate()->format('Y-m-d'),
                 'minutes' => $entry->minutes(),
-            ],
-            $pending,
-        );
+            ];
+        }
 
         return $this->render('timesheet/validation.html.twig', [
             'rows' => $rows,

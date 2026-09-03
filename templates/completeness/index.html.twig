@@ -53,7 +53,12 @@
                     <tr class="bg-surface-alt">
                         <th scope="col" class="px-4 py-3 font-semibold text-body">Collaborateur</th>
                         {% for week in weeks %}
-                            <th scope="col" class="px-3 py-3 text-center font-semibold text-body">Sem. {{ week }}</th>
+                            {# Libellé humanisé : n° de semaine ISO + date de début courte (date ISO en title).
+                               La clé `week` (Y-m-d) reste inchangée pour le lookup `cells[week]`. #}
+                            <th scope="col" class="px-3 py-3 text-center font-semibold text-body" title="Semaine du {{ week|date('d/m/Y') }}">
+                                Sem. {{ week|date('W') }}
+                                <span class="block text-xs font-normal text-muted">{{ week|date('d/m') }}</span>
+                            </th>
                         {% endfor %}
                     </tr>
                 </thead>

@@ -58,18 +58,20 @@
                 {% set r = app.request.attributes.get('_route') %}
                 <p class="px-5 pt-4 pb-1.5 text-xs font-semibold uppercase tracking-wider text-sidebar-label">Menu</p>
                 <nav aria-label="Navigation principale" class="flex flex-col gap-0.5 px-3">
+                    {# match : liste de préfixes de route pour l'état actif. Saisie liste ses routes
+                       (week + day) pour ne PAS capturer timesheet_validation (item distinct). #}
                     {% set items = [
-                        {label:'Accueil', route:'home', match:'home', perm:null, icon:'home'},
-                        {label:'Saisie', route:'timesheet_week', match:'timesheet_', perm:null, icon:'pencil'},
-                        {label:'Validation', route:'timesheet_validation', match:'timesheet_validation', perm:'validate:time', icon:'check'},
-                        {label:'Complétude', route:'completeness_page', match:'completeness_page', perm:null, icon:'chart'},
-                        {label:'Valorisation', route:'valuation_dashboard', match:'valuation_dashboard', perm:'view:project_financials', icon:'euro'},
-                        {label:'Projets', route:'project_index', match:'project_', perm:null, icon:'folder'},
-                        {label:'Absences', route:'absence_page', match:'absence_page', perm:null, icon:'calendar'},
-                        {label:'Relances', route:'reminders_page', match:'reminders_', perm:'manage:reminders', icon:'bell'},
-                        {label:'Organisation', route:'organization_admin', match:'organization_admin', perm:'manage:organization', icon:'building'},
-                        {label:'Profils', route:'pricing_admin', match:'pricing_admin', perm:'manage:pricing', icon:'user'},
-                        {label:'Admin — Périodes', route:'period_admin', match:'period_', perm:'manage:periods', icon:'lock'}
+                        {label:'Accueil', route:'home', match:['home'], perm:null, icon:'home'},
+                        {label:'Saisie', route:'timesheet_week', match:['timesheet_week', 'timesheet_day'], perm:null, icon:'pencil'},
+                        {label:'Validation', route:'timesheet_validation', match:['timesheet_validation'], perm:'validate:time', icon:'check'},
+                        {label:'Complétude', route:'completeness_page', match:['completeness_page'], perm:null, icon:'chart'},
+                        {label:'Valorisation', route:'valuation_dashboard', match:['valuation_dashboard'], perm:'view:project_financials', icon:'euro'},
+                        {label:'Projets', route:'project_index', match:['project_'], perm:null, icon:'folder'},
+                        {label:'Absences', route:'absence_page', match:['absence_page'], perm:null, icon:'calendar'},
+                        {label:'Relances', route:'reminders_page', match:['reminders_'], perm:'manage:reminders', icon:'bell'},
+                        {label:'Organisation', route:'organization_admin', match:['organization_admin'], perm:'manage:organization', icon:'building'},
+                        {label:'Profils', route:'pricing_admin', match:['pricing_admin'], perm:'manage:pricing', icon:'user'},
+                        {label:'Admin — Périodes', route:'period_admin', match:['period_'], perm:'manage:periods', icon:'lock'}
                     ] %}
                     {# Icônes Heroicons (outline, MIT) inline — cohérentes avec les SVG des KPI, remplacent la puce générique. #}
                     {% set icons = {
@@ -87,7 +89,7 @@
                     } %}
                     {% for it in items %}
                         {% if it.perm is null or is_granted(it.perm) %}
-                            {% set active = r starts with it.match %}
+                            {% set active = it.match|filter(m => r starts with m) is not empty %}
                             <a href="{{ path(it.route) }}"
                                class="flex min-h-11 items-center gap-3 rounded px-3 text-[13px] {{ active ? 'bg-primary font-medium text-white' : 'hover:bg-white/5 hover:text-white' }}"
                                {% if active %}aria-current="page"{% endif %}>

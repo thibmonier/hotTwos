@@ -91,6 +91,22 @@ final class CompletenessPageTest extends WebTestCase
         self::assertStringContainsString('Vos semaines', (string) $this->client->getResponse()->getContent());
     }
 
+    /**
+     * US-069 (T-069-02) — les en-têtes de semaine sont humanisés (n° de semaine ISO + date courte),
+     * plus de date ISO technique « Sem. 2026-08-10 ».
+     */
+    public function testWeekHeadersAreHumanReadable(): void
+    {
+        $this->login('camille@agence.test');
+
+        $this->client->request('GET', '/completude');
+
+        self::assertResponseIsSuccessful();
+        $body = (string) $this->client->getResponse()->getContent();
+        self::assertDoesNotMatchRegularExpression('/Sem\. \d{4}-\d{2}-\d{2}/', $body);
+        self::assertMatchesRegularExpression('/Sem\. \d{1,2}\b/', $body);
+    }
+
     private function login(string $email): void
     {
         $this->client->request('POST', '/api/login', server: ['CONTENT_TYPE' => 'application/json'], content: json_encode(['email' => $email, 'password' => 'motdepasse-solide'], JSON_THROW_ON_ERROR));
