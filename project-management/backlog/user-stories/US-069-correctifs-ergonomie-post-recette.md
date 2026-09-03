@@ -72,13 +72,16 @@ THEN les états peuplés (lignes, totaux, statuts) sont vérifiés et tracés
 |----|------|-------------|--------|------------|
 | T-069-01 | [FE-WEB] | Corriger le `match` de nav (« Saisie » ne capture plus `timesheet_validation`) | ✅ | 1h |
 | T-069-02 | [FE-WEB] | Libellés d'en-tête de semaine humanisés (grille de complétude : n° ISO + date courte) | ✅ | 2h |
-| T-069-03 | [TEST] | Passe recette complémentaire valorisation/validation sur données peuplées | 🔴 | 2h |
+| T-069-03 | [TEST] | Passe recette complémentaire valorisation/validation sur données peuplées | ✅ | 2h |
 | T-069-04 | [FE-WEB] | `aria-modal="true"` sur `dialog.summary-dialog` (`timesheet/week.html.twig`) — a11y WCAG AA | ✅ | 0.5h |
 | T-069-05 | [BE] | `ValidationPageController` : libellé de repli + log si un projet disparaît entre deux requêtes (au lieu de l'UUID brut) | ✅ | 1h |
 
 ## Progression
 
-4/5 tasks complétées (80%) — reste T-069-03 (recette manuelle sur données peuplées)
+5/5 tasks complétées (100%). Recette peuplée menée (REC-20260903-us069) : T-01/02/04/05 confirmés.
+**Findings à backloguer** : F2 valorisation non démontrable (seed sans profils/tarifs), F3 unité minutes
+sur `/validation` vs heures décimales en saisie, F-INFRA-1 `Dockerfile` sans `tailwind:build` avant
+`asset-map:compile` (build `make up` cassé). Voir `.recette/reports/REC-20260903-us069-report.md`.
 
 ## Definition of Done
 

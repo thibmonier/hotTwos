@@ -77,7 +77,7 @@ final class SeedDemoDataCommand extends Command
 
         $this->initializeDefaultRoles->forTenant($tenant);
         $users = $this->seedUsers($tenant);
-        $projects = $this->seedProjects($tenant);
+        $projects = $this->seedProjects($tenant, $users['marc']);
         $this->seedAbsence($tenant, $users['camille'], $users['marc']);
         $this->seedTimeEntries($tenant, $users['camille'], $users['marc'], $projects);
         $this->em->persist(ReminderRule::default($tenant));
@@ -117,11 +117,13 @@ final class SeedDemoDataCommand extends Command
     /**
      * @return array{alpha: string, beta: string}
      */
-    private function seedProjects(TenantId $tenant): array
+    private function seedProjects(TenantId $tenant, User $marc): array
     {
         $this->ensureAbsenceProject->forTenant($tenant);
-        $alpha = new Project($tenant, 'ALPHA', 'Refonte site Alpha');
-        $beta = new Project($tenant, 'BETA', 'Application mobile Beta');
+        // Marc (chef de projet) est responsable des deux projets : ses imputations en attente
+        // alimentent l'écran /validation (parcours peuplé, cf. US-069 T-069-03).
+        $alpha = new Project($tenant, 'ALPHA', 'Refonte site Alpha', true, $marc->id());
+        $beta = new Project($tenant, 'BETA', 'Application mobile Beta', true, $marc->id());
         $this->em->persist($alpha);
         $this->em->persist($beta);
         $this->em->flush();
