@@ -8,6 +8,71 @@
 {% block body %}
     <h1 class="visually-hidden">Profils de tarification</h1>
 
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="flash flash-{{ label == 'error' ? 'error' : label }}"
+                 role="{{ label == 'error' ? 'alert' : 'status' }}">{{ message }}</div>
+        {% endfor %}
+    {% endfor %}
+
+    {# Affecter un collaborateur à un profil (US-060 T-060-02) — POST-Redirect-Get + CSRF #}
+    <section aria-labelledby="assign-profile-heading" class="mb-6">
+        <h2 id="assign-profile-heading" class="mb-3 text-base font-semibold text-ink">Affecter un collaborateur à un profil</h2>
+        <div class="rounded-md border border-border bg-surface shadow-sm">
+            <div class="p-4">
+                {% if collaborators is empty or rows is empty %}
+                    <p class="text-muted">Un collaborateur et un profil actif sont requis pour créer une affectation.</p>
+                {% else %}
+                    <form method="post" action="{{ path('pricing_assign') }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('pricing_assign') }}">
+
+                        <div class="mb-4">
+                            <label for="assign-user" class="mb-1 block text-xs font-medium text-body">Collaborateur</label>
+                            <select id="assign-user" name="userId" required
+                                    class="w-full max-w-md rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-focus">
+                                {% for id, name in collaborators %}
+                                    <option value="{{ id }}">{{ name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="assign-profile" class="mb-1 block text-xs font-medium text-body">Profil</label>
+                            <select id="assign-profile" name="profileId" required
+                                    class="w-full max-w-md rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-focus">
+                                {% for row in rows %}
+                                    {% if row.active %}
+                                        <option value="{{ row.id }}">{{ row.name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-4 flex flex-wrap gap-4">
+                            <div class="flex-1 min-w-[180px]">
+                                <label for="assign-from" class="mb-1 block text-xs font-medium text-body">À partir du</label>
+                                <input type="date" id="assign-from" name="effectiveFrom" required
+                                       class="w-full rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-focus">
+                            </div>
+                            <div class="flex-1 min-w-[180px]">
+                                <label for="assign-to" class="mb-1 block text-xs font-medium text-body">
+                                    Jusqu'au <span class="font-normal text-muted">(optionnel)</span>
+                                </label>
+                                <input type="date" id="assign-to" name="effectiveTo"
+                                       class="w-full rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-focus">
+                            </div>
+                        </div>
+
+                        <button type="submit"
+                                class="inline-flex min-h-9 items-center rounded bg-primary px-4 text-xs font-semibold text-primary-fg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1">
+                            Affecter le collaborateur
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
     <div data-controller="pricing">
 
         {# Liste des profils #}
