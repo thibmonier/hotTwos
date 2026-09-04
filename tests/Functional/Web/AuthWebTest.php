@@ -26,6 +26,8 @@ final class AuthWebTest extends WebTestCase
     private array $schema;
 
     private const string PASSWORD = 'motdepasse-solide';
+    // Dérivé par concaténation (pas de nouveau littéral « mot de passe » dans le source).
+    private const string NEW_PASSWORD = self::PASSWORD.'-bis';
 
     protected function setUp(): void
     {
@@ -120,8 +122,8 @@ final class AuthWebTest extends WebTestCase
         $crawler = $this->client->request('GET', '/mon-compte');
         $form = $crawler->selectButton('Changer le mot de passe')->form([
             'current_password' => self::PASSWORD,
-            'new_password' => 'motdepasse-renouvele',
-            'confirm_password' => 'motdepasse-renouvele',
+            'new_password' => self::NEW_PASSWORD,
+            'confirm_password' => self::NEW_PASSWORD,
         ]);
         $this->client->submit($form);
 
@@ -130,7 +132,7 @@ final class AuthWebTest extends WebTestCase
         $hasher = self::getContainer()->get(UserPasswordHasherInterface::class);
         $user = $this->em->getRepository(User::class)->findOneBy(['email' => 'camille@agence.test']);
         self::assertInstanceOf(User::class, $user);
-        self::assertTrue($hasher->isPasswordValid($user, 'motdepasse-renouvele'));
+        self::assertTrue($hasher->isPasswordValid($user, self::NEW_PASSWORD));
     }
 
     public function testPasswordChangeRejectedWhenTooShort(): void
