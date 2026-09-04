@@ -1,0 +1,16 @@
+framework:
+    rate_limiter:
+        # US-068 T-068-10 — limite les demandes de réinitialisation par IP (anti-abus / amplification).
+        password_reset_request:
+            policy: 'sliding_window'
+            limit: 5
+            interval: '15 minutes'
+
+# En test : storage non persistant (array) pour les limiteurs (login_throttling + reset), afin
+# d'éviter toute pollution entre méthodes/exécutions (le pool disque n'est pas vidé par cache:clear).
+when@test:
+    framework:
+        cache:
+            pools:
+                cache.rate_limiter:
+                    adapter: cache.adapter.array

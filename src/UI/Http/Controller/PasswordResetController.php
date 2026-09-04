@@ -12,6 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use SymfonyCasts\Bundle\ResetPassword\Controller\ResetPasswordControllerTrait;
@@ -40,6 +41,7 @@ final class PasswordResetController extends AbstractController
         private readonly PasswordResetMailer $mailer,
         private readonly UserPasswordHasherInterface $hasher,
         private readonly EntityManagerInterface $em,
+        private readonly RateLimiterFactoryInterface $passwordResetRequestLimiter,
     ) {
     }
 
@@ -49,6 +51,13 @@ final class PasswordResetController extends AbstractController
         if ($request->isMethod('POST')) {
             if (!$this->isCsrfTokenValid('reset_password_request', (string) $request->request->get('_csrf_token'))) {
                 $this->addFlash('error', 'Jeton de sécurité invalide, veuillez réessayer.');
+
+                return $this->redirectToRoute('forgot_password_request');
+            }
+
+            // Anti-abus par IP (T-068-10) : borne le nombre de demandes indépendamment du compte visé.
+            if (!$this->passwordResetRequestLimiter->create($request->getClientIp())->consume()->isAccepted()) {
+                $this->addFlash('error', 'Trop de demandes de réinitialisation. Réessayez dans quelques minutes.');
 
                 return $this->redirectToRoute('forgot_password_request');
             }
