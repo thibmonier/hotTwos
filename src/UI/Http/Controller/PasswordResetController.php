@@ -12,6 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
@@ -38,6 +39,7 @@ final class PasswordResetController extends AbstractController
         private readonly PasswordResetMailer $mailer,
         private readonly UserPasswordHasherInterface $hasher,
         private readonly EntityManagerInterface $em,
+        #[Target('passwordResetRequestLimiter')]
         private readonly RateLimiterFactoryInterface $passwordResetRequestLimiter,
         private readonly PasswordPolicy $passwordPolicy,
     ) {
