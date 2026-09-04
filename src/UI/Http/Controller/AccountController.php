@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use InvalidArgumentException;
 
 /**
  * US-067 (T-067-04) / US-068 (T-068-04) — écran « Mon compte » : l'utilisateur renseigne son nom/prénom
@@ -48,7 +49,7 @@ final class AccountController extends AbstractController
 
         try {
             $user->rename('' === $firstName ? null : $firstName, '' === $lastName ? null : $lastName);
-        } catch (\InvalidArgumentException) {
+        } catch (InvalidArgumentException) {
             $this->addFlash('error', 'Nom ou prénom invalide (100 caractères maximum).');
 
             return $this->redirectToRoute('account');
