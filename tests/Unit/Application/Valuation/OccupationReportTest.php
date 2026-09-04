@@ -22,7 +22,6 @@ final class OccupationReportTest extends TestCase
 {
     private const string ALICE = '018f9c4e-0000-7000-8000-0000000000a1';
     private const string BOB = '018f9c4e-0000-7000-8000-0000000000b2';
-    private const string CAROL = '018f9c4e-0000-7000-8000-0000000000c3';
     private const string TYPE = '018f9c4e-0000-7000-8000-0000000000f0';
 
     private TenantId $tenant;
@@ -45,10 +44,10 @@ final class OccupationReportTest extends TestCase
         // Bob a 5 jours ouvrés d'absence validée en août (lun-ven complets).
         $this->absences->save($this->validatedAbsence(self::BOB, '2026-08-10', '2026-08-14'));
 
-        $overview = $this->report()->forTenant($this->tenant, [self::ALICE, self::BOB, self::CAROL]);
+        $overview = $this->report()->forTenant($this->tenant);
 
         self::assertSame('2026-08', $overview->referenceMonth);
-        // Carol (0 jour valorisé) est exclue.
+        // Seuls les collaborateurs avec activité valorisée sont listés (Alice, Bob).
         self::assertCount(2, $overview->lines);
 
         $lines = [];
@@ -69,7 +68,7 @@ final class OccupationReportTest extends TestCase
         // Bob plus occupé qu'Alice.
         $this->valuations->valuedDayCountByUser = [self::ALICE => 5, self::BOB => 20];
 
-        $overview = $this->report()->forTenant($this->tenant, [self::ALICE, self::BOB]);
+        $overview = $this->report()->forTenant($this->tenant);
 
         self::assertSame(self::BOB, $overview->lines[0]->userId);
         self::assertSame(self::ALICE, $overview->lines[1]->userId);
@@ -80,7 +79,7 @@ final class OccupationReportTest extends TestCase
         // Aucune valorisation → mois courant (clock) en repli, aucune ligne.
         $this->valuations->valuedDayCountByUser = [];
 
-        $overview = $this->report()->forTenant($this->tenant, [self::ALICE]);
+        $overview = $this->report()->forTenant($this->tenant);
 
         self::assertTrue($overview->isEmpty());
         self::assertSame('2026-09', $overview->referenceMonth);
@@ -92,7 +91,7 @@ final class OccupationReportTest extends TestCase
         // Plus de jours valorisés que la capacité (reports / week-ends) → borné à 100 %.
         $this->valuations->valuedDayCountByUser = [self::ALICE => 999];
 
-        $overview = $this->report()->forTenant($this->tenant, [self::ALICE]);
+        $overview = $this->report()->forTenant($this->tenant);
 
         self::assertSame(100, $overview->lines[0]->percent());
     }

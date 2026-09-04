@@ -12,6 +12,7 @@
 | T-060-06 | US-060 | [BE] Projection `fact_project_revenue` post-validation | 3h |
 | T-060-07 | US-060 | [TEST] Affectation, occupation, par-projet, SLA ≤ 15 min | 3h |
 | T-060-08 | US-060 | [REV] Revue de clôture | 1h |
+| T-060-09 | US-060 | [OPS] Follow-up perf (revue T-060-08) : index `time_entry(project_id)` + coalescence du rebuild analytique (1 rebuild/lot aujourd'hui) — **différé**, non bloquant | 2h |
 | T-068-01 | US-068 | [OPS] Mailer + reset-password-bundle | 2h |
 | T-068-05 | US-068 | [DB] Migration `reset_password_request` | 1h |
 | T-068-06 | US-068 | [BE] `ResetPasswordController` + e-mail | 4h |

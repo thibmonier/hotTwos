@@ -33,25 +33,19 @@ final readonly class OccupationReport
     ) {
     }
 
-    /**
-     * @param list<string> $userIds
-     */
-    public function forTenant(TenantId $tenant, array $userIds): OccupationOverview
+    public function forTenant(TenantId $tenant): OccupationOverview
     {
         $reference = $this->valuations->latestValuedWorkDate($tenant) ?? $this->clock->now();
         $from = $reference->modify('first day of this month')->setTime(0, 0);
         $to = $from->modify('+1 month');
 
         $workingDays = $this->workingDaysBetween($from, $to);
+        // `valuedDayCountByUser` ne renvoie déjà que les collaborateurs ayant une activité valorisée
+        // sur le mois : on itère ce sous-ensemble plutôt que tous les utilisateurs du tenant.
         $valuedByUser = $this->valuations->valuedDayCountByUser($tenant, $from, $to);
 
         $lines = [];
-        foreach ($userIds as $userId) {
-            $valued = $valuedByUser[$userId] ?? 0;
-            if (0 === $valued) {
-                continue; // n'afficher que les collaborateurs ayant une activité valorisée sur le mois.
-            }
-
+        foreach ($valuedByUser as $userId => $valued) {
             $capacity = max(0, $workingDays - $this->absenceDays($tenant, $userId, $from, $to));
             $lines[] = new OccupationLine($userId, $valued, $capacity);
         }

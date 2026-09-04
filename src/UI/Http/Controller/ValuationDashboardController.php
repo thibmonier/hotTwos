@@ -87,7 +87,7 @@ final class ValuationDashboardController extends AbstractController
      */
     private function occupationView(TenantId $tenant): array
     {
-        $overview = $this->occupation->forTenant($tenant, $this->users->findIdsByTenant($tenant));
+        $overview = $this->occupation->forTenant($tenant);
         $names = $this->users->findDisplayNamesByIds(
             $tenant,
             array_map(static fn (OccupationLine $line): string => $line->userId, $overview->lines),
