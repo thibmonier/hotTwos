@@ -7,7 +7,6 @@
 
 | ID | US | Tâche | Estimation |
 |----|-----|-------|------------|
-| T-060-02 | US-060 | [FE-WEB] Écran d'affectation profil↔collaborateur | 3h |
 | T-060-03 | US-060 | [BE] Taux d'occupation | 4h |
 | T-060-04 | US-060 | [BE] Ventilation par projet | 4h |
 | T-060-05 | US-060 | [FE-WEB] Dashboard par projet + occupation | 3h |
@@ -45,14 +44,15 @@
 | T-068-03 | US-068 | [FE-WEB] `security/login.html.twig` + bouton déconnexion topbar | 2026-09-04 |
 | T-067-04 | US-067 | [FE-WEB] Écran « Mon compte » (profil nom/prénom) | 2026-09-04 |
 | T-068-04 | US-068 | [BE/FE-WEB] Changement de mot de passe (Argon2id, CSRF) + 8 tests `AuthWebTest` | 2026-09-04 |
+| T-060-02 | US-060 | [FE-WEB] Écran d'affectation profil↔collaborateur (POST-Redirect-Get + CSRF, `MANAGE_PRICING`) + 4 tests `ProfileAssignmentPageTest` | 2026-09-04 |
 
 ## 🚫 Bloqué
 | ID | US | Raison | Action |
 |----|-----|--------|--------|
 
 ## Métriques
-- **Tâches** : 26 total · 13 terminées (50%)
-- **Heures** : 63h estimées · ~28h consommées · ~35h restantes
+- **Tâches** : 26 total · 14 terminées (54%)
+- **Heures** : 63h estimées · ~31h consommées · ~32h restantes
 - **F2 levé** : /valorisation démontrable (CA 3 600 €, 5/5 imputations valorisées sur le seed)
 - **US-068** : login/logout web (form_login, 2 pare-feux, redirection /login), « Mon compte » (profil + mot de passe). Reste : mot de passe oublié (mailer + reset-password-bundle).
 - **Points** : 22 engagés (US-060 largement pré-implémentée → risque réduit)

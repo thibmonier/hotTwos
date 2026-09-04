@@ -9,6 +9,7 @@ use App\Domain\Authorization\Permission;
 use App\Domain\Pricing\Profile;
 use App\Domain\Pricing\ProfileRepository;
 use App\Domain\User\User;
+use App\Domain\User\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -25,6 +26,7 @@ final class ProfilePageController extends AbstractController
     public function __construct(
         private readonly Authorizer $authorizer,
         private readonly ProfileRepository $profiles,
+        private readonly UserRepository $users,
     ) {
     }
 
@@ -43,6 +45,15 @@ final class ProfilePageController extends AbstractController
             $this->profiles->findByTenant($user->tenantId()),
         );
 
-        return $this->render('pricing/index.html.twig', ['rows' => $rows]);
+        $collaborators = $this->users->findDisplayNamesByIds(
+            $user->tenantId(),
+            $this->users->findIdsByTenant($user->tenantId()),
+        );
+        asort($collaborators);
+
+        return $this->render('pricing/index.html.twig', [
+            'rows' => $rows,
+            'collaborators' => $collaborators,
+        ]);
     }
 }
