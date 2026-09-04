@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\Valuation;
 
 use App\Domain\Tenant\TenantId;
+use DateTimeImmutable;
 
 /**
  * Port de persistance des valorisations figées (US-060, DIP). Tenant explicite.
@@ -34,4 +35,18 @@ interface TimeEntryValuationRepository
      * @return list<TimeEntryValuation>
      */
     public function findValued(TenantId $tenant, int $limit): array;
+
+    /**
+     * Date de prestation la plus récente parmi les valorisations abouties (US-060, T-060-03) —
+     * sert à cadrer le mois de référence de l'occupation. `null` si aucune valorisation.
+     */
+    public function latestValuedWorkDate(TenantId $tenant): ?DateTimeImmutable;
+
+    /**
+     * Nombre de jours (dates de prestation distinctes) valorisés par collaborateur sur `[from, to)`
+     * (US-060, T-060-03). Rattachement via le join `time_entry_valuation ↔ time_entry`.
+     *
+     * @return array<string, int> userId => jours valorisés distincts
+     */
+    public function valuedDayCountByUser(TenantId $tenant, DateTimeImmutable $from, DateTimeImmutable $to): array;
 }

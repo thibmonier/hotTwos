@@ -6,8 +6,10 @@ namespace App\Tests\Functional\Api;
 
 use App\Application\Authorization\InitializeDefaultRoles;
 use App\Domain\Authorization\Role;
+use App\Domain\Project\Project;
 use App\Domain\Tenant\Tenant;
 use App\Domain\Tenant\TenantId;
+use App\Domain\Timesheet\TimeEntry;
 use App\Domain\User\User;
 use App\Domain\Valuation\TimeEntryValuation;
 use App\Infrastructure\Persistence\Doctrine\DoctrineRoleRepository;
@@ -46,6 +48,9 @@ final class ValuationDashboardTest extends WebTestCase
             $this->em->getClassMetadata(Tenant::class),
             $this->em->getClassMetadata(User::class),
             $this->em->getClassMetadata(Role::class),
+            // L'occupation (T-060-03) joint time_entry ↔ project : les tables doivent exister.
+            $this->em->getClassMetadata(Project::class),
+            $this->em->getClassMetadata(TimeEntry::class),
             $this->em->getClassMetadata(TimeEntryValuation::class),
         ];
         $tool = new SchemaTool($this->em);
