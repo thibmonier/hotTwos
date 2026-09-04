@@ -28,6 +28,9 @@ security:
                 check_path: api_login
                 username_path: email
                 password_path: password
+            # US-068 T-068-10 — anti-brute-force : limite les tentatives par IP + identifiant.
+            login_throttling:
+                max_attempts: 5
             logout:
                 path: api_logout
         # Web : authentification par formulaire, redirection vers /login pour les non-authentifiés (US-068).
@@ -39,6 +42,9 @@ security:
                 check_path: login
                 enable_csrf: true
                 default_target_path: home
+            # US-068 T-068-10 — anti-brute-force : limite les tentatives par IP + identifiant.
+            login_throttling:
+                max_attempts: 5
             logout:
                 path: app_logout
                 target: login
