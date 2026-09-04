@@ -45,6 +45,7 @@ final class ValuationDashboardController extends AbstractController
 
         $tenant = $user->tenantId();
         $summary = $this->valuations->summaryFor($tenant);
+        $projectBreakdown = $this->valuations->projectBreakdownFor($tenant);
 
         $canViewCost = $this->authorizer->can($user, Permission::VIEW_COLLABORATOR_COST);
         $auditTrail = [];
@@ -67,6 +68,7 @@ final class ValuationDashboardController extends AbstractController
 
         return $this->render('valuation/index.html.twig', [
             'summary' => $summary,
+            'projectBreakdown' => $projectBreakdown,
             'freshnessMinutes' => $this->freshnessMinutes($summary->lastValuedAt),
             'canViewCost' => $canViewCost,
             'auditTrail' => $auditTrail,
