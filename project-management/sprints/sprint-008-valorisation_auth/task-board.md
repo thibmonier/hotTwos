@@ -7,8 +7,6 @@
 
 | ID | US | Tâche | Estimation |
 |----|-----|-------|------------|
-| T-060-07 | US-060 | [TEST] Affectation, occupation, par-projet, SLA ≤ 15 min | 3h |
-| T-060-08 | US-060 | [REV] Revue de clôture | 1h |
 | T-060-09 | US-060 | [OPS] Follow-up perf (revue T-060-08) : index `time_entry(project_id)` + coalescence du rebuild analytique (1 rebuild/lot aujourd'hui) — **différé**, non bloquant | 2h |
 | T-068-01 | US-068 | [OPS] Mailer + reset-password-bundle | 2h |
 | T-068-05 | US-068 | [DB] Migration `reset_password_request` | 1h |
@@ -46,14 +44,17 @@
 | T-060-04 | US-060 | [BE+FE-WEB] Ventilation par projet (join `time_entry_valuation ↔ time_entry`, DTO `ProjectValuationLine`, table dashboard + gating coût) + 2 tests | 2026-09-04 |
 | T-060-03 | US-060 | [BE] Taux d'occupation (`OccupationReport` : jours valorisés / (ouvrés − absences), mois de la dernière prestation valorisée) + 4 tests | 2026-09-04 |
 | T-060-05 | US-060 | [FE-WEB] Dashboard : table occupation par collaborateur (barre + %) + test fonctionnel | 2026-09-04 |
+| T-060-07 | US-060 | [TEST] Couverture d'ensemble : affectation (`ProfileAssignmentPageTest`), occupation (`OccupationReportTest`+`OccupationDashboardTest`), par-projet (`ProjectValuationBreakdownTest`), SLA ≤ 15 min (`ValuationThroughputTest`) | 2026-09-04 |
+| T-060-08 | US-060 | [REV] Revue de clôture `symfony-reviewer` (28/30) : sécurité/DDD/SOLID OK ; simplif `OccupationReport` appliquée ; perf → follow-up T-060-09 | 2026-09-04 |
 
 ## 🚫 Bloqué
 | ID | US | Raison | Action |
 |----|-----|--------|--------|
 
 ## Métriques
-- **Tâches** : 26 total · 14 terminées (54%)
-- **Heures** : 63h estimées · ~31h consommées · ~32h restantes
-- **F2 levé** : /valorisation démontrable (CA 3 600 €, 5/5 imputations valorisées sur le seed)
+- **Tâches** : 26 total · 21 terminées (81%)
+- **Heures** : 63h estimées · ~48h consommées · ~15h restantes
+- **US-060 tranche 2 CLÔTURÉE** : affectation (T-060-02), ventilation par projet (T-060-04), projection `fact_project_revenue` (T-060-06), occupation (T-060-03/05), tests d'ensemble (T-060-07), revue (T-060-08). Reste follow-up perf **différé** T-060-09.
+- **F2 levé** : /valorisation démontrable (CA 3 600 €, 5/5 imputations valorisées sur le seed) ; dashboard enrichi (par-projet + occupation).
 - **US-068** : login/logout web (form_login, 2 pare-feux, redirection /login), « Mon compte » (profil + mot de passe). Reste : mot de passe oublié (mailer + reset-password-bundle).
 - **Points** : 22 engagés (US-060 largement pré-implémentée → risque réduit)
