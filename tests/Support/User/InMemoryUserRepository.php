@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Support\User;
 
 use App\Domain\Tenant\TenantId;
+use App\Domain\User\User;
 use App\Domain\User\UserRepository;
 
 final class InMemoryUserRepository implements UserRepository
@@ -15,6 +16,9 @@ final class InMemoryUserRepository implements UserRepository
     /** @var array<string, string> */
     private array $emails = [];
 
+    /** @var list<User> registre d'objets User pour les recherches par e-mail (US-068). */
+    private array $users = [];
+
     public function register(TenantId $tenant, string $userId, ?string $email = null): void
     {
         $this->known[$this->key($tenant, $userId)] = true;
@@ -22,6 +26,12 @@ final class InMemoryUserRepository implements UserRepository
         if (null !== $email) {
             $this->emails[$this->key($tenant, $userId)] = $email;
         }
+    }
+
+    public function add(User $user): void
+    {
+        $this->register($user->tenantId(), $user->id(), $user->email());
+        $this->users[] = $user;
     }
 
     public function existsInTenant(TenantId $tenant, string $userId): bool
@@ -59,6 +69,11 @@ final class InMemoryUserRepository implements UserRepository
     {
         // Le test double ne porte pas de nom : repli sur l'e-mail (comportement US-067 CA-3).
         return $this->findEmailsByIds($tenant, $userIds);
+    }
+
+    public function findByEmail(string $email): array
+    {
+        return array_values(array_filter($this->users, static fn (User $u): bool => $u->email() === $email));
     }
 
     private function key(TenantId $tenant, string $userId): string

@@ -12,6 +12,13 @@ parameters:
     valuation.closed_periods: []
     # US-054 — droit annuel d'absences acquis par collaborateur (accrual simplifié, paramétrable).
     absence.acquired_days: 25.0
+    # US-068 — expéditeur des e-mails transactionnels (réinitialisation de mot de passe).
+    app.mail_from: '%env(default:app_mail_from_default:MAIL_FROM)%'
+    app_mail_from_default: 'no-reply@hottwos.example'
+    app.mail_from_name: 'HotTwos'
+    # Défaut committé du transport mailer (US-068) : `null://null` (aucun envoi) sauf surcharge par
+    # MAILER_DSN dans .env / .env.local. Évite un échec de compilation si la variable est absente.
+    env(MAILER_DSN): 'null://null'
 
 services:
     # default configuration for services in *this* file
@@ -113,3 +120,18 @@ services:
     App\Domain\Reminder\ReminderLogRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineReminderLogRepository'
     App\Domain\Reminder\ReminderNotifier: '@App\Infrastructure\Reminder\LoggingReminderNotifier'
     App\Domain\Tenant\TenantRegistry: '@App\Infrastructure\Persistence\Doctrine\DoctrineTenantRegistry'
+
+    # US-068 — mot de passe oublié : envoi du lien de réinitialisation (DIP).
+    App\Infrastructure\Security\ResetPassword\SymfonyPasswordResetMailer:
+        arguments:
+            $fromAddress: '%app.mail_from%'
+            $fromName: '%app.mail_from_name%'
+    App\Application\User\PasswordResetMailer: '@App\Infrastructure\Security\ResetPassword\SymfonyPasswordResetMailer'
+
+# US-068 — en test, le mailer de réinitialisation est un enregistreur en mémoire (aucun envoi réel),
+# récupérable depuis le conteneur pour lire le lien capturé.
+when@test:
+    services:
+        App\Tests\Support\User\RecordingPasswordResetMailer:
+            public: true
+        App\Application\User\PasswordResetMailer: '@App\Tests\Support\User\RecordingPasswordResetMailer'

@@ -8,12 +8,7 @@
 | ID | US | Tâche | Estimation |
 |----|-----|-------|------------|
 | T-060-09 | US-060 | [OPS] Follow-up perf (revue T-060-08) : index `time_entry(project_id)` + coalescence du rebuild analytique (1 rebuild/lot aujourd'hui) — **différé**, non bloquant | 2h |
-| T-068-01 | US-068 | [OPS] Mailer + reset-password-bundle | 2h |
-| T-068-05 | US-068 | [DB] Migration `reset_password_request` | 1h |
-| T-068-06 | US-068 | [BE] `ResetPasswordController` + e-mail | 4h |
-| T-068-07 | US-068 | [FE-WEB] `forgot`/`reset` templates | 2h |
-| T-068-08 | US-068 | [TEST] Parcours auth web complet | 3h |
-| T-068-09 | US-068 | [REV] Revue sécurité | 1h |
+| T-068-10 | US-068 | [OPS] Durcissement auth (revue T-068-09) : rate limiting login + `/mot-de-passe-oublie` (symfony/rate-limiter), invalidation des sessions au changement de mot de passe (reset + Mon compte), `NotCompromisedPassword` — **différé** | 3h |
 
 ## 🔄 En Cours
 | ID | US | Tâche | Démarré |
@@ -46,15 +41,21 @@
 | T-060-05 | US-060 | [FE-WEB] Dashboard : table occupation par collaborateur (barre + %) + test fonctionnel | 2026-09-04 |
 | T-060-07 | US-060 | [TEST] Couverture d'ensemble : affectation (`ProfileAssignmentPageTest`), occupation (`OccupationReportTest`+`OccupationDashboardTest`), par-projet (`ProjectValuationBreakdownTest`), SLA ≤ 15 min (`ValuationThroughputTest`) | 2026-09-04 |
 | T-060-08 | US-060 | [REV] Revue de clôture `symfony-reviewer` (28/30) : sécurité/DDD/SOLID OK ; simplif `OccupationReport` appliquée ; perf → follow-up T-060-09 | 2026-09-04 |
+| T-068-01 | US-068 | [OPS] `symfony/mailer` + `symfonycasts/reset-password-bundle` + config (mailer.yaml, reset_password.yaml : lifetime/throttle 1h) | 2026-09-04 |
+| T-068-05 | US-068 | [DB] Entité + repo `ResetPasswordRequest` (hexagonal, sans ServiceEntityRepository) + migration `reset_password_request` (hors RLS) | 2026-09-04 |
+| T-068-06 | US-068 | [BE] `PasswordResetController` (demande→email→reset, anti-énumération, CSRF, token session, Argon2id) + `findByEmail` inter-tenant + port/adapter mailer | 2026-09-04 |
+| T-068-07 | US-068 | [FE-WEB] Templates forgot/check-email/reset + email HTML + lien depuis le login | 2026-09-04 |
+| T-068-08 | US-068 | [TEST] `ResetPasswordWebTest` : parcours complet, anti-énumération (email inconnu), jeton invalide, borne haute mot de passe (4 cas) | 2026-09-04 |
+| T-068-09 | US-068 | [REV] Revue sécurité `security-auditor` : **sain, aucun bloquant** ; corrigés : e-mail async (anti-énumération timing), borne haute + garde format ; différés → T-068-10 | 2026-09-04 |
 
 ## 🚫 Bloqué
 | ID | US | Raison | Action |
 |----|-----|--------|--------|
 
 ## Métriques
-- **Tâches** : 26 total · 21 terminées (81%)
-- **Heures** : 63h estimées · ~48h consommées · ~15h restantes
+- **Tâches** : 26 initiales · 26 terminées (T-068-09 revue sécurité en cours) ; +1 follow-up différé T-060-09
+- **Heures** : 63h estimées · ~60h consommées
 - **US-060 tranche 2 CLÔTURÉE** : affectation (T-060-02), ventilation par projet (T-060-04), projection `fact_project_revenue` (T-060-06), occupation (T-060-03/05), tests d'ensemble (T-060-07), revue (T-060-08). Reste follow-up perf **différé** T-060-09.
 - **F2 levé** : /valorisation démontrable (CA 3 600 €, 5/5 imputations valorisées sur le seed) ; dashboard enrichi (par-projet + occupation).
-- **US-068** : login/logout web (form_login, 2 pare-feux, redirection /login), « Mon compte » (profil + mot de passe). Reste : mot de passe oublié (mailer + reset-password-bundle).
+- **US-068 CLÔTURÉE** : login/logout web, « Mon compte » (profil + mot de passe), **mot de passe oublié** (mailer + reset-password-bundle, anti-énumération, token par compte multi-tenant, Argon2id). Revue sécurité T-068-09 en cours.
 - **Points** : 22 engagés (US-060 largement pré-implémentée → risque réduit)

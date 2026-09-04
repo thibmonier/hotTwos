@@ -24,6 +24,14 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Domain'
                 prefix: 'App\Domain'
                 alias: App
+            # US-068 (T-068-05) — entité de persistance du reset-password-bundle, hors domaine
+            # (couplée au vendor) : mappée depuis l'infrastructure pour garder le domaine pur.
+            Security:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Infrastructure/Security'
+                prefix: 'App\Infrastructure\Security'
+                alias: Security
         # Isolation multi-tenant (ARC-33) — activé par requête via TenantFilterConfigurator (ARC-61).
         filters:
             tenant:

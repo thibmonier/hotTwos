@@ -85,4 +85,16 @@ final readonly class DoctrineUserRepository implements UserRepository
 
         return $names;
     }
+
+    public function findByEmail(string $email): array
+    {
+        /** @var list<User> $users */
+        $users = $this->entityManager->createQuery(
+            'SELECT u FROM '.User::class.' u WHERE u.email = :email',
+        )
+            ->setParameter('email', $email)
+            ->getResult();
+
+        return $users;
+    }
 }
