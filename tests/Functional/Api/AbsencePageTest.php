@@ -66,7 +66,8 @@ final class AbsencePageTest extends WebTestCase
     {
         $this->client->request('GET', '/absences');
 
-        self::assertResponseStatusCodeSame(401);
+        // US-068 : route web → redirection vers la page de connexion (plus de 401 web).
+        self::assertResponseRedirects('/login');
     }
 
     public function testCollaboratorSeesCountersAndRequests(): void

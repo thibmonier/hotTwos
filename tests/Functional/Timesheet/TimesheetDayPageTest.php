@@ -70,6 +70,7 @@ final class TimesheetDayPageTest extends WebTestCase
         $client = self::createClient();
         $client->request('GET', '/saisie/jour/2026-09-01');
 
-        self::assertResponseStatusCodeSame(401);
+        // US-068 : route web → redirection vers la page de connexion (plus de 401 web).
+        self::assertResponseRedirects('/login');
     }
 }

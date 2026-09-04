@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon compte — HotOnes{% endblock %}
+{% block page_section 'Compte' %}
+{% block page_title 'Mon compte' %}
+
+{% block body %}
+    <div class="mx-auto flex w-full max-w-2xl flex-col gap-6">
+
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="rounded border px-3 py-2 text-sm {{ label == 'success' ? 'border-success text-success' : 'flash-error border-danger text-danger' }}" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+        {# Profil : nom / prénom (US-067, CA-2) #}
+        <section class="rounded-md border border-border bg-surface p-6 shadow-sm">
+            <h2 class="mb-1 text-base font-semibold text-ink">Profil</h2>
+            <p class="mb-4 text-sm text-muted">Votre nom d'affichage dans l'application. Connecté en tant que <strong>{{ account.email }}</strong>.</p>
+
+            <form method="post" action="{{ path('account_profile') }}" class="flex flex-col gap-4">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('account_profile') }}">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div class="flex flex-col gap-1">
+                        <label for="first_name" class="text-sm font-medium text-body">Prénom</label>
+                        <input type="text" id="first_name" name="first_name" value="{{ account.firstName }}" maxlength="100"
+                               class="min-h-11 rounded border border-border-strong bg-surface px-3 text-sm text-ink focus:border-primary">
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label for="last_name" class="text-sm font-medium text-body">Nom</label>
+                        <input type="text" id="last_name" name="last_name" value="{{ account.lastName }}" maxlength="100"
+                               class="min-h-11 rounded border border-border-strong bg-surface px-3 text-sm text-ink focus:border-primary">
+                    </div>
+                </div>
+                <div>
+                    <button type="submit" class="inline-flex min-h-11 items-center rounded bg-primary px-4 text-sm font-semibold text-white hover:opacity-90">Enregistrer le profil</button>
+                </div>
+            </form>
+        </section>
+
+        {# Mot de passe (US-068, CA-3) #}
+        <section class="rounded-md border border-border bg-surface p-6 shadow-sm">
+            <h2 class="mb-1 text-base font-semibold text-ink">Mot de passe</h2>
+            <p class="mb-4 text-sm text-muted">Au moins 12 caractères. Vous devez confirmer votre mot de passe actuel.</p>
+
+            <form method="post" action="{{ path('account_password') }}" class="flex flex-col gap-4">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('account_password') }}">
+                <div class="flex flex-col gap-1">
+                    <label for="current_password" class="text-sm font-medium text-body">Mot de passe actuel</label>
+                    <input type="password" id="current_password" name="current_password" autocomplete="current-password" required
+                           class="min-h-11 rounded border border-border-strong bg-surface px-3 text-sm text-ink focus:border-primary">
+                </div>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div class="flex flex-col gap-1">
+                        <label for="new_password" class="text-sm font-medium text-body">Nouveau mot de passe</label>
+                        <input type="password" id="new_password" name="new_password" autocomplete="new-password" minlength="12" required
+                               class="min-h-11 rounded border border-border-strong bg-surface px-3 text-sm text-ink focus:border-primary">
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label for="confirm_password" class="text-sm font-medium text-body">Confirmation</label>
+                        <input type="password" id="confirm_password" name="confirm_password" autocomplete="new-password" minlength="12" required
+                               class="min-h-11 rounded border border-border-strong bg-surface px-3 text-sm text-ink focus:border-primary">
+                    </div>
+                </div>
+                <div>
+                    <button type="submit" class="inline-flex min-h-11 items-center rounded bg-primary px-4 text-sm font-semibold text-white hover:opacity-90">Changer le mot de passe</button>
+                </div>
+            </form>
+        </section>
+    </div>
+{% endblock %}
