@@ -14,8 +14,10 @@ use App\Domain\Tenant\TenantId;
 use App\Domain\Timesheet\TimeEntry;
 use App\Domain\Valuation\TimeValuationCalculator;
 use App\Domain\Valuation\ValuationStatus;
+use App\Application\Analytics\AnalyticsRebuildScheduler;
 use App\Tests\Support\Analytics\InMemoryEventStore;
 use App\Tests\Support\Messaging\RecordingMessageBus;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use App\Tests\Support\Pricing\InMemoryProfileAssignmentRepository;
 use App\Tests\Support\Pricing\InMemoryProfileRateRepository;
 use App\Tests\Support\Timesheet\InMemoryTimeEntryRepository;
@@ -63,7 +65,7 @@ final class ValuationThroughputTest extends TestCase
             new TimeValuationCalculator(),
             $valuations,
             $events,
-            new RecordingMessageBus(),
+            new AnalyticsRebuildScheduler(new RecordingMessageBus(), new ArrayAdapter()),
         );
 
         $start = microtime(true);

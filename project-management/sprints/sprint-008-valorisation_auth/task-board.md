@@ -7,7 +7,6 @@
 
 | ID | US | Tâche | Estimation |
 |----|-----|-------|------------|
-| T-060-09 | US-060 | [OPS] Follow-up perf (revue T-060-08) : index `time_entry(project_id)` + coalescence du rebuild analytique (1 rebuild/lot aujourd'hui) — **différé**, non bloquant | 2h |
 | T-068-11 | US-068 | [OPS] `NotCompromisedPassword` (reset + Mon compte) — **différé** : dépendance HTTP externe runtime (HaveIBeenPwned) à cadrer (cache, fail-open, mock en test) + `symfony/validator` | 2h |
 
 ## 🔄 En Cours
@@ -48,6 +47,7 @@
 | T-068-08 | US-068 | [TEST] `ResetPasswordWebTest` : parcours complet, anti-énumération (email inconnu), jeton invalide, borne haute mot de passe (4 cas) | 2026-09-04 |
 | T-068-09 | US-068 | [REV] Revue sécurité `security-auditor` : **sain, aucun bloquant** ; corrigés : e-mail async (anti-énumération timing), borne haute + garde format ; différés → T-068-10/11 | 2026-09-04 |
 | T-068-10 | US-068 | [OPS] Durcissement auth : rate limiting `login_throttling` (2 pare-feux) + limiteur IP `/mot-de-passe-oublie` (symfony/rate-limiter) + test régression invalidation des sessions au changement de mot de passe | 2026-09-04 |
+| T-060-09 | US-060 | [OPS] Perf analytique : index `idx_time_entry_project` (migration) + coalescence du rebuild (`AnalyticsRebuildScheduler`, drapeau cache par tenant, acquitté au début du rebuild) + 3 tests | 2026-09-04 |
 
 ## 🚫 Bloqué
 | ID | US | Raison | Action |

@@ -23,6 +23,9 @@ use InvalidArgumentException;
 #[ORM\Table(name: 'time_entry')]
 #[ORM\UniqueConstraint(name: 'uniq_time_entry_grain', columns: ['tenant_id', 'user_id', 'project_id', 'work_date'])]
 #[ORM\Index(name: 'idx_time_entry_tenant_user_date', columns: ['tenant_id', 'user_id', 'work_date'])]
+// US-060 T-060-09 — accélère les jointures valorisation↔projet (ventilation par projet, occupation),
+// où le grain (tenant,user,project,date) ne peut servir de préfixe d'index sur project_id seul.
+#[ORM\Index(name: 'idx_time_entry_project', columns: ['project_id'])]
 class TimeEntry implements TenantOwned
 {
     /** Plafond d'une imputation unitaire : 24 h (une journée). */
