@@ -32,11 +32,15 @@ La marge n'est fiable que si les temps saisis et valorisés par EPIC-003 sont fi
 
 ## User Stories
 
-À affiner — lot 2 (28 EF)
+Tranche 1 affinée (Sprint 9, 2026-09-04) — décision : **produit facturable = CA reconnu** (proxy, cf. US-071). Reste 28 EF à couvrir sur les tranches suivantes.
 
 | ID | Nom | Statut | Points | Sprint |
 |----|-----|--------|--------|--------|
-| - | À décomposer lors du Sprint Planning lot 2 | - | - | - |
+| US-071 | Moteur de marge réelle par projet à la clôture | 🔴 To Do | 8 | 9 |
+| US-072 | Budget vs réalisé et alerte de dérive financière | 🔴 To Do | 5 | 9 |
+| US-073 | Tableau de bord finance consolidé (direction) | 🔴 To Do | 8 | 9 |
+| US-074 | Export comptable configurable (réserve) | 🔴 To Do | 5 | 9 |
+| — | Reste EPIC-005 (facturé réel, encours de facturation, connecteur compta…) | — | À affiner | ≥ 10 |
 
 ---
 
@@ -61,7 +65,7 @@ La marge n'est fiable que si les temps saisis et valorisés par EPIC-003 sont fi
 
 ## Progression
 
-0/0 US complétées (0 %)
+Tranche 1 affinée : 4 US (26 pts, dont 5 en réserve) planifiées Sprint 9. 0/4 complétées (0 %).
 
 ---
 
