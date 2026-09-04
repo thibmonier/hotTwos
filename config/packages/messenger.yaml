@@ -45,6 +45,9 @@ framework:
             # US-056 T-056-03 : calcul + émission des relances hors requête (RLS armée par le
             # middleware à la consommation ; jamais sync — le contexte de la requête serait effacé).
             'App\Application\Reminder\Message\SendDueReminders': async
+            # US-068 (revue T-068-09) : envoi des e-mails hors requête → réponse à temps constant sur
+            # « mot de passe oublié » (pas d'énumération par timing) et pas d'envoi SMTP synchrone.
+            'Symfony\Component\Mailer\Messenger\SendEmailMessage': async
 
 when@test:
     framework:

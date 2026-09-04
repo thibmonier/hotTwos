@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Vérifiez votre boîte mail — HotOnes{% endblock %}
+{% block page_title 'Vérifiez votre boîte mail' %}
+
+{% block body %}
+    <div class="mx-auto mt-10 w-full max-w-sm">
+        <div class="rounded-md border border-border bg-surface p-6 shadow-sm">
+            <h1 class="mb-1 text-lg font-semibold text-ink">Vérifiez votre boîte mail</h1>
+            <p class="mb-3 text-sm text-muted">
+                Si un compte est associé à cette adresse, un e-mail contenant un lien de réinitialisation vient d'être envoyé.
+                Pensez à vérifier vos courriers indésirables.
+            </p>
+            <p class="text-xs text-muted">
+                Ce lien est valable {{ (tokenLifetime / 3600)|round }} h. Passé ce délai, refaites une demande.
+            </p>
+        </div>
+
+        <p class="mt-4 text-center text-xs text-muted">
+            <a href="{{ path('login') }}" class="font-medium text-primary hover:underline">Retour à la connexion</a>
+        </p>
+    </div>
+{% endblock %}

@@ -39,4 +39,13 @@ interface UserRepository
      * @return array<string, string> id → nom d'affichage
      */
     public function findDisplayNamesByIds(TenantId $tenant, array $userIds): array;
+
+    /**
+     * Comptes portant cette adresse e-mail (US-068, mot de passe oublié). **Volontairement
+     * inter-tenant** : l'e-mail n'est unique que par tenant (`uniq_user_tenant_email`), et le flux de
+     * réinitialisation est anonyme (aucun contexte tenant) — chaque compte reçoit son propre jeton.
+     *
+     * @return list<User>
+     */
+    public function findByEmail(string $email): array;
 }
