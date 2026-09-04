@@ -17,12 +17,18 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 #[AsMessageHandler]
 final readonly class ProjectAnalyticsHandler
 {
-    public function __construct(private RebuildAnalytics $rebuild)
-    {
+    public function __construct(
+        private RebuildAnalytics $rebuild,
+        private AnalyticsRebuildScheduler $scheduler,
+    ) {
     }
 
     public function __invoke(AnalyticsRebuildRequested $message): void
     {
-        $this->rebuild->forTenant($message->tenantId());
+        $tenant = $message->tenantId();
+        // Lève le drapeau AVANT le rejeu (T-060-09) : une demande arrivée pendant le rebuild ré-arme
+        // la coalescence et déclenche un nouveau rebuild couvrant ses données (cohérence éventuelle).
+        $this->scheduler->acknowledge($tenant);
+        $this->rebuild->forTenant($tenant);
     }
 }

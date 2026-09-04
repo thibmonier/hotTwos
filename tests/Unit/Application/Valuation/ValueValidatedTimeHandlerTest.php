@@ -14,9 +14,11 @@ use App\Domain\Tenant\TenantId;
 use App\Domain\Timesheet\TimeEntry;
 use App\Domain\Valuation\TimeValuationCalculator;
 use App\Domain\Valuation\ValuationStatus;
+use App\Application\Analytics\AnalyticsRebuildScheduler;
 use App\Application\Analytics\Message\AnalyticsRebuildRequested;
 use App\Tests\Support\Analytics\InMemoryEventStore;
 use App\Tests\Support\Messaging\RecordingMessageBus;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use App\Tests\Support\Pricing\InMemoryProfileAssignmentRepository;
 use App\Tests\Support\Pricing\InMemoryProfileRateRepository;
 use App\Tests\Support\Timesheet\InMemoryTimeEntryRepository;
@@ -60,7 +62,7 @@ final class ValueValidatedTimeHandlerTest extends TestCase
             new TimeValuationCalculator(),
             $this->valuations,
             $this->events,
-            $this->bus,
+            new AnalyticsRebuildScheduler($this->bus, new ArrayAdapter()),
         );
     }
 

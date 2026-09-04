@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Valuation;
 
-use App\Application\Analytics\Message\AnalyticsRebuildRequested;
+use App\Application\Analytics\AnalyticsRebuildScheduler;
 use App\Application\Timesheet\Message\TimeEntriesValidated;
 use App\Domain\Analytics\EventStore;
 use App\Domain\Analytics\RevenueRecognized;
@@ -20,7 +20,6 @@ use App\Domain\Valuation\TimeValuationCalculator;
 use App\Domain\Valuation\ValuationStatus;
 use DateTimeImmutable;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
  * Valorisation asynchrone des temps validés (US-060, T-060-02).
@@ -45,7 +44,7 @@ final readonly class ValueValidatedTimeHandler
         private TimeValuationCalculator $calculator,
         private TimeEntryValuationRepository $valuations,
         private EventStore $events,
-        private MessageBusInterface $bus,
+        private AnalyticsRebuildScheduler $rebuildScheduler,
     ) {
     }
 
@@ -62,9 +61,9 @@ final readonly class ValueValidatedTimeHandler
         }
 
         // Rematérialise fact_project_revenue (T-060-06) une fois le CA reconnu : projection async
-        // (rejeu par le projecteur), consommée après le commit de ce message → événements visibles.
+        // (rejeu par le projecteur), coalescée par tenant (T-060-09) pour éviter les rebuilds redondants.
         if ($recognizedRevenue) {
-            $this->bus->dispatch(new AnalyticsRebuildRequested($tenant->toString()));
+            $this->rebuildScheduler->schedule($tenant);
         }
     }
 

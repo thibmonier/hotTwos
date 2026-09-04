@@ -17,7 +17,9 @@ use App\Domain\Timesheet\TimeEntry;
 use App\Domain\Valuation\TimeValuationCalculator;
 use App\Domain\Valuation\ValuationStatus;
 use App\Tests\Support\Analytics\InMemoryEventStore;
+use App\Application\Analytics\AnalyticsRebuildScheduler;
 use App\Tests\Support\Messaging\RecordingMessageBus;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use App\Tests\Support\Pricing\InMemoryProfileAssignmentRepository;
 use App\Tests\Support\Pricing\InMemoryProfileRateRepository;
 use App\Tests\Support\Timesheet\InMemoryTimeEntryRepository;
@@ -58,8 +60,8 @@ final class FrozenSnapshotTest extends TestCase
         $this->events = new InMemoryEventStore();
         $this->bus = new RecordingMessageBus();
 
-        // Bus dédié au handler de valorisation : ses demandes de rebuild analytique (T-060-06) ne
-        // doivent pas polluer $this->bus, qui observe le re-déclenchement CA-4.
+        // Planificateur dédié au handler de valorisation : ses demandes de rebuild analytique
+        // (T-060-06/09) ne doivent pas polluer $this->bus, qui observe le re-déclenchement CA-4.
         $this->value = new ValueValidatedTimeHandler(
             $this->entries,
             $this->assignments,
@@ -67,7 +69,7 @@ final class FrozenSnapshotTest extends TestCase
             new TimeValuationCalculator(),
             $this->valuations,
             $this->events,
-            new RecordingMessageBus(),
+            new AnalyticsRebuildScheduler(new RecordingMessageBus(), new ArrayAdapter()),
         );
         $this->revalue = new RevalueOnRateDefinedHandler(
             $this->valuations,
