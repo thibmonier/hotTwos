@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Support\Valuation;
 
 use App\Domain\Tenant\TenantId;
+use App\Domain\Valuation\ProjectValuationLine;
 use App\Domain\Valuation\TimeEntryValuation;
 use App\Domain\Valuation\TimeEntryValuationRepository;
 use App\Domain\Valuation\ValuationStatus;
@@ -14,6 +15,14 @@ final class InMemoryTimeEntryValuationRepository implements TimeEntryValuationRe
 {
     /** @var list<TimeEntryValuation> */
     public array $valuations = [];
+
+    /**
+     * Ventilation par projet — le rattachement projet vit dans `time_entry` (hors de ce fake) :
+     * les tests la fixent explicitement plutôt que de la recalculer.
+     *
+     * @var list<ProjectValuationLine>
+     */
+    public array $projectBreakdown = [];
 
     public function save(TimeEntryValuation $valuation): void
     {
@@ -80,5 +89,10 @@ final class InMemoryTimeEntryValuationRepository implements TimeEntryValuationRe
         usort($valued, static fn (TimeEntryValuation $a, TimeEntryValuation $b): int => $b->valuedAt() <=> $a->valuedAt());
 
         return array_slice($valued, 0, $limit);
+    }
+
+    public function projectBreakdownFor(TenantId $tenant): array
+    {
+        return $this->projectBreakdown;
     }
 }

@@ -8,8 +8,7 @@
 | ID | US | Tâche | Estimation |
 |----|-----|-------|------------|
 | T-060-03 | US-060 | [BE] Taux d'occupation | 4h |
-| T-060-04 | US-060 | [BE] Ventilation par projet | 4h |
-| T-060-05 | US-060 | [FE-WEB] Dashboard par projet + occupation | 3h |
+| T-060-05 | US-060 | [FE-WEB] Dashboard : **occupation** (part par-projet livrée avec T-060-04) | 1h |
 | T-060-07 | US-060 | [TEST] Affectation, occupation, par-projet, SLA ≤ 15 min | 3h |
 | T-060-08 | US-060 | [REV] Revue de clôture | 1h |
 | T-068-01 | US-068 | [OPS] Mailer + reset-password-bundle | 2h |
@@ -45,6 +44,7 @@
 | T-068-04 | US-068 | [BE/FE-WEB] Changement de mot de passe (Argon2id, CSRF) + 8 tests `AuthWebTest` | 2026-09-04 |
 | T-060-02 | US-060 | [FE-WEB] Écran d'affectation profil↔collaborateur (POST-Redirect-Get + CSRF, `MANAGE_PRICING`) + 4 tests `ProfileAssignmentPageTest` | 2026-09-04 |
 | T-060-06 | US-060 | [BE] Projection `fact_project_revenue` post-validation (message async `AnalyticsRebuildRequested` → `ProjectAnalyticsHandler` → rebuild ; couvre aussi la re-valorisation CA-4) + 3 tests | 2026-09-04 |
+| T-060-04 | US-060 | [BE+FE-WEB] Ventilation par projet (join `time_entry_valuation ↔ time_entry`, DTO `ProjectValuationLine`, table dashboard + gating coût) + 2 tests | 2026-09-04 |
 
 ## 🚫 Bloqué
 | ID | US | Raison | Action |

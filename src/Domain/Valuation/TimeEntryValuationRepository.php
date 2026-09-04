@@ -34,4 +34,13 @@ interface TimeEntryValuationRepository
      * @return list<TimeEntryValuation>
      */
     public function findValued(TenantId $tenant, int $limit): array;
+
+    /**
+     * Ventilation par projet des valorisations abouties (US-060, T-060-04) : CA, coût et marge par
+     * projet, triés du CA décroissant. Le rattachement au projet passe par le join
+     * `time_entry_valuation ↔ time_entry` (le snapshot ne porte pas `project_id`).
+     *
+     * @return list<ProjectValuationLine>
+     */
+    public function projectBreakdownFor(TenantId $tenant): array;
 }
