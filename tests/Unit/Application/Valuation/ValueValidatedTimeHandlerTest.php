@@ -14,7 +14,9 @@ use App\Domain\Tenant\TenantId;
 use App\Domain\Timesheet\TimeEntry;
 use App\Domain\Valuation\TimeValuationCalculator;
 use App\Domain\Valuation\ValuationStatus;
+use App\Application\Analytics\Message\AnalyticsRebuildRequested;
 use App\Tests\Support\Analytics\InMemoryEventStore;
+use App\Tests\Support\Messaging\RecordingMessageBus;
 use App\Tests\Support\Pricing\InMemoryProfileAssignmentRepository;
 use App\Tests\Support\Pricing\InMemoryProfileRateRepository;
 use App\Tests\Support\Timesheet\InMemoryTimeEntryRepository;
@@ -39,6 +41,7 @@ final class ValueValidatedTimeHandlerTest extends TestCase
     private InMemoryProfileRateRepository $rates;
     private InMemoryTimeEntryValuationRepository $valuations;
     private InMemoryEventStore $events;
+    private RecordingMessageBus $bus;
     private ValueValidatedTimeHandler $handler;
 
     protected function setUp(): void
@@ -49,6 +52,7 @@ final class ValueValidatedTimeHandlerTest extends TestCase
         $this->rates = new InMemoryProfileRateRepository();
         $this->valuations = new InMemoryTimeEntryValuationRepository();
         $this->events = new InMemoryEventStore();
+        $this->bus = new RecordingMessageBus();
         $this->handler = new ValueValidatedTimeHandler(
             $this->entries,
             $this->assignments,
@@ -56,6 +60,7 @@ final class ValueValidatedTimeHandlerTest extends TestCase
             new TimeValuationCalculator(),
             $this->valuations,
             $this->events,
+            $this->bus,
         );
     }
 
@@ -136,6 +141,31 @@ final class ValueValidatedTimeHandlerTest extends TestCase
         $this->handle([$entryId]);
 
         self::assertSame([], $this->events->appended);
+    }
+
+    public function testValuedEntryRequestsAnalyticsRebuild(): void
+    {
+        $this->assignProfile();
+        $this->rates->save(new ProfileRate($this->tenant, self::PROFILE, EffectivePeriod::since($this->date('2026-01-01')), 45000, 78000));
+        $entryId = $this->saveEntry($this->date('2026-06-15'), 420);
+
+        $this->handle([$entryId]);
+
+        // Le CA reconnu → une demande de rematérialisation de fact_project_revenue (T-060-06).
+        self::assertCount(1, $this->bus->dispatched);
+        self::assertInstanceOf(AnalyticsRebuildRequested::class, $this->bus->dispatched[0]);
+        self::assertTrue($this->bus->dispatched[0]->tenantId()->equals($this->tenant));
+    }
+
+    public function testMissingRateRequestsNoRebuild(): void
+    {
+        $this->assignProfile();
+        // Rien de valorisé (aucun tarif) → aucune projection à rejouer.
+        $entryId = $this->saveEntry($this->date('2026-06-15'), 420);
+
+        $this->handle([$entryId]);
+
+        self::assertSame([], $this->bus->dispatched);
     }
 
     private function assignProfile(): void

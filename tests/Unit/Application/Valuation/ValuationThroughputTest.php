@@ -15,6 +15,7 @@ use App\Domain\Timesheet\TimeEntry;
 use App\Domain\Valuation\TimeValuationCalculator;
 use App\Domain\Valuation\ValuationStatus;
 use App\Tests\Support\Analytics\InMemoryEventStore;
+use App\Tests\Support\Messaging\RecordingMessageBus;
 use App\Tests\Support\Pricing\InMemoryProfileAssignmentRepository;
 use App\Tests\Support\Pricing\InMemoryProfileRateRepository;
 use App\Tests\Support\Timesheet\InMemoryTimeEntryRepository;
@@ -62,6 +63,7 @@ final class ValuationThroughputTest extends TestCase
             new TimeValuationCalculator(),
             $valuations,
             $events,
+            new RecordingMessageBus(),
         );
 
         $start = microtime(true);
