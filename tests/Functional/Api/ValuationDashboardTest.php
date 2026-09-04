@@ -48,7 +48,7 @@ final class ValuationDashboardTest extends WebTestCase
             $this->em->getClassMetadata(Tenant::class),
             $this->em->getClassMetadata(User::class),
             $this->em->getClassMetadata(Role::class),
-            // La ventilation par projet (T-060-04) joint time_entry ↔ project : les tables doivent exister.
+            // Ventilation par projet (T-060-04) et occupation (T-060-03) joignent time_entry ↔ project.
             $this->em->getClassMetadata(Project::class),
             $this->em->getClassMetadata(TimeEntry::class),
             $this->em->getClassMetadata(TimeEntryValuation::class),

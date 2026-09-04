@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Web;
 
 use App\Application\Authorization\InitializeDefaultRoles;
+use App\Domain\Absence\AbsenceRequest;
 use App\Domain\Authorization\Role;
 use App\Domain\Project\Project;
 use App\Domain\Tenant\Tenant;
@@ -50,6 +51,8 @@ final class ProjectValuationBreakdownTest extends WebTestCase
             $this->em->getClassMetadata(Project::class),
             $this->em->getClassMetadata(TimeEntry::class),
             $this->em->getClassMetadata(TimeEntryValuation::class),
+            // Le dashboard calcule aussi l'occupation (T-060-03) qui interroge absence_request.
+            $this->em->getClassMetadata(AbsenceRequest::class),
         ];
         $tool = new SchemaTool($this->em);
         $tool->dropSchema($this->schema);

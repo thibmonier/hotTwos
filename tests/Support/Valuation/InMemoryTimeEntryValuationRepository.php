@@ -10,6 +10,7 @@ use App\Domain\Valuation\TimeEntryValuation;
 use App\Domain\Valuation\TimeEntryValuationRepository;
 use App\Domain\Valuation\ValuationStatus;
 use App\Domain\Valuation\ValuationSummary;
+use DateTimeImmutable;
 
 final class InMemoryTimeEntryValuationRepository implements TimeEntryValuationRepository
 {
@@ -23,6 +24,12 @@ final class InMemoryTimeEntryValuationRepository implements TimeEntryValuationRe
      * @var list<ProjectValuationLine>
      */
     public array $projectBreakdown = [];
+
+    /** Occupation (T-060-03) : le rattachement date/collaborateur vit dans `time_entry` (hors fake). */
+    public ?DateTimeImmutable $latestValuedWorkDate = null;
+
+    /** @var array<string, int> userId => jours valorisés distincts, fixés par les tests. */
+    public array $valuedDayCountByUser = [];
 
     public function save(TimeEntryValuation $valuation): void
     {
@@ -94,5 +101,15 @@ final class InMemoryTimeEntryValuationRepository implements TimeEntryValuationRe
     public function projectBreakdownFor(TenantId $tenant): array
     {
         return $this->projectBreakdown;
+    }
+
+    public function latestValuedWorkDate(TenantId $tenant): ?DateTimeImmutable
+    {
+        return $this->latestValuedWorkDate;
+    }
+
+    public function valuedDayCountByUser(TenantId $tenant, DateTimeImmutable $from, DateTimeImmutable $to): array
+    {
+        return $this->valuedDayCountByUser;
     }
 }

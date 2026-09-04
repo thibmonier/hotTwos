@@ -147,6 +147,49 @@
         {% endif %}
     </section>
 
+    {# ── Occupation par collaborateur (US-060 T-060-03) ────────────────────── #}
+    <section aria-labelledby="occupation-heading" class="mb-6">
+        <h2 id="occupation-heading" class="mb-3 text-xs font-semibold uppercase tracking-wider text-muted">
+            Occupation par collaborateur{% if not occupation.rows is empty %} <span class="font-normal normal-case text-muted">— {{ occupation.month }}</span>{% endif %}
+        </h2>
+        {% if occupation.rows is empty %}
+            <p class="rounded-md border border-border bg-surface p-4 text-xs text-muted shadow-sm">
+                Aucune activité valorisée à mesurer pour l'instant.
+            </p>
+        {% else %}
+            <div class="overflow-x-auto rounded-md border border-border bg-surface shadow-sm">
+                <table class="w-full border-collapse text-left">
+                    <caption class="visually-hidden">Taux d'occupation par collaborateur sur {{ occupation.month }} (jours valorisés sur capacité)</caption>
+                    <thead>
+                        <tr class="bg-surface-alt text-xs">
+                            <th scope="col" class="px-4 py-3 font-semibold text-body">Collaborateur</th>
+                            <th scope="col" class="px-4 py-3 text-right font-semibold text-body">Jours valorisés</th>
+                            <th scope="col" class="px-4 py-3 text-right font-semibold text-body">Capacité (j)</th>
+                            <th scope="col" class="px-4 py-3 text-right font-semibold text-body">Occupation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in occupation.rows %}
+                            <tr class="border-t border-border text-xs">
+                                <td class="px-4 py-3 font-medium text-ink">{{ row.name }}</td>
+                                <td class="px-4 py-3 text-right tabular-nums text-body">{{ row.valuedDays }}</td>
+                                <td class="px-4 py-3 text-right tabular-nums text-body">{{ row.capacityDays }}</td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center justify-end gap-2">
+                                        <div class="h-2 w-24 overflow-hidden rounded-full bg-border" role="progressbar" aria-valuenow="{{ row.percent }}" aria-valuemin="0" aria-valuemax="100" aria-label="Occupation de {{ row.name }} : {{ row.percent }} %">
+                                            <div class="h-full rounded-full bg-primary" style="width:{{ row.percent }}%;"></div>
+                                        </div>
+                                        <span class="w-10 text-right tabular-nums font-medium text-ink">{{ row.percent }} %</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </section>
+
     {# ── Détail coût & marge — réservé DG / contrôle de gestion ─────────────── #}
     <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-muted">Détail des opérations</h2>
     {% if canViewCost %}

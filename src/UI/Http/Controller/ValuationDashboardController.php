@@ -5,8 +5,12 @@ declare(strict_types=1);
 namespace App\UI\Http\Controller;
 
 use App\Application\Authorization\Authorizer;
+use App\Application\Valuation\OccupationReport;
 use App\Domain\Authorization\Permission;
+use App\Domain\Tenant\TenantId;
 use App\Domain\User\User;
+use App\Domain\User\UserRepository;
+use App\Domain\Valuation\OccupationLine;
 use App\Domain\Valuation\TimeEntryValuation;
 use App\Domain\Valuation\TimeEntryValuationRepository;
 use DateTimeImmutable;
@@ -35,6 +39,8 @@ final class ValuationDashboardController extends AbstractController
         private readonly Authorizer $authorizer,
         private readonly TimeEntryValuationRepository $valuations,
         private readonly ClockInterface $clock,
+        private readonly OccupationReport $occupation,
+        private readonly UserRepository $users,
     ) {
     }
 
@@ -69,10 +75,38 @@ final class ValuationDashboardController extends AbstractController
         return $this->render('valuation/index.html.twig', [
             'summary' => $summary,
             'projectBreakdown' => $projectBreakdown,
+            'occupation' => $this->occupationView($tenant),
             'freshnessMinutes' => $this->freshnessMinutes($summary->lastValuedAt),
             'canViewCost' => $canViewCost,
             'auditTrail' => $auditTrail,
         ]);
+    }
+
+    /**
+     * Occupation par collaborateur (T-060-03), avec nom d'affichage résolu (US-067).
+     *
+     * @return array{month: string, rows: list<array{name: string, valuedDays: int, capacityDays: int, percent: int}>}
+     */
+    private function occupationView(TenantId $tenant): array
+    {
+        $overview = $this->occupation->forTenant($tenant);
+        $names = $this->users->findDisplayNamesByIds(
+            $tenant,
+            array_map(static fn (OccupationLine $line): string => $line->userId, $overview->lines),
+        );
+
+        return [
+            'month' => $overview->referenceMonth,
+            'rows' => array_map(
+                static fn (OccupationLine $line): array => [
+                    'name' => $names[$line->userId] ?? $line->userId,
+                    'valuedDays' => $line->valuedDays,
+                    'capacityDays' => $line->capacityDays,
+                    'percent' => $line->percent(),
+                ],
+                $overview->lines,
+            ),
+        ];
     }
 
     private function freshnessMinutes(?DateTimeImmutable $lastValuedAt): ?int
