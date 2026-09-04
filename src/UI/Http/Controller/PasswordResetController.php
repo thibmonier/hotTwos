@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\UI\Http\Controller;
 
+use App\Application\User\PasswordPolicy;
 use App\Application\User\PasswordResetMailer;
 use App\Domain\User\User;
 use App\Domain\User\UserRepository;
@@ -31,10 +32,6 @@ final class PasswordResetController extends AbstractController
 {
     use ResetPasswordControllerTrait;
 
-    private const int MIN_PASSWORD_LENGTH = 12;
-    /** Borne haute : au-delà, le hasher Symfony lève (mishandling exceptional conditions, règle 11 §7). */
-    private const int MAX_PASSWORD_LENGTH = 128;
-
     public function __construct(
         private readonly ResetPasswordHelperInterface $resetPasswordHelper,
         private readonly UserRepository $users,
@@ -42,6 +39,7 @@ final class PasswordResetController extends AbstractController
         private readonly UserPasswordHasherInterface $hasher,
         private readonly EntityManagerInterface $em,
         private readonly RateLimiterFactoryInterface $passwordResetRequestLimiter,
+        private readonly PasswordPolicy $passwordPolicy,
     ) {
     }
 
@@ -146,8 +144,8 @@ final class PasswordResetController extends AbstractController
         $new = (string) $request->request->get('new_password');
         $confirm = (string) $request->request->get('confirm_password');
 
-        if (mb_strlen($new) < self::MIN_PASSWORD_LENGTH || mb_strlen($new) > self::MAX_PASSWORD_LENGTH) {
-            $this->addFlash('error', sprintf('Le mot de passe doit contenir entre %d et %d caractères.', self::MIN_PASSWORD_LENGTH, self::MAX_PASSWORD_LENGTH));
+        if (null !== ($violation = $this->passwordPolicy->violation($new))) {
+            $this->addFlash('error', $violation);
 
             return $this->render('security/reset_password.html.twig');
         }

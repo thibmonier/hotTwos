@@ -7,7 +7,7 @@
 
 | ID | US | Tâche | Estimation |
 |----|-----|-------|------------|
-| T-068-11 | US-068 | [OPS] `NotCompromisedPassword` (reset + Mon compte) — **différé** : dépendance HTTP externe runtime (HaveIBeenPwned) à cadrer (cache, fail-open, mock en test) + `symfony/validator` | 2h |
+| _(aucune — sprint complet, hors cérémonies review/rétro)_ | | | |
 
 ## 🔄 En Cours
 | ID | US | Tâche | Démarré |
@@ -48,6 +48,7 @@
 | T-068-09 | US-068 | [REV] Revue sécurité `security-auditor` : **sain, aucun bloquant** ; corrigés : e-mail async (anti-énumération timing), borne haute + garde format ; différés → T-068-10/11 | 2026-09-04 |
 | T-068-10 | US-068 | [OPS] Durcissement auth : rate limiting `login_throttling` (2 pare-feux) + limiteur IP `/mot-de-passe-oublie` (symfony/rate-limiter) + test régression invalidation des sessions au changement de mot de passe | 2026-09-04 |
 | T-060-09 | US-060 | [OPS] Perf analytique : index `idx_time_entry_project` (migration) + coalescence du rebuild (`AnalyticsRebuildScheduler`, drapeau cache par tenant, acquitté au début du rebuild) + 3 tests | 2026-09-04 |
+| T-068-11 | US-068 | [OPS] `NotCompromisedPassword` (HIBP k-anonymity, fail-open) via `PasswordPolicy` partagé (reset + Mon compte) ; désactivé en env test ; symfony/validator + http-client + 4 tests | 2026-09-04 |
 
 ## 🚫 Bloqué
 | ID | US | Raison | Action |

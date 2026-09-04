@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\UI\Http\Controller;
 
+use App\Application\User\PasswordPolicy;
 use App\Domain\User\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,11 +22,10 @@ use InvalidArgumentException;
  */
 final class AccountController extends AbstractController
 {
-    private const int MIN_PASSWORD_LENGTH = 12;
-
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly UserPasswordHasherInterface $hasher,
+        private readonly PasswordPolicy $passwordPolicy,
     ) {
     }
 
@@ -80,8 +80,8 @@ final class AccountController extends AbstractController
 
             return $this->redirectToRoute('account');
         }
-        if (mb_strlen($new) < self::MIN_PASSWORD_LENGTH) {
-            $this->addFlash('error', sprintf('Le nouveau mot de passe doit contenir au moins %d caractères.', self::MIN_PASSWORD_LENGTH));
+        if (null !== ($violation = $this->passwordPolicy->violation($new))) {
+            $this->addFlash('error', $violation);
 
             return $this->redirectToRoute('account');
         }
