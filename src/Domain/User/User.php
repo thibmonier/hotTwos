@@ -144,6 +144,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TenantO
         return $this->password;
     }
 
+    /**
+     * Remplace le mot de passe (déjà haché en Argon2id par l'appelant — US-068, jamais de clair ici).
+     */
+    public function changePassword(string $hashedPassword): void
+    {
+        if ('' === $hashedPassword) {
+            throw new InvalidArgumentException('Le mot de passe haché ne peut pas être vide.');
+        }
+
+        $this->password = $hashedPassword;
+    }
+
     public function eraseCredentials(): void
     {
     }

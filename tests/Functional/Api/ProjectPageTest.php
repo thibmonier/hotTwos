@@ -79,7 +79,8 @@ final class ProjectPageTest extends WebTestCase
     public function testUnauthenticatedIsRejected(): void
     {
         $this->client->request('GET', '/projets');
-        self::assertResponseStatusCodeSame(401);
+        // US-068 : route web → redirection vers la page de connexion (plus de 401 web).
+        self::assertResponseRedirects('/login');
     }
 
     public function testCollaboratorSeesListWithoutCreate(): void

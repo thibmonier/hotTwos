@@ -16,15 +16,33 @@ security:
         dev:
             pattern: ^/(_profiler|_wdt|assets|build)/
             security: false
-        main:
+        # API : authentification JSON. Sans point d'entrée web → 401 pour les non-authentifiés (US-002).
+        api:
+            pattern: ^/api
             lazy: true
             provider: app_users
+            # Contexte de session partagé avec le pare-feu web : une session vaut pour l'API et le web
+            # (comportement historique du pare-feu unique) ; seuls les points d'entrée diffèrent (401 vs /login).
+            context: main
             json_login:
                 check_path: api_login
                 username_path: email
                 password_path: password
             logout:
                 path: api_logout
+        # Web : authentification par formulaire, redirection vers /login pour les non-authentifiés (US-068).
+        main:
+            lazy: true
+            provider: app_users
+            form_login:
+                login_path: login
+                check_path: login
+                enable_csrf: true
+                default_target_path: home
+            logout:
+                path: app_logout
+                target: login
+                enable_csrf: true
 
     access_control:
         # /api/me exige un utilisateur authentifié (dont le tenant est alors résolu).
@@ -69,6 +87,8 @@ security:
         - { path: ^/api/activity-summary, roles: ROLE_USER }
         # Projets US-030+ : authentifié ; les habilitations (VIEW/CREATE/EDIT_PROJECT) sont applicatives.
         - { path: ^/projets, roles: ROLE_USER }
+        # Mon compte US-067/US-068 : l'utilisateur gère son propre profil et mot de passe.
+        - { path: ^/mon-compte, roles: ROLE_USER }
 
 when@test:
     security:
