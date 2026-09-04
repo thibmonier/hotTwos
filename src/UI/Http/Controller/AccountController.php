@@ -36,7 +36,7 @@ final class AccountController extends AbstractController
     }
 
     #[Route('/mon-compte/profil', name: 'account_profile', methods: ['POST'])]
-    public function updateProfile(#[CurrentUser] User $user, Request $request): Response
+    public function updateProfile(#[CurrentUser] User $user, Request $request): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         if (!$this->isCsrfTokenValid('account_profile', (string) $request->request->get('_csrf_token'))) {
             $this->addFlash('error', 'Jeton de sécurité invalide, veuillez réessayer.');
@@ -62,7 +62,7 @@ final class AccountController extends AbstractController
     }
 
     #[Route('/mon-compte/mot-de-passe', name: 'account_password', methods: ['POST'])]
-    public function changePassword(#[CurrentUser] User $user, Request $request): Response
+    public function changePassword(#[CurrentUser] User $user, Request $request): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         if (!$this->isCsrfTokenValid('account_password', (string) $request->request->get('_csrf_token'))) {
             $this->addFlash('error', 'Jeton de sécurité invalide, veuillez réessayer.');

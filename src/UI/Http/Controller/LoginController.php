@@ -20,13 +20,13 @@ final class LoginController extends AbstractController
     #[Route('/login', name: 'login', methods: ['GET', 'POST'])]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
-        if (null !== $this->getUser()) {
+        if ($this->getUser() instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             return $this->redirectToRoute('home');
         }
 
         return $this->render('security/login.html.twig', [
             'last_username' => $authenticationUtils->getLastUsername(),
-            'has_error' => null !== $authenticationUtils->getLastAuthenticationError(),
+            'has_error' => $authenticationUtils->getLastAuthenticationError() instanceof \Symfony\Component\Security\Core\Exception\AuthenticationException,
         ]);
     }
 
