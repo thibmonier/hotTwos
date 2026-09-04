@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Valuation;
 
+use App\Application\Analytics\Message\AnalyticsRebuildRequested;
 use App\Application\Timesheet\Message\TimeEntriesValidated;
 use App\Domain\Analytics\EventStore;
 use App\Domain\Analytics\RevenueRecognized;
@@ -19,6 +20,7 @@ use App\Domain\Valuation\TimeValuationCalculator;
 use App\Domain\Valuation\ValuationStatus;
 use DateTimeImmutable;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
  * Valorisation asynchrone des temps validés (US-060, T-060-02).
@@ -43,6 +45,7 @@ final readonly class ValueValidatedTimeHandler
         private TimeValuationCalculator $calculator,
         private TimeEntryValuationRepository $valuations,
         private EventStore $events,
+        private MessageBusInterface $bus,
     ) {
     }
 
@@ -51,10 +54,17 @@ final readonly class ValueValidatedTimeHandler
         $tenant = $message->tenantId();
         $validatedAt = $message->validatedAt();
 
+        $recognizedRevenue = false;
         foreach ($this->entries->findByIds($tenant, $message->timeEntryIds()) as $entry) {
             $valuation = $this->value($tenant, $entry, $validatedAt);
             $this->valuations->save($valuation);
-            $this->recognizeRevenue($tenant, $entry, $valuation, $validatedAt);
+            $recognizedRevenue = $this->recognizeRevenue($tenant, $entry, $valuation, $validatedAt) || $recognizedRevenue;
+        }
+
+        // Rematérialise fact_project_revenue (T-060-06) une fois le CA reconnu : projection async
+        // (rejeu par le projecteur), consommée après le commit de ce message → événements visibles.
+        if ($recognizedRevenue) {
+            $this->bus->dispatch(new AnalyticsRebuildRequested($tenant->toString()));
         }
     }
 
@@ -68,9 +78,9 @@ final readonly class ValueValidatedTimeHandler
         TimeEntry $entry,
         TimeEntryValuation $valuation,
         DateTimeImmutable $occurredAt,
-    ): void {
+    ): bool {
         if (ValuationStatus::VALUED !== $valuation->status()) {
-            return;
+            return false;
         }
 
         $this->events->append(new RevenueRecognized(
@@ -81,6 +91,8 @@ final readonly class ValueValidatedTimeHandler
             $occurredAt,
             $entry->id(),
         ));
+
+        return true;
     }
 
     private function value(TenantId $tenant, TimeEntry $entry, DateTimeImmutable $validatedAt): TimeEntryValuation

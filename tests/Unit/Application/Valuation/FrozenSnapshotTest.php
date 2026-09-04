@@ -58,6 +58,8 @@ final class FrozenSnapshotTest extends TestCase
         $this->events = new InMemoryEventStore();
         $this->bus = new RecordingMessageBus();
 
+        // Bus dédié au handler de valorisation : ses demandes de rebuild analytique (T-060-06) ne
+        // doivent pas polluer $this->bus, qui observe le re-déclenchement CA-4.
         $this->value = new ValueValidatedTimeHandler(
             $this->entries,
             $this->assignments,
@@ -65,6 +67,7 @@ final class FrozenSnapshotTest extends TestCase
             new TimeValuationCalculator(),
             $this->valuations,
             $this->events,
+            new RecordingMessageBus(),
         );
         $this->revalue = new RevalueOnRateDefinedHandler(
             $this->valuations,
