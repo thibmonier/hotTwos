@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\UI\Http\Controller;
 
 use App\Application\Authorization\Authorizer;
+use App\Application\Budget\ViewProjectBudgetTracking;
 use App\Application\Project\ChangeProjectStatus;
 use App\Application\Project\CreateProject;
 use App\Domain\Authorization\Permission;
@@ -51,6 +52,7 @@ final class ProjectPageController extends AbstractController
         private readonly ExceptionalImputationOpeningRepository $openings,
         private readonly ExternalCommitmentRepository $commitments,
         private readonly ProjectReopeningRepository $reopenings,
+        private readonly ViewProjectBudgetTracking $budgetTracking,
     ) {
     }
 
@@ -128,8 +130,14 @@ final class ProjectPageController extends AbstractController
             throw $this->createNotFoundException('Projet introuvable.');
         }
 
+        // Suivi budgétaire (US-072) : réservé aux rôles finance/direction (HAB-1) ; le read service
+        // applique lui-même le gating fin (coût/marge/dérive conditionnés à VIEW_COLLABORATOR_COST).
+        $canViewFinancials = $this->authorizer->can($user, Permission::VIEW_PROJECT_FINANCIALS);
+
         return $this->render('project/show.html.twig', [
             'project' => $this->row($project),
+            'canViewFinancials' => $canViewFinancials,
+            'budgetTracking' => $canViewFinancials ? $this->budgetTracking->forProject($user, $project->id()) : null,
             'transitions' => array_map(
                 static fn (ProjectStatus $s): array => ['value' => $s->value, 'label' => $s->label()],
                 $project->status()->allowedTransitions(),
