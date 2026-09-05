@@ -4,7 +4,7 @@
 - **ID**: US-072
 - **EPIC**: EPIC-005 (Finance & rentabilité)
 - **Sprint**: Sprint 9
-- **Statut**: 🔴 To Do
+- **Statut**: ✅ Done (branche `feature/us-072-budget-derive`, revue approuvée, `make ci` vert)
 - **Points**: 5
 - **Persona**: P2 (Marc — chef de projet), P6 (Directeur financier)
 - **Créé le**: 2026-09-04
@@ -79,11 +79,22 @@ THEN le réalisé valorisé (coût, CA, marge) est affiché normalement
 
 | ID | Type | Description | Statut | Estimation |
 |----|------|-------------|--------|------------|
-| - | - | À décomposer (`/project:decompose-tasks 009`) | 🔴 | - |
+| T-072-01 | [BE] | `BudgetTrackingCalculator` (écarts, consommation, dérive) | ✅ | 3h |
+| T-072-02 | [BE] | Dérive marge + seuil paramétrable (`MarginDriftThresholdProvider`) | ✅ | 2h |
+| T-072-03 | [FE-WEB] | Onglet « Suivi budgétaire » fiche projet (a11y, gating) | ✅ | 3h |
+| T-072-04 | [TEST] | Comparaison, alerte seuil, sans budget (CA-4), gating | ✅ | 2h |
+| T-072-05 | [REV] | Revue de clôture (`symfony-reviewer`) | ✅ | 1h |
 
 ## Progression
 
-0/0 tasks complétées (0%)
+5/5 tasks complétées (100%) — revue approuvée
+
+## Note de périmètre (décision PO 2026-09-04)
+
+Le modèle ne portait qu'un budget de charge (`Project.budget_cents`). Sur décision PO, ajout d'un
+**CA cible** (`revenue_budget_cents`, nullable) pour couvrir CA-1/CA-2 (coût + CA + marge cible).
+La **marge cible** est dérivée (CA cible − coût cible) via `MarginCalculator` — non stockée (ARC-6).
+Le réalisé est la **valorisation à date** (avant clôture), pour permettre de réagir tôt.
 
 ## Definition of Done
 
