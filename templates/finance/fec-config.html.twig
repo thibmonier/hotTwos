@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Configuration FEC{% endblock %}
+{% block page_section %}Finance &amp; rentabilité{% endblock %}
+{% block page_title %}Configuration comptable (export FEC){% endblock %}
+
+{% block body %}
+    <h1 class="visually-hidden">configuration comptable FEC</h1>
+
+    <p class="mb-4 max-w-2xl text-sm text-muted">
+        SIREN et mapping des comptes utilisés pour dériver les écritures FEC (produit, tiers, charge,
+        contrepartie). Prérequis de l'export FEC (US-074).
+    </p>
+
+    <form method="post" action="{{ path('fec_config_save') }}" class="max-w-2xl">
+        <input type="hidden" name="_token" value="{{ csrf_token('fec_config') }}">
+
+        {% set fields = [
+            {n:'siren', l:'SIREN (9 chiffres)', v: config ? config.siren : ''},
+            {n:'journalCode', l:'Code journal', v: config ? config.journalCode : 'VT'},
+            {n:'journalLib', l:'Libellé journal', v: config ? config.journalLib : 'Ventes'},
+            {n:'revenueAccountNum', l:'Compte produit (n°)', v: config ? config.revenueAccountNum : '706000'},
+            {n:'revenueAccountLib', l:'Compte produit (libellé)', v: config ? config.revenueAccountLib : 'Prestations de services'},
+            {n:'receivableAccountNum', l:'Compte tiers/client (n°)', v: config ? config.receivableAccountNum : '411000'},
+            {n:'receivableAccountLib', l:'Compte tiers/client (libellé)', v: config ? config.receivableAccountLib : 'Clients'},
+            {n:'costAccountNum', l:'Compte charge (n°)', v: config ? config.costAccountNum : '641000'},
+            {n:'costAccountLib', l:'Compte charge (libellé)', v: config ? config.costAccountLib : 'Rémunérations'},
+            {n:'costCounterpartAccountNum', l:'Compte contrepartie charge (n°)', v: config ? config.costCounterpartAccountNum : '791000'},
+            {n:'costCounterpartAccountLib', l:'Compte contrepartie charge (libellé)', v: config ? config.costCounterpartAccountLib : 'Transferts de charges'}
+        ] %}
+
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {% for f in fields %}
+                <div>
+                    <label for="fec-{{ f.n }}" class="mb-1 block text-[13px] font-medium text-ink">{{ f.l }}</label>
+                    <input id="fec-{{ f.n }}" name="{{ f.n }}" value="{{ f.v }}" required
+                           class="min-h-10 w-full rounded border border-border-strong bg-surface px-3 text-sm text-ink">
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="mt-5 flex gap-2">
+            <button type="submit" class="min-h-10 rounded bg-primary px-4 text-sm font-semibold text-white hover:bg-primary/90">Enregistrer</button>
+            <a href="{{ path('finance_dashboard') }}" class="min-h-10 inline-flex items-center rounded border border-border-strong px-4 text-sm text-muted hover:text-ink">Retour</a>
+        </div>
+    </form>
+{% endblock %}
