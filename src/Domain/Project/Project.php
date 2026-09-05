@@ -225,6 +225,21 @@ class Project implements TenantOwned
         return $this->revenueBudgetCents;
     }
 
+    /** Définit (ou efface) le budget de charge cible (US-072 / seed). `null` efface ; sinon > 0. */
+    public function defineBudget(?int $budgetCents): void
+    {
+        if (null !== $budgetCents && $budgetCents <= 0) {
+            throw new ProjectException('Le budget de charge, s\'il est défini, doit être strictement positif.');
+        }
+        $this->budgetCents = $budgetCents;
+    }
+
+    /** Rattache le projet à un client (dimension finance US-073 / seed). */
+    public function defineClient(?string $clientName): void
+    {
+        $this->clientName = null !== $clientName && '' !== trim($clientName) ? trim($clientName) : null;
+    }
+
     /**
      * Définit (ou efface) le CA cible prévisionnel (US-072). Planning financier : autorisé quel que
      * soit le statut. `null` efface la cible ; une valeur doit être strictement positive.

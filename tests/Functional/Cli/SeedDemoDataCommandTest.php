@@ -11,6 +11,9 @@ use App\Domain\Authorization\Role;
 use App\Domain\Pricing\Profile;
 use App\Domain\Pricing\ProfileAssignment;
 use App\Domain\Pricing\ProfileRate;
+use App\Domain\Period\AccountingPeriod;
+use App\Domain\Fec\FecConfiguration;
+use App\Domain\Margin\ProjectMargin;
 use App\Domain\Project\Project;
 use App\Domain\Reminder\ReminderRule;
 use App\Domain\Tenant\Tenant;
@@ -43,7 +46,7 @@ final class SeedDemoDataCommandTest extends KernelTestCase
 
         $this->schema = array_map(
             $this->em->getClassMetadata(...),
-            [Tenant::class, User::class, Role::class, Project::class, TimeEntry::class, AbsenceType::class, AbsenceRequest::class, ReminderRule::class, Profile::class, ProfileRate::class, ProfileAssignment::class, TimeEntryValuation::class, StoredEvent::class],
+            [Tenant::class, User::class, Role::class, Project::class, TimeEntry::class, AbsenceType::class, AbsenceRequest::class, ReminderRule::class, Profile::class, ProfileRate::class, ProfileAssignment::class, TimeEntryValuation::class, StoredEvent::class, AccountingPeriod::class, FecConfiguration::class, ProjectMargin::class],
         );
         $tool = new SchemaTool($this->em);
         $tool->dropSchema($this->schema);
@@ -66,7 +69,7 @@ final class SeedDemoDataCommandTest extends KernelTestCase
         self::assertSame(0, $exitCode);
         $this->em->clear();
 
-        self::assertSame(3, $this->entityCount(User::class), 'Trois utilisateurs de démo (collaborateur, chef de projet, admin).');
+        self::assertSame(4, $this->entityCount(User::class), 'Quatre utilisateurs de démo (collaborateur, chef de projet, dirigeant, admin).');
         self::assertSame(1, $this->entityCount(ReminderRule::class), 'Une règle de relance par tenant.');
         self::assertSame(1, $this->entityCount(AbsenceRequest::class), 'Une absence validée.');
         self::assertGreaterThanOrEqual(8, $this->entityCount(TimeEntry::class), 'Des imputations sur plusieurs semaines.');
