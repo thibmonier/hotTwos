@@ -6,6 +6,7 @@ namespace App\Tests\Functional\Web;
 
 use App\Application\Authorization\InitializeDefaultRoles;
 use App\Domain\Authorization\Role;
+use App\Domain\Budget\MarginDriftThreshold;
 use App\Domain\Margin\ProjectMargin;
 use App\Domain\Project\ContractType;
 use App\Domain\Project\Project;
@@ -48,6 +49,7 @@ final class FinanceDashboardTest extends WebTestCase
             $this->em->getClassMetadata(Role::class),
             $this->em->getClassMetadata(Project::class),
             $this->em->getClassMetadata(ProjectMargin::class),
+            $this->em->getClassMetadata(MarginDriftThreshold::class),
         ];
         $tool = new SchemaTool($this->em);
         $tool->dropSchema($this->schema);

@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Seuil de dérive{% endblock %}
+{% block page_section %}Finance &amp; rentabilité{% endblock %}
+{% block page_title %}Seuil d'alerte de dérive de marge{% endblock %}
+
+{% block body %}
+    <h1 class="visually-hidden">seuil de dérive de marge</h1>
+
+    <p class="mb-4 max-w-xl text-sm text-muted">
+        Seuil (en points de taux de marge) au-delà duquel un projet est signalé « en dérive »
+        (suivi budgétaire US-072, dashboard finance US-073). À défaut, la valeur de référence est
+        {{ default }} points (OBJ-6).
+    </p>
+
+    <form method="post" action="{{ path('margin_drift_config_save') }}" class="max-w-sm">
+        <input type="hidden" name="_token" value="{{ csrf_token('margin_drift_config') }}">
+        <label for="points" class="mb-1 block text-[13px] font-medium text-ink">Seuil (points, 0–100)</label>
+        <input id="points" name="points" type="number" min="0" max="100" required
+               value="{{ threshold ? threshold.points : default }}"
+               class="min-h-10 w-full rounded border border-border-strong bg-surface px-3 text-sm text-ink">
+        <div class="mt-4 flex gap-2">
+            <button type="submit" class="min-h-10 rounded bg-primary px-4 text-sm font-semibold text-white hover:bg-primary/90">Enregistrer</button>
+            <a href="{{ path('finance_dashboard') }}" class="min-h-10 inline-flex items-center rounded border border-border-strong px-4 text-sm text-muted hover:text-ink">Retour</a>
+        </div>
+    </form>
+{% endblock %}

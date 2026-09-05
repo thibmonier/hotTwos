@@ -15,5 +15,8 @@ use App\Domain\Tenant\TenantId;
  */
 interface MarginDriftThresholdProvider
 {
+    /** Valeur de référence du seuil de dérive (points) — OBJ-6, à défaut de configuration tenant. */
+    public const float DEFAULT_POINTS = 5.0;
+
     public function pointsFor(TenantId $tenant): float;
 }

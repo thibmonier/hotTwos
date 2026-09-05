@@ -18,6 +18,7 @@ use App\Domain\Tenant\Tenant;
 use App\Domain\Tenant\TenantId;
 use App\Domain\Timesheet\TimeEntry;
 use App\Domain\User\User;
+use App\Domain\Budget\MarginDriftThreshold;
 use App\Domain\Valuation\TimeEntryValuation;
 use App\Infrastructure\Persistence\Doctrine\DoctrineProjectRepository;
 use App\Infrastructure\Persistence\Doctrine\DoctrineRoleRepository;
@@ -59,6 +60,7 @@ final class ProjectPageTest extends WebTestCase
             // US-072 : la fiche projet expose le suivi budgétaire (join valorisation) aux rôles finance.
             $this->em->getClassMetadata(TimeEntry::class),
             $this->em->getClassMetadata(TimeEntryValuation::class),
+            $this->em->getClassMetadata(MarginDriftThreshold::class),
         ];
         $tool = new SchemaTool($this->em);
         $tool->dropSchema($this->schema);

@@ -14,7 +14,8 @@ use App\Domain\Tenant\TenantId;
  */
 final readonly class DefaultMarginDriftThresholdProvider implements MarginDriftThresholdProvider
 {
-    public const float DEFAULT_POINTS = 5.0;
+    /** Alias de la constante du port (source unique de vérité) — conservé pour compat des appelants. */
+    public const float DEFAULT_POINTS = MarginDriftThresholdProvider::DEFAULT_POINTS;
 
     public function pointsFor(TenantId $tenant): float
     {
