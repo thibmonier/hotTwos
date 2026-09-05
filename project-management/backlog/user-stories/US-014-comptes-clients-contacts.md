@@ -3,9 +3,10 @@
 ## Métadonnées
 - **ID**: US-014
 - **EPIC**: EPIC-001
-- **Sprint**: Sprint 2
-- **Statut**: 🔴 To Do
-- **Points**: 3
+- **Sprint**: Sprint 11 (tranche minimale)
+- **Statut**: 🟢 Ready (tranche S11 minimale affinée — voir note de périmètre)
+- **Points**: 5 *(tranche S11 : entité + rattachement projet ; hiérarchie/contacts/recherche = tranche ultérieure)*
+- **Note de périmètre S11 (ADR-0022)**: prérequis de la facturation → **entité `Client` par tenant (nom, SIREN optionnel) + rattachement `Project → Client`**. **Hors S11** (tranche ultérieure) : hiérarchie groupe/filiale, contacts (rôle/statut), recherche avancée, migration des ventilations finance de `Project.clientName` vers `Client`. Les CA-1/CA-2/CA-3 ci-dessous décrivent la **cible complète**.
 - **Persona**: ADMIN / P4 Yann (Commercial)
 - **Créé le**: 2026-08-31
 - **Mis à jour**: 2026-08-31

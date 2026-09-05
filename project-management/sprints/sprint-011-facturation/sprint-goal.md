@@ -34,26 +34,29 @@
 - [ ] Gating HAB-1 (montants sensibles) · **ADR** superséder 0020 (facturé réel > proxy)
 - [ ] Recette navigateur sur données peuplées (seed enrichi facturation) tracée dans `.recette/`
 
-## Sprint Backlog (candidat — à AFFINER : nouvelles US + spike/ADR)
+## Sprint Backlog (affiné — décisions PO 2026-09-05, ADR-0022)
 
-| Priorité | ID (à créer) | Titre | Points (est.) | Statut |
-|----------|--------------|-------|---------------|--------|
-| 🔴 Must | T-SPIKE / ADR | Spike modélisation facturation + **ADR superséder 0020** (facture, échéance, source de revenu) | 2 | 🔵 À faire (préambule) |
-| 🔴 Must | US-075 | Émission de **factures par projet/période** (modèle `Invoice`, montant, statut, RLS) | 8 | 🔵 À affiner |
-| 🔴 Must | US-076 | Brancher le **facturé réel comme source de marge** (port « source de revenu », repli CA reconnu) | 5 | 🔵 À affiner |
-| 🟡 Should | US-077 | Export **FEC sur facturé réel** (le `FecGenerator` prend le facturé réel en entrée) | 5 | 🔵 À affiner |
+> **Décisions PO** : (1) facturation **minimale, émission manuelle** (échéances/encaissement en tranche
+> ultérieure) ; (2) **client structuré d'abord** (US-014 tranche minimale, prérequis d'US-075).
+> Cadrage acté en **[ADR-0022](../../../docs/adr/0022-facturation-minimale-facture-reel.md)** (supersede 0020).
+
+| Priorité | ID | Titre | Points | Statut |
+|----------|-----|-------|--------|--------|
+| ✅ | ADR-0022 | Cadrage facturation minimale + facturé réel > proxy (préambule) | — | ✅ Fait |
+| 🔴 Must | US-014 | **Client structuré (tranche minimale)** : entité `Client` + rattachement projet | 5 | 🟢 Ready |
+| 🔴 Must | US-075 | Émission **manuelle** de factures par projet/période (`Invoice`, RLS) | 8 | 🟢 Ready |
+| 🔴 Must | US-076 | **Facturé réel comme source de marge** (port « source de revenu », repli CA reconnu) | 5 | 🟢 Ready |
+| 🟡 Should | US-077 | Export **FEC sur facturé réel** | 5 | 🟢 Ready |
 | 🟢 Could | R-01 | Correctif onglet « Suivi budgétaire » (1er clic) | — (dette) | 🔵 À faire |
 
-**Engagement pressenti (Must)** : spike/ADR + US-075 (8) + US-076 (5) ≈ **13 pts** + le préambule. US-077
-(Should, 5) si capacité. R-01 (Could, quick-win). Total Must ~13-15 pts (marge de sécurité sur un chantier
-de modélisation).
+**Engagement (Must) : US-014 (5) + US-075 (8) + US-076 (5) = 18 pts** (capacité ~22). US-077 (Should, 5)
+si capacité ; R-01 (Could, quick-win). Ordre : **US-014 → US-075 → US-076 → US-077**.
 
 ### Notes de préparation (Definition of Ready)
-- **Aucune de ces US n'existe encore** : les créer (`/project:add-story EPIC-005 …`) et les affiner avant engagement.
-- **Décision structurante** : périmètre « facturation minimale » (émission manuelle vs dérivée du CA reconnu ;
-  échéances/encaissement dans le scope ou tranche ultérieure) — à trancher au **spike/Planning P1**.
-- **Réutilisation** : le seam « source de revenu » est déjà anticipé (ADR-0020/0021 mentionnent le raccord
-  « facturé réel » sans réécrire le moteur). `MarginCalculator` / `FecGenerator` restent inchangés.
+- **US-014, US-075, US-076, US-077 sont Ready** (affinées le 2026-09-05). US-014 est **cadrée à sa tranche
+  minimale** (entité + rattachement projet ; hiérarchie/contacts/recherche = tranche ultérieure).
+- **Réutilisation** : le seam « source de revenu » est anticipé (ADR-0020/0021) → `MarginCalculator` et
+  `FecGenerator` **inchangés** (ARC-6) ; US-076 matérialise le port et bascule la règle vers le facturé réel.
 
 ## Dépendances
 
