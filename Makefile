@@ -71,6 +71,9 @@ test: ## Lance la suite de tests (config dist, déterministe / miroir CI)
 deptrac: ## Vérifie les frontières d'architecture
 	$(APP) php vendor/bin/deptrac analyse
 
+cache-dev: ## Vide puis réamorce le cache dev (évite le faux désync schema:validate / l'échec PHPStan après cache:clear — T-TECH-03)
+	$(APP) sh -lc 'php bin/console cache:clear >/dev/null && APP_DEBUG=1 php bin/console cache:warmup'
+
 analyse: ## Analyse statique PHPStan niveau max
 	$(APP) php vendor/bin/phpstan analyse --memory-limit=1G
 
