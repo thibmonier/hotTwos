@@ -69,6 +69,9 @@ class Project implements TenantOwned
         /** CA cible prévisionnel (US-072, EF-FIN) — enveloppe de revenu, en centimes. Optionnel. */
         #[ORM\Column(name: 'revenue_budget_cents', type: 'integer', nullable: true)]
         private ?int $revenueBudgetCents = null,
+        /** Rattachement au compte client structuré (US-014). Optionnel — coexiste avec clientName. */
+        #[ORM\Column(name: 'client_id', type: 'guid', nullable: true)]
+        private ?string $clientId = null,
     ) {
         if ('' === $code) {
             throw new InvalidArgumentException('Le code projet ne peut pas être vide.');
@@ -238,6 +241,17 @@ class Project implements TenantOwned
     public function defineClient(?string $clientName): void
     {
         $this->clientName = null !== $clientName && '' !== trim($clientName) ? trim($clientName) : null;
+    }
+
+    public function clientId(): ?string
+    {
+        return $this->clientId;
+    }
+
+    /** Rattache le projet à un compte client structuré (US-014). `null` détache. */
+    public function attachClient(?string $clientId): void
+    {
+        $this->clientId = null !== $clientId && '' !== trim($clientId) ? trim($clientId) : null;
     }
 
     /**

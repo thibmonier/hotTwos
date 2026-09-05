@@ -9,6 +9,8 @@ use App\Application\Budget\ViewProjectBudgetTracking;
 use App\Application\Project\ChangeProjectStatus;
 use App\Application\Project\CreateProject;
 use App\Domain\Authorization\Permission;
+use App\Domain\Client\Client;
+use App\Domain\Client\ClientRepository;
 use App\Domain\Project\ContractType;
 use App\Domain\Project\Project;
 use App\Domain\Project\ExceptionalImputationOpening;
@@ -53,6 +55,7 @@ final class ProjectPageController extends AbstractController
         private readonly ExternalCommitmentRepository $commitments,
         private readonly ProjectReopeningRepository $reopenings,
         private readonly ViewProjectBudgetTracking $budgetTracking,
+        private readonly ClientRepository $clients,
     ) {
     }
 
@@ -138,6 +141,11 @@ final class ProjectPageController extends AbstractController
             'project' => $this->row($project),
             'canViewFinancials' => $canViewFinancials,
             'budgetTracking' => $canViewFinancials ? $this->budgetTracking->forProject($user, $project->id()) : null,
+            'clientId' => $project->clientId(),
+            'clients' => array_map(
+                static fn (Client $c): array => ['id' => $c->id(), 'name' => $c->name()],
+                $this->clients->findAllByTenant($user->tenantId()),
+            ),
             'transitions' => array_map(
                 static fn (ProjectStatus $s): array => ['value' => $s->value, 'label' => $s->label()],
                 $project->status()->allowedTransitions(),
@@ -287,6 +295,36 @@ final class ProjectPageController extends AbstractController
         } catch (ProjectException $exception) {
             $this->addFlash('error', $exception->getMessage());
         }
+
+        return $this->redirectToRoute('project_show', ['id' => $id]);
+    }
+
+    #[Route('/projets/{id}/client', name: 'project_attach_client', requirements: ['id' => '[0-9a-f-]{36}'], methods: ['POST'])]
+    public function attachClient(#[CurrentUser] User $user, string $id, Request $request): RedirectResponse
+    {
+        $this->authorizer->ensureCan($user, Permission::EDIT_PROJECT);
+        if (!$this->isCsrfTokenValid('attach_client', (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Jeton de sécurité invalide.');
+
+            return $this->redirectToRoute('project_show', ['id' => $id]);
+        }
+
+        $project = $this->projects->find($user->tenantId(), $id);
+        if (!$project instanceof Project) {
+            throw $this->createNotFoundException('Projet introuvable.');
+        }
+
+        $clientId = trim((string) $request->request->get('clientId'));
+        // Valide l'appartenance du client au tenant avant rattachement (deny-by-default).
+        if ('' !== $clientId && !$this->clients->find($user->tenantId(), $clientId) instanceof Client) {
+            $this->addFlash('error', 'Client inconnu.');
+
+            return $this->redirectToRoute('project_show', ['id' => $id]);
+        }
+
+        $project->attachClient('' !== $clientId ? $clientId : null);
+        $this->projects->save($project);
+        $this->addFlash('success', 'Client du projet mis à jour.');
 
         return $this->redirectToRoute('project_show', ['id' => $id]);
     }

@@ -94,6 +94,23 @@
             {% elseif transitions is empty %}
                 <p class="text-xs text-muted">Aucune transition disponible depuis ce statut.</p>
             {% endif %}
+
+            {# Rattachement client (US-014) — placé après les transitions (n'altère pas le 1er jeton CSRF de la page). #}
+            {% if canEdit %}
+                <form method="post" action="{{ path('project_attach_client', { id: project.id }) }}" class="mt-4 flex flex-wrap items-end gap-2">
+                    <input type="hidden" name="_token" value="{{ csrf_token('attach_client') }}">
+                    <div>
+                        <label for="project-client" class="mb-1 block text-[13px] font-medium text-ink">Client rattaché</label>
+                        <select id="project-client" name="clientId" class="min-h-10 rounded border border-border-strong bg-surface px-3 text-sm text-ink">
+                            <option value="">— Aucun —</option>
+                            {% for c in clients %}
+                                <option value="{{ c.id }}" {{ c.id == clientId ? 'selected' : '' }}>{{ c.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="min-h-10 rounded border border-border-strong px-3 text-sm font-semibold text-muted hover:bg-surface-alt hover:text-ink">Rattacher</button>
+                </form>
+            {% endif %}
         </section>
 
         {# ── Suivi budgétaire (US-072) ── #}

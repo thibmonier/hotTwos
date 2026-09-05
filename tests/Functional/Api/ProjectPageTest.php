@@ -18,6 +18,7 @@ use App\Domain\Tenant\Tenant;
 use App\Domain\Tenant\TenantId;
 use App\Domain\Timesheet\TimeEntry;
 use App\Domain\User\User;
+use App\Domain\Client\Client;
 use App\Domain\Budget\MarginDriftThreshold;
 use App\Domain\Valuation\TimeEntryValuation;
 use App\Infrastructure\Persistence\Doctrine\DoctrineProjectRepository;
@@ -61,6 +62,7 @@ final class ProjectPageTest extends WebTestCase
             $this->em->getClassMetadata(TimeEntry::class),
             $this->em->getClassMetadata(TimeEntryValuation::class),
             $this->em->getClassMetadata(MarginDriftThreshold::class),
+            $this->em->getClassMetadata(Client::class),
         ];
         $tool = new SchemaTool($this->em);
         $tool->dropSchema($this->schema);
