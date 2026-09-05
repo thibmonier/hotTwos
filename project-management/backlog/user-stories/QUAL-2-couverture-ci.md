@@ -52,3 +52,9 @@ THEN le surcoût de temps reste acceptable (pcov, pas xdebug)
 
 ## Notes
 Le seuil initial sera **calé sur la couverture réelle mesurée** (baseline) puis relevé progressivement vers 80 %+ si nécessaire — éviter de casser la CI dès l'activation.
+
+## Réalisation (2026-09-05)
+- **Baseline mesurée** : **82,78 % de lignes** (3615/4367), 73,35 % méthodes, 81,09 % éléments.
+- Le DoD ≥ 80 % (lignes) est **déjà atteint** → seuil CI posé à **80 %** (passe avec marge).
+- pcov ajouté à l'image (désactivé par défaut, `pcov.enabled=0`) ; cible `make coverage` ; gate CI
+  « lignes ≥ 80 % » (parse `coverage.xml`, échoue sinon).

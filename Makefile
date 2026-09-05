@@ -74,6 +74,9 @@ deptrac: ## Vérifie les frontières d'architecture
 cache-dev: ## Vide puis réamorce le cache dev (évite le faux désync schema:validate / l'échec PHPStan après cache:clear — T-TECH-03)
 	$(APP) sh -lc 'php bin/console cache:clear >/dev/null && APP_DEBUG=1 php bin/console cache:warmup'
 
+coverage: ## Couverture de tests (pcov, conteneurisé — QUAL-2)
+	$(DC) run --rm -T -e APP_ENV=test app sh -lc 'php bin/console cache:clear --env=test --no-warmup >/dev/null && php -d pcov.enabled=1 bin/phpunit -c phpunit.dist.xml --coverage-text --coverage-clover=coverage.xml'
+
 analyse: ## Analyse statique PHPStan niveau max
 	$(APP) php vendor/bin/phpstan analyse --memory-limit=1G
 

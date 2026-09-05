@@ -99,8 +99,23 @@ jobs:
       # (4) Tests + couverture (unitaires + intégration multi-tenant)
       - name: Tests (PHPUnit) + couverture
         run: php bin/phpunit --coverage-text --coverage-clover=coverage.xml
-      # NOTE : le gate « couverture ≥ 80 % sur règles critiques » (ENF-MAINT-1)
-      # s'active dès l'apparition des règles de gestion (US-001+).
+
+      # (4bis) Gate couverture (QUAL-2 / ENF-MAINT-1) : échoue sous le seuil de lignes.
+      # Seuil 80 % (DoD) ; baseline mesurée 2026-09-05 = 82,78 %.
+      - name: Gate couverture (lignes ≥ 80 %)
+        run: |
+          python3 - <<'PY'
+          import re, sys
+          data = open('coverage.xml', encoding='utf-8').read()
+          best = max(re.findall(r'<metrics ([^>]*)/>', data),
+                     key=lambda a: int(dict(re.findall(r'(\w+)="(\d+)"', a)).get('statements', 0)))
+          m = dict(re.findall(r'(\w+)="(\d+)"', best))
+          st, cov = int(m['statements']), int(m['coveredstatements'])
+          pct = cov / st * 100 if st else 0.0
+          threshold = 80.0
+          print(f"Couverture lignes : {cov}/{st} = {pct:.2f}% (seuil {threshold:.0f}%)")
+          sys.exit(0 if pct >= threshold else 1)
+          PY
 
       # (5)(6)(10)(11) — étapes prêtes, activées avec le code correspondant :
       #  (5) tests d'isolation multi-tenant (groupe @multitenant) → US-001
