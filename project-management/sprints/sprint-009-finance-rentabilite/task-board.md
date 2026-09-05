@@ -7,9 +7,8 @@
 
 | ID | US | Tâche | Estimation |
 |----|-----|-------|------------|
-| T-TECH-01 | — | [OPS] Recette navigateur données peuplées (rétro) | 3h |
-| T-TECH-02 | — | [OPS] MAILER staging + e2e reset | 2h |
-| T-TECH-03 | — | [OPS] Warmup cache dev après cache:clear | 1h |
+| T-TECH-01 | — | [OPS] Recette navigateur données peuplées (rétro) — **reconduit S10, escaladé** | 3h |
+| T-TECH-02 | — | [OPS] MAILER staging + e2e reset (dépend creds SMTP staging) — **reconduit S10** | 2h |
 
 ### Réserve (Could — si capacité)
 | ID | US | Tâche | Estimation |
@@ -27,6 +26,7 @@
 ## ✅ Terminé
 | ID | US | Tâche | Terminé |
 |----|-----|-------|---------|
+| T-TECH-03 | — | [OPS] Warmup cache dev (`make cache-dev`) | 2026-09-04 |
 | T-073-07 | US-073 | [REV] Revue de clôture (symfony-reviewer — approuvé, gating HAB-1 impeccable) | 2026-09-04 |
 | T-073-01 | US-073 | [BE] Read model consolidé (`ConsolidatedFinanceReport`) | 2026-09-04 |
 | T-073-02 | US-073 | [BE] Ventilation par client (`Project.clientName`) | 2026-09-04 |
