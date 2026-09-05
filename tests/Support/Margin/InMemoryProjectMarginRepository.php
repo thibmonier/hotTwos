@@ -36,4 +36,18 @@ final class InMemoryProjectMarginRepository implements ProjectMarginRepository
 
         return $own;
     }
+
+    public function findPeriods(TenantId $tenant): array
+    {
+        $periods = [];
+        foreach ($this->margins as $margin) {
+            if ($margin->tenantId()->equals($tenant)) {
+                $periods[$margin->period()] = true;
+            }
+        }
+        $periods = array_keys($periods);
+        rsort($periods);
+
+        return $periods;
+    }
 }

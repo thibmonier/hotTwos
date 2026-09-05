@@ -53,4 +53,20 @@ final readonly class DoctrineProjectMarginRepository implements ProjectMarginRep
 
         return $margins;
     }
+
+    public function findPeriods(TenantId $tenant): array
+    {
+        /** @var list<array<string, mixed>> $rows */
+        $rows = $this->entityManager->createQuery(
+            'SELECT DISTINCT m.period AS period FROM '.ProjectMargin::class.' m'
+            .' WHERE m.tenantId = :tenant ORDER BY m.period DESC',
+        )
+            ->setParameter('tenant', $tenant->toString())
+            ->getResult();
+
+        return array_map(
+            static fn (array $row): string => is_string($row['period']) ? $row['period'] : '',
+            $rows,
+        );
+    }
 }
