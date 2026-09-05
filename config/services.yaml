@@ -98,8 +98,9 @@ services:
     # Port marges figées (US-071, DIP).
     App\Domain\Margin\ProjectMarginRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineProjectMarginRepository'
 
-    # Seuil de dérive de marge (US-072, DIP) — défaut OBJ-6 (5 pts), override tenant via US-018.
-    App\Domain\Budget\MarginDriftThresholdProvider: '@App\Infrastructure\Budget\DefaultMarginDriftThresholdProvider'
+    # Seuil de dérive de marge (US-072/US-018, DIP) — paramétrable par tenant, repli défaut OBJ-6 (5 pts).
+    App\Domain\Budget\MarginDriftThresholdProvider: '@App\Infrastructure\Budget\TenantMarginDriftThresholdProvider'
+    App\Domain\Budget\MarginDriftThresholdRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineMarginDriftThresholdRepository'
 
     # Port configuration comptable FEC (US-074, DIP).
     App\Domain\Fec\FecConfigurationRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineFecConfigurationRepository'
