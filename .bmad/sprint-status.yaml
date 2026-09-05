@@ -73,17 +73,17 @@ stories:
   US-071: { title: "Moteur de marge réelle par projet à la clôture", sprint: 9, status: done }
   US-072: { title: "Budget vs réalisé & alerte de dérive", sprint: 9, status: done }
   US-073: { title: "Tableau de bord finance consolidé", sprint: 9, status: done }
-  US-074: { title: "Export comptable au format FEC", sprint: 10, status: ready, points: 8 }  # PO: format FEC ; réestimé 5→8
+  US-074: { title: "Export comptable au format FEC", sprint: 10, status: done, points: 8 }  # PO: format FEC ; réestimé 5→8
 
 # Stories techniques / dette qualité (hors vélocité) engagées au Sprint 10
 tech_stories:
   QUAL-1: { title: "Recette navigateur sur données peuplées (finance)", sprint: 10, status: ready }  # action rétro escaladée
-  QUAL-2: { title: "Instrumentation couverture (pcov + seuil CI)", sprint: 10, status: ready }        # audit S9
+  QUAL-2: { title: "Instrumentation couverture (pcov + seuil CI)", sprint: 10, status: done }        # audit S9
 
 # Récapitulatif
 totals:
-  done: 38
-  ready: 4          # US-074, US-018, QUAL-1, QUAL-2 (candidates/engagées S10)
+  done: 40          # +US-074, +QUAL-2 (S10)
+  ready: 2          # US-018 (Should), QUAL-1 (recette — manuel)
   in_progress: 0
   backlog: 12
   orphans: [US-012, US-013, US-014, US-015, US-016, US-017, US-018, US-019, US-020, US-032]  # dans aucun sprint

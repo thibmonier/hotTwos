@@ -4,7 +4,7 @@
 - **ID**: QUAL-2 (story technique / dette qualité)
 - **EPIC**: — (dette qualité transverse)
 - **Sprint**: Sprint 10 (🔴 Must)
-- **Statut**: 🟢 Ready (affinée S10)
+- **Statut**: ✅ Done (livré Sprint 10 — PR #48)
 - **Points**: — (dette, hors vélocité) · **Estimation**: ~0.5 j
 - **Persona**: Équipe dev (garde-fou qualité)
 - **Créé le**: 2026-09-05

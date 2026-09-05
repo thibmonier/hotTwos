@@ -4,7 +4,7 @@
 - **ID**: US-074
 - **EPIC**: EPIC-005 (Finance & rentabilité)
 - **Sprint**: Sprint 10
-- **Statut**: 🟢 Ready (affinée S10 — format FEC acté par le PO)
+- **Statut**: ✅ Done (livré Sprint 10 — PR #49, revue approuvée, `make ci` vert)
 - **Points**: 8 *(réestimé depuis 5 : conformité FEC = écritures équilibrées + 18 champs normés + mapping de comptes configurable, au-delà d'un simple CSV)*
 - **Persona**: P6 (Directeur financier / contrôleur de gestion)
 - **Créé le**: 2026-09-04
@@ -91,7 +91,17 @@ THEN l'export est refusé avec un message explicite
 
 | ID | Type | Description | Statut | Estimation |
 |----|------|-------------|--------|------------|
-| - | - | À décomposer (`/project:decompose-tasks 010`) | 🔴 | - |
+| T-074-01 | [DOC] | ADR-0021 « périmètre export FEC » | ✅ | 1h |
+| T-074-02/03 | [DB] | `FecConfiguration` (SIREN + comptes) + migration RLS | ✅ | 4h |
+| T-074-04 | [BE] | `FecLine` + `FecGenerator` (18 champs, débit=crédit) | ✅ | 4h |
+| T-074-05 | [BE] | `ExportFec` (période clôturée + gating HAB-1/HAB-6) | ✅ | 3h |
+| T-074-06 | [FE-WEB] | Téléchargement `/finance/export/fec` + config `/finance/config-fec` | ✅ | 3h |
+| T-074-07 | [TEST] | Conformité 18 champs, équilibre, gating, période/config, RLS | ✅ | 3h |
+| T-074-09 | [REV] | Revue de clôture (`symfony-reviewer` — approuvé, réserves traitées) | ✅ | 1h |
+
+## Progression
+
+7/7 tâches complétées (100%) — livré PR #49
 
 ## Definition of Done
 

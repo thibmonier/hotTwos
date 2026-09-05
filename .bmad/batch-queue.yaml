@@ -1,77 +1,64 @@
-# File d'exécution — Sprint 9 (généré par /project:run-sprint 009 --auto)
-sprint: sprint-009-finance-rentabilite
-generated_at: 2026-09-04
-goal: "Marge réelle par projet à la clôture + budget vs réalisé (dérive) + dashboard finance consolidé (direction, HAB-1)"
+# File d'exécution — Sprint 10 (généré par /project:run-sprint 010 --auto)
+sprint: sprint-010-export-qualite
+generated_at: 2026-09-05
+goal: "Export comptable FEC (US-074) sur base qualité assainie (recette données peuplées + couverture instrumentée en CI)"
 
 execution:
-  mode: sequential          # 1 dev, TDD/BDD, une PR par story (GitHub Flow)
+  mode: sequential          # 1 dev, TDD/BDD, une PR par item (GitHub Flow)
   parallel_limit: 1
   resume_on_failure: true
   checkpoint_interval: 1
 
-# Décision d'entrée actée (PO) — préambule obligatoire
-preamble:
-  - id: T-071-08
-    desc: "[DOC] ADR léger « produit facturable = CA reconnu » (docs/adr/)"
-    status: pending
+# Conventions héritées S9 (actées) : sprint entier d'affilée · merge après CI verte (squash) · branche suivante depuis main.
 
-# Prérequis / gates NON automatisables
 gates:
   - id: main-green
-    desc: "main vert (make ci, 470 tests) au démarrage S9"
+    desc: "main vert au démarrage S10"
     status: satisfied
-  - id: no-open-pr
-    desc: "Aucune PR ouverte au démarrage"
+  - id: goal-valide
+    desc: "Sprint Goal validé PO ; format export = FEC"
     status: satisfied
-  - id: adr-facturable
-    desc: "ADR facturable=CA reconnu formalisé (T-071-08) avant code US-071"
-    status: pending
 
-stories:
-  - id: US-071
-    title: "Moteur de marge réelle par projet à la clôture (CA reconnu − coût valorisé, INV-2)"
-    points: 8
+items:
+  - id: QUAL-2
+    title: "Instrumentation couverture (pcov + seuil CI)"
+    type: dette
     priority: 1
-    depends_on: []          # S8 (fact_project_revenue, ProjectValuationLine) déjà mergé
-    status: done            # branche feature/us-071-marge-reelle, revue approuvée, make ci vert
-    note: "Cœur EPIC-005 : moteur unique (ARC-6), figé à la clôture (US-057), gating HAB-1."
-  - id: US-072
-    title: "Budget vs réalisé + alerte de dérive financière (OBJ-2/OBJ-6, budgets US-033)"
-    points: 5
+    depends_on: []
+    status: done            # PR #48
+    note: "Self-contained infra ; instrumente la couverture avant d'ajouter du code US-074."
+  - id: QUAL-1-seed
+    title: "T-QUAL-1-01 — seed finance peuplé (code)"
+    type: dette
     priority: 2
-    depends_on: []          # US-033 (budget) déjà livré ; indépendant de US-071 côté données
-    status: done            # branche feature/us-072-budget-derive, revue approuvée, make ci vert
-  - id: US-073
-    title: "Tableau de bord finance consolidé multi-projets/clients (direction, HAB-1, < 3 s P95)"
+    depends_on: []
+    status: pending
+    note: "Partie code de QUAL-1 ; prérequis de la recette navigateur."
+  - id: US-074
+    title: "Export comptable FEC (écritures équilibrées via mapping tenant)"
     points: 8
     priority: 3
-    depends_on: [US-071, US-072]
-    status: done            # branche feature/us-073-dashboard-finance, revue approuvée, make ci vert
-
-# Réserve (Could) — hors engagement, si capacité
-reserve:
-  - id: US-074
-    title: "Export comptable configurable (EF-FIN-22)"
-    points: 5
-    status: deferred
-
-# Tâches transverses (hors points) — action rétro reconduite
-tech_debt:
-  - id: T-TECH-01
-    desc: "[OPS] Recette navigateur sur données peuplées (priorité qualité, à caser tôt)"
+    depends_on: [QUAL-2]
+    status: done            # PR #49
+    note: "Cœur du sprint. ADR T-074-01 en préambule."
+  - id: US-018
+    title: "Seuil de dérive de marge paramétrable par tenant (override US-072)"
+    points: 3
+    priority: 4
+    depends_on: []
     status: pending
-  - id: T-TECH-02
-    desc: "[OPS] MAILER staging + e2e reset mot de passe"
-    status: pending
-  - id: T-TECH-03
-    desc: "[OPS] Warmup cache dev après cache:clear (fiabiliser PHPStan)"
+    note: "Should — seulement si capacité (fêtes)."
+
+# Nécessite l'app lancée + Chrome (interactif) — pas dans le run autonome, à cadencer avec l'utilisateur :
+manual:
+  - id: QUAL-1-recette
+    desc: "T-QUAL-1-02/03 — recette navigateur écrans finance × 3 rôles + rapport .recette/"
     status: pending
 
-total_points: 21          # US-071 + US-072 + US-073 (US-074 en réserve)
+total_points: 8          # US-074 (+3 US-018 en Should) ; QUAL-1/2 = dette hors vélocité
 
-# Ordre d'exécution (phases)
 plan:
-  phase_0: [T-071-08]                 # ADR facturable (préambule, débloque US-071)
-  phase_1: [US-071, T-TECH-01]        # moteur de marge (fondation) + recette données peuplées
-  phase_2: [US-072]                   # budget vs réalisé + dérive
-  phase_3: [US-073]                   # dashboard consolidé (après US-071 + US-072)
+  phase_1: [QUAL-2, QUAL-1-seed]     # instrumentation couverture + seed peuplé
+  phase_2: [US-074]                  # moteur FEC (TDD)
+  phase_3: [US-018]                  # Should si capacité
+  manual:  [QUAL-1-recette]          # recette navigateur (app + Chrome, avec l'utilisateur)
