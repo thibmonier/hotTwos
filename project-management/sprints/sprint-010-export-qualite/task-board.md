@@ -12,23 +12,6 @@
 | T-QUAL-1-02 | [TEST] Recette navigateur (`/valorisation`, fiche projet, `/finance`) × 3 rôles + captures | 2h |
 | T-QUAL-1-03 | [DOC] Rapport `.recette/` + backlog des findings | 1h |
 
-### QUAL-2 — Couverture pcov + CI (Must)
-| ID | Tâche | Estimation |
-|----|-------|------------|
-| T-QUAL-2-01 | [OPS] pcov dans l'image Docker + cible `make coverage` | 1h |
-| T-QUAL-2-02 | [OPS] Baseline couverture + seuil bloquant CI (documenté) | 1.5h |
-
-### US-074 — Export comptable FEC (Must, 8 pts)
-| ID | Tâche | Estimation |
-|----|-------|------------|
-| T-074-01 | [DOC] ADR léger « périmètre export FEC » (écritures équilibrées via mapping) | 1h |
-| T-074-02 | [DB] Entité `AccountMapping` (comptes tenant : produit/tiers/charge/contrepartie) + port | 3h |
-| T-074-03 | [DB] Migration `account_mapping` (RLS tenant, unique) | 1h |
-| T-074-04 | [BE] `FecLine` (VO) + `FecGenerator` (domaine) — 18 champs, débit=crédit | 4h |
-| T-074-05 | [BE] Use case `ExportFec` (marges période clôturée + mapping → fichier), gating HAB-1/HAB-6 | 3h |
-| T-074-06 | [FE-WEB] Bouton « Export FEC » + route téléchargement gated + écran config mapping | 3h |
-| T-074-07 | [TEST] Conformité 18 champs, équilibre, nommage, gating, période/mapping absents | 3h |
-| T-074-08 | [REV] Revue de clôture (`symfony-reviewer`) | 1h |
 
 ## 🔲 À Faire — Should (si capacité, fêtes)
 
@@ -57,6 +40,8 @@
 ## ✅ Terminé
 | ID | Tâche | Terminé |
 |----|-------|---------|
+| QUAL-2 | Couverture pcov + gate CI ≥ 80 % (baseline 82,78 %) — PR #48 | 2026-09-05 |
+| US-074 | Export comptable FEC (8 pts) — PR #49, revue approuvée | 2026-09-05 |
 
 ## 🚫 Bloqué
 | ID | Raison | Action |
@@ -69,7 +54,6 @@
 4. **US-018** (Should) si capacité.
 
 ## Métriques
-- **Tâches Must** : 13 (QUAL-1 ×3, QUAL-2 ×2, US-074 ×8) · **Should** : US-018 ×5
-- **Heures Must** : ~26.5h · **Should** : ~7.5h
-- **Points engagés** : US-074 = 8 (+US-018 = 3 en Should) ; QUAL-1/2 = dette (hors vélocité)
-- ⚠️ Capacité réduite (fêtes) : engager Must, tirer US-018 seulement si avance
+- **Avancement** : QUAL-2 ✅ + US-074 ✅ (8 pts livrés). Reste : QUAL-1 (recette navigateur, manuel) + US-018 (Should).
+- **Points** : 8/8 engagés livrés (US-074) ; US-018 (3) en Should à décider ; QUAL-1/2 = dette
+- ⚠️ Capacité réduite (fêtes) : Must livré ; US-018 seulement si avance ; QUAL-1 nécessite l'app + Chrome
