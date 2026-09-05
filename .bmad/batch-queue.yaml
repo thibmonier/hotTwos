@@ -1,64 +1,58 @@
-# File d'exécution — Sprint 10 (généré par /project:run-sprint 010 --auto)
-sprint: sprint-010-export-qualite
+# File d'exécution — Sprint 11 (généré par /project:decompose-tasks 011)
+sprint: sprint-011-facturation
 generated_at: 2026-09-05
-goal: "Export comptable FEC (US-074) sur base qualité assainie (recette données peuplées + couverture instrumentée en CI)"
+goal: "Le facturé réel devient la base de la rentabilité (facturation manuelle minimale, ADR-0022)"
 
 execution:
-  mode: sequential          # 1 dev, TDD/BDD, une PR par item (GitHub Flow)
+  mode: sequential          # 1 dev, TDD, une PR par story ; merge après CI verte
   parallel_limit: 1
   resume_on_failure: true
   checkpoint_interval: 1
 
-# Conventions héritées S9 (actées) : sprint entier d'affilée · merge après CI verte (squash) · branche suivante depuis main.
-
 gates:
   - id: main-green
-    desc: "main vert au démarrage S10"
+    desc: "main vert au démarrage S11"
     status: satisfied
-  - id: goal-valide
-    desc: "Sprint Goal validé PO ; format export = FEC"
+  - id: adr-0022
+    desc: "ADR-0022 (facturation minimale, facturé réel > proxy) acté"
     status: satisfied
 
-items:
-  - id: QUAL-2
-    title: "Instrumentation couverture (pcov + seuil CI)"
-    type: dette
+stories:
+  - id: US-014
+    title: "Client structuré (tranche minimale — entité + rattachement projet)"
+    points: 5
     priority: 1
     depends_on: []
-    status: done            # PR #48
-    note: "Self-contained infra ; instrumente la couverture avant d'ajouter du code US-074."
-  - id: QUAL-1-seed
-    title: "T-QUAL-1-01 — seed finance peuplé (code)"
-    type: dette
-    priority: 2
-    depends_on: []
-    status: done            # PR #52
-    note: "Partie code de QUAL-1 ; prérequis de la recette navigateur."
-  - id: US-074
-    title: "Export comptable FEC (écritures équilibrées via mapping tenant)"
+    status: pending
+    note: "Prérequis facturation. Entrée du sprint."
+  - id: US-075
+    title: "Émission manuelle de factures par projet/période"
     points: 8
+    priority: 2
+    depends_on: [US-014]
+    status: pending
+  - id: US-076
+    title: "Facturé réel comme source de marge (port RevenueSource, repli CA reconnu)"
+    points: 5
     priority: 3
-    depends_on: [QUAL-2]
-    status: done            # PR #49
-    note: "Cœur du sprint. ADR T-074-01 en préambule."
-  - id: US-018
-    title: "Seuil de dérive de marge paramétrable par tenant (override US-072)"
-    points: 3
+    depends_on: [US-075]
+    status: pending
+  - id: US-077
+    title: "Export FEC sur facturé réel (Should)"
+    points: 5
     priority: 4
-    depends_on: []
-    status: done            # PR #51
-    note: "Should — seulement si capacité (fêtes)."
+    depends_on: [US-076]
+    status: pending
 
-# Nécessite l'app lancée + Chrome (interactif) — pas dans le run autonome, à cadencer avec l'utilisateur :
-manual:
-  - id: QUAL-1-recette
-    desc: "T-QUAL-1-02/03 — recette navigateur écrans finance × 3 rôles + rapport .recette/"
-    status: done            # PR #52 (.recette/sprint-010)
+reserve:
+  - id: T-R01
+    title: "Correctif onglet Suivi budgétaire (1er clic)"
+    status: deferred
 
-total_points: 8          # US-074 (+3 US-018 en Should) ; QUAL-1/2 = dette hors vélocité
+total_points: 18          # US-014 + US-075 + US-076 (US-077 en Should)
 
 plan:
-  phase_1: [QUAL-2, QUAL-1-seed]     # instrumentation couverture + seed peuplé
-  phase_2: [US-074]                  # moteur FEC (TDD)
-  phase_3: [US-018]                  # Should si capacité
-  manual:  [QUAL-1-recette]          # recette navigateur (app + Chrome, avec l'utilisateur)
+  phase_1: [US-014]
+  phase_2: [US-075]
+  phase_3: [US-076]
+  phase_4: [US-077]        # Should si capacité
