@@ -32,7 +32,7 @@ items:
     type: dette
     priority: 2
     depends_on: []
-    status: pending
+    status: done            # PR #52
     note: "Partie code de QUAL-1 ; prérequis de la recette navigateur."
   - id: US-074
     title: "Export comptable FEC (écritures équilibrées via mapping tenant)"
@@ -46,14 +46,14 @@ items:
     points: 3
     priority: 4
     depends_on: []
-    status: pending
+    status: done            # PR #51
     note: "Should — seulement si capacité (fêtes)."
 
 # Nécessite l'app lancée + Chrome (interactif) — pas dans le run autonome, à cadencer avec l'utilisateur :
 manual:
   - id: QUAL-1-recette
     desc: "T-QUAL-1-02/03 — recette navigateur écrans finance × 3 rôles + rapport .recette/"
-    status: pending
+    status: done            # PR #52 (.recette/sprint-010)
 
 total_points: 8          # US-074 (+3 US-018 en Should) ; QUAL-1/2 = dette hors vélocité
 
