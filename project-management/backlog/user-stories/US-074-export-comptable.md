@@ -1,94 +1,108 @@
-# US-074: Export comptable configurable (réserve)
+# US-074: Export comptable au format FEC
 
 ## Métadonnées
 - **ID**: US-074
 - **EPIC**: EPIC-005 (Finance & rentabilité)
-- **Sprint**: Sprint 9 (**réserve** — Could, si capacité)
-- **Statut**: 🟢 Ready (affinée — réserve S9 non prise, candidate S10)
-- **Points**: 5
+- **Sprint**: Sprint 10
+- **Statut**: 🟢 Ready (affinée S10 — format FEC acté par le PO)
+- **Points**: 8 *(réestimé depuis 5 : conformité FEC = écritures équilibrées + 18 champs normés + mapping de comptes configurable, au-delà d'un simple CSV)*
 - **Persona**: P6 (Directeur financier / contrôleur de gestion)
 - **Créé le**: 2026-09-04
-- **Mis à jour**: 2026-09-04
+- **Mis à jour**: 2026-09-05
 
 ## Traçabilité
-- **Implémente**: EF-FIN-22 (export vers la comptabilité — format configurable, sans donnée perdue), OBJ-3 (reporting financier automatisé)
-- **Dépend de**: US-071 (marge réelle), US-073 (consolidation)
-- **Note périmètre**: l'EF-FIN-22 est notée « hors périmètre direct » dans EPIC-005 → traitée ici comme **réserve** de sprint.
+- **Implémente**: EF-FIN-22 (export vers la comptabilité), OBJ-3 (reporting financier automatisé, zéro ressaisie)
+- **Dépend de**: US-071 (marge/CA/coût figés par projet à la clôture), US-073 (consolidation), US-057 (clôture de période)
+- **Décision PO (2026-09-05)**: le format d'export est le **FEC** (Fichier des Écritures Comptables, art. A47 A-1 du LPF) — norme légale française, opposable à l'administration fiscale.
 
 ## User Story
 
 **En tant que** directeur financier (P6),
-**je veux** **exporter** les données de rentabilité figées (CA reconnu, coût, marge par projet/client/période) dans un **format configurable** (CSV/comptable),
-**afin de** réconcilier avec la comptabilité sans ressaisie et garantir une traçabilité opposable.
+**je veux** exporter les écritures de rentabilité d'une **période clôturée** au **format FEC** (norme légale),
+**afin de** transmettre à la comptabilité / à l'expert-comptable un fichier opposable, sans ressaisie ni perte de donnée.
+
+## Décision de conception (à acter en ADR léger — T-074-01)
+
+L'application n'est pas une comptabilité en partie double : elle produit du **CA reconnu** et du **coût
+valorisé** figés (US-071). L'export FEC génère des **écritures équilibrées** (débit = crédit) à partir de
+ces montants, via un **mapping de comptes configurable par tenant** (compte de produit, compte de
+tiers/client, compte de charge, compte de contrepartie). Ce n'est pas un grand livre complet mais un
+**export normé FEC des écritures de rentabilité reconnues** — le raccordement à une compta en partie
+double réelle reste une évolution ultérieure.
 
 ## Critères d'Acceptation
 
-### CA-1 (Nominal) : Export d'une période clôturée
+### CA-1 (Nominal) : Export FEC d'une période clôturée
 
 ```gherkin
-GIVEN la période "Novembre 2026" est clôturée et ses marges sont figées (US-071)
-WHEN un directeur financier exporte la rentabilité de la période
-THEN un fichier est généré contenant, par projet (et/ou client) : période, CA reconnu, coût valorisé, marge, taux de marge
-  AND chaque ligne est traçable (identifiant projet/client, période) et opposable
-  AND aucune donnée n'est perdue ou tronquée (montants en centimes, pas d'arrondi destructeur)
+GIVEN la période "2026-11" est clôturée et ses marges figées (US-071)
+  AND un mapping de comptes est configuré pour le tenant (produit, tiers, charge, contrepartie)
+WHEN un directeur financier exporte la période au format FEC
+THEN un fichier FEC est généré, nommé "<SIREN>FEC<AAAAMMJJ>.txt" (JJ = dernier jour de la période)
+  AND il contient les 18 champs obligatoires dans l'ordre normé, séparés par tabulation, encodés UTF-8,
+      première ligne = en-tête des noms de champs
+  AND chaque reconnaissance (CA, coût) produit une écriture équilibrée (somme débit = somme crédit)
+  AND les montants sont au format décimal FEC (séparateur virgule, 2 décimales, pas d'arrondi destructeur)
+  AND EcritureDate / PieceDate / ValidDate sont au format AAAAMMJJ, cohérentes avec la clôture
 ```
 
-### CA-2 (Nominal) : Format configurable
+### CA-2 (Contrainte) : Conformité stricte des 18 champs FEC
 
 ```gherkin
-GIVEN plusieurs formats d'export sont proposés (ex. CSV séparateur `;`, colonnes ordonnables)
-WHEN l'utilisateur choisit un format et lance l'export
-THEN le fichier respecte le format demandé (encodage, séparateur, entêtes)
-  AND le format retenu est mémorisable comme préférence tenant (paramétrable)
+GIVEN le fichier FEC généré
+WHEN il est contrôlé (structure normée)
+THEN les colonnes sont exactement, dans l'ordre : JournalCode, JournalLib, EcritureNum, EcritureDate,
+     CompteNum, CompteLib, CompAuxNum, CompAuxLib, PieceRef, PieceDate, EcritureLib, Debit, Credit,
+     EcritureLet, DateLet, ValidDate, Montantdevise, Idevise
+  AND EcritureNum est séquentiel et unique par journal
+  AND un champ non applicable est vide (jamais "N/A"), Debit XOR Credit non nul par ligne
+  AND le total Debit = total Credit sur l'ensemble du fichier (INV-2 — centimes entiers en interne)
 ```
 
 ### CA-3 (Habilitation) : Réservé finance/direction (HAB-1)
 
 ```gherkin
-GIVEN un utilisateur sans rôle finance/direction
-WHEN il tente d'exporter la rentabilité
-THEN l'export est refusé (deny-by-default)
-  AND tout export réussi par un rôle habilité est tracé (auteur, périmètre, date — HAB-6)
+GIVEN un utilisateur sans habilitation coût/finance (ni VIEW_PROJECT_FINANCIALS + VIEW_COLLABORATOR_COST)
+WHEN il tente d'exporter le FEC
+THEN l'export est refusé (deny-by-default, 403)
+  AND tout export réussi est tracé (auteur, période, date — HAB-6)
 ```
 
-### CA-4 (Erreur) : Export d'une période non clôturée
+### CA-4 (Erreur) : Période non clôturée ou mapping absent
 
 ```gherkin
-GIVEN une période non clôturée (marges provisoires)
-WHEN un utilisateur tente d'exporter cette période
-THEN l'export est refusé ou explicitement marqué "provisoire — non opposable"
-  AND l'utilisateur est invité à clôturer la période (US-057) pour un export figé
+GIVEN une période non clôturée (marges provisoires) OU un mapping de comptes non configuré
+WHEN un utilisateur tente l'export FEC
+THEN l'export est refusé avec un message explicite
+  ("période non clôturée — export non opposable" / "mapping de comptes requis")
+  AND aucun fichier partiel n'est produit
 ```
 
 ## Critères UI/UX
 
 ### Web
-- Bouton d'export accessible depuis le tableau de bord finance consolidé (US-073), avec choix du format et du périmètre (période/client).
-- Retour utilisateur clair (génération en cours / fichier prêt) ; téléchargement serveur (pas de calcul front).
+- Bouton « Export FEC » sur le tableau de bord finance (US-073), avec sélecteur de période (mois **clôturé** uniquement) ; téléchargement serveur (aucun calcul front).
+- Écran de configuration du mapping de comptes (par tenant) accessible aux rôles habilités.
 
 ### Mobile
-- Hors périmètre mobile (fonction desktop de contrôle de gestion).
+- Hors périmètre (fonction desktop de contrôle de gestion).
 
 ## Tasks
 
 | ID | Type | Description | Statut | Estimation |
 |----|------|-------------|--------|------------|
-| - | - | À décomposer (`/project:decompose-tasks 009`) | 🔴 | - |
-
-## Progression
-
-0/0 tasks complétées (0%)
+| - | - | À décomposer (`/project:decompose-tasks 010`) | 🔴 | - |
 
 ## Definition of Done
 
-- [ ] Tous les critères d'acceptation validés
-- [ ] Traçabilité opposable de l'export · gating HAB-1/HAB-6
-- [ ] `make ci` vert · revue de clôture
+- [ ] Fichier FEC conforme (18 champs, encodage, nommage, débit=crédit) vérifié par test
+- [ ] Mapping de comptes configurable par tenant · gating HAB-1/HAB-6 · période clôturée uniquement
+- [ ] ADR léger « périmètre export FEC » (T-074-01)
+- [ ] `make ci` vert · revue de clôture · recette sur données peuplées (QUAL-1)
 
 ---
 
 ## Notes
 
-**Réserve de sprint** : à prendre uniquement si US-071/072/073 sont terminées avant la fin du sprint. Sinon reportée au prochain incrément d'EPIC-005.
-
-**Interface comptable réelle** (connecteur vers un logiciel comptable) : hors périmètre — ici on produit un fichier configurable, pas une intégration directe.
+**Interface comptable réelle** (connecteur logiciel compta) : hors périmètre — on produit le fichier FEC,
+pas une intégration directe. **Compta en partie double complète** : évolution ultérieure d'EPIC-005.

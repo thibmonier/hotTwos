@@ -37,7 +37,7 @@ stories:
   US-015: { title: "Taux de vente & priorité", sprint: null, status: backlog }
   US-016: { title: "Devises", sprint: null, status: backlog }
   US-017: { title: "Statuts & circuits de validation", sprint: null, status: backlog }
-  US-018: { title: "Seuils d'alerte", sprint: null, status: backlog }               # override du seuil de dérive US-072
+  US-018: { title: "Seuils d'alerte paramétrables (tenant)", sprint: 10, status: ready }   # candidate S10 Should — override seuil dérive US-072
   US-019: { title: "Onboarding tenant", sprint: null, status: backlog }
   US-020: { title: "Audit du paramétrage", sprint: null, status: backlog }
   US-030: { title: "Création projet & statuts", sprint: 6, status: done }
@@ -73,13 +73,18 @@ stories:
   US-071: { title: "Moteur de marge réelle par projet à la clôture", sprint: 9, status: done }
   US-072: { title: "Budget vs réalisé & alerte de dérive", sprint: 9, status: done }
   US-073: { title: "Tableau de bord finance consolidé", sprint: 9, status: done }
-  US-074: { title: "Export comptable configurable", sprint: null, status: ready }    # affinée, réserve S9 non prise, candidate S10
+  US-074: { title: "Export comptable au format FEC", sprint: 10, status: ready, points: 8 }  # PO: format FEC ; réestimé 5→8
+
+# Stories techniques / dette qualité (hors vélocité) engagées au Sprint 10
+tech_stories:
+  QUAL-1: { title: "Recette navigateur sur données peuplées (finance)", sprint: 10, status: ready }  # action rétro escaladée
+  QUAL-2: { title: "Instrumentation couverture (pcov + seuil CI)", sprint: 10, status: ready }        # audit S9
 
 # Récapitulatif
 totals:
   done: 38
-  ready: 1
+  ready: 4          # US-074, US-018, QUAL-1, QUAL-2 (candidates/engagées S10)
   in_progress: 0
-  backlog: 15
+  backlog: 12
   orphans: [US-012, US-013, US-014, US-015, US-016, US-017, US-018, US-019, US-020, US-032]  # dans aucun sprint
   referenced_not_delivered: [US-033, US-035, US-036, US-053]
