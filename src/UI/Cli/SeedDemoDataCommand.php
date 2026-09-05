@@ -5,11 +5,15 @@ declare(strict_types=1);
 namespace App\UI\Cli;
 
 use App\Application\Authorization\InitializeDefaultRoles;
+use App\Application\Margin\ComputeProjectMargins;
 use App\Application\Timesheet\EnsureAbsenceProject;
 use App\Application\Timesheet\Message\TimeEntriesValidated;
 use App\Application\Valuation\ValueValidatedTimeHandler;
 use App\Domain\Absence\AbsenceRequest;
 use App\Domain\Absence\AbsenceType;
+use App\Domain\Fec\FecConfiguration;
+use App\Domain\Period\AccountingPeriod;
+use App\Domain\Period\PeriodStatus;
 use App\Domain\Pricing\CalculationMode;
 use App\Domain\Pricing\Profile;
 use App\Domain\Pricing\ProfileAssignment;
@@ -55,6 +59,7 @@ final class SeedDemoDataCommand extends Command
         private readonly InitializeDefaultRoles $initializeDefaultRoles,
         private readonly EnsureAbsenceProject $ensureAbsenceProject,
         private readonly ValueValidatedTimeHandler $valuationHandler,
+        private readonly ComputeProjectMargins $computeMargins,
         #[Autowire('%kernel.environment%')]
         private readonly string $environment,
     ) {
@@ -94,20 +99,22 @@ final class SeedDemoDataCommand extends Command
         // Pricing + valorisation : profil, tarif et affectation de Camille, puis valorisation des
         // imputations validées (US-060). Sans cela, /valorisation reste vide (finding F2).
         $this->seedPricingAndValuation($tenant, $users['camille'], $validatedIds);
+        $this->seedFinance($tenant);
 
         $io->success('Tenant de démonstration créé.');
         $io->table(['Élément', 'Valeur'], [
             ['Tenant', $tenant->toString()],
-            ['Connexions', 'camille@demo.test (Collaborateur) · marc@demo.test (Chef de projet) · admin@demo.test (Administrateur)'],
+            ['Connexions', 'camille@demo.test (Collaborateur) · marc@demo.test (Chef de projet) · dg@demo.test (Dirigeant, coût/marge) · admin@demo.test (Administrateur)'],
             ['Mot de passe', self::PASSWORD],
-            ['Écrans', '/saisie · /saisie/jour · /completude · /absences · /relances · /administration/periodes'],
+            ['Écrans', '/saisie · /completude · /absences · /valorisation · /projets · /finance'],
+            ['Finance', 'période clôturée + marges figées + budgets/clients + config FEC (recette QUAL-1)'],
         ]);
 
         return Command::SUCCESS;
     }
 
     /**
-     * @return array{camille: User, marc: User, admin: User}
+     * @return array{camille: User, marc: User, admin: User, dg: User}
      */
     private function seedUsers(TenantId $tenant): array
     {
@@ -117,11 +124,14 @@ final class SeedDemoDataCommand extends Command
             'camille' => new User($tenant, 'camille@demo.test', $hash, ['Collaborateur']),
             'marc' => new User($tenant, 'marc@demo.test', $hash, ['Chef de projet']),
             'admin' => new User($tenant, 'admin@demo.test', $hash, ['Administrateur']),
+            // Dirigeant : seul rôle démo avec VIEW_COLLABORATOR_COST (coût/marge/dérive/export FEC).
+            'dg' => new User($tenant, 'dg@demo.test', $hash, ['Dirigeant']),
         ];
         // US-067 : noms d'affichage renseignés (les écrans montrent « Prénom Nom », plus l'e-mail brut).
         $users['camille']->rename('Camille', 'Martin');
         $users['marc']->rename('Marc', 'Dubois');
         $users['admin']->rename('Alex', 'Admin');
+        $users['dg']->rename('Diane', 'Girard');
         foreach ($users as $user) {
             $this->em->persist($user);
         }
@@ -140,6 +150,13 @@ final class SeedDemoDataCommand extends Command
         // alimentent l'écran /validation (parcours peuplé, cf. US-069 T-069-03).
         $alpha = new Project($tenant, 'ALPHA', 'Refonte site Alpha', true, $marc->id());
         $beta = new Project($tenant, 'BETA', 'Application mobile Beta', true, $marc->id());
+        // Budgets + clients (US-072/073) pour peupler les écrans finance (recette QUAL-1).
+        $alpha->defineClient('ACME Tourisme');
+        $alpha->defineBudget(40_000_00);
+        $alpha->defineRevenueBudget(60_000_00);
+        $beta->defineClient('Globex');
+        $beta->defineBudget(15_000_00);
+        $beta->defineRevenueBudget(12_000_00);
         $this->em->persist($alpha);
         $this->em->persist($beta);
         $this->em->flush();
@@ -213,6 +230,36 @@ final class SeedDemoDataCommand extends Command
         // Valorisation synchrone (pas de dépendance à un worker Messenger pour la démo).
         ($this->valuationHandler)(new TimeEntriesValidated($tenant->toString(), $validatedIds, new DateTimeImmutable('now')));
         $this->em->flush();
+    }
+
+    /**
+     * Peuple les écrans finance (recette QUAL-1) : clôture de la période valorisée, figeage des marges
+     * par projet (US-071) et configuration comptable FEC (US-074). L'export FEC et le dashboard
+     * consolidé ne montrent que des périodes clôturées.
+     */
+    private function seedFinance(TenantId $tenant): void
+    {
+        $period = $this->monday(3)->format('Y-m');
+
+        $this->em->persist(new AccountingPeriod($tenant, $period, PeriodStatus::CLOSED));
+        $this->em->persist(new FecConfiguration(
+            $tenant,
+            '123456789',
+            'VT',
+            'Ventes',
+            '706000',
+            'Prestations de services',
+            '411000',
+            'Clients',
+            '641000',
+            'Rémunérations',
+            '791000',
+            'Transferts de charges',
+        ));
+        $this->em->flush();
+
+        // Figeage des marges à partir des valorisations de la période (moteur US-071).
+        $this->computeMargins->forClosedPeriod($tenant, $period);
     }
 
     /** Lundi de la semaine située `$weeksAgo` semaines avant la semaine courante. */
