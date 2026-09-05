@@ -46,6 +46,25 @@ interface TimeEntryValuationRepository
     public function projectBreakdownFor(TenantId $tenant): array;
 
     /**
+     * Ventilation par projet des valorisations abouties **sur une période** `[from, to)` (US-071,
+     * T-071-04) : CA reconnu, coût et marge par projet pour figer la marge à la clôture. Même
+     * rattachement projet que {@see projectBreakdownFor()} (join `time_entry_valuation ↔ time_entry`),
+     * borné à la date de prestation du mois clôturé.
+     *
+     * @return list<ProjectValuationLine>
+     */
+    public function projectBreakdownForPeriod(TenantId $tenant, DateTimeImmutable $from, DateTimeImmutable $to): array;
+
+    /**
+     * Nombre d'imputations non valorisées (`MISSING_RATE`, CA-4) par projet **sur une période**
+     * `[from, to)` (US-071, T-071-04) — sert à marquer une marge « partielle » et à en indiquer le
+     * volume. Rattachement projet via le join `time_entry_valuation ↔ time_entry`.
+     *
+     * @return array<string, int> projectId => imputations non valorisées
+     */
+    public function missingRateCountByProjectForPeriod(TenantId $tenant, DateTimeImmutable $from, DateTimeImmutable $to): array;
+
+    /**
      * Date de prestation la plus récente parmi les valorisations abouties (US-060, T-060-03) —
      * sert à cadrer le mois de référence de l'occupation. `null` si aucune valorisation.
      */

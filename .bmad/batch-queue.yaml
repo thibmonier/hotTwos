@@ -1,58 +1,77 @@
-# File d'exécution — Sprint 7 (généré par /project:run-sprint 007)
-sprint: sprint-007-design-system
-generated_at: 2026-09-02
-goal: "Design system posé et appliqué au lot 1 (EPIC-012 D1→D4)"
+# File d'exécution — Sprint 9 (généré par /project:run-sprint 009 --auto)
+sprint: sprint-009-finance-rentabilite
+generated_at: 2026-09-04
+goal: "Marge réelle par projet à la clôture + budget vs réalisé (dérive) + dashboard finance consolidé (direction, HAB-1)"
 
 execution:
-  mode: sequential
-  parallel_limit: 2
+  mode: sequential          # 1 dev, TDD/BDD, une PR par story (GitHub Flow)
+  parallel_limit: 1
   resume_on_failure: true
   checkpoint_interval: 1
 
-# Prérequis et gates NON automatisables — à lever avant/pendant l'exécution
-gates:
-  - id: pr-12-merge
-    desc: "PR #12 (US-061→066 + conception) mergée sur main"
+# Décision d'entrée actée (PO) — préambule obligatoire
+preamble:
+  - id: T-071-08
+    desc: "[DOC] ADR léger « produit facturable = CA reconnu » (docs/adr/)"
     status: pending
-  - id: maquettes-validees
-    desc: "US-062 : validation PO des maquettes. LEVÉ le 2026-09-02 — 3 écrans validés sur maquette + direction pré-approuvée pour les 8 restants (process assoupli). Reskin US-064 débloqué (validation PO en lot du résultat). Plancher DoD conservé : WCAG 2.2 AA + états sans-permission (données sensibles)."
+
+# Prérequis / gates NON automatisables
+gates:
+  - id: main-green
+    desc: "main vert (make ci, 470 tests) au démarrage S9"
     status: satisfied
+  - id: no-open-pr
+    desc: "Aucune PR ouverte au démarrage"
+    status: satisfied
+  - id: adr-facturable
+    desc: "ADR facturable=CA reconnu formalisé (T-071-08) avant code US-071"
+    status: pending
 
 stories:
-  - id: US-061
-    title: "Charte & design system (tokens + composants Skote)"
-    points: 5
+  - id: US-071
+    title: "Moteur de marge réelle par projet à la clôture (CA reconnu − coût valorisé, INV-2)"
+    points: 8
     priority: 1
-    depends_on: []
-    status: pending
-    note: "Fondation — aucun gate externe, exécutable en premier."
-  - id: US-062
-    title: "Conception UX/UI — maquettes validées"
+    depends_on: []          # S8 (fact_project_revenue, ProjectValuationLine) déjà mergé
+    status: done            # branche feature/us-071-marge-reelle, revue approuvée, make ci vert
+    note: "Cœur EPIC-005 : moteur unique (ARC-6), figé à la clôture (US-057), gating HAB-1."
+  - id: US-072
+    title: "Budget vs réalisé + alerte de dérive financière (OBJ-2/OBJ-6, budgets US-033)"
     points: 5
     priority: 2
-    depends_on: []
+    depends_on: []          # US-033 (budget) déjà livré ; indépendant de US-071 côté données
     status: pending
-    gate: maquettes-validees
-    note: "Reste à faire léger (pré-avancée en conception) ; DoD = validation PO."
-  - id: US-063
-    title: "Intégration du layout Skote sur le socle Twig/Stimulus"
-    points: 5
-    priority: 3
-    depends_on: [US-061]
-    status: pending
-  - id: US-064
-    title: "Reskin des écrans livrés selon les maquettes"
+  - id: US-073
+    title: "Tableau de bord finance consolidé multi-projets/clients (direction, HAB-1, < 3 s P95)"
     points: 8
-    priority: 4
-    depends_on: [US-061, US-062, US-063]
+    priority: 3
+    depends_on: [US-071, US-072]
     status: pending
-    gate: maquettes-validees
-    note: "Reskin écran par écran conditionné à la maquette validée."
 
-total_points: 23
+# Réserve (Could) — hors engagement, si capacité
+reserve:
+  - id: US-074
+    title: "Export comptable configurable (EF-FIN-22)"
+    points: 5
+    status: deferred
+
+# Tâches transverses (hors points) — action rétro reconduite
+tech_debt:
+  - id: T-TECH-01
+    desc: "[OPS] Recette navigateur sur données peuplées (priorité qualité, à caser tôt)"
+    status: pending
+  - id: T-TECH-02
+    desc: "[OPS] MAILER staging + e2e reset mot de passe"
+    status: pending
+  - id: T-TECH-03
+    desc: "[OPS] Warmup cache dev après cache:clear (fiabiliser PHPStan)"
+    status: pending
+
+total_points: 21          # US-071 + US-072 + US-073 (US-074 en réserve)
 
 # Ordre d'exécution (phases)
 plan:
-  phase_1: [T-TECH-01, US-061]        # dette RLS + fondation design system
-  phase_2: [US-062, US-063]           # maquettes (→ validation PO) ‖ layout
-  phase_3: [US-064]                   # reskin (après validation maquettes + layout)
+  phase_0: [T-071-08]                 # ADR facturable (préambule, débloque US-071)
+  phase_1: [US-071, T-TECH-01]        # moteur de marge (fondation) + recette données peuplées
+  phase_2: [US-072]                   # budget vs réalisé + dérive
+  phase_3: [US-073]                   # dashboard consolidé (après US-071 + US-072)

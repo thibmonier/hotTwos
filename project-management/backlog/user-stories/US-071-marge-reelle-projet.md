@@ -4,7 +4,7 @@
 - **ID**: US-071
 - **EPIC**: EPIC-005 (Finance & rentabilité)
 - **Sprint**: Sprint 9
-- **Statut**: 🔴 To Do
+- **Statut**: ✅ Done (branche `feature/us-071-marge-reelle`, revue approuvée, `make ci` vert)
 - **Points**: 8
 - **Persona**: P6 (Directeur financier / contrôleur de gestion), P2 (Marc — chef de projet)
 - **Créé le**: 2026-09-04
@@ -95,11 +95,19 @@ THEN il voit le CA reconnu par projet
 
 | ID | Type | Description | Statut | Estimation |
 |----|------|-------------|--------|------------|
-| - | - | À décomposer (`/project:decompose-tasks 009`) | 🔴 | - |
+| T-071-08 | [DOC] | ADR-0020 « facturable = CA reconnu » | ✅ | 1h |
+| T-071-01 | [DB] | Entité `ProjectMargin` + port `ProjectMarginRepository` | ✅ | 3h |
+| T-071-02 | [DB] | Migration `project_margin` (RLS, unique) | ✅ | 2h |
+| T-071-03 | [BE] | `MarginCalculator` (moteur domaine, ARC-6) | ✅ | 2h |
+| T-071-04 | [BE] | `ComputeProjectMargins` (figeage à la clôture) | ✅ | 4h |
+| T-071-05 | [BE] | `FreezeProjectMarginsOnPeriodClosed` (branchement clôture async) | ✅ | 2h |
+| T-071-06 | [BE] | `ViewProjectMargins` (lecture figée + gating HAB-1/HAB-6) | ✅ | 2h |
+| T-071-07 | [TEST] | Tests (marge, INV-2, partiel CA-4, gating CA-5) | ✅ | 3h |
+| T-071-09 | [REV] | Revue de clôture (`symfony-reviewer`) | ✅ | 1h |
 
 ## Progression
 
-0/0 tasks complétées (0%)
+9/9 tasks complétées (100%) — revue approuvée (réserves traitées : test RLS + doc ordonnancement)
 
 ## Definition of Done
 
