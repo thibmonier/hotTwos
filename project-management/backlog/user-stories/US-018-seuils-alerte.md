@@ -3,9 +3,10 @@
 ## Métadonnées
 - **ID**: US-018
 - **EPIC**: EPIC-001
-- **Sprint**: Sprint 2
-- **Statut**: 🔴 To Do
+- **Sprint**: Sprint 10 (candidate 🟡 Should)
+- **Statut**: 🟢 Ready (affinée — candidate S10)
 - **Points**: 3
+- **Note tranche S10**: si capacité (fêtes), prioriser le **seuil de dérive de marge paramétrable par tenant** qui **remplace** l'implémentation par défaut d'US-072 (`MarginDriftThresholdProvider` / `DefaultMarginDriftThresholdProvider`, défaut 5 pts). Patron : entité tenant type `ReminderRule`. Les autres seuils (occupation, retard saisie) constituent des tranches ultérieures.
 - **Persona**: ADMIN / P2 Marc (Chef de Projet)
 - **Créé le**: 2026-08-31
 - **Mis à jour**: 2026-08-31

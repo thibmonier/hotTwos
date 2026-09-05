@@ -31,21 +31,27 @@
 - [ ] **Recette navigateur sur données peuplées** tracée dans `.recette/` (action rétro — cette fois tenue)
 - [ ] Documentation & ADR si décision structurante ; déployable
 
-## Sprint Backlog (candidat — à détailler via `/project:decompose-tasks 010`)
+## Sprint Backlog (affiné — décomposé via `/project:decompose-tasks 010`)
+
+> **Sprint Goal validé par le PO (2026-09-05).** Décision PO : format d'export = **FEC** (norme légale).
 
 | Priorité | ID | Titre | Points | Statut |
 |----------|-----|-------|--------|--------|
-| 🔴 Must | US-074 | Export comptable configurable (EF-FIN-22) | 5 | 🟢 Ready (affinée S9) |
-| 🔴 Must | QUAL-1 | Recette navigateur sur données peuplées (écrans finance) — action rétro escaladée | — (dette) | 🔵 À affiner |
-| 🔴 Must | QUAL-2 | Instrumenter la couverture : pcov + seuil ≥ 80 % bloquant en CI | — (dette) | 🔵 À affiner |
-| 🟡 Should | US-018 | Seuils d'alerte paramétrables par tenant (override du seuil de dérive US-072) | ? | 🔵 À affiner (backlog) |
-| 🟢 Could | US-036 | Atterrissage & détection de dérive (charge) — complète la dérive financière S9 | ? | 🔵 À affiner (backlog) |
+| 🔴 Must | US-074 | Export comptable au **format FEC** (EF-FIN-22) | 8 *(réestimé 5→8)* | 🟢 Ready |
+| 🔴 Must | QUAL-1 | Recette navigateur sur données peuplées (écrans finance) — action rétro escaladée | — (dette, ~1j) | 🟢 Ready |
+| 🔴 Must | QUAL-2 | Couverture : pcov + seuil bloquant en CI | — (dette, ~0.5j) | 🟢 Ready |
+| 🟡 Should | US-018 | Seuils d'alerte paramétrables par tenant (override du seuil de dérive US-072) | 3 | 🟢 Ready |
+| 🟢 Could | US-036 | Atterrissage & détection de dérive (charge) | ? | 🔵 backlog |
 
-**Engagement pressenti (Must)** : US-074 (5 pts) + QUAL-1 + QUAL-2. US-018 en Should si la capacité (réduite par les fêtes) le permet ; US-036 en Could.
+**Engagement (Must) : US-074 (8 pts) + QUAL-1 + QUAL-2.** US-018 (3 pts, Should) si la capacité réduite
+(fêtes) le permet ; US-036 en Could (non affinée). Total points engagés ≈ **8** (+3 en Should) — cohérent
+avec une capacité ~15-18 pts amputée par les fêtes, le reste étant consommé par la dette qualité (QUAL-1/2).
 
 ### Notes de préparation (Definition of Ready)
-- **US-074** est la seule story **Ready** (affinée en réserve S9). Les autres nécessitent un **affinage** avant engagement (Planning P1/affinage) — elles sont aujourd'hui `backlog` dans `.bmad/sprint-status.yaml`.
-- QUAL-1/QUAL-2 sont des **tâches de dette** (hors points) issues de la rétro S9 et de l'audit ; à décomposer comme tâches transverses.
+- **US-074, US-018, QUAL-1, QUAL-2** sont **Ready** (affinées le 2026-09-05, `sprint-status.yaml` à jour).
+- **US-074** : voir la décision de conception (export FEC = écritures équilibrées via mapping de comptes
+  configurable) → **ADR léger T-074-01** en préambule.
+- **US-036** (Could) reste `backlog`, à affiner seulement si tout le reste est terminé.
 
 ## Dépendances
 
