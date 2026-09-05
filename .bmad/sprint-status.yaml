@@ -17,6 +17,7 @@ sprints:
   sprint-007: { theme: "Design system", points: 33, goal_met: true, stories: [US-061, US-062, US-063, US-064, US-065, US-066, US-069] }
   sprint-008: { theme: "Valorisation & auth web", points: 22, goal_met: true, stories: [US-070, US-060, US-067, US-068] }
   sprint-009: { theme: "Finance & rentabilité", points: 21, goal_met: true, stories: [US-071, US-072, US-073] }
+  sprint-010: { theme: "Export FEC & consolidation qualité", points: 11, goal_met: true, stories: [US-074, US-018], debt: [QUAL-1, QUAL-2] }
 
 # État par story. status ∈ {done, ready, in-progress, backlog}
 stories:
@@ -37,7 +38,7 @@ stories:
   US-015: { title: "Taux de vente & priorité", sprint: null, status: backlog }
   US-016: { title: "Devises", sprint: null, status: backlog }
   US-017: { title: "Statuts & circuits de validation", sprint: null, status: backlog }
-  US-018: { title: "Seuils d'alerte paramétrables (tenant)", sprint: 10, status: ready }   # candidate S10 Should — override seuil dérive US-072
+  US-018: { title: "Seuils d'alerte paramétrables (tenant)", sprint: 10, status: done }      # S10 — override seuil dérive US-072 (PR #51)
   US-019: { title: "Onboarding tenant", sprint: null, status: backlog }
   US-020: { title: "Audit du paramétrage", sprint: null, status: backlog }
   US-030: { title: "Création projet & statuts", sprint: 6, status: done }
@@ -77,13 +78,13 @@ stories:
 
 # Stories techniques / dette qualité (hors vélocité) engagées au Sprint 10
 tech_stories:
-  QUAL-1: { title: "Recette navigateur sur données peuplées (finance)", sprint: 10, status: ready }  # action rétro escaladée
+  QUAL-1: { title: "Recette navigateur sur données peuplées (finance)", sprint: 10, status: done }  # PR #52 — dette rétro soldée
   QUAL-2: { title: "Instrumentation couverture (pcov + seuil CI)", sprint: 10, status: done }        # audit S9
 
 # Récapitulatif
 totals:
-  done: 40          # +US-074, +QUAL-2 (S10)
-  ready: 2          # US-018 (Should), QUAL-1 (recette — manuel)
+  done: 42          # S10 complet : US-074, US-018, QUAL-1, QUAL-2
+  ready: 0
   in_progress: 0
   backlog: 12
   orphans: [US-012, US-013, US-014, US-015, US-016, US-017, US-018, US-019, US-020, US-032]  # dans aucun sprint

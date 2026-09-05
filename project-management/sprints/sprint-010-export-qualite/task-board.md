@@ -5,29 +5,13 @@
 
 ## 🔲 À Faire
 
-### QUAL-1 — Recette données peuplées (Must, **jour 1**)
-| ID | Tâche | Estimation |
-|----|-------|------------|
-| T-QUAL-1-01 | [OPS] Étendre le seed finance (projets budgétés coût+CA cible, valorisation, période clôturée figée) | 2h |
-| T-QUAL-1-02 | [TEST] Recette navigateur (`/valorisation`, fiche projet, `/finance`) × 3 rôles + captures | 2h |
-| T-QUAL-1-03 | [DOC] Rapport `.recette/` + backlog des findings | 1h |
+_Aucune — tous les items engagés (Must + Should) sont livrés._
 
-
-## 🔲 À Faire — Should (si capacité, fêtes)
-
-### US-018 — Seuils paramétrables tenant (tranche dérive marge)
-| ID | Tâche | Estimation |
-|----|-------|------------|
-| T-018-01 | [DB] Entité `MarginDriftThreshold` tenant (patron `ReminderRule`) + migration RLS | 2h |
-| T-018-02 | [BE] `TenantMarginDriftThresholdProvider` (remplace Default) + config | 2h |
-| T-018-03 | [FE-WEB] Paramétrage admin du seuil | 1.5h |
-| T-018-04 | [TEST] Override seuil + fallback défaut | 1.5h |
-| T-018-05 | [REV] Revue de clôture | 0.5h |
-
-### Could (non affiné)
-| ID | Tâche | Estimation |
-|----|-------|------------|
-| US-036 | Atterrissage & détection de dérive (charge) — à affiner si tout le reste est fini | ? |
+### Backlog issu du sprint
+| ID | Origine | Description |
+|----|---------|-------------|
+| R-01 | recette QUAL-1 | 1er clic sur l'onglet « Suivi budgétaire » ne bascule pas le panneau (2e clic OK) — contrôleur Stimulus `tabs` | 
+| US-036 | Could (non pris) | Atterrissage & détection de dérive (charge) |
 
 ## 🔄 En Cours
 | ID | Tâche | Démarré |
@@ -42,6 +26,8 @@
 |----|-------|---------|
 | QUAL-2 | Couverture pcov + gate CI ≥ 80 % (baseline 82,78 %) — PR #48 | 2026-09-05 |
 | US-074 | Export comptable FEC (8 pts) — PR #49, revue approuvée | 2026-09-05 |
+| US-018 | Seuil de dérive paramétrable tenant (3 pts) — PR #51 | 2026-09-05 |
+| QUAL-1 | Seed finance peuplé + recette navigateur (rapport `.recette/`) — PR #52 | 2026-09-05 |
 
 ## 🚫 Bloqué
 | ID | Raison | Action |
@@ -54,6 +40,7 @@
 4. **US-018** (Should) si capacité.
 
 ## Métriques
-- **Avancement** : QUAL-2 ✅ + US-074 ✅ (8 pts livrés). Reste : QUAL-1 (recette navigateur, manuel) + US-018 (Should).
-- **Points** : 8/8 engagés livrés (US-074) ; US-018 (3) en Should à décider ; QUAL-1/2 = dette
-- ⚠️ Capacité réduite (fêtes) : Must livré ; US-018 seulement si avance ; QUAL-1 nécessite l'app + Chrome
+- **Avancement** : ✅ **100 %** — QUAL-2, US-074, US-018, QUAL-1 tous livrés et mergés (#48, #49, #51, #52).
+- **Points** : **11/11 livrés** (US-074 = 8 + US-018 = 3) ; QUAL-1/2 = dette qualité soldée.
+- **Dette rétro** : recette sur données peuplées (report S7→S9) **enfin soldée** (`.recette/sprint-010/`).
+- **Findings** : R-01 (UX mineur, onglet) → backlog.

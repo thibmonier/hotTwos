@@ -4,7 +4,7 @@
 - **ID**: QUAL-1 (story technique / dette qualité)
 - **EPIC**: — (action rétrospective transverse)
 - **Sprint**: Sprint 10 (🔴 Must — **jour 1**)
-- **Statut**: 🟢 Ready (affinée S10)
+- **Statut**: ✅ Done (livré Sprint 10 — PR #52)
 - **Points**: — (dette, hors vélocité) · **Estimation**: ~1 j
 - **Persona**: P6 (Directeur financier), P2 (Chef de projet) — via recette
 - **Créé le**: 2026-09-05
