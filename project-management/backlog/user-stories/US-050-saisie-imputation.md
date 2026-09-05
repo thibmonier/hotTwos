@@ -4,7 +4,7 @@
 - **ID**: US-050
 - **EPIC**: EPIC-003
 - **Sprint**: Sprint 1
-- **Statut**: 🔴 To Do
+- **Statut**: ✅ Done (livré Sprint 3)
 - **Points**: 5
 - **Persona**: P1 (Camille — collaborateur)
 - **Créé le**: 2026-08-31

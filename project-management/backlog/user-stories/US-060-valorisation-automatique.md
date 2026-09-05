@@ -4,7 +4,7 @@
 - **ID**: US-060
 - **EPIC**: EPIC-003
 - **Sprint**: Sprint 4
-- **Statut**: 🔴 To Do
+- **Statut**: ✅ Done (livré Sprint 8)
 - **Points**: 8
 - **Persona**: P2 (Marc — chef de projet), P6 (Directeur financier / contrôleur de gestion)
 - **Créé le**: 2026-08-31

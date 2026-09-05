@@ -4,7 +4,7 @@
 - **ID**: US-008
 - **EPIC**: EPIC-000
 - **Sprint**: Sprint 0
-- **Statut**: 🔴 To Do
+- **Statut**: ✅ Done (livré Sprint 2)
 - **Points**: 5
 - **Persona**: Équipe technique / Responsable technique
 - **Créé le**: 2026-08-31

@@ -4,7 +4,7 @@
 - **ID**: US-001
 - **EPIC**: EPIC-000
 - **Sprint**: Sprint 1
-- **Statut**: 🔴 To Do
+- **Statut**: ✅ Done (livré Sprint 1)
 - **Points**: 8
 - **Persona**: ADMIN / RSSI
 - **Créé le**: 2026-08-31

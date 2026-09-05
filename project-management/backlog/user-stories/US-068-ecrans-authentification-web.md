@@ -4,7 +4,7 @@
 - **ID**: US-068
 - **EPIC**: EPIC-000
 - **Sprint**: Backlog (non assigné)
-- **Statut**: 🔴 To Do
+- **Statut**: ✅ Done (livré Sprint 8)
 - **Points**: 8
 - **Persona**: Tous (P1-P6) — tout utilisateur s'authentifie
 - **Créé le**: 2026-09-02

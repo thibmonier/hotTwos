@@ -4,7 +4,7 @@
 - **ID**: US-058
 - **EPIC**: EPIC-003
 - **Sprint**: Sprint 2
-- **Statut**: 🔴 To Do
+- **Statut**: ✅ Done (livré Sprint 5)
 - **Points**: 3
 - **Persona**: P2 (Marc — chef de projet), P3 (Sophie — directrice de BU / reporting)
 - **Créé le**: 2026-08-31

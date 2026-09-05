@@ -4,7 +4,7 @@
 - **ID**: US-070
 - **EPIC**: EPIC-012 (contexte recette) — **transverse** (touche aussi EPIC-005 finance, EPIC-011 industrialisation)
 - **Sprint**: À planifier (backlog)
-- **Statut**: 🔴 To Do
+- **Statut**: ✅ Done (livré Sprint 8)
 - **Points**: 3
 - **Persona**: P2 Marc (manager — valorisation/validation), équipe de dev/OPS
 - **Créé le**: 2026-09-03

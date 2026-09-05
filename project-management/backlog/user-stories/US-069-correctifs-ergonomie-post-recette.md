@@ -4,7 +4,7 @@
 - **ID**: US-069
 - **EPIC**: EPIC-012
 - **Sprint**: À planifier (backlog — irritants mineurs)
-- **Statut**: 🔴 To Do
+- **Statut**: ✅ Done (livré Sprint 7)
 - **Points**: 2
 - **Persona**: P1 (collaborateur), P3 (manager/validation) — confort de navigation et de lecture
 - **Créé le**: 2026-09-03

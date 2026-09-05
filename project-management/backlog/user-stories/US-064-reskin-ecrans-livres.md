@@ -4,7 +4,7 @@
 - **ID**: US-064
 - **EPIC**: EPIC-012
 - **Sprint**: À planifier (fast-track)
-- **Statut**: 🔴 To Do
+- **Statut**: ✅ Done (livré Sprint 7)
 - **Points**: 8
 - **Persona**: Tous (P1 à P6) — écrans quotidiens de saisie et de pilotage
 - **Créé le**: 2026-09-02

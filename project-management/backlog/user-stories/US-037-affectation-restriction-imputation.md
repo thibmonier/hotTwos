@@ -4,7 +4,7 @@
 - **ID**: US-037
 - **EPIC**: EPIC-002
 - **Sprint**: 3
-- **Statut**: 🔴 To Do
+- **Statut**: ✅ Done (livré Sprint 6)
 - **Points**: 5
 - **Persona**: P2 (Marc – Chef de projet), P3 (Sophie – Resource manager)
 - **Créé le**: 2026-08-31

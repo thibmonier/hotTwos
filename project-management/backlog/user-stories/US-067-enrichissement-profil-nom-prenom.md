@@ -4,7 +4,7 @@
 - **ID**: US-067
 - **EPIC**: EPIC-000
 - **Sprint**: Backlog (non assigné)
-- **Statut**: 🔴 To Do
+- **Statut**: ✅ Done (livré Sprint 8)
 - **Points**: 3
 - **Persona**: Tous (P1-P6) — identification lisible ; bénéfice premier P2 Marc / P3 Sophie (pilotage)
 - **Créé le**: 2026-09-02
