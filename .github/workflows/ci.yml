@@ -99,8 +99,11 @@ jobs:
       # (4) Tests + couverture (unitaires + intégration multi-tenant)
       - name: Tests (PHPUnit) + couverture
         run: php bin/phpunit --coverage-text --coverage-clover=coverage.xml
-      # NOTE : le gate « couverture ≥ 80 % sur règles critiques » (ENF-MAINT-1)
-      # s'active dès l'apparition des règles de gestion (US-001+).
+
+      # (4bis) Gate couverture (QUAL-2 / ENF-MAINT-1) : échoue sous le seuil de lignes.
+      # Seuil 80 % (DoD) ; baseline mesurée 2026-09-05 = 82,78 %.
+      - name: Gate couverture (lignes ≥ 80 %)
+        run: php bin/coverage-gate.php coverage.xml 80
 
       # (5)(6)(10)(11) — étapes prêtes, activées avec le code correspondant :
       #  (5) tests d'isolation multi-tenant (groupe @multitenant) → US-001

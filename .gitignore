@@ -52,3 +52,4 @@ yarn-error.log
 
 # Tailwind (binaire + CSS buildé) — ADR-0019
 /var/tailwind/
+coverage.xml

@@ -9,8 +9,10 @@ ENV APP_DEBUG=0
 ENV COMPOSER_ALLOW_SUPERUSER=1
 WORKDIR /app
 
-# Extensions PHP (PostgreSQL, intl, opcache) + Composer.
-RUN install-php-extensions pdo_pgsql intl opcache zip @composer
+# Extensions PHP (PostgreSQL, intl, opcache) + Composer. pcov pour la couverture (QUAL-2).
+RUN install-php-extensions pdo_pgsql intl opcache zip pcov @composer
+# pcov désactivé par défaut : zéro surcoût en dev/prod, activé à la demande (`php -d pcov.enabled=1`).
+RUN printf "pcov.enabled=0\n" > /usr/local/etc/php/conf.d/zz-pcov.ini
 
 # Caddyfile custom (désactive h2c — évite la corruption de méthode HTTP derrière un proxy).
 COPY frankenphp/Caddyfile /etc/frankenphp/Caddyfile
