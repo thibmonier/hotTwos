@@ -40,7 +40,7 @@ stories:
     points: 5
     priority: 2
     depends_on: []          # US-033 (budget) déjà livré ; indépendant de US-071 côté données
-    status: pending
+    status: done            # branche feature/us-072-budget-derive, revue approuvée, make ci vert
   - id: US-073
     title: "Tableau de bord finance consolidé multi-projets/clients (direction, HAB-1, < 3 s P95)"
     points: 8

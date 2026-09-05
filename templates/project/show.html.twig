@@ -64,6 +64,12 @@
                     role="tab" id="tab-closure" aria-controls="panel-closure"
                     aria-selected="false" tabindex="-1" data-tabs-target="tab"
                     data-action="tabs#select keydown->tabs#keydown">Clôture</button>
+            {% if canViewFinancials %}
+                <button class="min-h-11 flex-shrink-0 border-b-2 border-transparent -mb-[2px] px-4 text-sm font-semibold text-muted transition-colors duration-150 hover:border-border-strong hover:text-ink aria-[selected=true]:border-primary aria-[selected=true]:text-primary"
+                        role="tab" id="tab-budget" aria-controls="panel-budget"
+                        aria-selected="false" tabindex="-1" data-tabs-target="tab"
+                        data-action="tabs#select keydown->tabs#keydown">Suivi budgétaire</button>
+            {% endif %}
         </div>
 
         {# ── Cycle de vie ── #}
@@ -89,6 +95,107 @@
                 <p class="text-xs text-muted">Aucune transition disponible depuis ce statut.</p>
             {% endif %}
         </section>
+
+        {# ── Suivi budgétaire (US-072) ── #}
+        {% if canViewFinancials %}
+            {% set bt = budgetTracking %}
+            <section id="panel-budget" role="tabpanel"
+                     aria-labelledby="tab-budget" data-tabs-target="panel" hidden>
+                <h2 class="mb-3 text-sm font-semibold text-ink">Suivi budgétaire — budget vs réalisé</h2>
+
+                {% if not bt.hasBudget %}
+                    <p class="text-muted">Aucun budget défini pour ce projet.</p>
+                    {% if canEdit %}
+                        <p class="mt-1 text-xs text-muted">Définissez le budget prévisionnel (coût et CA cible) pour activer la comparaison et l'alerte de dérive.</p>
+                    {% endif %}
+                {% else %}
+                    {% if bt.isDrifting %}
+                        <div class="mb-4 rounded border border-danger/40 bg-danger/10 p-3" role="status">
+                            <p class="text-sm font-semibold text-danger">
+                                ⚠ Dérive financière défavorable&nbsp;: −{{ bt.marginRateDriftPoints|number_format(1, ',', ' ') }}&nbsp;pts de marge
+                                (réel {{ bt.realizedMarginRatePercent|number_format(1, ',', ' ') }}&nbsp;% vs cible {{ bt.targetMarginRatePercent|number_format(1, ',', ' ') }}&nbsp;%).
+                            </p>
+                            <p class="text-xs text-muted">Seuil d'alerte&nbsp;: {{ bt.driftThresholdPoints|number_format(1, ',', ' ') }}&nbsp;pts. Dérive de marge — distincte de la dérive de charge (US-036).</p>
+                        </div>
+                    {% endif %}
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full border-collapse text-sm">
+                            <thead>
+                                <tr class="border-b-2 border-border text-left text-xs uppercase text-muted">
+                                    <th scope="col" class="py-2 pr-4">Indicateur</th>
+                                    <th scope="col" class="py-2 pr-4 text-right">Cible</th>
+                                    <th scope="col" class="py-2 pr-4 text-right">Réalisé</th>
+                                    <th scope="col" class="py-2 text-right">Écart</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {# CA — visible dès VIEW_PROJECT_FINANCIALS #}
+                                <tr class="border-b border-border">
+                                    <th scope="row" class="py-2 pr-4 font-medium text-ink">CA reconnu</th>
+                                    <td class="py-2 pr-4 text-right">{{ bt.revenueBudgetCents is not null ? (bt.revenueBudgetCents / 100)|number_format(2, ',', ' ') ~ ' €' : '—' }}</td>
+                                    <td class="py-2 pr-4 text-right">{{ (bt.realizedRevenueCents / 100)|number_format(2, ',', ' ') }}&nbsp;€</td>
+                                    <td class="py-2 text-right">
+                                        {% if bt.revenueVarianceCents is not null %}
+                                            <span class="font-semibold {{ bt.revenueVarianceCents >= 0 ? 'text-success' : 'text-danger' }}">
+                                                {{ bt.revenueVarianceCents >= 0 ? 'favorable' : 'défavorable' }}
+                                                ({{ bt.revenueVarianceCents >= 0 ? '+' : '' }}{{ (bt.revenueVarianceCents / 100)|number_format(2, ',', ' ') }}&nbsp;€)
+                                            </span>
+                                        {% else %}—{% endif %}
+                                    </td>
+                                </tr>
+
+                                {% if bt.costVisible %}
+                                    <tr class="border-b border-border">
+                                        <th scope="row" class="py-2 pr-4 font-medium text-ink">Coût</th>
+                                        <td class="py-2 pr-4 text-right">{{ bt.costBudgetCents is not null ? (bt.costBudgetCents / 100)|number_format(2, ',', ' ') ~ ' €' : '—' }}</td>
+                                        <td class="py-2 pr-4 text-right">{{ (bt.realizedCostCents / 100)|number_format(2, ',', ' ') }}&nbsp;€</td>
+                                        <td class="py-2 text-right">
+                                            {% if bt.costVarianceCents is not null %}
+                                                {# Coût réalisé > cible = défavorable #}
+                                                <span class="font-semibold {{ bt.costVarianceCents <= 0 ? 'text-success' : 'text-danger' }}">
+                                                    {{ bt.costVarianceCents <= 0 ? 'favorable' : 'défavorable' }}
+                                                    ({{ bt.costVarianceCents >= 0 ? '+' : '' }}{{ (bt.costVarianceCents / 100)|number_format(2, ',', ' ') }}&nbsp;€)
+                                                </span>
+                                            {% else %}—{% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr class="border-b border-border">
+                                        <th scope="row" class="py-2 pr-4 font-medium text-ink">Marge</th>
+                                        <td class="py-2 pr-4 text-right">
+                                            {{ bt.targetMarginCents is not null ? (bt.targetMarginCents / 100)|number_format(2, ',', ' ') ~ ' €' : '—' }}
+                                            {% if bt.targetMarginRatePercent is not null %}<span class="text-muted"> ({{ bt.targetMarginRatePercent|number_format(1, ',', ' ') }}&nbsp;%)</span>{% endif %}
+                                        </td>
+                                        <td class="py-2 pr-4 text-right">
+                                            {{ (bt.realizedMarginCents / 100)|number_format(2, ',', ' ') }}&nbsp;€
+                                            {% if bt.realizedMarginRatePercent is not null %}<span class="text-muted"> ({{ bt.realizedMarginRatePercent|number_format(1, ',', ' ') }}&nbsp;%)</span>{% endif %}
+                                        </td>
+                                        <td class="py-2 text-right">
+                                            {% if bt.marginVarianceCents is not null %}
+                                                <span class="font-semibold {{ bt.marginVarianceCents >= 0 ? 'text-success' : 'text-danger' }}">
+                                                    {{ bt.marginVarianceCents >= 0 ? 'favorable' : 'défavorable' }}
+                                                    ({{ bt.marginVarianceCents >= 0 ? '+' : '' }}{{ (bt.marginVarianceCents / 100)|number_format(2, ',', ' ') }}&nbsp;€)
+                                                </span>
+                                            {% else %}—{% endif %}
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {% if bt.costVisible and bt.consumptionPercent is not null %}
+                        <p class="mt-3 text-sm text-body">
+                            Consommation budgétaire (coût)&nbsp;:
+                            <strong class="{{ bt.consumptionPercent > 100 ? 'text-danger' : 'text-ink' }}">{{ bt.consumptionPercent|number_format(1, ',', ' ') }}&nbsp;%</strong>
+                            {% if bt.consumptionPercent > 100 %}<span class="text-danger"> (budget de charge dépassé)</span>{% endif %}
+                        </p>
+                    {% elseif not bt.costVisible %}
+                        <p class="mt-3 text-xs text-muted">Coût, marge et dérive réservés aux rôles habilités (finance/direction).</p>
+                    {% endif %}
+                {% endif %}
+            </section>
+        {% endif %}
 
         {# ── Structure ── #}
         <section id="panel-structure" role="tabpanel"

@@ -98,6 +98,9 @@ services:
     # Port marges figées (US-071, DIP).
     App\Domain\Margin\ProjectMarginRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineProjectMarginRepository'
 
+    # Seuil de dérive de marge (US-072, DIP) — défaut OBJ-6 (5 pts), override tenant via US-018.
+    App\Domain\Budget\MarginDriftThresholdProvider: '@App\Infrastructure\Budget\DefaultMarginDriftThresholdProvider'
+
     # Statut de clôture de période (US-060 CA-5) : clôture **réelle** par tenant (US-057, T-057-03),
     # branchée sur l'agrégat AccountingPeriod. Le stub ConfiguredPeriodClosure reste défini
     # (utilisable en test / configuration) mais n'est plus l'implémentation de production.

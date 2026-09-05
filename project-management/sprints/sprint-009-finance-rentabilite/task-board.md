@@ -7,11 +7,6 @@
 
 | ID | US | Tâche | Estimation |
 |----|-----|-------|------------|
-| T-072-01 | US-072 | [BE] `BudgetVsActual` (budget US-033 vs réalisé) | 3h |
-| T-072-02 | US-072 | [BE] Détection de dérive (seuil paramétrable) | 2h |
-| T-072-03 | US-072 | [FE-WEB] Suivi budgétaire fiche projet | 3h |
-| T-072-04 | US-072 | [TEST] Comparaison, alerte seuil, sans budget | 2h |
-| T-072-05 | US-072 | [REV] Revue de clôture | 1h |
 | T-073-01 | US-073 | [BE] Read model consolidé tenant + par projet | 3h |
 | T-073-02 | US-073 | [BE] Ventilation par client (US-014) | 3h |
 | T-073-03 | US-073 | [FE-WEB] Controller + route `/finance` (habilitation) | 2h |
@@ -39,6 +34,11 @@
 ## ✅ Terminé
 | ID | US | Tâche | Terminé |
 |----|-----|-------|---------|
+| T-072-05 | US-072 | [REV] Revue de clôture (symfony-reviewer — approuvé, réserves déjà couvertes) | 2026-09-04 |
+| T-072-01 | US-072 | [BE] `BudgetTrackingCalculator` (budget vs réalisé) | 2026-09-04 |
+| T-072-02 | US-072 | [BE] Dérive marge + seuil (`MarginDriftThresholdProvider`) | 2026-09-04 |
+| T-072-03 | US-072 | [FE-WEB] Onglet « Suivi budgétaire » fiche projet | 2026-09-04 |
+| T-072-04 | US-072 | [TEST] Comparaison, alerte seuil, sans budget, gating | 2026-09-04 |
 | T-071-09 | US-071 | [REV] Revue de clôture (approuvée + réserves traitées) | 2026-09-04 |
 | T-071-08 | US-071 | [DOC] ADR-0020 « facturable = CA reconnu » | 2026-09-04 |
 | T-071-01 | US-071 | [DB] Entité `ProjectMargin` + port repo | 2026-09-04 |
@@ -54,8 +54,8 @@
 |----|-----|--------|--------|
 
 ## Métriques
-- **Tâches** : 24 engagées (+5 réserve) · 9 terminées (US-071 complète, 38 %)
-- **Heures** : 55h engagées (+9.5h réserve) · ~20h consommées (US-071)
-- **Points** : 21 engagés (US-071/072/073) — **8 livrés (US-071)** ; US-074 (5) en réserve
+- **Tâches** : 24 engagées (+5 réserve) · 14 terminées (US-071 + US-072, 58 %)
+- **Heures** : 55h engagées (+9.5h réserve) · ~31h consommées (US-071 + US-072)
+- **Points** : 21 engagés (US-071/072/073) — **13 livrés (US-071 + US-072)** ; US-074 (5) en réserve
 - **Décision d'entrée** : proxy « facturable = CA reconnu » (ADR léger T-071-08 en préambule)
 - **Priorité qualité** : T-TECH-01 (recette données peuplées) — action rétro reconduite depuis S7

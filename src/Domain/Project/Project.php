@@ -66,6 +66,9 @@ class Project implements TenantOwned
         private ?DateTimeImmutable $startDate = null,
         #[ORM\Column(name: 'end_date', type: 'date_immutable', nullable: true)]
         private ?DateTimeImmutable $endDate = null,
+        /** CA cible prévisionnel (US-072, EF-FIN) — enveloppe de revenu, en centimes. Optionnel. */
+        #[ORM\Column(name: 'revenue_budget_cents', type: 'integer', nullable: true)]
+        private ?int $revenueBudgetCents = null,
     ) {
         if ('' === $code) {
             throw new InvalidArgumentException('Le code projet ne peut pas être vide.');
@@ -94,6 +97,7 @@ class Project implements TenantOwned
         ContractType $contractType,
         ?DateTimeImmutable $startDate,
         ?DateTimeImmutable $endDate,
+        ?int $revenueBudgetCents = null,
     ): self {
         if ('' === trim($clientName)) {
             throw new ProjectException('Le client est obligatoire (RG-PRJ-1).');
@@ -104,11 +108,14 @@ class Project implements TenantOwned
         if ($budgetCents <= 0) {
             throw new ProjectException('Le budget est obligatoire (RG-PRJ-1).');
         }
+        if (null !== $revenueBudgetCents && $revenueBudgetCents <= 0) {
+            throw new ProjectException('Le CA cible, s\'il est défini, doit être strictement positif.');
+        }
         if ($startDate instanceof DateTimeImmutable && $endDate instanceof DateTimeImmutable && $startDate > $endDate) {
             throw new ProjectException('La date de début doit précéder la date de fin.');
         }
 
-        return new self($tenantId, $code, $name, true, $responsibleUserId, ProjectStatus::EN_PREPARATION, trim($clientName), $budgetCents, $contractType, $startDate, $endDate);
+        return new self($tenantId, $code, $name, true, $responsibleUserId, ProjectStatus::EN_PREPARATION, trim($clientName), $budgetCents, $contractType, $startDate, $endDate, $revenueBudgetCents);
     }
 
     /** Fait évoluer le statut selon les transitions autorisées (US-030, EF-PRJ-4). */
@@ -211,6 +218,23 @@ class Project implements TenantOwned
     public function budgetCents(): ?int
     {
         return $this->budgetCents;
+    }
+
+    public function revenueBudgetCents(): ?int
+    {
+        return $this->revenueBudgetCents;
+    }
+
+    /**
+     * Définit (ou efface) le CA cible prévisionnel (US-072). Planning financier : autorisé quel que
+     * soit le statut. `null` efface la cible ; une valeur doit être strictement positive.
+     */
+    public function defineRevenueBudget(?int $revenueBudgetCents): void
+    {
+        if (null !== $revenueBudgetCents && $revenueBudgetCents <= 0) {
+            throw new ProjectException('Le CA cible, s\'il est défini, doit être strictement positif.');
+        }
+        $this->revenueBudgetCents = $revenueBudgetCents;
     }
 
     public function contractType(): ?ContractType
