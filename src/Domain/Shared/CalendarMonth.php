@@ -17,6 +17,9 @@ final class CalendarMonth
     /** Format canonique d'un mois calendaire. */
     public const string PATTERN = '/^\d{4}-(0[1-9]|1[0-2])$/';
 
+    /**
+     * @phpstan-assert-if-true non-empty-string $period
+     */
     public static function isValid(string $period): bool
     {
         return 1 === preg_match(self::PATTERN, $period);

@@ -101,6 +101,9 @@ services:
     # Seuil de dérive de marge (US-072, DIP) — défaut OBJ-6 (5 pts), override tenant via US-018.
     App\Domain\Budget\MarginDriftThresholdProvider: '@App\Infrastructure\Budget\DefaultMarginDriftThresholdProvider'
 
+    # Port configuration comptable FEC (US-074, DIP).
+    App\Domain\Fec\FecConfigurationRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineFecConfigurationRepository'
+
     # Statut de clôture de période (US-060 CA-5) : clôture **réelle** par tenant (US-057, T-057-03),
     # branchée sur l'agrégat AccountingPeriod. Le stub ConfiguredPeriodClosure reste défini
     # (utilisable en test / configuration) mais n'est plus l'implémentation de production.
