@@ -4,7 +4,7 @@
 - **ID**: US-004
 - **EPIC**: EPIC-000
 - **Sprint**: Sprint 0
-- **Statut**: 🔴 To Do
+- **Statut**: ✅ Done (livré Sprint 0)
 - **Points**: 5
 - **Persona**: Équipe technique
 - **Créé le**: 2026-08-31

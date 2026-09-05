@@ -4,7 +4,7 @@
 - **ID**: US-061
 - **EPIC**: EPIC-012
 - **Sprint**: À planifier (fast-track)
-- **Statut**: 🔴 To Do
+- **Statut**: ✅ Done (livré Sprint 7)
 - **Points**: 5
 - **Persona**: Tous (P1 à P6) — bénéficiaires d'une interface cohérente ; conçue avec l'équipe UX/UI
 - **Créé le**: 2026-09-02

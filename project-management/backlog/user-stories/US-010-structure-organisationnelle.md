@@ -4,7 +4,7 @@
 - **ID**: US-010
 - **EPIC**: EPIC-001
 - **Sprint**: Sprint 4
-- **Statut**: 🔴 To Do
+- **Statut**: ✅ Done (livré Sprint 4)
 - **Points**: 5
 - **Persona**: ADMIN
 - **Créé le**: 2026-08-31

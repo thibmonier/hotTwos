@@ -4,7 +4,7 @@
 - **ID**: US-057
 - **EPIC**: EPIC-003
 - **Sprint**: Sprint 3
-- **Statut**: 🔴 To Do
+- **Statut**: ✅ Done (livré Sprint 5)
 - **Points**: 5
 - **Persona**: P2 (Marc — chef de projet), ADMIN (administrateur tenant)
 - **Créé le**: 2026-08-31

@@ -4,7 +4,7 @@
 - **ID**: US-062
 - **EPIC**: EPIC-012
 - **Sprint**: À planifier (fast-track)
-- **Statut**: 🔴 To Do
+- **Statut**: ✅ Done (livré Sprint 7)
 - **Points**: 5
 - **Persona**: Tous (P1 à P6) — parcours et écrans couvrant tous les rôles
 - **Créé le**: 2026-09-02

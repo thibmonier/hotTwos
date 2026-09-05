@@ -4,7 +4,7 @@
 - **ID**: US-005
 - **EPIC**: EPIC-000
 - **Sprint**: Sprint 1 / Sprint 2
-- **Statut**: ✅ Done — tranche Sprint 1 (schéma, projections, non-divergence CI, RLS, anti-écriture)
+- **Statut**: ✅ Done (livré Sprint 1)
 - **Points**: 8
 - **Persona**: Équipe technique / P6 Élodie (Dirigeante)
 - **Créé le**: 2026-08-31

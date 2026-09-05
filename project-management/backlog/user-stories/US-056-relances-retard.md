@@ -4,7 +4,7 @@
 - **ID**: US-056
 - **EPIC**: EPIC-003
 - **Sprint**: Sprint 2
-- **Statut**: 🔴 To Do
+- **Statut**: ✅ Done (livré Sprint 5)
 - **Points**: 3
 - **Persona**: P1 (Camille — collaborateur, destinataire), P2 (Marc — chef de projet, paramètre les règles)
 - **Créé le**: 2026-08-31

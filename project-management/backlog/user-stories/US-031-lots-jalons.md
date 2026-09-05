@@ -4,7 +4,7 @@
 - **ID**: US-031
 - **EPIC**: EPIC-002
 - **Sprint**: 2
-- **Statut**: 🔴 To Do
+- **Statut**: ✅ Done (livré Sprint 6)
 - **Points**: 5
 - **Persona**: P2 (Marc – Chef de projet)
 - **Créé le**: 2026-08-31

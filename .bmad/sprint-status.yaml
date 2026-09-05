@@ -1,0 +1,85 @@
+# Statut consolidé du backlog — source de vérité réconciliée depuis git + reviews de sprint.
+# Généré par /project:sync-backlog (réconciliation complète, direction files←git).
+# Les statuts des fichiers markdown ont été alignés sur cet état.
+last_sync: "2026-09-05T08:30:00Z"
+source_of_truth: "git history + project-management/sprints/*/sprint-review.md"
+resolution_strategy: "git-wins (les fichiers markdown étaient périmés)"
+
+# Résumé par sprint (goal atteint d'après sprint-review.md)
+sprints:
+  sprint-000: { theme: "Fondations & outillage", points: 28, goal_met: true, stories: [US-006, US-007, US-004, US-008, US-009] }
+  sprint-001: { theme: "Walking skeleton", points: 29, goal_met: true, stories: [US-001, US-002, US-003, US-005] }
+  sprint-002: { theme: "Consolidation technique", points: 20, goal_met: true, stories: [US-006, US-008] }   # complétion (worker réel, obs.)
+  sprint-003: { theme: "Première saisie du temps", points: 23, goal_met: true, stories: [US-050, US-051, US-055] }
+  sprint-004: { theme: "Valorisation", points: 21, goal_met: true, stories: [US-010, US-011, US-060] }
+  sprint-005: { theme: "Complétude & clôture", points: 22, goal_met: true, stories: [US-057, US-054, US-058, US-056, US-052, US-059] }
+  sprint-006: { theme: "Projets & delivery", points: 21, goal_met: true, stories: [US-030, US-031, US-037, US-034, US-038] }
+  sprint-007: { theme: "Design system", points: 33, goal_met: true, stories: [US-061, US-062, US-063, US-064, US-065, US-066, US-069] }
+  sprint-008: { theme: "Valorisation & auth web", points: 22, goal_met: true, stories: [US-070, US-060, US-067, US-068] }
+  sprint-009: { theme: "Finance & rentabilité", points: 21, goal_met: true, stories: [US-071, US-072, US-073] }
+
+# État par story. status ∈ {done, ready, in-progress, backlog}
+stories:
+  US-001: { title: "Fondation multi-tenant & isolation", sprint: 1, status: done }
+  US-002: { title: "Authentification & cycle de vie users", sprint: 1, status: done }
+  US-003: { title: "Rôles & habilitations (RBAC)", sprint: 1, status: done }
+  US-004: { title: "CI/CD mode worker", sprint: 0, status: done }
+  US-005: { title: "Modèle analytique en étoile", sprint: 1, status: done }
+  US-006: { title: "Squelette applicatif Symfony", sprint: 2, status: done }        # tranches S0→S2
+  US-007: { title: "Environnement conteneurisé", sprint: 0, status: done }
+  US-008: { title: "Staging / Vault / observabilité", sprint: 2, status: done }     # tranches S0→S2
+  US-009: { title: "Outillage qualité / sécurité", sprint: 0, status: done }
+  US-010: { title: "Structure organisationnelle", sprint: 4, status: done }
+  US-011: { title: "Référentiel profils & taux", sprint: 4, status: done }
+  US-012: { title: "Calendriers & absences", sprint: null, status: backlog }
+  US-013: { title: "Référentiel compétences", sprint: null, status: backlog }
+  US-014: { title: "Comptes clients & contacts", sprint: null, status: backlog }    # dépendance future US-073 (dimension client structurée)
+  US-015: { title: "Taux de vente & priorité", sprint: null, status: backlog }
+  US-016: { title: "Devises", sprint: null, status: backlog }
+  US-017: { title: "Statuts & circuits de validation", sprint: null, status: backlog }
+  US-018: { title: "Seuils d'alerte", sprint: null, status: backlog }               # override du seuil de dérive US-072
+  US-019: { title: "Onboarding tenant", sprint: null, status: backlog }
+  US-020: { title: "Audit du paramétrage", sprint: null, status: backlog }
+  US-030: { title: "Création projet & statuts", sprint: 6, status: done }
+  US-031: { title: "Lots & jalons", sprint: 6, status: done }
+  US-032: { title: "Projets internes", sprint: null, status: backlog }
+  US-033: { title: "Budget charge & montant", sprint: null, status: backlog }       # référencé S6/S9 goals ; budget_cents/revenue_budget_cents posés en pratique
+  US-034: { title: "Engagements externes", sprint: 6, status: done }
+  US-035: { title: "Avancement & RAF", sprint: null, status: backlog }              # référencé S6 goal, non livré
+  US-036: { title: "Atterrissage & détection de dérive (charge)", sprint: null, status: backlog }  # complété côté finance par US-072
+  US-037: { title: "Affectation & restriction d'imputation", sprint: 6, status: done }
+  US-038: { title: "Clôture opérationnelle projet", sprint: 6, status: done }
+  US-050: { title: "Saisie / imputation hebdo", sprint: 3, status: done }
+  US-051: { title: "Saisie ≤ 2 min", sprint: 3, status: done }
+  US-052: { title: "Saisie mobile", sprint: 5, status: done }
+  US-053: { title: "Préremplissage IA", sprint: null, status: backlog }             # dépend EPIC-010
+  US-054: { title: "Déclaration / validation absences", sprint: 5, status: done }
+  US-055: { title: "Validation des temps par lot", sprint: 3, status: done }
+  US-056: { title: "Relances retard de saisie", sprint: 5, status: done }
+  US-057: { title: "Clôture de période & traçabilité", sprint: 5, status: done }
+  US-058: { title: "Tableau de complétude", sprint: 5, status: done }
+  US-059: { title: "Synthèse activité & planning", sprint: 5, status: done }
+  US-060: { title: "Valorisation automatique du temps validé", sprint: 8, status: done }  # tranches S4→S8
+  US-061: { title: "Charte & design system", sprint: 7, status: done }
+  US-062: { title: "Conception UX/UI lot 1", sprint: 7, status: done }
+  US-063: { title: "Intégration layout", sprint: 7, status: done }
+  US-064: { title: "Reskin des écrans livrés", sprint: 7, status: done }
+  US-065: { title: "Accessibilité WCAG 2.2 AA", sprint: 7, status: done }
+  US-066: { title: "Recette ergonomie & validation", sprint: 7, status: done }
+  US-067: { title: "Enrichissement profil (nom/prénom)", sprint: 8, status: done }
+  US-068: { title: "Écrans d'authentification web", sprint: 8, status: done }
+  US-069: { title: "Correctifs ergonomie post-recette", sprint: 7, status: done }
+  US-070: { title: "Findings recette (build/seed)", sprint: 8, status: done }
+  US-071: { title: "Moteur de marge réelle par projet à la clôture", sprint: 9, status: done }
+  US-072: { title: "Budget vs réalisé & alerte de dérive", sprint: 9, status: done }
+  US-073: { title: "Tableau de bord finance consolidé", sprint: 9, status: done }
+  US-074: { title: "Export comptable configurable", sprint: null, status: ready }    # affinée, réserve S9 non prise, candidate S10
+
+# Récapitulatif
+totals:
+  done: 38
+  ready: 1
+  in_progress: 0
+  backlog: 15
+  orphans: [US-012, US-013, US-014, US-015, US-016, US-017, US-018, US-019, US-020, US-032]  # dans aucun sprint
+  referenced_not_delivered: [US-033, US-035, US-036, US-053]

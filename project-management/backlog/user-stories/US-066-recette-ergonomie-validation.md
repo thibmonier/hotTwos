@@ -4,7 +4,7 @@
 - **ID**: US-066
 - **EPIC**: EPIC-012
 - **Sprint**: À planifier (fast-track)
-- **Statut**: 🔴 To Do
+- **Statut**: ✅ Done (livré Sprint 7)
 - **Points**: 3
 - **Persona**: Tous (P1 à P6) — validation de l'ergonomie définitive par les utilisateurs cibles
 - **Créé le**: 2026-09-02

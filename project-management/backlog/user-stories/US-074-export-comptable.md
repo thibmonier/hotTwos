@@ -4,7 +4,7 @@
 - **ID**: US-074
 - **EPIC**: EPIC-005 (Finance & rentabilité)
 - **Sprint**: Sprint 9 (**réserve** — Could, si capacité)
-- **Statut**: 🔴 To Do
+- **Statut**: 🟢 Ready (affinée — réserve S9 non prise, candidate S10)
 - **Points**: 5
 - **Persona**: P6 (Directeur financier / contrôleur de gestion)
 - **Créé le**: 2026-09-04
