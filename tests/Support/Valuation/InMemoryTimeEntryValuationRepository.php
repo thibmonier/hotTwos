@@ -31,6 +31,17 @@ final class InMemoryTimeEntryValuationRepository implements TimeEntryValuationRe
     /** @var array<string, int> userId => jours valorisés distincts, fixés par les tests. */
     public array $valuedDayCountByUser = [];
 
+    /**
+     * Ventilation par projet sur une période (US-071) — fixée explicitement par les tests (le
+     * rattachement date/projet vit dans `time_entry`, hors de ce fake).
+     *
+     * @var list<ProjectValuationLine>
+     */
+    public array $projectBreakdownForPeriod = [];
+
+    /** @var array<string, int> projectId => imputations MISSING_RATE sur la période, fixé par les tests. */
+    public array $missingRateCountByProject = [];
+
     public function save(TimeEntryValuation $valuation): void
     {
         // Une seule valorisation par imputation : remplace la précédente (re-valorisation).
@@ -101,6 +112,16 @@ final class InMemoryTimeEntryValuationRepository implements TimeEntryValuationRe
     public function projectBreakdownFor(TenantId $tenant): array
     {
         return $this->projectBreakdown;
+    }
+
+    public function projectBreakdownForPeriod(TenantId $tenant, DateTimeImmutable $from, DateTimeImmutable $to): array
+    {
+        return $this->projectBreakdownForPeriod;
+    }
+
+    public function missingRateCountByProjectForPeriod(TenantId $tenant, DateTimeImmutable $from, DateTimeImmutable $to): array
+    {
+        return $this->missingRateCountByProject;
     }
 
     public function latestValuedWorkDate(TenantId $tenant): ?DateTimeImmutable

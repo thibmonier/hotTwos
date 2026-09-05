@@ -139,6 +139,62 @@ final readonly class DoctrineTimeEntryValuationRepository implements TimeEntryVa
         );
     }
 
+    public function projectBreakdownForPeriod(TenantId $tenant, DateTimeImmutable $from, DateTimeImmutable $to): array
+    {
+        // Même join que projectBreakdownFor, borné à la période de prestation (US-071, T-071-04).
+        /** @var list<array<string, mixed>> $rows */
+        $rows = $this->entityManager->createQuery(
+            'SELECT p.id AS projectId, p.name AS projectName, COUNT(v.id) AS c,'
+            .' COALESCE(SUM(v.revenueCents), 0) AS rev, COALESCE(SUM(v.costCents), 0) AS cost'
+            .' FROM '.TimeEntryValuation::class.' v, '.TimeEntry::class.' te, '.Project::class.' p'
+            .' WHERE v.tenantId = :tenant AND v.status = :status'
+            .' AND te.id = v.timeEntryId AND p.id = te.projectId'
+            .' AND te.workDate >= :from AND te.workDate < :to'
+            .' GROUP BY p.id, p.name ORDER BY rev DESC',
+        )
+            ->setParameter('tenant', $tenant->toString())
+            ->setParameter('status', ValuationStatus::VALUED->value)
+            ->setParameter('from', $from)
+            ->setParameter('to', $to)
+            ->getResult();
+
+        return array_map(
+            fn (array $row): ProjectValuationLine => new ProjectValuationLine(
+                $this->stringOf($row['projectId']),
+                $this->stringOf($row['projectName']),
+                $this->intOf($row['c']),
+                $this->intOf($row['rev']),
+                $this->intOf($row['cost']),
+            ),
+            $rows,
+        );
+    }
+
+    public function missingRateCountByProjectForPeriod(TenantId $tenant, DateTimeImmutable $from, DateTimeImmutable $to): array
+    {
+        /** @var list<array<string, mixed>> $rows */
+        $rows = $this->entityManager->createQuery(
+            'SELECT te.projectId AS projectId, COUNT(v.id) AS c'
+            .' FROM '.TimeEntryValuation::class.' v, '.TimeEntry::class.' te'
+            .' WHERE v.tenantId = :tenant AND v.status = :status'
+            .' AND te.id = v.timeEntryId'
+            .' AND te.workDate >= :from AND te.workDate < :to'
+            .' GROUP BY te.projectId',
+        )
+            ->setParameter('tenant', $tenant->toString())
+            ->setParameter('status', ValuationStatus::MISSING_RATE->value)
+            ->setParameter('from', $from)
+            ->setParameter('to', $to)
+            ->getResult();
+
+        $byProject = [];
+        foreach ($rows as $row) {
+            $byProject[$this->stringOf($row['projectId'])] = $this->intOf($row['c']);
+        }
+
+        return $byProject;
+    }
+
     public function latestValuedWorkDate(TenantId $tenant): ?DateTimeImmutable
     {
         // Join implicite v ↔ time_entry pour remonter à la date de prestation (T-060-03).
