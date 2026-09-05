@@ -4,7 +4,7 @@
 - **ID**: US-073
 - **EPIC**: EPIC-005 (Finance & rentabilité)
 - **Sprint**: Sprint 9
-- **Statut**: 🔴 To Do
+- **Statut**: ✅ Done (branche `feature/us-073-dashboard-finance`, revue approuvée, `make ci` vert)
 - **Points**: 8
 - **Persona**: P6 (Directeur financier / contrôleur de gestion), P7 (Dirigeant)
 - **Créé le**: 2026-09-04
@@ -77,11 +77,24 @@ THEN les totaux et ventilations sont recalculés côté backend pour le périmè
 
 | ID | Type | Description | Statut | Estimation |
 |----|------|-------------|--------|------------|
-| - | - | À décomposer (`/project:decompose-tasks 009`) | 🔴 | - |
+| T-073-01 | [BE] | `ConsolidatedFinanceReport` (totaux + ventilation projet) | ✅ | 3h |
+| T-073-02 | [BE] | Ventilation par client (`Project.clientName`) | ✅ | 3h |
+| T-073-03 | [FE-WEB] | Controller + route `/finance` (403 deny-by-default) | ✅ | 2h |
+| T-073-04 | [FE-WEB] | Template consolidé (gating, a11y, figé/provisoire) | ✅ | 4h |
+| T-073-05 | [BE] | Perf O(projets) sur marges figées (pas de rejeu, ARC-6) | ✅ | 2h |
+| T-073-06 | [TEST] | Accès 403, gating, consolidation, filtre client | ✅ | 3h |
+| T-073-07 | [REV] | Revue de clôture (`symfony-reviewer`) | ✅ | 1h |
 
 ## Progression
 
-0/0 tasks complétées (0%)
+7/7 tasks complétées (100%) — revue approuvée (gating HAB-1 impeccable)
+
+## Note de périmètre
+
+Dimension client via `Project.clientName` (US-014 structuré = enrichissement futur). Consolidation
+sur les **marges figées `ProjectMargin`** d'US-071 (déjà agrégées par période → perf O(projets), pas de
+projection `fact_project_margin` supplémentaire, ARC-6). Perf profilée non exécutée sur 5 ans
+d'historique (jeu de données réel à venir avec T-TECH-01 recette données peuplées).
 
 ## Definition of Done
 

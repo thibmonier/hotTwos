@@ -7,13 +7,6 @@
 
 | ID | US | Tâche | Estimation |
 |----|-----|-------|------------|
-| T-073-01 | US-073 | [BE] Read model consolidé tenant + par projet | 3h |
-| T-073-02 | US-073 | [BE] Ventilation par client (US-014) | 3h |
-| T-073-03 | US-073 | [FE-WEB] Controller + route `/finance` (habilitation) | 2h |
-| T-073-04 | US-073 | [FE-WEB] Template dashboard consolidé (gating, a11y) | 4h |
-| T-073-05 | US-073 | [BE/TEST] Perf < 3 s (agrégats + index T-060-09) | 2h |
-| T-073-06 | US-073 | [TEST] Accès 403, gating, consolidation | 3h |
-| T-073-07 | US-073 | [REV] Revue de clôture | 1h |
 | T-TECH-01 | — | [OPS] Recette navigateur données peuplées (rétro) | 3h |
 | T-TECH-02 | — | [OPS] MAILER staging + e2e reset | 2h |
 | T-TECH-03 | — | [OPS] Warmup cache dev après cache:clear | 1h |
@@ -34,6 +27,13 @@
 ## ✅ Terminé
 | ID | US | Tâche | Terminé |
 |----|-----|-------|---------|
+| T-073-07 | US-073 | [REV] Revue de clôture (symfony-reviewer — approuvé, gating HAB-1 impeccable) | 2026-09-04 |
+| T-073-01 | US-073 | [BE] Read model consolidé (`ConsolidatedFinanceReport`) | 2026-09-04 |
+| T-073-02 | US-073 | [BE] Ventilation par client (`Project.clientName`) | 2026-09-04 |
+| T-073-03 | US-073 | [FE-WEB] Controller + route `/finance` (403 deny-by-default) | 2026-09-04 |
+| T-073-04 | US-073 | [FE-WEB] Template consolidé (gating, a11y, figé/provisoire) | 2026-09-04 |
+| T-073-05 | US-073 | [BE] Perf O(projets) sur marges figées (pas de rejeu) | 2026-09-04 |
+| T-073-06 | US-073 | [TEST] Accès 403, gating, consolidation, filtre client | 2026-09-04 |
 | T-072-05 | US-072 | [REV] Revue de clôture (symfony-reviewer — approuvé, réserves déjà couvertes) | 2026-09-04 |
 | T-072-01 | US-072 | [BE] `BudgetTrackingCalculator` (budget vs réalisé) | 2026-09-04 |
 | T-072-02 | US-072 | [BE] Dérive marge + seuil (`MarginDriftThresholdProvider`) | 2026-09-04 |
@@ -54,8 +54,9 @@
 |----|-----|--------|--------|
 
 ## Métriques
-- **Tâches** : 24 engagées (+5 réserve) · 14 terminées (US-071 + US-072, 58 %)
-- **Heures** : 55h engagées (+9.5h réserve) · ~31h consommées (US-071 + US-072)
-- **Points** : 21 engagés (US-071/072/073) — **13 livrés (US-071 + US-072)** ; US-074 (5) en réserve
+- **Tâches** : 24 engagées (+5 réserve) · 21 terminées (US-071 + US-072 + US-073, 88 %)
+- **Heures** : 55h engagées (+9.5h réserve) · ~49h consommées (3 stories)
+- **Points** : 21 engagés (US-071/072/073) — **21 livrés ✅ (100 % — Sprint Goal atteint)** ; US-074 (5) en réserve
+- **Reste** : tâches transverses T-TECH-01/02/03 (hors points, actions rétro)
 - **Décision d'entrée** : proxy « facturable = CA reconnu » (ADR léger T-071-08 en préambule)
 - **Priorité qualité** : T-TECH-01 (recette données peuplées) — action rétro reconduite depuis S7

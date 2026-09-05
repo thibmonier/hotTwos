@@ -29,4 +29,12 @@ interface ProjectMarginRepository
      * @return list<ProjectMargin>
      */
     public function findForPeriod(TenantId $tenant, string $period): array;
+
+    /**
+     * Périodes disposant de marges figées, de la plus récente à la plus ancienne (US-073) — alimente
+     * le sélecteur de période du tableau de bord consolidé.
+     *
+     * @return list<string>
+     */
+    public function findPeriods(TenantId $tenant): array;
 }

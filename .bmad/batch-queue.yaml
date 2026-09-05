@@ -46,7 +46,7 @@ stories:
     points: 8
     priority: 3
     depends_on: [US-071, US-072]
-    status: pending
+    status: done            # branche feature/us-073-dashboard-finance, revue approuvée, make ci vert
 
 # Réserve (Could) — hors engagement, si capacité
 reserve:
