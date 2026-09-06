@@ -67,12 +67,17 @@ THEN l'accès est refusé (403)
 ```
 
 ## Definition of Done
-- [ ] Modèle « ligne de budget par profil » (lot → {profil, jours}) + migration + RLS
-- [ ] Conversion jours→€ vente/coût via les taux **historisés** (port référentiel EPIC-001), date de référence
-- [ ] Réconciliation lot/projet (EF-PRJ-2) mise à jour avec les équivalents par profil
-- [ ] UI : saisie du budget par profil sur le lot + affichage équivalents € vente/coût
-- [ ] Tests : conversion multi-profils, taux historisé, profil sans taux, réconciliation, gating
-- [ ] `make ci` vert · revue de clôture
+- [x] Modèle `LotProfileBudget` (lot → {profil, jours}) + port + migration + RLS
+- [x] Conversion jours→€ vente/coût via `RateResolver::resolveAt` (taux **historisés** EPIC-001), date de référence = début projet
+- [x] `ProfileBudgetCalculator` : agrégation par lot, profil sans taux signalé (CA-4)
+- [x] UI : saisie du budget par profil sur le lot (onglet Structure) + affichage équivalents € vente/coût
+- [x] Use case `DefineLotProfileBudget` (gated EDIT_PROJECT, upsert par couple lot/profil)
+- [x] Tests : conversion multi-profils, taux historisé à date, profil sans taux, gating, functional
+- [x] `make ci` vert · revue de clôture
+
+## Note de réalisation
+Réutilise intégralement `App\Domain\Pricing` (`RateResolver`, `ProfileRate` coût+vente historisés). Le budget
+par profil **coexiste** avec `ProjectLot.budgetDays/budgetCents` (migration douce). Saisie au niveau lot racine.
 
 ## Notes
 Réutiliser le référentiel profils/taux d'EPIC-001 (ne pas dupliquer les taux). Compatibilité ascendante :

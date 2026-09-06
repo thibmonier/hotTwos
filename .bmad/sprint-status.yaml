@@ -80,7 +80,7 @@ stories:
   US-075: { title: "Émission manuelle de factures par projet/période", sprint: 11, status: done, points: 8 }
   US-076: { title: "Facturé réel comme source de marge (supersede proxy)", sprint: 11, status: done, points: 5 }
   US-077: { title: "Export FEC sur facturé réel", sprint: 11, status: done, points: 5 }   # Should — PR #61 (acquis par source unique US-076)
-  US-078: { title: "Budget charge par profil (EF-PRJ-9)", sprint: null, status: ready, points: 8 }   # affinée 2026-09-06 (complète EPIC-002)
+  US-078: { title: "Budget charge par profil (EF-PRJ-9)", sprint: 13, status: done, points: 8 }   # S13 (complète EPIC-002)
   US-079: { title: "Raffinements pilotage — export/courbe/seuil par type (EF-PRJ-14/15/16)", sprint: null, status: ready, points: 8 }   # affinée 2026-09-06 (Should, à découper)
 
 # Stories techniques / dette qualité (hors vélocité) engagées au Sprint 10

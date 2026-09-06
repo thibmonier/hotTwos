@@ -9,7 +9,9 @@ use App\Domain\Authorization\Role;
 use App\Domain\Project\ContractType;
 use App\Domain\Project\ExceptionalImputationOpening;
 use App\Domain\Project\ExternalCommitment;
+use App\Domain\Pricing\Profile;
 use App\Domain\Project\BudgetAmendment;
+use App\Domain\Project\LotProfileBudget;
 use App\Domain\Project\Project;
 use App\Domain\Project\ProjectAssignment;
 use App\Domain\Project\ProjectLot;
@@ -72,6 +74,8 @@ final class ProjectBudgetTrackingTest extends WebTestCase
             $this->em->getClassMetadata(Client::class),
             $this->em->getClassMetadata(Invoice::class),
             $this->em->getClassMetadata(BudgetAmendment::class),
+            $this->em->getClassMetadata(Profile::class),
+            $this->em->getClassMetadata(LotProfileBudget::class),
         ];
         $tool = new SchemaTool($this->em);
         $tool->dropSchema($this->schema);
