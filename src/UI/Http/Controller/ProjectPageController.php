@@ -50,6 +50,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use DateTimeImmutable;
+use RuntimeException;
 
 /**
  * US-030 (T-030-06) — écran de gestion des projets (adaptateur web). Liste, création (RG-PRJ-1) et
@@ -470,6 +471,53 @@ final class ProjectPageController extends AbstractController
         }
 
         return $this->redirectToRoute('project_show', ['id' => $id, '_fragment' => 'panel-structure']);
+    }
+
+    #[Route('/projets/{id}/pilotage/export', name: 'project_pilotage_export', requirements: ['id' => '[0-9a-f-]{36}'], methods: ['GET'])]
+    public function exportPilotage(#[CurrentUser] User $user, string $id): Response
+    {
+        $this->authorizer->ensureCan($user, Permission::VIEW_PROJECT_FINANCIALS);
+        $project = $this->projects->find($user->tenantId(), $id);
+        if (!$project instanceof Project) {
+            throw $this->createNotFoundException('Projet introuvable.');
+        }
+
+        $bt = $this->budgetTracking->forProject($user, $id);
+        $lots = $this->lots->findForProject($user->tenantId(), $id);
+
+        // Colonnes coût réservées à VIEW_COLLABORATOR_COST (HAB-1) : $bt gate déjà ces champs à null.
+        $euro = static fn (?int $cents): string => null === $cents ? '' : number_format($cents / 100, 2, '.', '');
+        $nullable = static fn (?int $value): string => null === $value ? '' : (string) $value;
+        $ecart = (null !== $bt->landingCostCents && null !== $bt->costBudgetCents) ? $bt->landingCostCents - $bt->costBudgetCents : null;
+
+        $rootDays = 0;
+        foreach ($lots as $lot) {
+            if ($lot->isRoot()) {
+                $rootDays += $lot->budgetDays();
+            }
+        }
+
+        $rows = [['Section', 'Élément', 'Budget (j)', 'Avancement (%)', 'RAF (j)', 'Budget courant (€)', 'Consommé (€)', 'Atterrissage (€)', 'Écart (€)']];
+        $rows[] = ['Projet', $project->name(), (string) $rootDays, $nullable($bt->landingProgressPercent), '', $euro($bt->costBudgetCents), $euro($bt->realizedCostCents), $euro($bt->landingCostCents), $euro($ecart)];
+        foreach ($lots as $lot) {
+            $rows[] = ['Lot', $lot->name(), (string) $lot->budgetDays(), $nullable($lot->physicalProgressPercent()), $nullable($lot->remainingWorkDays()), '', '', '', ''];
+        }
+
+        $handle = fopen('php://temp', 'r+');
+        if (false === $handle) {
+            throw new RuntimeException('Impossible de générer le fichier CSV.');
+        }
+        foreach ($rows as $row) {
+            fputcsv($handle, $row, ';', '"', '');
+        }
+        rewind($handle);
+        $csv = (string) stream_get_contents($handle);
+        fclose($handle);
+
+        return new Response($csv, Response::HTTP_OK, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => sprintf('attachment; filename="pilotage-%s.csv"', $project->code()),
+        ]);
     }
 
     #[Route('/projets/{id}/interne', name: 'project_toggle_internal', requirements: ['id' => '[0-9a-f-]{36}'], methods: ['POST'])]

@@ -58,10 +58,15 @@ THEN l'alerte est également escaladée à la direction
 ```
 
 ## Definition of Done
-- [ ] Export CSV du tableau de pilotage (EF-PRJ-14) — gating HAB-1 sur les colonnes de coût
-- [ ] Historisation de l'atterrissage + visualisation de la courbe (EF-PRJ-16)
-- [ ] Seuil de dérive **par type de projet** (remplace les constantes `ChargeLandingCalculator`) + 2e seuil direction (EF-PRJ-15)
-- [ ] Tests par sous-capacité ; `make ci` vert · revue de clôture
+- [x] **US-079a** Export CSV du tableau de pilotage (EF-PRJ-14) — gating HAB-1 sur les colonnes de coût — **livré S14 (PR #78)**
+- [ ] **US-079c** Historisation de l'atterrissage + visualisation de la courbe (EF-PRJ-16) — **reporté S15** (historisation invasive dans `ComputeProjectMargins`, décision Tech Lead)
+- [ ] **US-079b** Seuil de dérive **par type de projet** + 2e seuil direction (EF-PRJ-15) — **reporté S15** (raffinement)
+- [x] Tests par sous-capacité (export) ; `make ci` vert
+
+## Note de découpage (S14)
+La story parapluie a été livrée en tranches : **US-079a export** en S14 ; **US-079c courbe** et **US-079b
+seuil par type** reportés au S15 (la courbe demande une historisation dans le handler de figeage de marge —
+intégration disproportionnée pour une valeur Should).
 
 ## Notes
 Story « parapluie » : au sprint planning, découper en 3 (export / courbe / seuil) selon la capacité.

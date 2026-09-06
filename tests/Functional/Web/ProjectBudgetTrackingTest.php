@@ -248,6 +248,25 @@ final class ProjectBudgetTrackingTest extends WebTestCase
         self::assertStringNotContainsString('avenant(s)', $content);
     }
 
+    public function testPilotageCsvExportGatesCostColumns(): void
+    {
+        // Dirigeant (coût visible) : les colonnes coût sont remplies.
+        $this->login('dg@agence.test');
+        $this->client->request('GET', '/projets/'.$this->budgetedProjectId.'/pilotage/export');
+        self::assertResponseIsSuccessful();
+        self::assertStringContainsString('text/csv', (string) $this->client->getResponse()->headers->get('Content-Type'));
+        $dg = (string) $this->client->getResponse()->getContent();
+        self::assertStringContainsString('Atterrissage (€)', $dg);           // en-tête
+        self::assertStringContainsString('33000.00', $dg);                   // consommé visible (coût)
+
+        // Chef de projet (sans coût) : colonnes coût vides (HAB-1).
+        $this->login('marc@agence.test');
+        $this->client->request('GET', '/projets/'.$this->budgetedProjectId.'/pilotage/export');
+        self::assertResponseIsSuccessful();
+        $marc = (string) $this->client->getResponse()->getContent();
+        self::assertStringNotContainsString('33000.00', $marc);              // coût masqué
+    }
+
     private function login(string $email): void
     {
         $this->client->request(

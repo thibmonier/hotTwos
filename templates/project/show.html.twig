@@ -133,7 +133,9 @@
             {% set bt = budgetTracking %}
             <section id="panel-budget" role="tabpanel"
                      aria-labelledby="tab-budget" data-tabs-target="panel" hidden>
-                <h2 class="mb-3 text-sm font-semibold text-ink">Suivi budgétaire — budget vs réalisé</h2>
+                <h2 class="mb-3 text-sm font-semibold text-ink">Suivi budgétaire — budget vs réalisé
+                    <a href="{{ path('project_pilotage_export', { id: project.id }) }}" class="ml-2 text-xs font-medium text-primary hover:underline">Exporter (CSV)</a>
+                </h2>
 
                 {# ── Budget : initial, avenants & courant (US-033, EF-PRJ-8) ── #}
                 <div class="mb-4 rounded border border-border p-3">
