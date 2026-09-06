@@ -253,7 +253,7 @@ final class ProjectPageController extends AbstractController
         $childrenByParent = [];
         foreach ($lots as $lot) {
             if (!$lot->isRoot()) {
-                $childrenByParent[(string) $lot->parentLotId()][] = ['name' => $lot->name(), 'days' => $lot->budgetDays(), 'euros' => intdiv($lot->budgetCents(), 100)];
+                $childrenByParent[(string) $lot->parentLotId()][] = ['id' => $lot->id(), 'name' => $lot->name(), 'days' => $lot->budgetDays(), 'euros' => intdiv($lot->budgetCents(), 100), 'progress' => $lot->physicalProgressPercent(), 'raf' => $lot->remainingWorkDays()];
             }
         }
 
@@ -271,6 +271,8 @@ final class ProjectPageController extends AbstractController
                 'name' => $lot->name(),
                 'days' => $lot->budgetDays(),
                 'euros' => intdiv($lot->budgetCents(), 100),
+                'progress' => $lot->physicalProgressPercent(),
+                'raf' => $lot->remainingWorkDays(),
                 'children' => $childrenByParent[$lot->id()] ?? [],
             ];
         }

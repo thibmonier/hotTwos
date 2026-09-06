@@ -260,15 +260,42 @@
             {% if structure.roots is empty %}
                 <p class="text-muted">Aucun lot défini.</p>
             {% else %}
+                {% macro lot_progress(lot, projectId, canEdit) %}
+                    {# US-035 — avancement physique & RAF, distincts de la consommation (INV-4) #}
+                    <span class="text-xs text-muted">
+                        Avancement&nbsp;: {{ lot.progress is not null ? lot.progress ~ ' %' : '—' }}
+                        · RAF&nbsp;: {{ lot.raf is not null ? lot.raf ~ ' j' : '—' }}
+                    </span>
+                    {% if canEdit %}
+                        <form method="post" action="{{ path('project_lot_progress', { id: projectId, lotId: lot.id }) }}"
+                              class="mt-1 flex flex-wrap items-end gap-2">
+                            <input type="hidden" name="_token" value="{{ csrf_token('project_structure') }}">
+                            <label class="text-[11px] font-medium text-ink">Avancement&nbsp;%
+                                <input type="number" name="progress" min="0" max="100" inputmode="numeric" value="{{ lot.progress }}"
+                                       class="ml-1 w-16 rounded border border-border bg-surface px-2 py-1 text-[12px] text-body focus:border-primary focus:outline-none">
+                            </label>
+                            <label class="text-[11px] font-medium text-ink">RAF&nbsp;(j)
+                                <input type="number" name="raf" min="0" inputmode="numeric" value="{{ lot.raf }}"
+                                       class="ml-1 w-16 rounded border border-border bg-surface px-2 py-1 text-[12px] text-body focus:border-primary focus:outline-none">
+                            </label>
+                            <button type="submit" class="inline-flex min-h-8 items-center rounded bg-surface-2 px-2 text-[12px] font-semibold text-ink hover:bg-border">Enregistrer</button>
+                        </form>
+                    {% endif %}
+                {% endmacro %}
+
                 <ul class="mb-3 list-none p-0">
                     {% for lot in structure.roots %}
                         <li class="border-b border-border py-2 text-sm last:border-b-0">
                             <span class="font-semibold text-ink">{{ lot.name }}</span>
                             — {{ lot.days }}&nbsp;j / {{ lot.euros|number_format(0, ',', ' ') }}&nbsp;€
+                            <div class="mt-1">{{ _self.lot_progress(lot, project.id, canEdit) }}</div>
                             {% if lot.children is not empty %}
                                 <ul class="mt-1 list-none pl-6">
                                     {% for child in lot.children %}
-                                        <li class="py-0.5 text-body">{{ child.name }} — {{ child.days }}&nbsp;j / {{ child.euros|number_format(0, ',', ' ') }}&nbsp;€</li>
+                                        <li class="py-1 text-body">
+                                            {{ child.name }} — {{ child.days }}&nbsp;j / {{ child.euros|number_format(0, ',', ' ') }}&nbsp;€
+                                            <div class="mt-0.5">{{ _self.lot_progress(child, project.id, canEdit) }}</div>
+                                        </li>
                                     {% endfor %}
                                 </ul>
                             {% endif %}

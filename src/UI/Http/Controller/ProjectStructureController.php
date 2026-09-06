@@ -89,6 +89,25 @@ final class ProjectStructureController extends AbstractController
         return $this->toStructure($id);
     }
 
+    #[Route('/projets/{id}/lots/{lotId}/avancement', name: 'project_lot_progress', requirements: ['id' => '[0-9a-f-]{36}', 'lotId' => '[0-9a-f-]{36}'], methods: ['POST'])]
+    public function recordProgress(#[CurrentUser] User $user, string $id, string $lotId, Request $request): RedirectResponse
+    {
+        if (!$this->isCsrfTokenValid('project_structure', (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Jeton de sécurité invalide.');
+
+            return $this->toStructure($id);
+        }
+
+        try {
+            $this->lots->recordProgress($user, $lotId, $this->optionalInt($request->request->get('progress')), $this->optionalInt($request->request->get('raf')));
+            $this->addFlash('success', 'Avancement du lot enregistré.');
+        } catch (ProjectException $exception) {
+            $this->addFlash('error', $exception->getMessage());
+        }
+
+        return $this->toStructure($id);
+    }
+
     #[Route('/projets/{id}/jalons', name: 'project_milestone_add', requirements: ['id' => '[0-9a-f-]{36}'], methods: ['POST'])]
     public function addMilestone(#[CurrentUser] User $user, string $id, Request $request): RedirectResponse
     {
@@ -142,5 +161,20 @@ final class ProjectStructureController extends AbstractController
     private function toStructure(string $id): RedirectResponse
     {
         return $this->redirectToRoute('project_show', ['id' => $id, '_fragment' => 'panel-structure']);
+    }
+
+    /** Entier optionnel : champ vide → `null` (efface la valeur) ; non numérique → `null`. */
+    private function optionalInt(mixed $raw): ?int
+    {
+        if (!is_scalar($raw)) {
+            return null;
+        }
+        $trimmed = trim((string) $raw);
+        if ('' === $trimmed) {
+            return null;
+        }
+        $value = filter_var($trimmed, \FILTER_VALIDATE_INT);
+
+        return false === $value ? null : $value;
     }
 }

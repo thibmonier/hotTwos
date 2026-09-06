@@ -25,6 +25,14 @@ class ProjectLot implements TenantOwned
     #[ORM\Column(name: 'tenant_id', type: 'guid')]
     private string $tenantId;
 
+    /** Avancement physique déclaré (0-100 %), distinct de la consommation valorisée (US-035, INV-4). */
+    #[ORM\Column(name: 'physical_progress_percent', type: 'integer', nullable: true)]
+    private ?int $physicalProgressPercent = null;
+
+    /** Reste-à-faire déclaré en jours (US-035, INV-4) ; indépendant de l'avancement. */
+    #[ORM\Column(name: 'remaining_work_days', type: 'integer', nullable: true)]
+    private ?int $remainingWorkDays = null;
+
     public function __construct(
         TenantId $tenantId,
         #[ORM\Column(name: 'project_id', type: 'guid')]
@@ -58,6 +66,33 @@ class ProjectLot implements TenantOwned
         }
         $this->budgetDays = $budgetDays;
         $this->budgetCents = $budgetCents;
+    }
+
+    /**
+     * Enregistre l'avancement physique (%) et le reste-à-faire (jours) — US-035. Les deux données sont
+     * indépendantes (l'une sans l'autre est permis) et distinctes de la consommation valorisée (INV-4).
+     */
+    public function recordProgress(?int $physicalProgressPercent, ?int $remainingWorkDays): void
+    {
+        if (null !== $physicalProgressPercent && ($physicalProgressPercent < 0 || $physicalProgressPercent > 100)) {
+            throw new ProjectException('L\'avancement physique doit être compris entre 0 et 100 %.');
+        }
+        if (null !== $remainingWorkDays && $remainingWorkDays < 0) {
+            throw new ProjectException('Le reste-à-faire (RAF) ne peut pas être négatif.');
+        }
+
+        $this->physicalProgressPercent = $physicalProgressPercent;
+        $this->remainingWorkDays = $remainingWorkDays;
+    }
+
+    public function physicalProgressPercent(): ?int
+    {
+        return $this->physicalProgressPercent;
+    }
+
+    public function remainingWorkDays(): ?int
+    {
+        return $this->remainingWorkDays;
     }
 
     public function id(): string
