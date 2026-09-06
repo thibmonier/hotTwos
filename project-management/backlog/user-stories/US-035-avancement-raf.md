@@ -77,12 +77,17 @@ THEN l'accès est refusé (403)
 ```
 
 ## Definition of Done
-- [ ] `ProjectLot` : champs `physicalProgressPercent`/`remainingWorkDays` + mutateur avec invariants (0-100, RAF ≥ 0, `assertModifiable`)
-- [ ] Use case `RecordLotProgress` gated `EDIT_PROJECT`
-- [ ] Migration `project_lot` (colonnes nullable) + `schema:validate`
-- [ ] Saisie dans l'onglet Structure de la fiche projet
-- [ ] Tests : invariants, gating, INV-4 (avancement n'altère pas conso/RAF), refus projet clôturé
-- [ ] `make ci` vert (couverture ≥ 80 %) · revue de clôture
+- [x] `ProjectLot` : champs `physicalProgressPercent`/`remainingWorkDays` + mutateur avec invariants (0-100, RAF ≥ 0)
+- [x] `ManageProjectLots::recordProgress` gated `EDIT_PROJECT` (refus projet clôturé via `assertModifiable`)
+- [x] Migration `project_lot` (colonnes nullable) + `schema:validate`
+- [x] Saisie par lot dans l'onglet Structure de la fiche projet
+- [x] Tests : invariants (`ProjectLotTest`), gating/refus (`RecordLotProgressTest`), INV-4 (functional `ProjectPageTest`)
+- [x] `make ci` vert (couverture ≥ 80 %) · revue de clôture
+
+## Note de réalisation
+`recordProgress` a été ajouté au use case existant `ManageProjectLots` (aux côtés de `addLot`/`reallocate`)
+plutôt que dans une classe dédiée — plus DRY et cohérent avec le module. Action web `project_lot_progress`
+sur `ProjectStructureController` (CSRF `project_structure`).
 
 ## Notes
 Réutilise `ProjectLot`/`ProjectLotRepository` (US-031) et le pattern d'action gated de `ProjectPageController`.

@@ -84,6 +84,34 @@ final readonly class ManageProjectLots
         $this->audit->record('project_lot_reallocated', $tenant->toString(), $user->getUserIdentifier(), ['lot' => $lotId, 'reason' => trim($reason)]);
     }
 
+    /**
+     * Enregistre l'avancement physique (%) et le RAF (jours) d'un lot (US-035). Habilitation
+     * `EDIT_PROJECT` ; refusé sur projet clôturé (RG-PRJ-5). Données distinctes de la consommation (INV-4).
+     */
+    public function recordProgress(User $user, string $lotId, ?int $physicalProgressPercent, ?int $remainingWorkDays): void
+    {
+        $this->authorizer->ensureCan($user, Permission::EDIT_PROJECT);
+        $tenant = $user->tenantId();
+
+        $lot = $this->lots->find($tenant, $lotId);
+        if (!$lot instanceof ProjectLot) {
+            throw new ProjectException('Lot introuvable.');
+        }
+
+        $project = $this->projects->find($tenant, $lot->projectId());
+        if ($project instanceof Project) {
+            $project->assertModifiable();
+        }
+
+        $lot->recordProgress($physicalProgressPercent, $remainingWorkDays);
+        $this->lots->save($lot);
+        $this->audit->record('project_lot_progress_recorded', $tenant->toString(), $user->getUserIdentifier(), [
+            'lot' => $lotId,
+            'progress' => (string) ($physicalProgressPercent ?? ''),
+            'raf' => (string) ($remainingWorkDays ?? ''),
+        ]);
+    }
+
     private function guardRootOverrun(Project $project, string $projectId, int $addedCents, bool $confirmOverrun): void
     {
         $budget = $project->budgetCents();

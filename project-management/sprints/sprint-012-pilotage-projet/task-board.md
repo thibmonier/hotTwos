@@ -5,16 +5,6 @@
 
 ## 🔲 À Faire
 
-### US-035 — Avancement physique & RAF par lot (Must, 8 pts)
-| ID | Tâche | Est. |
-|----|-------|------|
-| T-035-01 | [DB] Champs + mutateur `ProjectLot` | 2h |
-| T-035-02 | [DB] Migration `project_lot` | 1h |
-| T-035-03 | [BE] Use case `RecordLotProgress` (gated EDIT_PROJECT) | 2h |
-| T-035-04 | [FE-WEB] Contrôleur + saisie onglet Structure | 3h |
-| T-035-05 | [TEST] Unit + Functional (INV-4) | 3h |
-| T-035-06 | [DOC/REV] Doc + revue | 1h |
-
 ### US-036 — Atterrissage charge & alerte de dérive précoce (Must, 8 pts)
 | ID | Tâche | Est. |
 |----|-------|------|
@@ -44,6 +34,7 @@
 | ID | Tâche | Terminé |
 |----|-------|---------|
 | Setup | Réconciliation EPIC-002 + affinage US-035/036 + décomposition | 2026-09-06 |
+| US-035 | Avancement physique & RAF par lot (8 pts) | 2026-09-06 |
 
 ## Ordre d'exécution
 1. **US-035** (fondation avancement/RAF).

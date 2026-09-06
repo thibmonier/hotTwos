@@ -22,6 +22,7 @@ use App\Domain\Client\Client;
 use App\Domain\Invoice\Invoice;
 use App\Domain\Budget\MarginDriftThreshold;
 use App\Domain\Valuation\TimeEntryValuation;
+use App\Infrastructure\Persistence\Doctrine\DoctrineProjectLotRepository;
 use App\Infrastructure\Persistence\Doctrine\DoctrineProjectRepository;
 use App\Infrastructure\Persistence\Doctrine\DoctrineRoleRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -163,6 +164,44 @@ final class ProjectPageTest extends WebTestCase
         self::assertResponseRedirects('/projets/'.$id);
 
         self::assertSame(ProjectStatus::EN_COURS, new DoctrineProjectRepository($this->em)->find($this->tenant, $id)?->status());
+    }
+
+    public function testChefRecordsLotProgress(): void
+    {
+        $this->login('marc@agence.test');
+        $create = $this->client->request('GET', '/projets/nouveau');
+        $token = $create->filter('input[name="_token"]')->attr('value') ?? '';
+        $this->client->request('POST', '/projets', [
+            '_token' => $token, 'name' => 'Pilotage', 'clientName' => 'Acme', 'budgetEuros' => '100000', 'contractType' => 'forfait',
+        ]);
+        $id = new DoctrineProjectRepository($this->em)->findAllByTenant($this->tenant)[0]->id();
+        $this->em->clear();
+
+        // Ajoute un lot (formulaire add-lot, intention CSRF « project_structure »).
+        $show = $this->client->request('GET', '/projets/'.$id);
+        $structureToken = $show->filter('form[action="/projets/'.$id.'/lots"] input[name="_token"]')->attr('value') ?? '';
+        $this->client->request('POST', '/projets/'.$id.'/lots', [
+            '_token' => $structureToken, 'name' => 'Conception', 'budgetDays' => '20', 'budgetEuros' => '16000', 'parentLotId' => '',
+        ]);
+        self::assertResponseRedirects();
+        $this->em->clear();
+
+        $lotId = new DoctrineProjectLotRepository($this->em)->findForProject($this->tenant, $id)[0]->id();
+
+        // Saisit l'avancement physique (40 %) et le RAF (6 j).
+        $this->client->request('POST', '/projets/'.$id.'/lots/'.$lotId.'/avancement', [
+            '_token' => $structureToken, 'progress' => '40', 'raf' => '6',
+        ]);
+        self::assertResponseRedirects();
+        $this->em->clear();
+
+        $lot = new DoctrineProjectLotRepository($this->em)->find($this->tenant, $lotId);
+        self::assertNotNull($lot);
+        self::assertSame(40, $lot->physicalProgressPercent());
+        self::assertSame(6, $lot->remainingWorkDays());
+        // INV-4 : l'avancement/RAF n'altèrent pas le budget du lot.
+        self::assertSame(20, $lot->budgetDays());
+        self::assertSame(1_600_000, $lot->budgetCents());
     }
 
     private function login(string $email): void
