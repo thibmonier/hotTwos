@@ -6,11 +6,15 @@ namespace App\UI\Http\Controller;
 
 use App\Application\Authorization\Authorizer;
 use App\Application\Budget\ViewProjectBudgetTracking;
+use App\Application\Project\AddBudgetAmendment;
 use App\Application\Project\ChangeProjectStatus;
 use App\Application\Project\CreateProject;
 use App\Domain\Authorization\Permission;
 use App\Application\Invoice\IssueInvoice;
 use App\Domain\Client\Client;
+use App\Domain\Project\BudgetAmendment;
+use App\Domain\Project\BudgetAmendmentRepository;
+use App\Domain\Project\CurrentProjectBudget;
 use App\Domain\Client\ClientRepository;
 use App\Domain\Invoice\Invoice;
 use App\Domain\Invoice\InvoiceException;
@@ -62,6 +66,9 @@ final class ProjectPageController extends AbstractController
         private readonly ClientRepository $clients,
         private readonly InvoiceRepository $invoices,
         private readonly IssueInvoice $issueInvoice,
+        private readonly BudgetAmendmentRepository $amendments,
+        private readonly CurrentProjectBudget $currentBudget,
+        private readonly AddBudgetAmendment $addBudgetAmendment,
     ) {
     }
 
@@ -143,6 +150,10 @@ final class ProjectPageController extends AbstractController
         // applique lui-même le gating fin (coût/marge/dérive conditionnés à VIEW_COLLABORATOR_COST).
         $canViewFinancials = $this->authorizer->can($user, Permission::VIEW_PROJECT_FINANCIALS);
 
+        // US-033 : budget courant (initial + Σ avenants) + historique des avenants.
+        $amendments = $this->amendments->findForProject($user->tenantId(), $project->id());
+        $current = $this->currentBudget->current($project->budgetCents(), $project->revenueBudgetCents(), $amendments);
+
         return $this->render('project/show.html.twig', [
             'project' => $this->row($project),
             'canViewFinancials' => $canViewFinancials,
@@ -166,7 +177,18 @@ final class ProjectPageController extends AbstractController
             ),
             'canEdit' => $this->authorizer->can($user, Permission::EDIT_PROJECT),
             'canManage' => $this->authorizer->can($user, Permission::MANAGE_ORGANIZATION),
-            'structure' => $this->structureView($user->tenantId(), $project->id(), $project->budgetCents()),
+            'structure' => $this->structureView($user->tenantId(), $project->id(), $current->costCents),
+            'initialBudgetEuros' => null !== $project->budgetCents() ? intdiv($project->budgetCents(), 100) : null,
+            'currentBudgetEuros' => null !== $current->costCents ? intdiv($current->costCents, 100) : null,
+            'budgetAmendments' => $canViewFinancials ? array_map(
+                static fn (BudgetAmendment $a): array => [
+                    'deltaCostEuros' => intdiv($a->deltaCostCents(), 100),
+                    'deltaRevenueEuros' => intdiv($a->deltaRevenueCents(), 100),
+                    'reason' => $a->reason(),
+                    'at' => $a->recordedAt()->format('d/m/Y'),
+                ],
+                $amendments,
+            ) : [],
             'milestones' => array_map(
                 static fn (ProjectMilestone $m): array => [
                     'name' => $m->name(),
@@ -365,6 +387,35 @@ final class ProjectPageController extends AbstractController
         }
 
         return $this->redirectToRoute('project_show', ['id' => $id]);
+    }
+
+    #[Route('/projets/{id}/avenant', name: 'project_budget_amend', requirements: ['id' => '[0-9a-f-]{36}'], methods: ['POST'])]
+    public function amendBudget(#[CurrentUser] User $user, string $id, Request $request): RedirectResponse
+    {
+        if (!$this->isCsrfTokenValid('budget_amend', (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Jeton de sécurité invalide.');
+
+            return $this->redirectToRoute('project_show', ['id' => $id]);
+        }
+
+        $deltaCost = filter_var($request->request->get('deltaCostEuros'), \FILTER_VALIDATE_INT);
+        $deltaRevenue = filter_var($request->request->get('deltaRevenueEuros'), \FILTER_VALIDATE_INT);
+        $reason = trim((string) $request->request->get('reason'));
+
+        try {
+            $this->addBudgetAmendment->add(
+                $user,
+                $id,
+                false !== $deltaCost ? $deltaCost * 100 : 0,
+                false !== $deltaRevenue ? $deltaRevenue * 100 : 0,
+                $reason,
+            );
+            $this->addFlash('success', 'Avenant budgétaire enregistré.');
+        } catch (ProjectException $exception) {
+            $this->addFlash('error', $exception->getMessage());
+        }
+
+        return $this->redirectToRoute('project_show', ['id' => $id, '_fragment' => 'panel-budget']);
     }
 
     /**

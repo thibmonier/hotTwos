@@ -111,6 +111,9 @@ services:
     # Port factures (US-075, DIP).
     App\Domain\Invoice\InvoiceRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineInvoiceRepository'
 
+    # Port avenants budgétaires (US-033, DIP).
+    App\Domain\Project\BudgetAmendmentRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineBudgetAmendmentRepository'
+
     # Source de revenu marge (US-076, DIP) — facturé réel s'il existe, sinon CA reconnu.
     App\Domain\Margin\RevenueSource: '@App\Infrastructure\Margin\InvoiceRevenueSource'
 

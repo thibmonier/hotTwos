@@ -11,6 +11,8 @@ use App\Domain\Budget\BudgetTrackingCalculator;
 use App\Domain\Budget\ChargeLanding;
 use App\Domain\Budget\ChargeLandingCalculator;
 use App\Domain\Budget\MarginDriftThresholdProvider;
+use App\Domain\Project\BudgetAmendmentRepository;
+use App\Domain\Project\CurrentProjectBudget;
 use App\Domain\Project\Project;
 use App\Domain\Project\ProjectException;
 use App\Domain\Project\ProjectLotRepository;
@@ -41,6 +43,8 @@ final readonly class ViewProjectBudgetTracking
         private ProjectLotRepository $lots,
         private ProjectProgressCalculator $progress,
         private ChargeLandingCalculator $landing,
+        private BudgetAmendmentRepository $amendments,
+        private CurrentProjectBudget $currentBudget,
     ) {
     }
 
@@ -59,10 +63,17 @@ final readonly class ViewProjectBudgetTracking
             $this->authorizer->authorizeSensitiveRead($user, Permission::VIEW_COLLABORATOR_COST, 'budget:project:'.$projectId);
         }
 
-        $realized = $this->realizedFor($tenant, $projectId);
-        $tracking = $this->calculator->track(
+        // US-033 : le suivi budgétaire compare le réalisé au **budget courant** (initial + Σ avenants).
+        $current = $this->currentBudget->current(
             $project->budgetCents(),
             $project->revenueBudgetCents(),
+            $this->amendments->findForProject($tenant, $projectId),
+        );
+
+        $realized = $this->realizedFor($tenant, $projectId);
+        $tracking = $this->calculator->track(
+            $current->costCents,
+            $current->revenueCents,
             $realized->costCents,
             $realized->revenueCents,
             $this->thresholds->pointsFor($tenant),
@@ -70,7 +81,7 @@ final readonly class ViewProjectBudgetTracking
 
         // US-036 : atterrissage charge à partir de l'avancement physique agrégé des lots (US-035).
         $physicalProgress = $this->progress->weightedPhysicalProgress($this->lots->findForProject($tenant, $projectId));
-        $landing = $this->landing->land($project->budgetCents(), $realized->costCents, $physicalProgress);
+        $landing = $this->landing->land($current->costCents, $realized->costCents, $physicalProgress);
 
         return $this->toView($projectId, $project->name(), $tracking, $landing, $costVisible);
     }

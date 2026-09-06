@@ -11,6 +11,8 @@ use App\Domain\Budget\MarginDriftThresholdProvider;
 use App\Domain\Margin\MarginCalculator;
 use App\Domain\Margin\ProjectMargin;
 use App\Domain\Margin\ProjectMarginRepository;
+use App\Domain\Project\BudgetAmendmentRepository;
+use App\Domain\Project\CurrentProjectBudget;
 use App\Domain\Project\Project;
 use App\Domain\Project\ProjectRepository;
 use App\Domain\Tenant\TenantId;
@@ -34,6 +36,8 @@ final readonly class ConsolidatedFinanceReport
         private MarginCalculator $marginCalculator,
         private BudgetTrackingCalculator $budgetCalculator,
         private MarginDriftThresholdProvider $thresholds,
+        private BudgetAmendmentRepository $amendments,
+        private CurrentProjectBudget $currentBudget,
     ) {
     }
 
@@ -128,9 +132,16 @@ final readonly class ConsolidatedFinanceReport
             return false;
         }
 
-        return $this->budgetCalculator->track(
+        // US-033 : dérive évaluée sur le budget courant (initial + Σ avenants).
+        $current = $this->currentBudget->current(
             $project->budgetCents(),
             $project->revenueBudgetCents(),
+            $this->amendments->findForProject($project->tenantId(), $project->id()),
+        );
+
+        return $this->budgetCalculator->track(
+            $current->costCents,
+            $current->revenueCents,
             $margin->costCents(),
             $margin->revenueCents(),
             $threshold,

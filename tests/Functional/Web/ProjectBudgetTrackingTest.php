@@ -9,6 +9,7 @@ use App\Domain\Authorization\Role;
 use App\Domain\Project\ContractType;
 use App\Domain\Project\ExceptionalImputationOpening;
 use App\Domain\Project\ExternalCommitment;
+use App\Domain\Project\BudgetAmendment;
 use App\Domain\Project\Project;
 use App\Domain\Project\ProjectAssignment;
 use App\Domain\Project\ProjectLot;
@@ -70,6 +71,7 @@ final class ProjectBudgetTrackingTest extends WebTestCase
             $this->em->getClassMetadata(MarginDriftThreshold::class),
             $this->em->getClassMetadata(Client::class),
             $this->em->getClassMetadata(Invoice::class),
+            $this->em->getClassMetadata(BudgetAmendment::class),
         ];
         $tool = new SchemaTool($this->em);
         $tool->dropSchema($this->schema);
@@ -207,6 +209,39 @@ final class ProjectBudgetTrackingTest extends WebTestCase
         $marc = (string) $this->client->getResponse()->getContent();
         self::assertStringContainsString('Dérive de charge précoce', $marc);
         self::assertStringNotContainsString('150 000', $marc);
+    }
+
+    public function testBudgetAmendmentUpdatesCurrentBudget(): void
+    {
+        // Projet budgété coût 40 000 € ; un avenant de +15 000 € → budget courant 55 000 € (US-033).
+        $this->login('marc@agence.test');
+        $show = $this->client->request('GET', '/projets/'.$this->budgetedProjectId);
+        self::assertResponseIsSuccessful();
+        $token = $show->filter('form[action="/projets/'.$this->budgetedProjectId.'/avenant"] input[name="_token"]')->attr('value') ?? '';
+
+        $this->client->request('POST', '/projets/'.$this->budgetedProjectId.'/avenant', [
+            '_token' => $token, 'deltaCostEuros' => '15000', 'deltaRevenueEuros' => '0', 'reason' => 'périmètre étendu — lot 3',
+        ]);
+        self::assertResponseRedirects();
+
+        $content = $this->client->request('GET', '/projets/'.$this->budgetedProjectId)->filter('#panel-budget')->html();
+        self::assertStringContainsString('55 000', $content);                  // budget de charge courant (40 000 + 15 000)
+        self::assertStringContainsString('périmètre étendu — lot 3', $content); // historique de l'avenant
+    }
+
+    public function testAmendmentRequiresReason(): void
+    {
+        $this->login('marc@agence.test');
+        $show = $this->client->request('GET', '/projets/'.$this->budgetedProjectId);
+        $token = $show->filter('form[action="/projets/'.$this->budgetedProjectId.'/avenant"] input[name="_token"]')->attr('value') ?? '';
+
+        $this->client->request('POST', '/projets/'.$this->budgetedProjectId.'/avenant', [
+            '_token' => $token, 'deltaCostEuros' => '20000', 'deltaRevenueEuros' => '0', 'reason' => '',
+        ]);
+        self::assertResponseRedirects();
+        // Aucun avenant enregistré : budget courant inchangé (pas de « 1 avenant »).
+        $content = $this->client->request('GET', '/projets/'.$this->budgetedProjectId)->filter('#panel-budget')->html();
+        self::assertStringNotContainsString('avenant(s)', $content);
     }
 
     private function login(string $email): void

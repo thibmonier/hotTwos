@@ -9,6 +9,7 @@ use App\Domain\Authorization\Role;
 use App\Domain\Budget\MarginDriftThreshold;
 use App\Domain\Margin\ProjectMargin;
 use App\Domain\Project\ContractType;
+use App\Domain\Project\BudgetAmendment;
 use App\Domain\Project\Project;
 use App\Domain\Tenant\Tenant;
 use App\Domain\Tenant\TenantId;
@@ -50,6 +51,7 @@ final class FinanceDashboardTest extends WebTestCase
             $this->em->getClassMetadata(Project::class),
             $this->em->getClassMetadata(ProjectMargin::class),
             $this->em->getClassMetadata(MarginDriftThreshold::class),
+            $this->em->getClassMetadata(BudgetAmendment::class),
         ];
         $tool = new SchemaTool($this->em);
         $tool->dropSchema($this->schema);

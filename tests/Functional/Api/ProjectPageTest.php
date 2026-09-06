@@ -8,6 +8,7 @@ use App\Application\Authorization\InitializeDefaultRoles;
 use App\Domain\Authorization\Role;
 use App\Domain\Project\ExceptionalImputationOpening;
 use App\Domain\Project\ExternalCommitment;
+use App\Domain\Project\BudgetAmendment;
 use App\Domain\Project\Project;
 use App\Domain\Project\ProjectReopening;
 use App\Domain\Project\ProjectAssignment;
@@ -66,6 +67,7 @@ final class ProjectPageTest extends WebTestCase
             $this->em->getClassMetadata(MarginDriftThreshold::class),
             $this->em->getClassMetadata(Client::class),
             $this->em->getClassMetadata(Invoice::class),
+            $this->em->getClassMetadata(BudgetAmendment::class),
         ];
         $tool = new SchemaTool($this->em);
         $tool->dropSchema($this->schema);

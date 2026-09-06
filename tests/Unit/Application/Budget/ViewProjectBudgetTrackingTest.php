@@ -14,6 +14,7 @@ use App\Domain\Budget\BudgetTrackingCalculator;
 use App\Domain\Budget\ChargeLandingCalculator;
 use App\Domain\Margin\MarginCalculator;
 use App\Domain\Project\ContractType;
+use App\Domain\Project\CurrentProjectBudget;
 use App\Domain\Project\Project;
 use App\Domain\Project\ProjectLot;
 use App\Domain\Project\ProjectProgressCalculator;
@@ -23,6 +24,7 @@ use App\Domain\Valuation\ProjectValuationLine;
 use App\Infrastructure\Budget\DefaultMarginDriftThresholdProvider;
 use App\Tests\Support\Authorization\InMemoryRoleRepository;
 use App\Tests\Support\Authorization\RecordingSecurityAuditLogger;
+use App\Tests\Support\Project\InMemoryBudgetAmendmentRepository;
 use App\Tests\Support\Project\InMemoryProjectLotRepository;
 use App\Tests\Support\Timesheet\InMemoryProjectRepository;
 use App\Tests\Support\Valuation\InMemoryTimeEntryValuationRepository;
@@ -86,6 +88,8 @@ final class ViewProjectBudgetTrackingTest extends TestCase
             $this->lots,
             new ProjectProgressCalculator(),
             new ChargeLandingCalculator(),
+            new InMemoryBudgetAmendmentRepository(),
+            new CurrentProjectBudget(),
         );
 
         $this->finance = new User($this->tenant, 'finance@agence.test', 'hash', ['Finance']);

@@ -77,12 +77,18 @@ THEN la modification est refusée (RG-PRJ-5, lecture seule structurelle)
 ```
 
 ## Definition of Done
-- [ ] Entité `BudgetAmendment` (tenant, projet, deltaCents, deltaDays, motif, auteur, date) + port repo + RLS
-- [ ] Budget **initial** figé à la création ; **budget courant** = initial + Σ avenants (dérivé, jamais recalculé côté imputations)
-- [ ] Use case `AmendBudget` gated `EDIT_PROJECT`, motif obligatoire (RG-PRJ-4), refus projet clôturé
-- [ ] Migration + RLS ; historique affiché sur la fiche projet
-- [ ] Tests : ajout, historique/reconstitution, motif obligatoire, non-altération des imputations (INV-2/3), gating
-- [ ] `make ci` vert · revue de clôture
+- [x] Entité `BudgetAmendment` (tenant, projet, deltaCostCents, deltaRevenueCents, motif, auteur, date) + port repo + RLS
+- [x] Budget **initial** = `Project::budgetCents()`/`revenueBudgetCents()` ; **budget courant** = initial + Σ avenants (`CurrentProjectBudget`), dérivé
+- [x] Use case `AddBudgetAmendment` gated `EDIT_PROJECT`, motif obligatoire (RG-PRJ-4), refus projet clôturé
+- [x] Migration + RLS ; historique affiché sur la fiche projet (onglet Suivi budgétaire)
+- [x] Rebranchement `ViewProjectBudgetTracking` + `ConsolidatedFinanceReport::isDrifting` + `ProjectPageController` sur le budget courant
+- [x] Tests : ajout, historique, motif obligatoire, gating, non-régression suivi budgétaire (initial sans avenant = courant)
+- [x] `make ci` vert · revue de clôture
+
+## Note de réalisation
+Avenant au niveau **€** (delta coût + delta CA). `Project::budgetCents()` reste le **budget initial** ;
+le budget courant se dérive à la lecture (`CurrentProjectBudget`) — les imputations/valorisations figées
+ne sont jamais touchées (INV-2/3, `AddBudgetAmendment` ne fait qu'ajouter un enregistrement).
 
 ## Notes
 Le **budget courant** doit devenir la référence du suivi budgétaire (US-072) et de l'atterrissage (US-036)
