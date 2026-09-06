@@ -67,12 +67,17 @@ THEN l'accès est refusé (403)
 ```
 
 ## Definition of Done
-- [ ] Marqueur « interne non facturable » sur `Project` (type ou flag) + migration
-- [ ] Exclusion des projets internes du calcul de marge (`ComputeProjectMargins` / dashboard)
-- [ ] Occupation **facturable** = jours facturables / base, projets internes exclus du numérateur mais présents dans la capacité consommée (RG-PRJ-6)
-- [ ] UI : création/marquage + distinction dans la liste projets
-- [ ] Tests : exclusion marge, occupation facturable, capacité consommée inchangée, gating
-- [ ] `make ci` vert · revue de clôture
+- [x] Marqueur `Project::internal` (bool) + `markInternal()`/`isInternal()` + migration
+- [x] Exclusion des projets internes du calcul de marge (filtre DQL `projectBreakdownFor`/`ForPeriod`)
+- [x] Occupation **facturable** (`valuedBillableDayCountByUser` + `OccupationLine::billablePercent`) : internes exclus du numérateur, capacité consommée inchangée (RG-PRJ-6)
+- [x] UI : marquage « interne » sur la fiche + badge (liste & fiche) + colonne « Facturable » sur `/valorisation`
+- [x] Tests : exclusion marge (intégration), occupation facturable (unit + functional), markInternal (unit), gating
+- [x] `make ci` vert · revue de clôture
+
+## Note de réalisation
+Booléen `Project::internal` (défaut false) — le marquage se fait sur la fiche projet (toggle gated
+`EDIT_PROJECT`). `OccupationLine` a gagné un `billableDays` optionnel (rétro-compatible). L'occupation
+totale et la capacité consommée restent inchangées ; seule une mesure « facturable » est ajoutée.
 
 ## Notes
 Attention à l'occupation existante (US-060 : jours valorisés / (ouvrés − absences)) — introduire la

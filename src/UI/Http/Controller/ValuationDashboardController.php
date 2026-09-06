@@ -103,6 +103,7 @@ final class ValuationDashboardController extends AbstractController
                     'valuedDays' => $line->valuedDays,
                     'capacityDays' => $line->capacityDays,
                     'percent' => $line->percent(),
+                    'billablePercent' => $line->billablePercent(),
                 ],
                 $overview->lines,
             ),

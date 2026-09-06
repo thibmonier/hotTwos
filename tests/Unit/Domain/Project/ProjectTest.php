@@ -67,6 +67,18 @@ final class ProjectTest extends TestCase
         Project::createBusiness(TenantId::generate(), 'PRJ-0001', 'Refonte', 'Acme Corp', 'marc', 0, ContractType::FORFAIT, null, null);
     }
 
+    public function testMarkInternalTogglesTheFlag(): void
+    {
+        $project = $this->business();
+        self::assertFalse($project->isInternal()); // facturable par défaut (US-032)
+
+        $project->markInternal(true);
+        self::assertTrue($project->isInternal());
+
+        $project->markInternal(false);
+        self::assertFalse($project->isInternal());
+    }
+
     private function business(): Project
     {
         return Project::createBusiness(

@@ -45,7 +45,7 @@ stories:
   US-020: { title: "Audit du paramétrage", sprint: null, status: backlog }
   US-030: { title: "Création projet & statuts", sprint: 6, status: done }
   US-031: { title: "Lots & jalons", sprint: 6, status: done }
-  US-032: { title: "Projets internes non facturables (EF-PRJ-5)", sprint: null, status: ready, points: 5 }   # affinée 2026-09-06
+  US-032: { title: "Projets internes non facturables (EF-PRJ-5)", sprint: 13, status: done, points: 5 }   # S13 (stretch livrée)
   US-033: { title: "Budget — initial, avenants & budget courant (EF-PRJ-8)", sprint: 13, status: done, points: 8 }   # S13 (débloque INV-8)
   US-034: { title: "Engagements externes", sprint: 6, status: done }
   US-035: { title: "Avancement physique & RAF par lot", sprint: 12, status: done, points: 8 }        # S12 pilotage charge

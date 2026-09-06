@@ -22,6 +22,9 @@
             <span class="status-badge {{ status_badge_map[project.statusFamily] ?? 'status-badge-neutral' }}">
                 {{ project.status }}
             </span>
+            {% if project.internal %}
+                <span class="status-badge status-badge-neutral">Interne — non facturable</span>
+            {% endif %}
         </h1>
         <p class="text-sm text-muted">
             Client&nbsp;: {{ project.client ?? '—' }}
@@ -93,6 +96,18 @@
                 </div>
             {% elseif transitions is empty %}
                 <p class="text-xs text-muted">Aucune transition disponible depuis ce statut.</p>
+            {% endif %}
+
+            {# Projet interne non facturable (US-032) — après les transitions (préserve le 1er jeton CSRF). #}
+            {% if canEdit %}
+                <form method="post" action="{{ path('project_toggle_internal', { id: project.id }) }}" class="mt-4 flex items-center gap-2">
+                    <input type="hidden" name="_token" value="{{ csrf_token('toggle_internal') }}">
+                    <label class="text-sm text-body">
+                        <input type="checkbox" name="internal" value="1" {{ project.internal ? 'checked' : '' }}>
+                        Projet interne non facturable (R&D, avant-vente, congés)
+                    </label>
+                    <button type="submit" class="inline-flex min-h-9 items-center rounded border border-border-strong px-3 text-xs font-semibold text-muted hover:bg-surface-alt hover:text-ink">Appliquer</button>
+                </form>
             {% endif %}
 
             {# Rattachement client (US-014) — placé après les transitions (n'altère pas le 1er jeton CSRF de la page). #}

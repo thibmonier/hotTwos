@@ -18,6 +18,8 @@ final readonly class OccupationLine
         public string $userId,
         public int $valuedDays,
         public int $capacityDays,
+        /** Jours valorisés sur des projets **facturables** (US-032/RG-PRJ-6) ; `null` si non calculé. */
+        public ?int $billableDays = null,
     ) {
     }
 
@@ -27,8 +29,19 @@ final readonly class OccupationLine
      */
     public function percent(): int
     {
+        return $this->ratio($this->valuedDays);
+    }
+
+    /** Taux d'occupation **facturable** (projets internes exclus, US-032) ; `null` si non calculé. */
+    public function billablePercent(): ?int
+    {
+        return null === $this->billableDays ? null : $this->ratio($this->billableDays);
+    }
+
+    private function ratio(int $days): int
+    {
         $capacity = max(1, $this->capacityDays);
 
-        return (int) min(100, round($this->valuedDays / $capacity * 100));
+        return (int) min(100, round($days / $capacity * 100));
     }
 }

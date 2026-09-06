@@ -31,6 +31,9 @@ final class InMemoryTimeEntryValuationRepository implements TimeEntryValuationRe
     /** @var array<string, int> userId => jours valorisés distincts, fixés par les tests. */
     public array $valuedDayCountByUser = [];
 
+    /** @var array<string, int> */
+    public array $valuedBillableDayCountByUser = [];
+
     /**
      * Ventilation par projet sur une période (US-071) — fixée explicitement par les tests (le
      * rattachement date/projet vit dans `time_entry`, hors de ce fake).
@@ -132,5 +135,10 @@ final class InMemoryTimeEntryValuationRepository implements TimeEntryValuationRe
     public function valuedDayCountByUser(TenantId $tenant, DateTimeImmutable $from, DateTimeImmutable $to): array
     {
         return $this->valuedDayCountByUser;
+    }
+
+    public function valuedBillableDayCountByUser(TenantId $tenant, DateTimeImmutable $from, DateTimeImmutable $to): array
+    {
+        return $this->valuedBillableDayCountByUser;
     }
 }

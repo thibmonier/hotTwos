@@ -121,6 +121,7 @@ final readonly class DoctrineTimeEntryValuationRepository implements TimeEntryVa
             .' FROM '.TimeEntryValuation::class.' v, '.TimeEntry::class.' te, '.Project::class.' p'
             .' WHERE v.tenantId = :tenant AND v.status = :status'
             .' AND te.id = v.timeEntryId AND p.id = te.projectId'
+            .' AND p.internal = false'
             .' GROUP BY p.id, p.name ORDER BY rev DESC',
         )
             ->setParameter('tenant', $tenant->toString())
@@ -149,6 +150,7 @@ final readonly class DoctrineTimeEntryValuationRepository implements TimeEntryVa
             .' FROM '.TimeEntryValuation::class.' v, '.TimeEntry::class.' te, '.Project::class.' p'
             .' WHERE v.tenantId = :tenant AND v.status = :status'
             .' AND te.id = v.timeEntryId AND p.id = te.projectId'
+            .' AND p.internal = false'
             .' AND te.workDate >= :from AND te.workDate < :to'
             .' GROUP BY p.id, p.name ORDER BY rev DESC',
         )
@@ -216,6 +218,31 @@ final readonly class DoctrineTimeEntryValuationRepository implements TimeEntryVa
             'SELECT te.userId AS userId, COUNT(DISTINCT te.workDate) AS days'
             .' FROM '.TimeEntryValuation::class.' v, '.TimeEntry::class.' te'
             .' WHERE v.tenantId = :tenant AND v.status = :status AND te.id = v.timeEntryId'
+            .' AND te.workDate >= :from AND te.workDate < :to GROUP BY te.userId',
+        )
+            ->setParameter('tenant', $tenant->toString())
+            ->setParameter('status', ValuationStatus::VALUED->value)
+            ->setParameter('from', $from)
+            ->setParameter('to', $to)
+            ->getResult();
+
+        $byUser = [];
+        foreach ($rows as $row) {
+            $byUser[$this->stringOf($row['userId'])] = $this->intOf($row['days']);
+        }
+
+        return $byUser;
+    }
+
+    public function valuedBillableDayCountByUser(TenantId $tenant, DateTimeImmutable $from, DateTimeImmutable $to): array
+    {
+        // Join projet pour exclure les projets internes (non facturables, US-032/RG-PRJ-6).
+        /** @var list<array<string, mixed>> $rows */
+        $rows = $this->entityManager->createQuery(
+            'SELECT te.userId AS userId, COUNT(DISTINCT te.workDate) AS days'
+            .' FROM '.TimeEntryValuation::class.' v, '.TimeEntry::class.' te, '.Project::class.' p'
+            .' WHERE v.tenantId = :tenant AND v.status = :status AND te.id = v.timeEntryId'
+            .' AND p.id = te.projectId AND p.internal = false'
             .' AND te.workDate >= :from AND te.workDate < :to GROUP BY te.userId',
         )
             ->setParameter('tenant', $tenant->toString())

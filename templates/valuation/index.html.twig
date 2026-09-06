@@ -166,6 +166,7 @@
                             <th scope="col" class="px-4 py-3 text-right font-semibold text-body">Jours valorisés</th>
                             <th scope="col" class="px-4 py-3 text-right font-semibold text-body">Capacité (j)</th>
                             <th scope="col" class="px-4 py-3 text-right font-semibold text-body">Occupation</th>
+                            <th scope="col" class="px-4 py-3 text-right font-semibold text-body">Facturable</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -182,6 +183,7 @@
                                         <span class="w-10 text-right tabular-nums font-medium text-ink">{{ row.percent }} %</span>
                                     </div>
                                 </td>
+                                <td class="px-4 py-3 text-right tabular-nums text-body">{{ row.billablePercent is not null ? row.billablePercent ~ ' %' : '—' }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
