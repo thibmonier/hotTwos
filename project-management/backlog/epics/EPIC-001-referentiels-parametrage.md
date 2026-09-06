@@ -2,7 +2,7 @@
 
 ## Métadonnées
 - **ID**: EPIC-001
-- **Statut**: 🔴 To Do
+- **Statut**: 🟡 En cours (socle livré : org, profils/taux, RBAC, clients, seuils ; reste valorisation multi-niveaux, devises, calendrier fériés, compétences, circuits, onboarding)
 - **Priorité**: Must Have (MoSCoW)
 - **Module**: REF
 - **Lot**: 1
@@ -32,19 +32,47 @@ Sans ce module stable, aucune saisie de temps, aucun projet ni aucune valorisati
 
 ## User Stories
 
-| ID | Nom | Statut | Points | Sprint |
+> **⚠️ Table réconciliée le 2026-09-06** avec `.bmad/sprint-status.yaml` (source de vérité). La
+> numérotation initiale (planifiée 2026-08-31) avait divergé de la livraison réelle. Les capacités du
+> module ont été livrées transversalement (socle S1/S4, clients S11, seuils S10).
+
+| ID | Nom | Statut | Sprint | EF-REF |
 |----|-----|--------|--------|--------|
-| US-010 | Créer et configurer la structure organisationnelle du tenant | 🔴 To Do | 5 | 2 |
-| US-011 | Gérer les profils collaborateurs et leurs taux historisés | 🔴 To Do | 8 | 2 |
-| US-012 | Paramétrer les calendriers et jours ouvrés par entité | 🔴 To Do | 5 | 3 |
-| US-013 | Créer et gérer le référentiel clients et donneurs d'ordre | 🔴 To Do | 5 | 3 |
-| US-014 | Gérer les types de contrat et les conditions tarifaires | 🔴 To Do | 5 | 3 |
-| US-015 | Administrer les habilitations (rôles, droits, périmètres) | 🔴 To Do | 8 | 2 |
-| US-016 | Configurer l'authentification et le 2FA par tenant | 🔴 To Do | 5 | 2 |
-| US-017 | Gérer les devises, unités et règles de valorisation | 🔴 To Do | 3 | 3 |
-| US-018 | Importer / exporter les référentiels (bootstrap tenant) | 🔴 To Do | 5 | 4 |
-| US-019 | Consulter l'historique des modifications de paramétrage | 🔴 To Do | 3 | 4 |
-| US-020 | Valider la complétude du paramétrage avant mise en production | 🔴 To Do | 3 | 4 |
+| US-010 | Structure organisationnelle du tenant | ✅ Done | 4 | EF-REF-1/2 |
+| US-011 | Profils collaborateurs & taux historisés | ✅ Done | 4 | EF-REF-4/5, 20 |
+| US-002 | Authentification & cycle de vie utilisateurs | ✅ Done | 1 | EF-REF-30 |
+| US-003 | Rôles & habilitations (RBAC + périmètres) | ✅ Done | 1 | EF-REF-31 |
+| US-014 | Comptes clients (tranche minimale) | ✅ Done | 11 | EF-REF-15 (16 contacts : partiel) |
+| US-018 | Seuils d'alerte paramétrables (tenant) | ✅ Done | 10 | EF-REF-26 (dérive marge) |
+| US-015 | Taux de vente multi-niveaux (profil/client/projet) + priorité | 🟢 Ready | 14 | EF-REF-19 |
+| US-016 | Devises & devise de référence tenant | 🟢 Ready | 14 | EF-REF-22 |
+| US-012 | Calendriers, jours ouvrés & fériés | 🔵 Backlog | — | EF-REF-6/7 |
+| US-013 | Référentiel de compétences & niveaux | 🔵 Backlog | — | EF-REF-10/11 |
+| US-017 | Statuts & circuits de validation paramétrables | 🔵 Backlog | — | EF-REF-24/25 |
+| US-019 | Onboarding tenant (< 15 min, defaults) | 🔵 Backlog | — | EF-REF-29 |
+| US-020 | Journal d'audit du paramétrage | 🔵 Backlog | — | EF-REF-33 |
+
+## Couverture des exigences (analyse d'écart — 2026-09-06)
+
+| EF-REF | Prio | État | Détail |
+|--------|------|------|--------|
+| EF-REF-1/2 (org + rattachement historisé) | M | ✅ | US-010 (S4) |
+| EF-REF-4/5 (profils + taux historisés) | M | ✅ | US-011 / `App\Domain\Pricing` (S4) |
+| EF-REF-20 (coût de revient + mode) | M | ✅ | `CalculationMode` + `LoadedCostCalculator` |
+| EF-REF-8 (types d'absence + impact capacité) | M | ✅ | `AbsenceType` (S5) |
+| EF-REF-15 (comptes clients) | M | 🟡 | US-014 (S11) minimal ; hiérarchie groupe/filiale + contacts EF-REF-16 : partiel |
+| EF-REF-23 (exercices/clôture) | M | ✅ | `AccountingPeriod` + clôture (S5/S10) |
+| EF-REF-26 (seuils d'alerte) | M | 🟡 | US-018 (dérive marge) ; autres seuils : partiel |
+| EF-REF-30/31 (users + RBAC périmètres) | M | ✅ | US-002/003 |
+| **EF-REF-19** (taux vente profil/client/projet + priorité) | **M** | ❌ | **manquant** (seul `ProfileRate` par profil) → US-015 |
+| **EF-REF-22** (devises + devise de référence) | **M** | ❌ | **manquant** (montants EUR implicites) → US-016 |
+| EF-REF-6/7 (calendrier fériés / temps partiel) | M/S | ❌ | manquant → US-012 |
+| EF-REF-10/11 (compétences + niveaux) | M | ❌ | manquant → US-013 |
+| EF-REF-24/25 (statuts & circuits paramétrables) | M | ❌ | manquant (statuts en enum) → US-017 |
+| EF-REF-29 (onboarding < 15 min) | M | ❌ | manquant → US-019 |
+| EF-REF-33 (audit paramétrage) | S | 🟡 | `SecurityAuditLogger` trace ; vue dédiée manquante → US-020 |
+
+**Tranche S14 (valorisation)** : US-015 (taux multi-niveaux, EF-REF-19) + US-016 (devises, EF-REF-22).
 
 ---
 
@@ -70,7 +98,9 @@ Sans ce module stable, aucune saisie de temps, aucun projet ni aucune valorisati
 
 ## Progression
 
-0/11 US complétées (0 %)
+Socle livré (org, profils/taux, RBAC, users, clients minimal, seuils, périodes). **MMF quasi atteinte**
+(reste calendrier fériés EF-REF-6 et onboarding EF-REF-29). Tranche S14 : US-015 + US-016 (valorisation).
+Réserve : US-012 (calendrier), US-013 (compétences), US-017 (statuts/circuits), US-019 (onboarding), US-020 (audit).
 
 ---
 
