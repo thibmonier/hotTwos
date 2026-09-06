@@ -12,7 +12,7 @@
 | Capacité (prévision) | ~20 points (1 dev ; vélocité récente ~22 hors S10, sécurité 10 %) |
 | Base git | `main` (après clôture S12, PR #67/#68) |
 | EPIC | EPIC-002 (Projets & delivery) — finition budget (capacités *Must* restantes) |
-| Statut | 🟢 **Décomposé — tâches prêtes, exécution en cours** |
+| Statut | ✅ **CLÔTURÉ (2026-09-06) — 21 pts (16 Must + 5 stretch), goal atteint 100 %** |
 
 ## Sprint Goal
 
