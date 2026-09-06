@@ -34,7 +34,7 @@ stories:
   US-011: { title: "Référentiel profils & taux", sprint: 4, status: done }
   US-012: { title: "Calendriers & absences", sprint: null, status: backlog }
   US-013: { title: "Référentiel compétences", sprint: null, status: backlog }
-  US-014: { title: "Comptes clients & contacts (tranche minimale S11)", sprint: 11, status: ready }   # prérequis facturation (ADR-0022)
+  US-014: { title: "Comptes clients & contacts (tranche minimale S11)", sprint: 11, status: done }   # prérequis facturation (ADR-0022)
   US-015: { title: "Taux de vente & priorité", sprint: null, status: backlog }
   US-016: { title: "Devises", sprint: null, status: backlog }
   US-017: { title: "Statuts & circuits de validation", sprint: null, status: backlog }
@@ -75,8 +75,8 @@ stories:
   US-072: { title: "Budget vs réalisé & alerte de dérive", sprint: 9, status: done }
   US-073: { title: "Tableau de bord finance consolidé", sprint: 9, status: done }
   US-074: { title: "Export comptable au format FEC", sprint: 10, status: done, points: 8 }  # PO: format FEC ; réestimé 5→8
-  US-075: { title: "Émission manuelle de factures par projet/période", sprint: 11, status: ready, points: 8 }
-  US-076: { title: "Facturé réel comme source de marge (supersede proxy)", sprint: 11, status: ready, points: 5 }
+  US-075: { title: "Émission manuelle de factures par projet/période", sprint: 11, status: done, points: 8 }
+  US-076: { title: "Facturé réel comme source de marge (supersede proxy)", sprint: 11, status: done, points: 5 }
   US-077: { title: "Export FEC sur facturé réel", sprint: 11, status: ready, points: 5 }   # Should
 
 # Stories techniques / dette qualité (hors vélocité) engagées au Sprint 10
@@ -86,8 +86,8 @@ tech_stories:
 
 # Récapitulatif
 totals:
-  done: 42          # S10 complet
-  ready: 4          # S11 affiné : US-014, US-075, US-076, US-077
+  done: 45          # +US-014/075/076 (S11)
+  ready: 1          # reste US-077 (Should)
   in_progress: 0
   backlog: 11
   orphans: [US-012, US-013, US-014, US-015, US-016, US-017, US-018, US-019, US-020, US-032]  # dans aucun sprint

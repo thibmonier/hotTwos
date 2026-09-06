@@ -23,20 +23,20 @@ stories:
     points: 5
     priority: 1
     depends_on: []
-    status: pending
+    status: done
     note: "Prérequis facturation. Entrée du sprint."
   - id: US-075
     title: "Émission manuelle de factures par projet/période"
     points: 8
     priority: 2
     depends_on: [US-014]
-    status: pending
+    status: done
   - id: US-076
     title: "Facturé réel comme source de marge (port RevenueSource, repli CA reconnu)"
     points: 5
     priority: 3
     depends_on: [US-075]
-    status: pending
+    status: done
   - id: US-077
     title: "Export FEC sur facturé réel (Should)"
     points: 5
