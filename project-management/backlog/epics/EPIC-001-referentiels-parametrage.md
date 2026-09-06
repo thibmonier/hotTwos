@@ -44,8 +44,8 @@ Sans ce module stable, aucune saisie de temps, aucun projet ni aucune valorisati
 | US-003 | Rôles & habilitations (RBAC + périmètres) | ✅ Done | 1 | EF-REF-31 |
 | US-014 | Comptes clients (tranche minimale) | ✅ Done | 11 | EF-REF-15 (16 contacts : partiel) |
 | US-018 | Seuils d'alerte paramétrables (tenant) | ✅ Done | 10 | EF-REF-26 (dérive marge) |
-| US-015 | Taux de vente multi-niveaux (profil/client/projet) + priorité | 🟢 Ready | 14 | EF-REF-19 |
-| US-016 | Devises & devise de référence tenant | 🟢 Ready | 14 | EF-REF-22 |
+| US-015 | Taux de vente multi-niveaux (profil/client/projet) + priorité | ✅ Done | 14 | EF-REF-19 |
+| US-016 | Devises & devise de référence tenant | ✅ Done | 14 | EF-REF-22 |
 | US-012 | Calendriers, jours ouvrés & fériés | 🔵 Backlog | — | EF-REF-6/7 |
 | US-013 | Référentiel de compétences & niveaux | 🔵 Backlog | — | EF-REF-10/11 |
 | US-017 | Statuts & circuits de validation paramétrables | 🔵 Backlog | — | EF-REF-24/25 |
@@ -64,8 +64,8 @@ Sans ce module stable, aucune saisie de temps, aucun projet ni aucune valorisati
 | EF-REF-23 (exercices/clôture) | M | ✅ | `AccountingPeriod` + clôture (S5/S10) |
 | EF-REF-26 (seuils d'alerte) | M | 🟡 | US-018 (dérive marge) ; autres seuils : partiel |
 | EF-REF-30/31 (users + RBAC périmètres) | M | ✅ | US-002/003 |
-| **EF-REF-19** (taux vente profil/client/projet + priorité) | **M** | ❌ | **manquant** (seul `ProfileRate` par profil) → US-015 |
-| **EF-REF-22** (devises + devise de référence) | **M** | ❌ | **manquant** (montants EUR implicites) → US-016 |
+| EF-REF-19 (taux vente profil/client/projet + priorité) | M | ✅ | US-015 (S14) — `SellingRate` + `SellingRateResolver` |
+| EF-REF-22 (devises + devise de référence) | M | ✅ | US-016 (S14) — `ReferenceCurrency` + `ExchangeRate` + `CurrencyConverter` |
 | EF-REF-6/7 (calendrier fériés / temps partiel) | M/S | ❌ | manquant → US-012 |
 | EF-REF-10/11 (compétences + niveaux) | M | ❌ | manquant → US-013 |
 | EF-REF-24/25 (statuts & circuits paramétrables) | M | ❌ | manquant (statuts en enum) → US-017 |

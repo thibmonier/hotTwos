@@ -12,7 +12,7 @@
 | Capacité (prévision) | ~20 points (1 dev ; vélocité récente ~20 hors S10, sécurité 10 %) |
 | Base git | `main` (après clôture S13, PR #73) |
 | EPIC | EPIC-002 (finition) + EPIC-001 (référentiels de valorisation) |
-| Statut | 🟢 **Décomposé — tâches prêtes (US-079 découpée a/c ; b→S15), exécution en cours** |
+| Statut | ✅ **CLÔTURÉ (2026-09-06) — US-015 + US-016 + US-079a (~11 pts) ; US-079c/b reportés S15** |
 
 ## Sprint Goal (proposé)
 
