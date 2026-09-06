@@ -9,8 +9,12 @@ use App\Application\Budget\ViewProjectBudgetTracking;
 use App\Application\Project\ChangeProjectStatus;
 use App\Application\Project\CreateProject;
 use App\Domain\Authorization\Permission;
+use App\Application\Invoice\IssueInvoice;
 use App\Domain\Client\Client;
 use App\Domain\Client\ClientRepository;
+use App\Domain\Invoice\Invoice;
+use App\Domain\Invoice\InvoiceException;
+use App\Domain\Invoice\InvoiceRepository;
 use App\Domain\Project\ContractType;
 use App\Domain\Project\Project;
 use App\Domain\Project\ExceptionalImputationOpening;
@@ -56,6 +60,8 @@ final class ProjectPageController extends AbstractController
         private readonly ProjectReopeningRepository $reopenings,
         private readonly ViewProjectBudgetTracking $budgetTracking,
         private readonly ClientRepository $clients,
+        private readonly InvoiceRepository $invoices,
+        private readonly IssueInvoice $issueInvoice,
     ) {
     }
 
@@ -146,6 +152,14 @@ final class ProjectPageController extends AbstractController
                 static fn (Client $c): array => ['id' => $c->id(), 'name' => $c->name()],
                 $this->clients->findAllByTenant($user->tenantId()),
             ),
+            'invoices' => $canViewFinancials ? array_map(
+                static fn (Invoice $i): array => [
+                    'period' => $i->period(),
+                    'amountCents' => $i->amountCents(),
+                    'issuedAt' => $i->issuedAt()->format('d/m/Y'),
+                ],
+                $this->invoices->findForProject($user->tenantId(), $project->id()),
+            ) : [],
             'transitions' => array_map(
                 static fn (ProjectStatus $s): array => ['value' => $s->value, 'label' => $s->label()],
                 $project->status()->allowedTransitions(),
@@ -325,6 +339,28 @@ final class ProjectPageController extends AbstractController
         $project->attachClient('' !== $clientId ? $clientId : null);
         $this->projects->save($project);
         $this->addFlash('success', 'Client du projet mis à jour.');
+
+        return $this->redirectToRoute('project_show', ['id' => $id]);
+    }
+
+    #[Route('/projets/{id}/facture', name: 'project_issue_invoice', requirements: ['id' => '[0-9a-f-]{36}'], methods: ['POST'])]
+    public function issueInvoice(#[CurrentUser] User $user, string $id, Request $request): RedirectResponse
+    {
+        if (!$this->isCsrfTokenValid('issue_invoice', (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Jeton de sécurité invalide.');
+
+            return $this->redirectToRoute('project_show', ['id' => $id]);
+        }
+
+        $period = trim((string) $request->request->get('period'));
+        $amountEuros = filter_var($request->request->get('amountEuros'), \FILTER_VALIDATE_INT);
+
+        try {
+            $this->issueInvoice->issue($user, $id, $period, false !== $amountEuros ? $amountEuros * 100 : 0);
+            $this->addFlash('success', sprintf('Facture émise pour la période %s.', $period));
+        } catch (InvoiceException $exception) {
+            $this->addFlash('error', $exception->getMessage());
+        }
 
         return $this->redirectToRoute('project_show', ['id' => $id]);
     }
