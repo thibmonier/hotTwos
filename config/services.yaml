@@ -120,6 +120,10 @@ services:
     # Port surcharges de taux de vente (US-015, DIP).
     App\Domain\Pricing\SellingRateRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineSellingRateRepository'
 
+    # Ports devises (US-016, DIP).
+    App\Domain\Currency\ReferenceCurrencyRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineReferenceCurrencyRepository'
+    App\Domain\Currency\ExchangeRateRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineExchangeRateRepository'
+
     # Source de revenu marge (US-076, DIP) — facturé réel s'il existe, sinon CA reconnu.
     App\Domain\Margin\RevenueSource: '@App\Infrastructure\Margin\InvoiceRevenueSource'
 

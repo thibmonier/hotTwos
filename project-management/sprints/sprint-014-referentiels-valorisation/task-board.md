@@ -5,16 +5,6 @@
 
 ## 🔲 À Faire
 
-### US-016 — Devises (Should, 3 pts)
-| ID | Tâche | Est. |
-|----|-------|------|
-| T-016-01 | [DB] Currency/ExchangeRate/devise réf + migration | 3h |
-| T-016-02 | [BE] `CurrencyConverter` | 2h |
-| T-016-03 | [BE] Use case config | 1.5h |
-| T-016-04 | [FE-WEB] UI config | 2h |
-| T-016-05 | [TEST] Unit + functional | 2.5h |
-| T-016-06 | [REV] Revue | 0.5h |
-
 ### US-079a — Export CSV (Must, ~3 pts)
 | ID | Tâche | Est. |
 |----|-------|------|
@@ -48,6 +38,7 @@
 |----|-------|---------|
 | Setup | Affinage EPIC-001 + décomposition S14 | 2026-09-06 |
 | US-015 | Taux de vente multi-niveaux + priorité (5 pts) | 2026-09-06 |
+| US-016 | Devises & devise de référence (3 pts) | 2026-09-06 |
 
 ## Ordre d'exécution
 1. **US-015** (taux multi-niveaux) → 2. **US-016** (devises) → 3. **US-079a** (export) → 4. **US-079c** (courbe). US-079b en réserve S15.

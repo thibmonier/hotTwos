@@ -66,12 +66,16 @@ THEN l'accès est refusé (403)
 ```
 
 ## Definition of Done
-- [ ] Devise de référence par tenant (défaut EUR) + référentiel devises + taux de change **datés** (`EffectivePeriod`) + migration RLS
-- [ ] Convertisseur (montant, devise source, date → devise de référence) ; cas taux manquant signalé
-- [ ] Use case de configuration gated `MANAGE_ORGANIZATION`, tracé
-- [ ] UI : configuration devise de référence + taux de change
-- [ ] Tests : conversion, taux historisé à date, taux manquant, défaut EUR, gating
-- [ ] `make ci` vert · revue de clôture
+- [x] `ReferenceCurrency` (devise de référence tenant, défaut EUR applicatif) + `ExchangeRate` **daté** (millièmes) + ports + migration RLS
+- [x] `CurrencyConverter` `(cents, devise, date) → cents référence` ; taux manquant signalé (`available=false`)
+- [x] Use case `ConfigureCurrency` (setReference + defineExchangeRate) gated `MANAGE_ORGANIZATION`, anti-chevauchement, tracé
+- [x] UI : `/finance/config-devises` (devise de référence + taux de change)
+- [x] Tests : conversion au taux daté, taux manquant, défaut EUR, référence configurée, gating, functional
+- [x] `make ci` vert · revue de clôture
+
+## Note de réalisation
+Montants internes **inchangés** (centimes) : la conversion est un service de lecture/consolidation. Taux
+stockés en **millièmes** (entiers, pas de flottants). Facturation multi-devise = tranche ultérieure.
 
 ## Notes
 Portée **minimale** : les montants internes restent en centimes (pas de reconversion du stock). La

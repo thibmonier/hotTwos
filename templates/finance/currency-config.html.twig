@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Devises{% endblock %}
+{% block page_section %}Finance &amp; rentabilité{% endblock %}
+{% block page_title %}Devises &amp; taux de change{% endblock %}
+
+{% block body %}
+    <h1 class="visually-hidden">Configuration des devises</h1>
+
+    <section class="mb-6 max-w-md rounded-md border border-border bg-surface p-4 shadow-sm">
+        <h2 class="mb-1 text-base font-semibold text-ink">Devise de référence</h2>
+        <p class="mb-3 text-sm text-muted">Tous les montants sont consolidés dans cette devise. Actuelle : <strong>{{ reference }}</strong>.</p>
+        <form method="post" action="{{ path('currency_config_reference') }}" class="flex items-end gap-2">
+            <input type="hidden" name="_token" value="{{ csrf_token('currency_config') }}">
+            <label class="text-[13px] font-medium text-ink">Devise
+                <select name="code" class="ml-1 min-h-10 rounded border border-border bg-surface px-2 text-sm text-body">
+                    {% for c in currencies %}<option value="{{ c }}" {{ c == reference ? 'selected' : '' }}>{{ c }}</option>{% endfor %}
+                </select>
+            </label>
+            <button type="submit" class="min-h-10 rounded bg-primary px-4 text-sm font-semibold text-primary-fg hover:opacity-90">Définir</button>
+        </form>
+    </section>
+
+    <section class="max-w-2xl rounded-md border border-border bg-surface p-4 shadow-sm">
+        <h2 class="mb-1 text-base font-semibold text-ink">Taux de change vers {{ reference }}</h2>
+        <p class="mb-3 text-xs text-muted">1 unité de la devise = X {{ reference }}, à partir de la date d'effet.</p>
+
+        {% if rates is empty %}
+            <p class="mb-3 text-sm text-muted">Aucun taux de change défini.</p>
+        {% else %}
+            <table class="mb-4 w-full border-collapse text-sm">
+                <thead>
+                    <tr class="border-b border-border text-left text-xs uppercase text-muted">
+                        <th class="py-2 pr-4">Devise</th><th class="py-2 pr-4">À partir du</th><th class="py-2 text-right">Taux</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in rates %}
+                        <tr class="border-b border-border last:border-b-0">
+                            <td class="py-2 pr-4 font-medium text-ink">{{ r.code }}</td>
+                            <td class="py-2 pr-4 text-body">{{ r.from }}</td>
+                            <td class="py-2 text-right tabular-nums text-body">{{ r.rate }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+
+        <form method="post" action="{{ path('currency_config_rate') }}" class="flex flex-wrap items-end gap-2">
+            <input type="hidden" name="_token" value="{{ csrf_token('currency_config') }}">
+            <label class="text-[13px] font-medium text-ink">Devise
+                <select name="code" class="ml-1 min-h-10 rounded border border-border bg-surface px-2 text-sm text-body">
+                    {% for c in currencies|filter(c => c != reference) %}<option value="{{ c }}">{{ c }}</option>{% endfor %}
+                </select>
+            </label>
+            <label class="text-[13px] font-medium text-ink">Date d'effet
+                <input type="date" name="from" required class="ml-1 min-h-10 rounded border border-border bg-surface px-2 text-sm text-body">
+            </label>
+            <label class="text-[13px] font-medium text-ink">Taux (→ {{ reference }})
+                <input type="number" name="rate" step="0.001" min="0.001" required class="ml-1 w-28 min-h-10 rounded border border-border bg-surface px-2 text-sm text-body">
+            </label>
+            <button type="submit" class="min-h-10 rounded bg-primary px-4 text-sm font-semibold text-primary-fg hover:opacity-90">Enregistrer le taux</button>
+        </form>
+    </section>
+{% endblock %}
