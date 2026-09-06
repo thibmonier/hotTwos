@@ -7,7 +7,9 @@ namespace App\Tests\Functional\Web;
 use App\Application\Authorization\InitializeDefaultRoles;
 use App\Domain\Authorization\Role;
 use App\Domain\Pricing\CalculationMode;
+use App\Domain\Client\Client;
 use App\Domain\Pricing\Profile;
+use App\Domain\Project\Project;
 use App\Domain\Pricing\ProfileAssignment;
 use App\Domain\Tenant\Tenant;
 use App\Domain\Tenant\TenantId;
@@ -52,6 +54,8 @@ final class ProfileAssignmentPageTest extends WebTestCase
             $this->em->getClassMetadata(Role::class),
             $this->em->getClassMetadata(Profile::class),
             $this->em->getClassMetadata(ProfileAssignment::class),
+            $this->em->getClassMetadata(Client::class),
+            $this->em->getClassMetadata(Project::class),
         ];
         $tool = new SchemaTool($this->em);
         $tool->dropSchema($this->schema);

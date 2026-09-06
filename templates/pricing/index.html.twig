@@ -242,4 +242,44 @@
 
         <p class="text-xs text-muted" aria-live="polite" data-pricing-target="status"></p>
     </div>
+
+    {# ── Surcharges de taux de vente (US-015, EF-REF-19) : client / projet, priorité projet > client > profil ── #}
+    <section aria-labelledby="selling-rate-heading" class="mt-6 rounded-md border border-border bg-surface p-4 shadow-sm">
+        <h2 id="selling-rate-heading" class="mb-1 text-base font-semibold text-ink">Surcharges de taux de vente</h2>
+        <p class="mb-3 text-xs text-muted">Un taux client ou projet prime sur le taux du profil (priorité projet &gt; client &gt; profil).</p>
+        <form method="post" action="{{ path('pricing_selling_rate_define') }}" class="flex flex-wrap items-end gap-3">
+            <input type="hidden" name="_token" value="{{ csrf_token('selling_rate') }}">
+            <label class="text-[13px] font-medium text-ink">Profil
+                <select name="profileId" required class="ml-1 min-h-10 rounded border border-border bg-surface px-2 text-sm text-body">
+                    {% for r in rows %}<option value="{{ r.id }}">{{ r.name }}</option>{% endfor %}
+                </select>
+            </label>
+            <label class="text-[13px] font-medium text-ink">Niveau
+                <select name="scope" required class="ml-1 min-h-10 rounded border border-border bg-surface px-2 text-sm text-body">
+                    <option value="client">Client</option>
+                    <option value="project">Projet</option>
+                </select>
+            </label>
+            <label class="text-[13px] font-medium text-ink">Cible (client ou projet)
+                <select name="scopeRefId" required class="ml-1 min-h-10 rounded border border-border bg-surface px-2 text-sm text-body">
+                    <optgroup label="Clients">
+                        {% for c in clients %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}
+                    </optgroup>
+                    <optgroup label="Projets">
+                        {% for p in projects %}<option value="{{ p.id }}">{{ p.name }}</option>{% endfor %}
+                    </optgroup>
+                </select>
+            </label>
+            <label class="text-[13px] font-medium text-ink">Date d'effet
+                <input type="date" name="from" required class="ml-1 min-h-10 rounded border border-border bg-surface px-2 text-sm text-body">
+            </label>
+            <label class="text-[13px] font-medium text-ink">Taux de vente (€/j)
+                <input type="number" name="sellingEuros" min="1" required class="ml-1 w-28 min-h-10 rounded border border-border bg-surface px-2 text-sm text-body">
+            </label>
+            <label class="text-[12px] text-muted">
+                <input type="checkbox" name="confirmRetroactive" value="1"> Confirmer si rétroactif
+            </label>
+            <button type="submit" class="min-h-10 rounded bg-primary px-4 text-sm font-semibold text-primary-fg hover:opacity-90">Enregistrer le taux</button>
+        </form>
+    </section>
 {% endblock %}

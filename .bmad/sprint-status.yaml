@@ -38,7 +38,7 @@ stories:
   US-012: { title: "Calendriers & absences", sprint: null, status: backlog }
   US-013: { title: "Référentiel compétences", sprint: null, status: backlog }
   US-014: { title: "Comptes clients & contacts (tranche minimale S11)", sprint: 11, status: done }   # prérequis facturation (ADR-0022)
-  US-015: { title: "Taux de vente multi-niveaux (profil/client/projet) + priorité (EF-REF-19)", sprint: 14, status: ready, points: 5 }   # affinée 2026-09-06
+  US-015: { title: "Taux de vente multi-niveaux (profil/client/projet) + priorité (EF-REF-19)", sprint: 14, status: done, points: 5 }   # S14
   US-016: { title: "Devises & devise de référence tenant (EF-REF-22)", sprint: 14, status: ready, points: 3 }   # affinée 2026-09-06
   US-017: { title: "Statuts & circuits de validation", sprint: null, status: backlog }
   US-018: { title: "Seuils d'alerte paramétrables (tenant)", sprint: 10, status: done }      # S10 — override seuil dérive US-072 (PR #51)
