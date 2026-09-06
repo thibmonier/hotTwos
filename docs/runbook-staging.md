@@ -30,9 +30,20 @@ railway up --detach   # sans streamer les logs
 | `DATABASE_URL` | PostgreSQL Railway | **oui** (démarrage refusé si absent) |
 | `SERVER_NAME` | `:${PORT}` (port fourni par Railway) | oui |
 | `SENTRY_DSN` | suivi d'erreurs Sentry (UE) | non (Sentry inactif si vide) |
+| `MAILER_DSN` | relais SMTP staging (envoi d'e-mails : relances, notifications) | recommandé (voir ci-dessous) |
 
 - **Rotation d'un secret** : mettre à jour la variable dans Railway ; le service redémarre avec la nouvelle valeur, **sans nouveau build de code** (ENF-SEC-10).
 - **Variable obligatoire manquante** : le conteneur échoue explicitement au démarrage (`docker/start.sh`), le déploiement ne passe pas (CA-4).
+
+### E-mail (`MAILER_DSN`) — T-OPS-01
+
+La configuration Symfony est **générique** (`config/packages/mailer.yaml` → `%env(MAILER_DSN)%`) : rien à
+changer dans le code, seule la variable d'environnement diffère par environnement.
+
+- **Dev** : `mailpit` (SMTP `1025`, UI `8025`) fourni par `compose.override.yaml`.
+- **Staging** : définir `MAILER_DSN` dans Railway vers un **relais SMTP** (ex. `smtp://user:pass@smtp-relay.example:587?encryption=tls`), ou un fournisseur transactionnel (`brevo+smtp://…`, `ses+smtp://…`). **Jamais de secret en dur** dans le dépôt (ARC-88) : la valeur vit uniquement dans les variables Railway.
+- **Sans `MAILER_DSN`** : l'envoi échoue silencieusement/temporise ; ne pas laisser vide en staging si des e-mails (relances de saisie US-056) doivent être testés.
+- **Recette e-mail** : après configuration, déclencher un e-mail (relance) et vérifier la réception côté relais/fournisseur ; tracer dans `.recette/`.
 
 ## Observabilité
 

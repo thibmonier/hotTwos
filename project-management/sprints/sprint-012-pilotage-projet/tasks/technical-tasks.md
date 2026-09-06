@@ -4,9 +4,14 @@ Dette de finition reportée, embarquée sur décision PO (rétro S11, actions 1-
 
 | ID | Type | Tâche | Est. | Statut |
 |----|------|-------|------|--------|
-| T-DET-01 | [FE-WEB] | Harmoniser les libellés « CA reconnu » → « Revenu retenu » | 1.5h | 🔲 |
-| T-R01 | [FE-WEB] | Corriger l'onglet « Suivi budgétaire » (1er clic — Stimulus `tabs`) | 1.5h | 🔲 |
-| T-OPS-01 | [OPS] | `MAILER_DSN` staging | 1.5h | 🔲 |
+| T-DET-01 | [FE-WEB] | Harmoniser les libellés « CA reconnu » → « Revenu retenu » | 1.5h | ✅ |
+| T-R01 | [FE-WEB] | Corriger l'onglet « Suivi budgétaire » (1er clic — Stimulus `tabs`) | 1.5h | ✅ |
+| T-OPS-01 | [OPS] | `MAILER_DSN` staging | 1.5h | ✅ |
+
+> **T-DET-01 — correction de périmètre** : seul `/finance` lit `ProjectMargin` (revenu retenu, US-076)
+> → renommé. `/valorisation` affiche la **valorisation brute (CA reconnu réel)** via `summaryFor()`/
+> `projectBreakdownFor()` → libellé **conservé** (renommer aurait été faux). Le tableau « Suivi budgétaire »
+> de la fiche projet lit aussi la valorisation (CA reconnu) → conservé.
 
 ## T-DET-01 [FE-WEB] — Libellés « Revenu retenu »
 - **Raison** : depuis US-076, la valeur affichée est le **revenu retenu** (facturé réel sinon CA reconnu). Le libellé « CA reconnu » est devenu mensonger côté UI (corrigé côté FEC en S11).

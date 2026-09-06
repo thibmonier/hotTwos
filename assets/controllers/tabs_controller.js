@@ -8,6 +8,18 @@ import { Controller } from '@hotwired/stimulus';
 export default class extends Controller {
     static targets = ['tab', 'panel'];
 
+    // T-R01 — normalise l'état initial au montage : exactement un onglet actif (celui marqué
+    // aria-selected, sinon le premier) et son panneau visible, tous les autres masqués. Corrige le
+    // « 1er clic sans effet » quand des onglets/panneaux sont rendus conditionnellement (état HTML
+    // initial potentiellement désaligné avec les cibles Stimulus réellement présentes).
+    connect() {
+        if (this.tabTargets.length === 0) {
+            return;
+        }
+        const active = this.tabTargets.find((t) => t.getAttribute('aria-selected') === 'true') ?? this.tabTargets[0];
+        this.#activate(active);
+    }
+
     select(event) {
         this.#activate(event.currentTarget);
     }
