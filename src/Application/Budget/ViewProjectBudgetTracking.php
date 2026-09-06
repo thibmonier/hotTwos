@@ -8,9 +8,13 @@ use App\Application\Authorization\Authorizer;
 use App\Domain\Authorization\Permission;
 use App\Domain\Budget\BudgetTracking;
 use App\Domain\Budget\BudgetTrackingCalculator;
+use App\Domain\Budget\ChargeLanding;
+use App\Domain\Budget\ChargeLandingCalculator;
 use App\Domain\Budget\MarginDriftThresholdProvider;
 use App\Domain\Project\Project;
 use App\Domain\Project\ProjectException;
+use App\Domain\Project\ProjectLotRepository;
+use App\Domain\Project\ProjectProgressCalculator;
 use App\Domain\Project\ProjectRepository;
 use App\Domain\Tenant\TenantId;
 use App\Domain\User\User;
@@ -34,6 +38,9 @@ final readonly class ViewProjectBudgetTracking
         private TimeEntryValuationRepository $valuations,
         private BudgetTrackingCalculator $calculator,
         private MarginDriftThresholdProvider $thresholds,
+        private ProjectLotRepository $lots,
+        private ProjectProgressCalculator $progress,
+        private ChargeLandingCalculator $landing,
     ) {
     }
 
@@ -61,7 +68,11 @@ final readonly class ViewProjectBudgetTracking
             $this->thresholds->pointsFor($tenant),
         );
 
-        return $this->toView($projectId, $project->name(), $tracking, $costVisible);
+        // US-036 : atterrissage charge à partir de l'avancement physique agrégé des lots (US-035).
+        $physicalProgress = $this->progress->weightedPhysicalProgress($this->lots->findForProject($tenant, $projectId));
+        $landing = $this->landing->land($project->budgetCents(), $realized->costCents, $physicalProgress);
+
+        return $this->toView($projectId, $project->name(), $tracking, $landing, $costVisible);
     }
 
     private function realizedFor(TenantId $tenant, string $projectId): ProjectValuationLine
@@ -75,7 +86,7 @@ final readonly class ViewProjectBudgetTracking
         return new ProjectValuationLine($projectId, '', 0, 0, 0);
     }
 
-    private function toView(string $projectId, string $projectName, BudgetTracking $t, bool $costVisible): ProjectBudgetTrackingView
+    private function toView(string $projectId, string $projectName, BudgetTracking $t, ChargeLanding $landing, bool $costVisible): ProjectBudgetTrackingView
     {
         return new ProjectBudgetTrackingView(
             $projectId,
@@ -97,6 +108,14 @@ final readonly class ViewProjectBudgetTracking
             $costVisible ? $t->marginRateDriftPoints : null,
             $t->driftThresholdPoints,
             $costVisible && $t->isDrifting,
+            // US-036 — atterrissage charge : ratios + alerte visibles dès VIEW_PROJECT_FINANCIALS ;
+            // montants € et consommation restent réservés au coût visible (HAB-1, jamais de coût unitaire).
+            $landing->available,
+            $costVisible ? $landing->landingCostCents : null,
+            $landing->overrunPercent,
+            $costVisible ? $landing->consumptionPercent : null,
+            $landing->physicalProgressPercent,
+            $landing->isEarlyDrift,
         );
     }
 }

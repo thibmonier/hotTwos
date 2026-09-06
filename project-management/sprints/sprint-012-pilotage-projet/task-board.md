@@ -5,16 +5,6 @@
 
 ## 🔲 À Faire
 
-### US-036 — Atterrissage charge & alerte de dérive précoce (Must, 8 pts)
-| ID | Tâche | Est. |
-|----|-------|------|
-| T-036-01 | [BE] `ChargeLandingCalculator` + DTO | 3h |
-| T-036-02 | [BE] Agrégation avancement projet | 1.5h |
-| T-036-03 | [BE] Exposition `ViewProjectBudgetTracking` (HAB-1) | 2.5h |
-| T-036-04 | [FE-WEB] UI atterrissage + badge + /finance | 3h |
-| T-036-05 | [TEST] Unit matrice OBJ-2 + HAB-1 + Functional | 3h |
-| T-036-06 | [REV] Revue | 0.5h |
-
 ### Dette (Should)
 | ID | Tâche | Est. |
 |----|-------|------|
@@ -35,6 +25,7 @@
 |----|-------|---------|
 | Setup | Réconciliation EPIC-002 + affinage US-035/036 + décomposition | 2026-09-06 |
 | US-035 | Avancement physique & RAF par lot (8 pts) | 2026-09-06 |
+| US-036 | Atterrissage charge & alerte de dérive précoce (8 pts) | 2026-09-06 |
 
 ## Ordre d'exécution
 1. **US-035** (fondation avancement/RAF).

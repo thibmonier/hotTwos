@@ -170,6 +170,45 @@ final class ProjectBudgetTrackingTest extends WebTestCase
         self::assertStringContainsString('Aucun budget défini pour ce projet', $content);
     }
 
+    public function testEarlyChargeDriftAlertOnProjectPage(): void
+    {
+        // Budget charge 100 000 € ; consommé 15 000 € à 10 % d'avancement → atterrissage 150 000 €
+        // (+50 %), consommation 15 % (< 50 %) → dérive de charge précoce (US-036, OBJ-2).
+        $project = Project::createBusiness(
+            $this->tenant,
+            'PRJ-0003',
+            'Pilotage',
+            'ACME',
+            '018f9c4e-0000-7000-8000-0000000000c1',
+            100_000_00,
+            ContractType::FORFAIT,
+            null,
+            null,
+            120_000_00,
+        );
+        $this->em->persist($project);
+        $lot = new ProjectLot($this->tenant, $project->id(), 'Développement', 10, 8_000_000);
+        $lot->recordProgress(10, null);
+        $this->em->persist($lot);
+        $this->valuate($project, '018f9c4e-0000-7000-8000-0000000000c1', '2026-08-19', 6_000_00, 15_000_00, new DateTimeImmutable('2026-01-01 00:00:00', new DateTimeZone('UTC')), new DateTimeImmutable('2026-08-20 10:00:00', new DateTimeZone('UTC')));
+        $this->em->flush();
+
+        // Dirigeant (coût visible) : alerte + montant d'atterrissage.
+        $this->login('dg@agence.test');
+        $this->client->request('GET', '/projets/'.$project->id());
+        self::assertResponseIsSuccessful();
+        $dg = (string) $this->client->getResponse()->getContent();
+        self::assertStringContainsString('Dérive de charge précoce', $dg);
+        self::assertStringContainsString('150 000', $dg); // atterrissage € visible
+
+        // Chef de projet (sans coût) : alerte visible, montant € masqué (HAB-1).
+        $this->login('marc@agence.test');
+        $this->client->request('GET', '/projets/'.$project->id());
+        $marc = (string) $this->client->getResponse()->getContent();
+        self::assertStringContainsString('Dérive de charge précoce', $marc);
+        self::assertStringNotContainsString('150 000', $marc);
+    }
+
     private function login(string $email): void
     {
         $this->client->request(

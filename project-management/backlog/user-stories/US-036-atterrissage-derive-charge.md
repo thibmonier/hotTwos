@@ -78,12 +78,17 @@ THEN il voit l'atterrissage/dérive globaux mais jamais le coût unitaire d'un c
 ```
 
 ## Definition of Done
-- [ ] Domaine `ChargeLandingCalculator` + DTO `ChargeLanding` (EAC, `overrunPercent`, `consumptionPercent`, `isEarlyDrift`) ; constantes OBJ-2 (10 % / 50 %)
-- [ ] Application : atterrissage exposé via `ViewProjectBudgetTracking` (gating HAB-1)
-- [ ] UI : atterrissage + badge alerte dans l'onglet « Suivi budgétaire » + compteur dérive charge dans `/finance`
-- [ ] Tests : matrice OBJ-2 (dépassement >/≤ 10 % × conso </≥ 50 %), cas manquants, HAB-1, INV-4
-- [ ] `make ci` vert (couverture ≥ 80 %) · revue de clôture
+- [x] Domaine `ChargeLandingCalculator` + DTO `ChargeLanding` (EAC, `overrunPercent`, `consumptionPercent`, `isEarlyDrift`) ; constantes OBJ-2 (10 % / 50 %)
+- [x] Agrégation avancement projet `ProjectProgressCalculator` (pondérée `budgetDays`)
+- [x] Application : atterrissage exposé via `ViewProjectBudgetTracking` (gating HAB-1)
+- [x] UI : atterrissage + badge alerte de dérive précoce dans l'onglet « Suivi budgétaire »
+- [x] Tests : matrice OBJ-2 (dépassement >/≤ 10 % × conso </≥ 50 %), cas manquants, HAB-1, INV-4
+- [x] `make ci` vert (couverture ≥ 80 %) · revue de clôture
 
 ## Notes
-Moteur unique (ARC-6) : réutiliser `projectBreakdownFor()`, `Project::budgetCents()` et le pattern seuil.
+Moteur unique (ARC-6) : réutilise `projectBreakdownFor()`, `Project::budgetCents()`, l'avancement d'US-035.
 Ne pas exposer de coût unitaire (HAB-1). Atterrissage montant = tranche ultérieure (le RAF est capté par US-035 pour ce futur).
+
+## Décisions de réalisation
+- **Gating (CA-6)** : l'alerte + ratios (dépassement %, avancement %) sont visibles dès `VIEW_PROJECT_FINANCIALS` ; les **montants € d'atterrissage** et la consommation restent réservés à `VIEW_COLLABORATOR_COST`. Le coût unitaire n'est jamais montré ; un CP « financials sans coût » voit bien la dérive.
+- **Compteur `/finance` différé** (hors CA) : le dashboard consolide des marges **figées par période**, alors que l'atterrissage croise un avancement **courant** → mélange sémantiquement incohérent. L'alerte vit sur la fiche projet, là où le CP agit (YAGNI ; un indicateur consolidé serait une story dédiée).
