@@ -5,13 +5,6 @@
 
 ## 🔲 À Faire
 
-### Dette (Should)
-| ID | Tâche | Est. |
-|----|-------|------|
-| T-DET-01 | [FE-WEB] Libellés « CA reconnu » → « Revenu retenu » | 1.5h |
-| T-R01 | [FE-WEB] Onglet « Suivi budgétaire » (Stimulus `tabs`) | 1.5h |
-| T-OPS-01 | [OPS] `MAILER_DSN` staging | 1.5h |
-
 ## 🔄 En Cours
 | ID | Tâche | Démarré |
 |----|-------|---------|
@@ -26,6 +19,7 @@
 | Setup | Réconciliation EPIC-002 + affinage US-035/036 + décomposition | 2026-09-06 |
 | US-035 | Avancement physique & RAF par lot (8 pts) | 2026-09-06 |
 | US-036 | Atterrissage charge & alerte de dérive précoce (8 pts) | 2026-09-06 |
+| Dette | T-DET-01 libellés /finance + T-R01 tabs + T-OPS-01 MAILER | 2026-09-06 |
 
 ## Ordre d'exécution
 1. **US-035** (fondation avancement/RAF).
