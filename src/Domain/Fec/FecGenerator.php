@@ -10,7 +10,8 @@ use App\Domain\Shared\CalendarMonth;
 /**
  * Génère un fichier FEC (US-074, ADR-0021) à partir des marges figées d'une période.
  *
- * Pour chaque projet : une écriture de **produit** (débit tiers / crédit produit = CA reconnu) et, si
+ * Pour chaque projet : une écriture de **produit** (débit tiers / crédit produit = **revenu retenu** —
+ * facturé réel s'il existe, sinon CA reconnu, figé par la source de revenu US-076/ADR-0022) et, si
  * coût > 0, une écriture de **charge** (débit charge / crédit contrepartie = coût valorisé). Chaque
  * écriture est équilibrée ; le total débit du fichier = total crédit (INV-2, centimes entiers en
  * interne, format décimal FEC en sortie). Moteur unique — aucun recalcul de marge.
@@ -38,7 +39,7 @@ final class FecGenerator
         foreach ($margins as $margin) {
             if ($margin->revenueCents() > 0) {
                 ++$ecritureNum;
-                $lib = sprintf('CA reconnu %s %s', $margin->projectName(), $period);
+                $lib = sprintf('Revenu retenu %s %s', $margin->projectName(), $period);
                 $piece = sprintf('CA-%s-%s', $period, $margin->projectRef());
                 $amount = $this->amount($margin->revenueCents());
                 $lines[] = $this->line($config, (string) $ecritureNum, $date, $config->receivableAccountNum(), $config->receivableAccountLib(), $margin, $piece, $lib, $amount, '');

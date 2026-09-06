@@ -13,9 +13,9 @@
 
 | ID | Type | Tâche | Est. | Dépend de | Statut |
 |----|------|-------|------|-----------|--------|
-| T-077-01 | [BE] | `FecGenerator`/`ExportFec` (US-074) alimentés par `RevenueSource` (US-076) au lieu du CA reconnu direct | 2h | US-076 | 🔲 |
-| T-077-02 | [TEST] | FEC sur facturé, repli, **cohérence FEC ↔ marge** (même source) | 2h | T-077-01 | 🔲 |
-| T-077-03 | [REV] | Revue de clôture | 0.5h | T-077-02 | 🔲 |
+| T-077-01 | [BE] | `FecGenerator`/`ExportFec` alimentés par la source unique via `ProjectMargin` re-figé (US-076) — acquis par construction ; libellé produit rendu neutre (« Revenu retenu ») | 2h | US-076 | ✅ |
+| T-077-02 | [TEST] | FEC sur facturé, repli, **cohérence FEC ↔ marge** (même source) — `FecReflectsBilledRevenueTest` | 2h | T-077-01 | ✅ |
+| T-077-03 | [REV] | Revue de clôture | 0.5h | T-077-02 | ✅ |
 
 ## Principe (ADR-0022, ARC-6)
 Un **seul** point applique la règle « facturé réel s'il existe, sinon CA reconnu » : le port
