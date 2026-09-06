@@ -5,17 +5,6 @@
 
 ## 🔲 À Faire
 
-### US-033 — Budget initial/avenants/courant (Must, 8 pts)
-| ID | Tâche | Est. |
-|----|-------|------|
-| T-033-01 | [DB] Entité `BudgetAmendment` + port | 2h |
-| T-033-02 | [DB] Migration + impl Doctrine | 2h |
-| T-033-03 | [BE] `AddBudgetAmendment` (gated, motif, refus clôturé) | 2h |
-| T-033-04 | [BE] `CurrentProjectBudget` + rebranchement 3 lecteurs | 3h |
-| T-033-05 | [FE-WEB] Formulaire avenant + historique | 3h |
-| T-033-06 | [TEST] Unit + Functional (INV-2/3) | 3h |
-| T-033-07 | [REV] Revue | 0.5h |
-
 ### US-078 — Budget charge par profil (Must, 8 pts)
 | ID | Tâche | Est. |
 |----|-------|------|
@@ -53,6 +42,7 @@
 | ID | Tâche | Terminé |
 |----|-------|---------|
 | Setup | Décomposition Sprint 13 | 2026-09-06 |
+| US-033 | Budget initial/avenants/courant (8 pts) | 2026-09-06 |
 
 ## Ordre d'exécution
 1. **US-033** (avenants → budget courant, référence du suivi/atterrissage).

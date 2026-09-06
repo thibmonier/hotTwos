@@ -17,8 +17,10 @@ use App\Domain\Project\ContractType;
 use App\Domain\Project\Project;
 use App\Domain\Tenant\TenantId;
 use App\Domain\User\User;
+use App\Domain\Project\CurrentProjectBudget;
 use App\Infrastructure\Budget\DefaultMarginDriftThresholdProvider;
 use App\Tests\Support\Authorization\InMemoryRoleRepository;
+use App\Tests\Support\Project\InMemoryBudgetAmendmentRepository;
 use App\Tests\Support\Authorization\RecordingSecurityAuditLogger;
 use App\Tests\Support\Margin\InMemoryProjectMarginRepository;
 use App\Tests\Support\Timesheet\InMemoryProjectRepository;
@@ -79,6 +81,8 @@ final class ConsolidatedFinanceReportTest extends TestCase
             new MarginCalculator(),
             new BudgetTrackingCalculator(new MarginCalculator()),
             new DefaultMarginDriftThresholdProvider(),
+            new InMemoryBudgetAmendmentRepository(),
+            new CurrentProjectBudget(),
         );
 
         $this->executive = new User($this->tenant, 'dg@agence.test', 'hash', ['Dirigeant']);
@@ -171,6 +175,8 @@ final class ConsolidatedFinanceReportTest extends TestCase
             new MarginCalculator(),
             new BudgetTrackingCalculator(new MarginCalculator()),
             new DefaultMarginDriftThresholdProvider(),
+            new InMemoryBudgetAmendmentRepository(),
+            new CurrentProjectBudget(),
         );
 
         $d = $report->forPeriod($other);
