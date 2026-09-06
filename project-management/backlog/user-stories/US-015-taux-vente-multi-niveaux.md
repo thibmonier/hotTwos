@@ -69,13 +69,17 @@ THEN l'accès est refusé (403)
 ```
 
 ## Definition of Done
-- [ ] Modèle de taux de vente **scopé** (profil | client | projet) historisé (`EffectivePeriod`) + port + migration RLS
-- [ ] Résolveur unique appliquant la priorité **projet > client > profil** (ARC-6), avec repli, à une date donnée
-- [ ] Règle appliquée exposée (niveau retenu) pour l'affichage
-- [ ] Use case de définition gated `MANAGE_PRICING`, anti-chevauchement (`EffectivePeriod::overlaps`), tracé
-- [ ] UI : gestion des surcharges de taux (client/projet) + affichage de la règle appliquée
-- [ ] Tests : priorité (les 3 niveaux), repli, historisation à date (INV-2), gating
-- [ ] `make ci` vert · revue de clôture
+- [x] Modèle `SellingRate` scopé (client/projet, le niveau profil restant `ProfileRate`) historisé (`EffectivePeriod`) + port + migration RLS
+- [x] `SellingRateResolver` unique : priorité **projet > client > profil** (repli `ProfileRate`) à une date, expose le niveau retenu (`ResolvedSellingRate`)
+- [x] Use case `DefineSellingRate` gated `MANAGE_PRICING`, anti-chevauchement, rétroactivité confirmée (INV-2), tracé
+- [x] UI : saisie des surcharges (client/projet) sur `/profils`
+- [x] Tests : priorité 3 niveaux + repli + historisé (INV-2), use case gating/overlap/rétro, functional
+- [x] `make ci` vert · revue de clôture
+
+## Note de réalisation
+Le niveau **profil** reste porté par `ProfileRate` (US-011) — `SellingRate` ne stocke que les surcharges
+client/projet, évitant la redondance. Résolveur = un seul point (ARC-6). L'affichage « règle appliquée »
+(niveau retenu) est disponible via `ResolvedSellingRate.level` pour le futur écran de chiffrage.
 
 ## Notes
 Réutiliser `ProfileRate`/`RateResolver` (profil) ; ajouter les niveaux client/projet et un résolveur de

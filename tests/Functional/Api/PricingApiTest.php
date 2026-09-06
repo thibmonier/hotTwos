@@ -6,8 +6,10 @@ namespace App\Tests\Functional\Api;
 
 use App\Application\Authorization\InitializeDefaultRoles;
 use App\Domain\Authorization\Role;
+use App\Domain\Client\Client;
 use App\Domain\Pricing\Profile;
 use App\Domain\Pricing\ProfileRate;
+use App\Domain\Project\Project;
 use App\Domain\Tenant\Tenant;
 use App\Domain\Tenant\TenantId;
 use App\Domain\User\User;
@@ -42,6 +44,8 @@ final class PricingApiTest extends WebTestCase
             $this->em->getClassMetadata(Role::class),
             $this->em->getClassMetadata(Profile::class),
             $this->em->getClassMetadata(ProfileRate::class),
+            $this->em->getClassMetadata(Client::class),
+            $this->em->getClassMetadata(Project::class),
         ];
         $tool = new SchemaTool($this->em);
         $tool->dropSchema($this->schema);

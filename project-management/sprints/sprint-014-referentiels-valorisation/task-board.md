@@ -5,17 +5,6 @@
 
 ## 🔲 À Faire
 
-### US-015 — Taux de vente multi-niveaux (Must, 5 pts)
-| ID | Tâche | Est. |
-|----|-------|------|
-| T-015-01 | [DB] `SellingRate` + port | 2.5h |
-| T-015-02 | [DB] Migration + impl Doctrine | 2h |
-| T-015-03 | [BE] `SellingRateResolver` (priorité) | 2.5h |
-| T-015-04 | [BE] `DefineSellingRate` (gated) | 2h |
-| T-015-05 | [FE-WEB] UI surcharges + règle appliquée | 3h |
-| T-015-06 | [TEST] Unit + functional | 3h |
-| T-015-07 | [REV] Revue | 0.5h |
-
 ### US-016 — Devises (Should, 3 pts)
 | ID | Tâche | Est. |
 |----|-------|------|
@@ -58,6 +47,7 @@
 | ID | Tâche | Terminé |
 |----|-------|---------|
 | Setup | Affinage EPIC-001 + décomposition S14 | 2026-09-06 |
+| US-015 | Taux de vente multi-niveaux + priorité (5 pts) | 2026-09-06 |
 
 ## Ordre d'exécution
 1. **US-015** (taux multi-niveaux) → 2. **US-016** (devises) → 3. **US-079a** (export) → 4. **US-079c** (courbe). US-079b en réserve S15.
