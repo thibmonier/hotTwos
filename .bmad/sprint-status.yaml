@@ -1,7 +1,7 @@
 # Statut consolidé du backlog — source de vérité réconciliée depuis git + reviews de sprint.
 # Généré par /project:sync-backlog (réconciliation complète, direction files←git).
 # Les statuts des fichiers markdown ont été alignés sur cet état.
-last_sync: "2026-09-05T08:30:00Z"
+last_sync: "2026-09-06T08:35:00Z"
 source_of_truth: "git history + project-management/sprints/*/sprint-review.md"
 resolution_strategy: "git-wins (les fichiers markdown étaient périmés)"
 
@@ -18,6 +18,7 @@ sprints:
   sprint-008: { theme: "Valorisation & auth web", points: 22, goal_met: true, stories: [US-070, US-060, US-067, US-068] }
   sprint-009: { theme: "Finance & rentabilité", points: 21, goal_met: true, stories: [US-071, US-072, US-073] }
   sprint-010: { theme: "Export FEC & consolidation qualité", points: 11, goal_met: true, stories: [US-074, US-018], debt: [QUAL-1, QUAL-2] }
+  sprint-011: { theme: "Module de facturation (capstone EPIC-005)", points: 23, goal_met: true, stories: [US-014, US-075, US-076, US-077] }  # facturé réel > proxy CA reconnu (ADR-0022)
 
 # État par story. status ∈ {done, ready, in-progress, backlog}
 stories:
@@ -77,7 +78,7 @@ stories:
   US-074: { title: "Export comptable au format FEC", sprint: 10, status: done, points: 8 }  # PO: format FEC ; réestimé 5→8
   US-075: { title: "Émission manuelle de factures par projet/période", sprint: 11, status: done, points: 8 }
   US-076: { title: "Facturé réel comme source de marge (supersede proxy)", sprint: 11, status: done, points: 5 }
-  US-077: { title: "Export FEC sur facturé réel", sprint: 11, status: ready, points: 5 }   # Should
+  US-077: { title: "Export FEC sur facturé réel", sprint: 11, status: done, points: 5 }   # Should — PR #61 (acquis par source unique US-076)
 
 # Stories techniques / dette qualité (hors vélocité) engagées au Sprint 10
 tech_stories:
