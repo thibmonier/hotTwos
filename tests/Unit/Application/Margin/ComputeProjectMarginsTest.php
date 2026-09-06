@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Application\Margin;
 
 use App\Application\Margin\ComputeProjectMargins;
+use App\Domain\Invoice\Invoice;
 use App\Domain\Margin\ProjectMargin;
 use App\Domain\Tenant\TenantId;
 use App\Domain\Valuation\ProjectValuationLine;
+use App\Infrastructure\Margin\InvoiceRevenueSource;
+use App\Tests\Support\Invoice\InMemoryInvoiceRepository;
 use App\Tests\Support\Margin\InMemoryProjectMarginRepository;
 use App\Tests\Support\Valuation\InMemoryTimeEntryValuationRepository;
 use DateTimeImmutable;
@@ -27,6 +30,7 @@ final class ComputeProjectMarginsTest extends TestCase
     private TenantId $tenant;
     private InMemoryTimeEntryValuationRepository $valuations;
     private InMemoryProjectMarginRepository $margins;
+    private InMemoryInvoiceRepository $invoices;
     private ComputeProjectMargins $compute;
 
     protected function setUp(): void
@@ -34,11 +38,28 @@ final class ComputeProjectMarginsTest extends TestCase
         $this->tenant = TenantId::generate();
         $this->valuations = new InMemoryTimeEntryValuationRepository();
         $this->margins = new InMemoryProjectMarginRepository();
+        $this->invoices = new InMemoryInvoiceRepository();
         $this->compute = new ComputeProjectMargins(
             $this->valuations,
             $this->margins,
+            new InvoiceRevenueSource($this->invoices),
             new MockClock(new DateTimeImmutable('2026-12-01 09:00:00', new DateTimeZone('UTC'))),
         );
+    }
+
+    public function testUsesBilledRevenueWhenInvoicePresent(): void
+    {
+        // CA reconnu 10 000 mais facturé réel 12 000 → la marge retient le facturé (ADR-0022, US-076).
+        $this->valuations->projectBreakdownForPeriod = [
+            new ProjectValuationLine(self::PROJECT_A, 'Site vitrine', 12, 10_000_00, 5_800_00),
+        ];
+        $this->invoices->save(Invoice::issue($this->tenant, self::PROJECT_A, '2026-11', 12_000_00, null, null, new DateTimeImmutable('2026-12-05', new DateTimeZone('UTC'))));
+
+        $this->compute->forClosedPeriod($this->tenant, '2026-11');
+
+        $margin = $this->margins->findForPeriod($this->tenant, '2026-11')[0];
+        self::assertSame(12_000_00, $margin->revenueCents());          // facturé réel
+        self::assertSame(6_200_00, $margin->marginCents());            // 12 000 − 5 800
     }
 
     public function testFreezesMarginPerProjectAtClosure(): void

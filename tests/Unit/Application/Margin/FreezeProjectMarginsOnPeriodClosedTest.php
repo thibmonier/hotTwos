@@ -9,6 +9,8 @@ use App\Application\Margin\FreezeProjectMarginsOnPeriodClosed;
 use App\Application\Period\Message\PeriodClosed;
 use App\Domain\Tenant\TenantId;
 use App\Domain\Valuation\ProjectValuationLine;
+use App\Infrastructure\Margin\InvoiceRevenueSource;
+use App\Tests\Support\Invoice\InMemoryInvoiceRepository;
 use App\Tests\Support\Margin\InMemoryProjectMarginRepository;
 use App\Tests\Support\Valuation\InMemoryTimeEntryValuationRepository;
 use DateTimeImmutable;
@@ -35,6 +37,7 @@ final class FreezeProjectMarginsOnPeriodClosedTest extends TestCase
         $handler = new FreezeProjectMarginsOnPeriodClosed(new ComputeProjectMargins(
             $valuations,
             $margins,
+            new InvoiceRevenueSource(new InMemoryInvoiceRepository()),
             new MockClock(new DateTimeImmutable('2026-12-01 09:00:00', new DateTimeZone('UTC'))),
         ));
 

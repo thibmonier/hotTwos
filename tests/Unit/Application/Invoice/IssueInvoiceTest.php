@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Application\Invoice;
 
 use App\Application\Authorization\Authorizer;
 use App\Application\Invoice\IssueInvoice;
+use App\Application\Margin\ComputeProjectMargins;
 use App\Domain\Authorization\AccessDeniedException;
 use App\Domain\Authorization\DataScope;
 use App\Domain\Authorization\Permission;
@@ -17,10 +18,14 @@ use App\Domain\Project\Project;
 use App\Domain\Tenant\TenantId;
 use App\Domain\User\User;
 use App\Domain\Valuation\PeriodClosureStatus;
+use App\Domain\Valuation\ProjectValuationLine;
+use App\Infrastructure\Margin\InvoiceRevenueSource;
 use App\Tests\Support\Authorization\InMemoryRoleRepository;
 use App\Tests\Support\Authorization\RecordingSecurityAuditLogger;
 use App\Tests\Support\Invoice\InMemoryInvoiceRepository;
+use App\Tests\Support\Margin\InMemoryProjectMarginRepository;
 use App\Tests\Support\Timesheet\InMemoryProjectRepository;
+use App\Tests\Support\Valuation\InMemoryTimeEntryValuationRepository;
 use DateTimeImmutable;
 use DateTimeZone;
 use PHPUnit\Framework\TestCase;
@@ -38,6 +43,8 @@ final class IssueInvoiceTest extends TestCase
     private TenantId $tenant;
     private InMemoryProjectRepository $projects;
     private InMemoryInvoiceRepository $invoices;
+    private InMemoryTimeEntryValuationRepository $valuations;
+    private InMemoryProjectMarginRepository $margins;
     private RecordingSecurityAuditLogger $audit;
     private InvoiceClosureStub $closure;
     private IssueInvoice $issue;
@@ -59,15 +66,20 @@ final class IssueInvoiceTest extends TestCase
         $this->projects->save($this->project);
 
         $this->invoices = new InMemoryInvoiceRepository();
+        $this->valuations = new InMemoryTimeEntryValuationRepository();
+        $this->margins = new InMemoryProjectMarginRepository();
         $this->closure = new InvoiceClosureStub(true);
         $this->audit = new RecordingSecurityAuditLogger();
+        $clock = new MockClock(new DateTimeImmutable('2026-12-05 10:00:00', new DateTimeZone('UTC')));
+        $computeMargins = new ComputeProjectMargins($this->valuations, $this->margins, new InvoiceRevenueSource($this->invoices), $clock);
         $this->issue = new IssueInvoice(
             new Authorizer($roles, $this->audit),
             $this->closure,
             $this->projects,
             $this->invoices,
+            $computeMargins,
             $this->audit,
-            new MockClock(new DateTimeImmutable('2026-12-05 10:00:00', new DateTimeZone('UTC'))),
+            $clock,
         );
 
         $this->finance = new User($this->tenant, 'finance@agence.test', 'hash', ['Finance']);
@@ -121,6 +133,21 @@ final class IssueInvoiceTest extends TestCase
         $this->issue->issue($this->finance, $this->project->id(), self::PERIOD, 12_000_00);
 
         self::assertSame(42_000_00, $this->invoices->totalForProjectPeriod($this->tenant, $this->project->id(), self::PERIOD));
+    }
+
+    public function testEmissionRefreezesMarginWithBilledRevenue(): void
+    {
+        // Marge d'abord figée sur le CA reconnu (10 000 − 5 800).
+        $this->valuations->projectBreakdownForPeriod = [
+            new ProjectValuationLine($this->project->id(), 'Refonte app', 12, 10_000_00, 5_800_00),
+        ];
+
+        // Émission d'une facture de 12 000 → re-figeage : la marge retient le facturé réel (US-076).
+        $this->issue->issue($this->finance, $this->project->id(), self::PERIOD, 12_000_00);
+
+        $margin = $this->margins->findForPeriod($this->tenant, self::PERIOD)[0];
+        self::assertSame(12_000_00, $margin->revenueCents());
+        self::assertSame(6_200_00, $margin->marginCents());
     }
 }
 

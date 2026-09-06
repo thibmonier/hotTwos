@@ -13,6 +13,7 @@ use App\Domain\Pricing\ProfileAssignment;
 use App\Domain\Pricing\ProfileRate;
 use App\Domain\Period\AccountingPeriod;
 use App\Domain\Fec\FecConfiguration;
+use App\Domain\Invoice\Invoice;
 use App\Domain\Margin\ProjectMargin;
 use App\Domain\Project\Project;
 use App\Domain\Reminder\ReminderRule;
@@ -46,7 +47,7 @@ final class SeedDemoDataCommandTest extends KernelTestCase
 
         $this->schema = array_map(
             $this->em->getClassMetadata(...),
-            [Tenant::class, User::class, Role::class, Project::class, TimeEntry::class, AbsenceType::class, AbsenceRequest::class, ReminderRule::class, Profile::class, ProfileRate::class, ProfileAssignment::class, TimeEntryValuation::class, StoredEvent::class, AccountingPeriod::class, FecConfiguration::class, ProjectMargin::class],
+            [Tenant::class, User::class, Role::class, Project::class, TimeEntry::class, AbsenceType::class, AbsenceRequest::class, ReminderRule::class, Profile::class, ProfileRate::class, ProfileAssignment::class, TimeEntryValuation::class, StoredEvent::class, AccountingPeriod::class, FecConfiguration::class, ProjectMargin::class, Invoice::class],
         );
         $tool = new SchemaTool($this->em);
         $tool->dropSchema($this->schema);

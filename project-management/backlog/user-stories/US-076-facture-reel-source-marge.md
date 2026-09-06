@@ -47,12 +47,18 @@ THEN il passe par un port unique « source de revenu » (DIP) qui applique la r�
   AND ni MarginCalculator ni le figeage de marge ne sont dupliqués/réécrits
 ```
 
-### CA-4 (Non-rétroactivité) : Marge figée inchangée
+### CA-4 (Re-figeage à l'émission — décision PO 2026-09-06)
 ```gherkin
-GIVEN une marge déjà figée à la clôture
-WHEN une facture est émise/modifiée ultérieurement
-THEN la marge figée passée n'est pas réécrite (INV-2) ; seule une réouverture recalcule
+GIVEN une marge figée à la clôture sur le CA reconnu (aucune facture)
+WHEN une facture est émise pour (projet, période) — acte explicite et tracé (HAB-6)
+THEN la marge de la période est **re-figée** avec le facturé réel (source unique cohérente : marge,
+     dashboard et FEC reflètent alors le facturé réel)
+  AND ce re-figeage n'est PAS une dérive de taux silencieuse (INV-2 vise les révisions tarifaires,
+     pas la finalisation par facturation) ; il est déclenché uniquement par l'émission d'une facture
 ```
+> **Note** : remplace la formulation initiale « la marge figée n'est jamais réécrite ». Décision PO
+> (2026-09-06) : l'émission de facture, arrivant après la clôture, finalise et re-fige la marge sur le
+> facturé réel — plutôt qu'une substitution à la lecture qui désynchroniserait le snapshot.
 
 ## Definition of Done
 - [ ] Port « source de revenu » (Domain) + implémentation (facturé réel avec repli CA reconnu)

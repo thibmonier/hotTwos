@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\Invoice;
 
 use App\Application\Authorization\Authorizer;
+use App\Application\Margin\ComputeProjectMargins;
 use App\Domain\Authorization\Permission;
 use App\Domain\Authorization\SecurityAuditLogger;
 use App\Domain\Invoice\Invoice;
@@ -31,6 +32,7 @@ final readonly class IssueInvoice
         private PeriodClosureStatus $closureStatus,
         private ProjectRepository $projects,
         private InvoiceRepository $invoices,
+        private ComputeProjectMargins $computeMargins,
         private SecurityAuditLogger $audit,
         private ClockInterface $clock,
     ) {
@@ -59,6 +61,10 @@ final readonly class IssueInvoice
 
         $invoice = Invoice::issue($tenant, $projectId, $period, $amountCents, $project->clientId(), $user->id(), $this->clock->now());
         $this->invoices->save($invoice);
+
+        // Re-figeage de la marge de la période avec le facturé réel (ADR-0022, US-076) : la marge, le
+        // dashboard et le FEC reflètent désormais le facturé réel. Acte explicite et tracé (HAB-6).
+        $this->computeMargins->forClosedPeriod($tenant, $period);
 
         $this->audit->record('invoice_issued', $tenant->toString(), $user->getUserIdentifier(), [
             'project' => $projectId,

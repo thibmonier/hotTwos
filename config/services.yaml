@@ -111,6 +111,9 @@ services:
     # Port factures (US-075, DIP).
     App\Domain\Invoice\InvoiceRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineInvoiceRepository'
 
+    # Source de revenu marge (US-076, DIP) — facturé réel s'il existe, sinon CA reconnu.
+    App\Domain\Margin\RevenueSource: '@App\Infrastructure\Margin\InvoiceRevenueSource'
+
     # Statut de clôture de période (US-060 CA-5) : clôture **réelle** par tenant (US-057, T-057-03),
     # branchée sur l'agrégat AccountingPeriod. Le stub ConfiguredPeriodClosure reste défini
     # (utilisable en test / configuration) mais n'est plus l'implémentation de production.
