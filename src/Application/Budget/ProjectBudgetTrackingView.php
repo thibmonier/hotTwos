@@ -34,6 +34,13 @@ final readonly class ProjectBudgetTrackingView
         public ?float $marginRateDriftPoints,
         public float $driftThresholdPoints,
         public bool $isDrifting,
+        // US-036 — atterrissage charge.
+        public bool $landingAvailable,
+        public ?int $landingCostCents,
+        public ?float $landingOverrunPercent,
+        public ?float $landingConsumptionPercent,
+        public ?int $landingProgressPercent,
+        public bool $landingEarlyDrift,
     ) {
     }
 }

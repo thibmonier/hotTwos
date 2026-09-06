@@ -136,6 +136,25 @@
                         </div>
                     {% endif %}
 
+                    {# ── Atterrissage charge & dérive précoce (US-036, OBJ-2) ── #}
+                    {% if bt.landingEarlyDrift %}
+                        <div class="mb-4 rounded border border-danger/40 bg-danger/10 p-3" role="status">
+                            <p class="text-sm font-semibold text-danger">
+                                ⚠ Dérive de charge précoce&nbsp;: dépassement projeté +{{ bt.landingOverrunPercent|number_format(1, ',', ' ') }}&nbsp;% du budget de charge, avant 50&nbsp;% de consommation (avancement {{ bt.landingProgressPercent }}&nbsp;%).
+                            </p>
+                            <p class="text-xs text-muted">Alerte OBJ-2 — agir tôt. Atterrissage = coût consommé / avancement physique.</p>
+                        </div>
+                    {% endif %}
+                    {% if bt.landingAvailable %}
+                        <p class="mb-4 text-sm text-body">
+                            Atterrissage charge (projeté)&nbsp;:
+                            {% if bt.landingCostCents is not null %}{{ (bt.landingCostCents / 100)|number_format(0, ',', ' ') }}&nbsp;€ — {% endif %}
+                            dépassement {{ bt.landingOverrunPercent >= 0 ? '+' : '' }}{{ bt.landingOverrunPercent|number_format(1, ',', ' ') }}&nbsp;% (avancement physique {{ bt.landingProgressPercent }}&nbsp;%).
+                        </p>
+                    {% elseif canEdit %}
+                        <p class="mb-4 text-xs text-muted">Atterrissage charge indisponible — renseignez le budget de charge et l'avancement physique des lots (onglet Structure).</p>
+                    {% endif %}
+
                     <div class="overflow-x-auto">
                         <table class="w-full border-collapse text-sm">
                             <thead>

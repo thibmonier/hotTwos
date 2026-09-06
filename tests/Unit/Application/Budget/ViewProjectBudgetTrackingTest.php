@@ -11,15 +11,19 @@ use App\Domain\Authorization\DataScope;
 use App\Domain\Authorization\Permission;
 use App\Domain\Authorization\Role;
 use App\Domain\Budget\BudgetTrackingCalculator;
+use App\Domain\Budget\ChargeLandingCalculator;
 use App\Domain\Margin\MarginCalculator;
 use App\Domain\Project\ContractType;
 use App\Domain\Project\Project;
+use App\Domain\Project\ProjectLot;
+use App\Domain\Project\ProjectProgressCalculator;
 use App\Domain\Tenant\TenantId;
 use App\Domain\User\User;
 use App\Domain\Valuation\ProjectValuationLine;
 use App\Infrastructure\Budget\DefaultMarginDriftThresholdProvider;
 use App\Tests\Support\Authorization\InMemoryRoleRepository;
 use App\Tests\Support\Authorization\RecordingSecurityAuditLogger;
+use App\Tests\Support\Project\InMemoryProjectLotRepository;
 use App\Tests\Support\Timesheet\InMemoryProjectRepository;
 use App\Tests\Support\Valuation\InMemoryTimeEntryValuationRepository;
 use PHPUnit\Framework\TestCase;
@@ -34,6 +38,7 @@ final class ViewProjectBudgetTrackingTest extends TestCase
     private TenantId $tenant;
     private InMemoryProjectRepository $projects;
     private InMemoryTimeEntryValuationRepository $valuations;
+    private InMemoryProjectLotRepository $lots;
     private RecordingSecurityAuditLogger $audit;
     private ViewProjectBudgetTracking $view;
     private User $finance;
@@ -70,6 +75,7 @@ final class ViewProjectBudgetTrackingTest extends TestCase
             new ProjectValuationLine($this->project->id(), 'Refonte app', 20, 42_000_00, 30_000_00),
         ];
 
+        $this->lots = new InMemoryProjectLotRepository();
         $this->audit = new RecordingSecurityAuditLogger();
         $this->view = new ViewProjectBudgetTracking(
             new Authorizer($roles, $this->audit),
@@ -77,6 +83,9 @@ final class ViewProjectBudgetTrackingTest extends TestCase
             $this->valuations,
             new BudgetTrackingCalculator(new MarginCalculator()),
             new DefaultMarginDriftThresholdProvider(),
+            $this->lots,
+            new ProjectProgressCalculator(),
+            new ChargeLandingCalculator(),
         );
 
         $this->finance = new User($this->tenant, 'finance@agence.test', 'hash', ['Finance']);
@@ -135,6 +144,48 @@ final class ViewProjectBudgetTrackingTest extends TestCase
         $this->expectException(AccessDeniedException::class);
 
         $this->view->forProject($this->collaborator, $this->project->id());
+    }
+
+    public function testFinanceSeesChargeLandingAndEarlyDrift(): void
+    {
+        // Réalisé 10 000 € à 20 % d'avancement → atterrissage 50 000 € (+25 %), consommation 25 % (< 50 %).
+        $this->valuations->projectBreakdown = [
+            new ProjectValuationLine($this->project->id(), 'Refonte app', 20, 42_000_00, 10_000_00),
+        ];
+        $this->lots->lots = [$this->lotAt($this->project->id(), 40, 20)];
+
+        $view = $this->view->forProject($this->finance, $this->project->id());
+
+        self::assertTrue($view->landingAvailable);
+        self::assertSame(50_000_00, $view->landingCostCents);
+        self::assertEqualsWithDelta(25.0, $view->landingOverrunPercent, 0.001);
+        self::assertSame(20, $view->landingProgressPercent);
+        self::assertTrue($view->landingEarlyDrift);
+    }
+
+    public function testProjectChiefSeesLandingAlertButNotCostAmount(): void
+    {
+        // HAB-1 : le CP sans coût voit l'alerte/ratio de dérive, jamais le montant € d'atterrissage.
+        $this->valuations->projectBreakdown = [
+            new ProjectValuationLine($this->project->id(), 'Refonte app', 20, 42_000_00, 10_000_00),
+        ];
+        $this->lots->lots = [$this->lotAt($this->project->id(), 40, 20)];
+
+        $view = $this->view->forProject($this->projectChief, $this->project->id());
+
+        self::assertTrue($view->landingAvailable);
+        self::assertTrue($view->landingEarlyDrift);
+        self::assertEqualsWithDelta(25.0, $view->landingOverrunPercent, 0.001);
+        self::assertNull($view->landingCostCents, 'Montant € d\'atterrissage masqué (HAB-1).');
+        self::assertNull($view->landingConsumptionPercent, 'Consommation masquée sans coût visible.');
+    }
+
+    private function lotAt(string $projectId, int $budgetDays, int $progress): ProjectLot
+    {
+        $lot = new ProjectLot($this->tenant, $projectId, 'Lot', $budgetDays, 1_000_000);
+        $lot->recordProgress($progress, null);
+
+        return $lot;
     }
 
     public function testProjectWithoutBudgetDisablesComparison(): void
