@@ -114,6 +114,9 @@ services:
     # Port avenants budgétaires (US-033, DIP).
     App\Domain\Project\BudgetAmendmentRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineBudgetAmendmentRepository'
 
+    # Port budget de charge par profil (US-078, DIP).
+    App\Domain\Project\LotProfileBudgetRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineLotProfileBudgetRepository'
+
     # Source de revenu marge (US-076, DIP) — facturé réel s'il existe, sinon CA reconnu.
     App\Domain\Margin\RevenueSource: '@App\Infrastructure\Margin\InvoiceRevenueSource'
 

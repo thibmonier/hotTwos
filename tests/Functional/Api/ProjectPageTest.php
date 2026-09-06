@@ -8,8 +8,13 @@ use App\Application\Authorization\InitializeDefaultRoles;
 use App\Domain\Authorization\Role;
 use App\Domain\Project\ExceptionalImputationOpening;
 use App\Domain\Project\ExternalCommitment;
+use App\Domain\Pricing\CalculationMode;
+use App\Domain\Pricing\Profile;
+use App\Domain\Pricing\ProfileRate;
 use App\Domain\Project\BudgetAmendment;
+use App\Domain\Project\LotProfileBudget;
 use App\Domain\Project\Project;
+use App\Domain\Shared\EffectivePeriod;
 use App\Domain\Project\ProjectReopening;
 use App\Domain\Project\ProjectAssignment;
 use App\Domain\Project\ProjectLot;
@@ -24,6 +29,8 @@ use App\Domain\Invoice\Invoice;
 use App\Domain\Budget\MarginDriftThreshold;
 use App\Domain\Valuation\TimeEntryValuation;
 use App\Infrastructure\Persistence\Doctrine\DoctrineProjectLotRepository;
+use DateTimeImmutable;
+use DateTimeZone;
 use App\Infrastructure\Persistence\Doctrine\DoctrineProjectRepository;
 use App\Infrastructure\Persistence\Doctrine\DoctrineRoleRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -68,6 +75,9 @@ final class ProjectPageTest extends WebTestCase
             $this->em->getClassMetadata(Client::class),
             $this->em->getClassMetadata(Invoice::class),
             $this->em->getClassMetadata(BudgetAmendment::class),
+            $this->em->getClassMetadata(Profile::class),
+            $this->em->getClassMetadata(ProfileRate::class),
+            $this->em->getClassMetadata(LotProfileBudget::class),
         ];
         $tool = new SchemaTool($this->em);
         $tool->dropSchema($this->schema);
@@ -204,6 +214,38 @@ final class ProjectPageTest extends WebTestCase
         // INV-4 : l'avancement/RAF n'altèrent pas le budget du lot.
         self::assertSame(20, $lot->budgetDays());
         self::assertSame(1_600_000, $lot->budgetCents());
+    }
+
+    public function testChefDefinesLotProfileBudget(): void
+    {
+        $this->login('marc@agence.test');
+
+        // Profil « Senior » + taux (vente 800 €/j) en vigueur.
+        $senior = new Profile($this->tenant, 'Senior', CalculationMode::DIRECT);
+        $this->em->persist($senior);
+        $this->em->persist(new ProfileRate($this->tenant, $senior->id(), EffectivePeriod::since(new DateTimeImmutable('2026-01-01', new DateTimeZone('UTC'))), 500_00, 800_00));
+        $this->em->flush();
+
+        $create = $this->client->request('GET', '/projets/nouveau');
+        $token = $create->filter('input[name="_token"]')->attr('value') ?? '';
+        $this->client->request('POST', '/projets', ['_token' => $token, 'name' => 'Budget profil', 'clientName' => 'Acme', 'budgetEuros' => '100000', 'contractType' => 'forfait']);
+        $id = new DoctrineProjectRepository($this->em)->findAllByTenant($this->tenant)[0]->id();
+        $this->em->clear();
+
+        $show = $this->client->request('GET', '/projets/'.$id);
+        $structureToken = $show->filter('form[action="/projets/'.$id.'/lots"] input[name="_token"]')->attr('value') ?? '';
+        $this->client->request('POST', '/projets/'.$id.'/lots', ['_token' => $structureToken, 'name' => 'Conception', 'budgetDays' => '60', 'budgetEuros' => '48000', 'parentLotId' => '']);
+        $this->em->clear();
+        $lotId = new DoctrineProjectLotRepository($this->em)->findForProject($this->tenant, $id)[0]->id();
+
+        // Définit 40 j de Senior → vente 40 × 800 = 32 000 €.
+        $this->client->request('POST', '/projets/'.$id.'/lots/'.$lotId.'/budget-profil', ['_token' => $structureToken, 'profileId' => $senior->id(), 'days' => '40']);
+        self::assertResponseRedirects();
+        $this->em->clear();
+
+        $content = $this->client->request('GET', '/projets/'.$id)->filter('#panel-structure')->html();
+        self::assertStringContainsString('32 000', $content); // équivalent € vente
+        self::assertStringContainsString('Senior', $content);
     }
 
     private function login(string $email): void

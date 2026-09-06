@@ -342,12 +342,45 @@
                     {% endif %}
                 {% endmacro %}
 
+                {% macro lot_profile_budget(lot, projectId, profiles, view, canEdit) %}
+                    {# US-078 — budget de charge par profil → équivalents € vente/coût aux taux en vigueur #}
+                    <div class="mt-1 text-xs text-muted">
+                        Budget par profil&nbsp;:
+                        {% if view %}
+                            {{ view.days }}&nbsp;j → vente {{ view.sellingEuros|number_format(0, ',', ' ') }}&nbsp;€ / coût {{ view.costEuros|number_format(0, ',', ' ') }}&nbsp;€
+                            {% if view.missing %}<span class="font-semibold text-warning">(taux manquant)</span>{% endif %}
+                        {% else %}—{% endif %}
+                    </div>
+                    {% if view and view.rows is not empty %}
+                        <ul class="list-none pl-4 text-[11px] text-muted">
+                            {% for r in view.rows %}<li>{{ r.profile }}&nbsp;: {{ r.days }}&nbsp;j</li>{% endfor %}
+                        </ul>
+                    {% endif %}
+                    {% if canEdit and profiles is not empty %}
+                        <form method="post" action="{{ path('project_lot_profile_budget', { id: projectId, lotId: lot.id }) }}"
+                              class="mt-1 flex flex-wrap items-end gap-2">
+                            <input type="hidden" name="_token" value="{{ csrf_token('project_structure') }}">
+                            <label class="text-[11px] font-medium text-ink">Profil
+                                <select name="profileId" class="ml-1 rounded border border-border bg-surface px-2 py-1 text-[12px] text-body focus:border-primary focus:outline-none">
+                                    {% for p in profiles %}<option value="{{ p.id }}">{{ p.name }}</option>{% endfor %}
+                                </select>
+                            </label>
+                            <label class="text-[11px] font-medium text-ink">Jours
+                                <input type="number" name="days" min="0" inputmode="numeric"
+                                       class="ml-1 w-16 rounded border border-border bg-surface px-2 py-1 text-[12px] text-body focus:border-primary focus:outline-none">
+                            </label>
+                            <button type="submit" class="inline-flex min-h-8 items-center rounded bg-surface-2 px-2 text-[12px] font-semibold text-ink hover:bg-border">Définir</button>
+                        </form>
+                    {% endif %}
+                {% endmacro %}
+
                 <ul class="mb-3 list-none p-0">
                     {% for lot in structure.roots %}
                         <li class="border-b border-border py-2 text-sm last:border-b-0">
                             <span class="font-semibold text-ink">{{ lot.name }}</span>
                             — {{ lot.days }}&nbsp;j / {{ lot.euros|number_format(0, ',', ' ') }}&nbsp;€
                             <div class="mt-1">{{ _self.lot_progress(lot, project.id, canEdit) }}</div>
+                            <div class="mt-1">{{ _self.lot_profile_budget(lot, project.id, profiles, lotProfileBudgets[lot.id]|default(null), canEdit) }}</div>
                             {% if lot.children is not empty %}
                                 <ul class="mt-1 list-none pl-6">
                                     {% for child in lot.children %}

@@ -5,16 +5,6 @@
 
 ## 🔲 À Faire
 
-### US-078 — Budget charge par profil (Must, 8 pts)
-| ID | Tâche | Est. |
-|----|-------|------|
-| T-078-01 | [DB] Entité `LotProfileBudget` + migration | 2.5h |
-| T-078-02 | [BE] `ProfileBudgetCalculator` (RateResolver) | 2.5h |
-| T-078-03 | [BE] `DefineLotProfileBudget` + lecture agrégée | 2h |
-| T-078-04 | [FE-WEB] Saisie par profil + équivalents € | 3h |
-| T-078-05 | [TEST] Unit + Functional | 3h |
-| T-078-06 | [REV] Revue | 0.5h |
-
 ### US-032 — Projets internes (Should, stretch, 5 pts)
 | ID | Tâche | Est. |
 |----|-------|------|
@@ -43,6 +33,7 @@
 |----|-------|---------|
 | Setup | Décomposition Sprint 13 | 2026-09-06 |
 | US-033 | Budget initial/avenants/courant (8 pts) | 2026-09-06 |
+| US-078 | Budget charge par profil (8 pts) | 2026-09-06 |
 
 ## Ordre d'exécution
 1. **US-033** (avenants → budget courant, référence du suivi/atterrissage).

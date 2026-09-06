@@ -9,12 +9,20 @@ use App\Application\Budget\ViewProjectBudgetTracking;
 use App\Application\Project\AddBudgetAmendment;
 use App\Application\Project\ChangeProjectStatus;
 use App\Application\Project\CreateProject;
+use App\Application\Project\DefineLotProfileBudget;
 use App\Domain\Authorization\Permission;
 use App\Application\Invoice\IssueInvoice;
 use App\Domain\Client\Client;
+use App\Domain\Pricing\Profile;
+use App\Domain\Pricing\ProfileRepository;
 use App\Domain\Project\BudgetAmendment;
 use App\Domain\Project\BudgetAmendmentRepository;
 use App\Domain\Project\CurrentProjectBudget;
+use App\Domain\Project\LotProfileBudget;
+use App\Domain\Project\LotProfileBudgetRepository;
+use App\Domain\Project\ProfileBudgetCalculator;
+use App\Domain\Tenant\TenantId;
+use Psr\Clock\ClockInterface;
 use App\Domain\Client\ClientRepository;
 use App\Domain\Invoice\Invoice;
 use App\Domain\Invoice\InvoiceException;
@@ -69,6 +77,11 @@ final class ProjectPageController extends AbstractController
         private readonly BudgetAmendmentRepository $amendments,
         private readonly CurrentProjectBudget $currentBudget,
         private readonly AddBudgetAmendment $addBudgetAmendment,
+        private readonly LotProfileBudgetRepository $lotProfileBudgets,
+        private readonly ProfileBudgetCalculator $profileBudgetCalculator,
+        private readonly ProfileRepository $profiles,
+        private readonly DefineLotProfileBudget $defineLotProfileBudget,
+        private readonly ClockInterface $clock,
     ) {
     }
 
@@ -189,6 +202,12 @@ final class ProjectPageController extends AbstractController
                 ],
                 $amendments,
             ) : [],
+            // US-078 — budget de charge par profil (équivalents € aux taux à la date de référence).
+            'profiles' => array_values(array_map(
+                static fn (Profile $p): array => ['id' => $p->id(), 'name' => $p->name()],
+                array_filter($this->profiles->findByTenant($user->tenantId()), static fn (Profile $p): bool => $p->isActive()),
+            )),
+            'lotProfileBudgets' => $this->profileBudgetView($user->tenantId(), $project->id(), $project->startDate() ?? $this->clock->now()),
             'milestones' => array_map(
                 static fn (ProjectMilestone $m): array => [
                     'name' => $m->name(),
@@ -244,7 +263,7 @@ final class ProjectPageController extends AbstractController
      *
      * @return array<string, mixed>
      */
-    private function commitmentsView(\App\Domain\Tenant\TenantId $tenant, string $projectId): array
+    private function commitmentsView(TenantId $tenant, string $projectId): array
     {
         $rows = [];
         $totalCents = 0;
@@ -267,7 +286,7 @@ final class ProjectPageController extends AbstractController
      *
      * @return array<string, mixed>
      */
-    private function structureView(\App\Domain\Tenant\TenantId $tenant, string $projectId, ?int $projectBudgetCents): array
+    private function structureView(TenantId $tenant, string $projectId, ?int $projectBudgetCents): array
     {
         $lots = $this->lots->findForProject($tenant, $projectId);
 
@@ -387,6 +406,70 @@ final class ProjectPageController extends AbstractController
         }
 
         return $this->redirectToRoute('project_show', ['id' => $id]);
+    }
+
+    /**
+     * Budget de charge par profil, par lot (US-078) : lignes {profil, jours} + équivalents € vente/coût
+     * aux taux de la date de référence. Indexé par id de lot.
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    private function profileBudgetView(TenantId $tenant, string $projectId, DateTimeImmutable $referenceDate): array
+    {
+        $profileNames = [];
+        foreach ($this->profiles->findByTenant($tenant) as $profile) {
+            $profileNames[$profile->id()] = $profile->name();
+        }
+
+        $linesByLot = [];
+        foreach ($this->lotProfileBudgets->findForProject($tenant, $projectId) as $line) {
+            $linesByLot[$line->lotId()][] = $line;
+        }
+
+        $view = [];
+        foreach ($linesByLot as $lotId => $lines) {
+            $breakdown = $this->profileBudgetCalculator->compute($tenant, $lines, $referenceDate);
+            $view[$lotId] = [
+                'rows' => array_map(
+                    static fn (LotProfileBudget $l): array => ['profile' => $profileNames[$l->profileId()] ?? $l->profileId(), 'days' => $l->days()],
+                    $lines,
+                ),
+                'days' => $breakdown->days,
+                'sellingEuros' => intdiv($breakdown->sellingCents, 100),
+                'costEuros' => intdiv($breakdown->costCents, 100),
+                'missing' => $breakdown->hasMissingRate(),
+            ];
+        }
+
+        return $view;
+    }
+
+    #[Route('/projets/{id}/lots/{lotId}/budget-profil', name: 'project_lot_profile_budget', requirements: ['id' => '[0-9a-f-]{36}', 'lotId' => '[0-9a-f-]{36}'], methods: ['POST'])]
+    public function defineLotProfileBudget(#[CurrentUser] User $user, string $id, string $lotId, Request $request): RedirectResponse
+    {
+        if (!$this->isCsrfTokenValid('project_structure', (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Jeton de sécurité invalide.');
+
+            return $this->redirectToRoute('project_show', ['id' => $id]);
+        }
+
+        $profileId = trim((string) $request->request->get('profileId'));
+        $days = filter_var($request->request->get('days'), \FILTER_VALIDATE_INT);
+
+        if ('' === $profileId || false === $days) {
+            $this->addFlash('error', 'Budget par profil : profil et jours requis.');
+
+            return $this->redirectToRoute('project_show', ['id' => $id, '_fragment' => 'panel-structure']);
+        }
+
+        try {
+            $this->defineLotProfileBudget->define($user, $lotId, $profileId, $days);
+            $this->addFlash('success', 'Budget de charge par profil enregistré.');
+        } catch (ProjectException $exception) {
+            $this->addFlash('error', $exception->getMessage());
+        }
+
+        return $this->redirectToRoute('project_show', ['id' => $id, '_fragment' => 'panel-structure']);
     }
 
     #[Route('/projets/{id}/avenant', name: 'project_budget_amend', requirements: ['id' => '[0-9a-f-]{36}'], methods: ['POST'])]
