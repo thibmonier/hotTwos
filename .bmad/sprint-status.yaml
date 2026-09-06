@@ -1,7 +1,7 @@
 # Statut consolidé du backlog — source de vérité réconciliée depuis git + reviews de sprint.
 # Généré par /project:sync-backlog (réconciliation complète, direction files←git).
 # Les statuts des fichiers markdown ont été alignés sur cet état.
-last_sync: "2026-09-06T08:35:00Z"
+last_sync: "2026-09-06T09:00:00Z"
 source_of_truth: "git history + project-management/sprints/*/sprint-review.md"
 resolution_strategy: "git-wins (les fichiers markdown étaient périmés)"
 
@@ -47,8 +47,8 @@ stories:
   US-032: { title: "Projets internes", sprint: null, status: backlog }
   US-033: { title: "Budget charge & montant", sprint: null, status: backlog }       # référencé S6/S9 goals ; budget_cents/revenue_budget_cents posés en pratique
   US-034: { title: "Engagements externes", sprint: 6, status: done }
-  US-035: { title: "Avancement & RAF", sprint: null, status: backlog }              # référencé S6 goal, non livré
-  US-036: { title: "Atterrissage & détection de dérive (charge)", sprint: null, status: backlog }  # complété côté finance par US-072
+  US-035: { title: "Avancement physique & RAF par lot", sprint: 12, status: ready, points: 8 }        # S12 pilotage charge
+  US-036: { title: "Atterrissage charge & alerte de dérive précoce", sprint: 12, status: ready, points: 8 }  # S12 (EF-PRJ-14/15, OBJ-2)
   US-037: { title: "Affectation & restriction d'imputation", sprint: 6, status: done }
   US-038: { title: "Clôture opérationnelle projet", sprint: 6, status: done }
   US-050: { title: "Saisie / imputation hebdo", sprint: 3, status: done }

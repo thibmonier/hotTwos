@@ -33,17 +33,25 @@ Pain point n°1 (`research-summary.md`) : la dérive est aujourd'hui détectée 
 
 ## User Stories
 
+> **⚠️ Table réconciliée le 2026-09-06** avec `.bmad/sprint-status.yaml` (source de vérité). La
+> numérotation initiale (ci-dessous, planifiée 2026-08-31) avait divergé de la livraison réelle ;
+> les titres/statuts/sprints ci-dessous reflètent désormais l'état effectif du dépôt.
+
 | ID | Nom | Statut | Points | Sprint |
 |----|-----|--------|--------|--------|
-| US-030 | Créer et structurer un projet (phases, lots, jalons) | 🔴 To Do | 5 | 3 |
-| US-031 | Définir et réviser le budget charge et montant | 🔴 To Do | 5 | 3 |
-| US-032 | Affecter des collaborateurs à un projet par profil | 🔴 To Do | 3 | 3 |
-| US-033 | Saisir l'avancement physique et le RAF par phase | 🔴 To Do | 5 | 4 |
-| US-034 | Consulter la consommation valorisée en temps réel | 🔴 To Do | 5 | 4 |
-| US-035 | Calculer l'atterrissage projet (charge et montant) | 🔴 To Do | 8 | 4 |
-| US-036 | Recevoir une alerte de dérive avant 50 % de consommation | 🔴 To Do | 5 | 4 |
-| US-037 | Gérer les avenants et révisions de périmètre | 🔴 To Do | 5 | 5 |
-| US-038 | Exporter le tableau de bord projet (synthèse PDF/CSV) | 🔴 To Do | 3 | 5 |
+| US-030 | Création projet & statuts | ✅ Done | 5 | 6 |
+| US-031 | Lots & jalons | ✅ Done | 5 | 6 |
+| US-034 | Engagements externes | ✅ Done | 5 | 6 |
+| US-037 | Affectation & restriction d'imputation | ✅ Done | 5 | 6 |
+| US-038 | Clôture opérationnelle projet | ✅ Done | 3 | 6 |
+| US-035 | Avancement physique & RAF par lot | 🟢 Ready | 8 | 12 |
+| US-036 | Atterrissage charge & alerte de dérive précoce (< 50 % conso) | 🟢 Ready | 8 | 12 |
+| US-033 | Budget charge & montant | 🔵 Backlog | 5 | — |
+| US-032 | Projets internes | 🔵 Backlog | 3 | — |
+
+> **Gap restant EPIC-002 (S12)** : le pilotage **côté charge/delivery** — avancement physique, RAF,
+> atterrissage charge et détection de dérive avant 50 % de consommation (EF-PRJ-14/15, OBJ-2). La dérive
+> **côté marge/montant** est déjà couverte par EPIC-005 (US-072 budget/dérive, US-018 seuil tenant).
 
 ---
 
@@ -68,7 +76,7 @@ Pain point n°1 (`research-summary.md`) : la dérive est aujourd'hui détectée 
 
 ## Progression
 
-0/9 US complétées (0 %)
+5/9 US livrées (56 %) — reste US-035/US-036 (S12, pilotage charge) puis US-033/US-032 (backlog).
 
 ---
 
