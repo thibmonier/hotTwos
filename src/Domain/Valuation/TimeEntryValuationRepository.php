@@ -77,4 +77,12 @@ interface TimeEntryValuationRepository
      * @return array<string, int> userId => jours valorisés distincts
      */
     public function valuedDayCountByUser(TenantId $tenant, DateTimeImmutable $from, DateTimeImmutable $to): array;
+
+    /**
+     * Comme {@see valuedDayCountByUser()} mais **restreint aux projets facturables** (projets internes
+     * exclus, US-032/EF-PRJ-5) : sert au taux d'occupation facturable (RG-PRJ-6).
+     *
+     * @return array<string, int> userId => jours facturables valorisés distincts
+     */
+    public function valuedBillableDayCountByUser(TenantId $tenant, DateTimeImmutable $from, DateTimeImmutable $to): array;
 }

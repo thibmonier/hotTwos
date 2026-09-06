@@ -104,6 +104,41 @@ final class OccupationDashboardTest extends WebTestCase
         self::assertStringContainsString('14 %', $content);
     }
 
+    public function testBillableOccupationExcludesInternalProjects(): void
+    {
+        // Bob : 2 jours sur projet facturable + 2 jours sur projet interne (août 2026).
+        $bob = new User($this->tenant, 'bob@agence.test', new SodiumPasswordHasher()->hash(self::PASSWORD), ['Collaborateur']);
+        $bob->rename('Bob', 'Martin');
+        $this->em->persist($bob);
+
+        $billable = new Project($this->tenant, 'APP', 'Application');
+        $this->em->persist($billable);
+        $internal = new Project($this->tenant, 'RND', 'R&D interne');
+        $internal->markInternal(true);
+        $this->em->persist($internal);
+
+        $when = new DateTimeImmutable('2026-08-20 10:00:00', new DateTimeZone('UTC'));
+        $rateDate = new DateTimeImmutable('2026-01-01 00:00:00', new DateTimeZone('UTC'));
+        $plan = [['2026-08-06', $billable], ['2026-08-07', $billable], ['2026-08-10', $internal], ['2026-08-11', $internal]];
+        foreach ($plan as [$day, $project]) {
+            $entry = new TimeEntry($this->tenant, $bob->id(), $project->id(), new DateTimeImmutable($day), 420);
+            $this->em->persist($entry);
+            $this->em->persist(TimeEntryValuation::valued($this->tenant, $entry->id(), 45000, 78000, 45000, 78000, $rateDate, $when));
+        }
+        $this->em->flush();
+
+        $this->login('marc@agence.test');
+        $this->client->request('GET', '/valorisation');
+        self::assertResponseIsSuccessful();
+        $content = (string) $this->client->getResponse()->getContent();
+
+        self::assertStringContainsString('Bob Martin', $content);
+        self::assertStringContainsString('Facturable', $content);        // colonne présente
+        // Bob : 4 jours valorisés / 21 = 19 % ; facturable 2 / 21 = 10 % (projet interne exclu).
+        self::assertStringContainsString('19 %', $content);
+        self::assertStringContainsString('10 %', $content);
+    }
+
     private function login(string $email): void
     {
         $this->client->request(

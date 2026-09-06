@@ -472,6 +472,28 @@ final class ProjectPageController extends AbstractController
         return $this->redirectToRoute('project_show', ['id' => $id, '_fragment' => 'panel-structure']);
     }
 
+    #[Route('/projets/{id}/interne', name: 'project_toggle_internal', requirements: ['id' => '[0-9a-f-]{36}'], methods: ['POST'])]
+    public function toggleInternal(#[CurrentUser] User $user, string $id, Request $request): RedirectResponse
+    {
+        $this->authorizer->ensureCan($user, Permission::EDIT_PROJECT);
+        if (!$this->isCsrfTokenValid('toggle_internal', (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Jeton de sécurité invalide.');
+
+            return $this->redirectToRoute('project_show', ['id' => $id]);
+        }
+
+        $project = $this->projects->find($user->tenantId(), $id);
+        if (!$project instanceof Project) {
+            throw $this->createNotFoundException('Projet introuvable.');
+        }
+
+        $project->markInternal($request->request->has('internal'));
+        $this->projects->save($project);
+        $this->addFlash('success', $project->isInternal() ? 'Projet marqué « interne non facturable ».' : 'Projet marqué facturable.');
+
+        return $this->redirectToRoute('project_show', ['id' => $id]);
+    }
+
     #[Route('/projets/{id}/avenant', name: 'project_budget_amend', requirements: ['id' => '[0-9a-f-]{36}'], methods: ['POST'])]
     public function amendBudget(#[CurrentUser] User $user, string $id, Request $request): RedirectResponse
     {
@@ -517,6 +539,7 @@ final class ProjectPageController extends AbstractController
             'contractType' => $project->contractType()?->label(),
             'startDate' => $project->startDate()?->format('d/m/Y'),
             'endDate' => $project->endDate()?->format('d/m/Y'),
+            'internal' => $project->isInternal(),
         ];
     }
 

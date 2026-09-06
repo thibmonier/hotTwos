@@ -96,6 +96,21 @@ final class OccupationReportTest extends TestCase
         self::assertSame(100, $overview->lines[0]->percent());
     }
 
+    public function testBillableOccupationExcludesInternalProjects(): void
+    {
+        // Alice : 18 jours valorisés dont 12 facturables (6 sur projets internes, US-032/RG-PRJ-6).
+        $this->valuations->latestValuedWorkDate = $this->date('2026-08-31');
+        $this->valuations->valuedDayCountByUser = [self::ALICE => 18];
+        $this->valuations->valuedBillableDayCountByUser = [self::ALICE => 12];
+
+        $line = $this->report()->forTenant($this->tenant)->lines[0];
+
+        $workingDays = $this->weekdaysInMonth('2026-08');
+        self::assertSame((int) min(100, round(18 / $workingDays * 100)), $line->percent());
+        self::assertSame((int) min(100, round(12 / $workingDays * 100)), $line->billablePercent());
+        self::assertLessThan($line->percent(), $line->billablePercent()); // facturable < total (capacité consommée inchangée)
+    }
+
     private function report(): OccupationReport
     {
         return new OccupationReport(

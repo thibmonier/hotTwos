@@ -72,6 +72,9 @@ class Project implements TenantOwned
         /** Rattachement au compte client structuré (US-014). Optionnel — coexiste avec clientName. */
         #[ORM\Column(name: 'client_id', type: 'guid', nullable: true)]
         private ?string $clientId = null,
+        /** Projet interne non facturable (US-032, EF-PRJ-5) : exclu de la marge, inclus dans la capacité (RG-PRJ-6). */
+        #[ORM\Column(name: 'internal', type: 'boolean', options: ['default' => false])]
+        private bool $internal = false,
     ) {
         if ('' === $code) {
             throw new InvalidArgumentException('Le code projet ne peut pas être vide.');
@@ -182,6 +185,17 @@ class Project implements TenantOwned
     public function isClosed(): bool
     {
         return ProjectStatus::CLOTURE === $this->status;
+    }
+
+    /** Projet interne non facturable (US-032, EF-PRJ-5) : exclu du calcul de marge (RG-PRJ-6). */
+    public function isInternal(): bool
+    {
+        return $this->internal;
+    }
+
+    public function markInternal(bool $internal): void
+    {
+        $this->internal = $internal;
     }
 
     /**

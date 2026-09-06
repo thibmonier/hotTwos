@@ -43,11 +43,13 @@ final readonly class OccupationReport
         // `valuedDayCountByUser` ne renvoie déjà que les collaborateurs ayant une activité valorisée
         // sur le mois : on itère ce sous-ensemble plutôt que tous les utilisateurs du tenant.
         $valuedByUser = $this->valuations->valuedDayCountByUser($tenant, $from, $to);
+        // US-032 : jours facturables (projets internes exclus) pour l'occupation facturable (RG-PRJ-6).
+        $billableByUser = $this->valuations->valuedBillableDayCountByUser($tenant, $from, $to);
 
         $lines = [];
         foreach ($valuedByUser as $userId => $valued) {
             $capacity = max(0, $workingDays - $this->absenceDays($tenant, $userId, $from, $to));
-            $lines[] = new OccupationLine($userId, $valued, $capacity);
+            $lines[] = new OccupationLine($userId, $valued, $capacity, $billableByUser[$userId] ?? 0);
         }
 
         usort($lines, static fn (OccupationLine $a, OccupationLine $b): int => $b->percent() <=> $a->percent());
