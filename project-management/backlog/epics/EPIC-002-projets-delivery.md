@@ -2,7 +2,7 @@
 
 ## Métadonnées
 - **ID**: EPIC-002
-- **Statut**: 🟡 En cours (MMF livrée ; reste avenants EF-PRJ-8, projets internes EF-PRJ-5, raffinements)
+- **Statut**: 🟢 Quasi terminé (toutes capacités Must+Should livrées ; reste raffinements US-079)
 - **Priorité**: Must Have (MoSCoW)
 - **Module**: PRJ
 - **Lot**: 1
@@ -46,9 +46,9 @@ Pain point n°1 (`research-summary.md`) : la dérive est aujourd'hui détectée 
 | US-038 | Clôture opérationnelle projet | ✅ Done | 3 | 6 |
 | US-035 | Avancement physique & RAF par lot | ✅ Done | 8 | 12 |
 | US-036 | Atterrissage charge & alerte de dérive précoce (< 50 % conso) | ✅ Done | 8 | 12 |
-| US-033 | Budget — initial, avenants & budget courant (EF-PRJ-8) | 🟢 Ready | 8 | — |
-| US-078 | Budget charge par profil (EF-PRJ-9) | 🟢 Ready | 8 | — |
-| US-032 | Projets internes non facturables (EF-PRJ-5) | 🟢 Ready | 5 | — |
+| US-033 | Budget — initial, avenants & budget courant (EF-PRJ-8) | ✅ Done | 8 | 13 |
+| US-078 | Budget charge par profil (EF-PRJ-9) | ✅ Done | 8 | 13 |
+| US-032 | Projets internes non facturables (EF-PRJ-5) | ✅ Done | 5 | 13 |
 | US-079 | Raffinements pilotage — export/courbe/seuil par type (EF-PRJ-14/15/16) | 🟢 Ready | 8 | — |
 
 ## Couverture des exigences (analyse d'écart — 2026-09-06)
@@ -63,19 +63,14 @@ Mapping des 17 EF déclarées (EF-PRJ-1..5, 8..16, 19, 20, 22) à l'implémentat
 | EF-PRJ-19/20/22 | M | ✅ | Affectation, restriction d'imputation, clôture (US-037/038). |
 | EF-PRJ-14 | M | 🟡 | Atterrissage livré (US-036) ; **manque** : « atterrissage = consommé + RAF » (CDC) + **export** des 5 valeurs. |
 | EF-PRJ-15 | M | 🟡 | Alerte de dérive précoce livrée (US-036, OBJ-2) ; **manque** : seuil paramétrable **par type de projet** + 2e seuil direction. |
-| **EF-PRJ-9** | **M** | 🟡 | Budget charge (jours) + montant globaux ; **manque** la ventilation **par profil** liée aux taux. |
-| **EF-PRJ-8** | **M** | ❌ | **Avenants** : budget initial / avenants / budget courant + historique daté (RG-PRJ-4). Bloque INV-8. → US-033. |
-| **EF-PRJ-5** | **S** | ❌ | **Projets internes non facturables** (exclusion marge, inclusion capacité, RG-PRJ-6). → US-032. |
-| **EF-PRJ-16** | **S** | ❌ | **Courbe d'atterrissage** : historisation + évolution dans le temps. |
+| EF-PRJ-9 | M | ✅ | Budget charge **par profil** lié aux taux historisés (US-078, S13). |
+| EF-PRJ-8 | M | ✅ | **Avenants** : budget initial / courant + historique daté (US-033, S13). Débloque INV-8. |
+| EF-PRJ-5 | S | ✅ | **Projets internes non facturables** (exclusion marge, occupation facturable, US-032, S13). |
+| **EF-PRJ-16** | **S** | ❌ | **Courbe d'atterrissage** : historisation + évolution — reste (US-079). |
 
-**MMF atteinte** (budget lots + avancement/RAF + atterrissage/dérive précoce). Reste à compléter,
-désormais **affiné en stories Ready** (2026-09-06) :
-- **US-033** — Budget initial / avenants / budget courant (EF-PRJ-8, **Must**) — débloque INV-8.
-- **US-078** — Budget charge par profil (EF-PRJ-9, **Must**).
-- **US-032** — Projets internes non facturables (EF-PRJ-5, Should, RG-PRJ-6).
-- **US-079** — Raffinements pilotage : export (EF-PRJ-14) + courbe (EF-PRJ-16) + seuil par type (EF-PRJ-15), Should — à découper.
-
-Total reste ≈ 29 pts (2 Must + 2 Should) → à séquencer sur 1-2 sprints.
+**MMF atteinte + toutes les capacités Must complètes** (S6/S12/S13). Reste uniquement les raffinements
+*Should* regroupés dans **US-079** : export des 5 valeurs (EF-PRJ-14), courbe d'atterrissage (EF-PRJ-16),
+seuil de dérive par type de projet + 2e seuil direction (EF-PRJ-15) — ~8 pts, à découper.
 
 > La dérive **côté marge/montant** est déjà couverte par EPIC-005 (US-072 budget/dérive, US-018 seuil tenant).
 
@@ -86,11 +81,11 @@ Total reste ≈ 29 pts (2 Must + 2 Should) → à séquencer sur 1-2 sprints.
 ### Critères bloquants
 - [x] `EF-PRJ-14/15` — Atterrissage calculé ; alerte dérive > 10 % déclenchée avant 50 % de consommation (US-036).
 - [x] `INV-4` — Avancement, RAF et consommation sont trois champs distincts, jamais déduits l'un de l'autre (US-035/036).
-- [ ] `INV-8` — Lien permanent projet → devis + avenants traçable. **(avenants EF-PRJ-8 manquants ; devis relève d'EPIC-006 CRM)**
+- [x] `INV-8` — volet **avenants** traçable (US-033) ; le volet **devis** relève d'EPIC-006 (CRM).
+- [x] Un avenant modifie le budget sans altérer les imputations historiques (`INV-2`/`INV-3`) — US-033.
 
 ### Critères fonctionnels
 - [x] Un chef de projet consulte l'état complet d'un projet sans ressaisie depuis la saisie de temps validée (fiche projet, onglets).
-- [ ] Un avenant modifie le budget sans altérer les imputations historiques (`INV-2`/`INV-3`). **(EF-PRJ-8 manquant)**
 - [ ] Détection de dérive testée sur des jeux de données représentatifs (3 tailles de tenant, `ENF-MAINT-5`). **(tests unitaires OK ; 3 tailles non couvertes)**
 
 ### Critères non-fonctionnels
@@ -102,9 +97,9 @@ Total reste ≈ 29 pts (2 Must + 2 Should) → à séquencer sur 1-2 sprints.
 
 ## Progression
 
-7/9 US livrées (78 %) — US-030/031/034/037/038 (S6), US-035/036 (S12). **MMF atteinte.**
-Reste : US-033 (avenants EF-PRJ-8 + charge par profil EF-PRJ-9, **Must**), US-032 (projets internes EF-PRJ-5, S),
-+ raffinements EF-PRJ-14/15/16 (export, courbe, seuil par type).
+10/10 US Must+Should livrées (100 % du périmètre EF déclaré) — S6 (5), S12 (US-035/036), S13 (US-033/078/032).
+**MMF + toutes capacités Must complètes.** Reste hors périmètre EF déclaré : US-079 (raffinements Should
+export/courbe/seuil, EF-PRJ-14/15/16 — ~8 pts).
 
 ---
 
