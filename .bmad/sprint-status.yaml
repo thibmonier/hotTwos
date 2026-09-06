@@ -1,7 +1,7 @@
 # Statut consolidé du backlog — source de vérité réconciliée depuis git + reviews de sprint.
 # Généré par /project:sync-backlog (réconciliation complète, direction files←git).
 # Les statuts des fichiers markdown ont été alignés sur cet état.
-last_sync: "2026-09-06T10:15:00Z"
+last_sync: "2026-09-06T11:00:00Z"
 source_of_truth: "git history + project-management/sprints/*/sprint-review.md"
 resolution_strategy: "git-wins (les fichiers markdown étaient périmés)"
 
@@ -45,8 +45,8 @@ stories:
   US-020: { title: "Audit du paramétrage", sprint: null, status: backlog }
   US-030: { title: "Création projet & statuts", sprint: 6, status: done }
   US-031: { title: "Lots & jalons", sprint: 6, status: done }
-  US-032: { title: "Projets internes", sprint: null, status: backlog }
-  US-033: { title: "Budget charge & montant", sprint: null, status: backlog }       # référencé S6/S9 goals ; budget_cents/revenue_budget_cents posés en pratique
+  US-032: { title: "Projets internes non facturables (EF-PRJ-5)", sprint: null, status: ready, points: 5 }   # affinée 2026-09-06
+  US-033: { title: "Budget — initial, avenants & budget courant (EF-PRJ-8)", sprint: null, status: ready, points: 8 }   # affinée 2026-09-06 (débloque INV-8)
   US-034: { title: "Engagements externes", sprint: 6, status: done }
   US-035: { title: "Avancement physique & RAF par lot", sprint: 12, status: done, points: 8 }        # S12 pilotage charge
   US-036: { title: "Atterrissage charge & alerte de dérive précoce", sprint: 12, status: done, points: 8 }  # S12 (EF-PRJ-14/15, OBJ-2)
@@ -80,6 +80,8 @@ stories:
   US-075: { title: "Émission manuelle de factures par projet/période", sprint: 11, status: done, points: 8 }
   US-076: { title: "Facturé réel comme source de marge (supersede proxy)", sprint: 11, status: done, points: 5 }
   US-077: { title: "Export FEC sur facturé réel", sprint: 11, status: done, points: 5 }   # Should — PR #61 (acquis par source unique US-076)
+  US-078: { title: "Budget charge par profil (EF-PRJ-9)", sprint: null, status: ready, points: 8 }   # affinée 2026-09-06 (complète EPIC-002)
+  US-079: { title: "Raffinements pilotage — export/courbe/seuil par type (EF-PRJ-14/15/16)", sprint: null, status: ready, points: 8 }   # affinée 2026-09-06 (Should, à découper)
 
 # Stories techniques / dette qualité (hors vélocité) engagées au Sprint 10
 tech_stories:

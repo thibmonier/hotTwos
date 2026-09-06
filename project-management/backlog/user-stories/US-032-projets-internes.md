@@ -2,100 +2,78 @@
 
 ## Métadonnées
 - **ID**: US-032
-- **EPIC**: EPIC-002
-- **Sprint**: 2
-- **Statut**: 🔴 To Do
-- **Points**: 3
-- **Persona**: P2 (Marc – Chef de projet), ADMIN
-- **Créé le**: 2026-08-31
-- **Mis à jour**: 2026-08-31
+- **EPIC**: EPIC-002 (Projets & delivery)
+- **Sprint**: — (backlog affiné, Ready)
+- **Statut**: 🟢 Ready
+- **Points**: 5
+- **Persona**: P2 (Marc — Chef de projet) / P3 (Sophie — Resource Manager)
+- **Créé le**: 2026-09-06
 
 ## Traçabilité
 - **Implémente**: EF-PRJ-5, RG-PRJ-6
-- **Dépend de**: US-001 (socle multitenant), US-003 (socle authentification), US-030 (création projet)
-- **Spec Technique**: PRJ-5 – Projets internes
+- **Dépend de**: US-030 (Project), US-060 (occupation/valorisation)
 
 ## User Story
 
-**En tant qu'** administrateur ou chef de projet,
-**je veux** qualifier un projet comme "interne" lors de sa création ou de sa modification,
-**afin que** le temps passé sur ce projet soit comptabilisé dans la capacité consommée de l'équipe sans affecter les indicateurs de marge commerciale.
+**En tant que** responsable de production (P3),
+**je veux** marquer un projet comme **interne non facturable** (R&D, avant-vente, formation, congés),
+**afin d'**imputer du temps hors production client sans fausser la marge, tout en le comptant dans la capacité consommée (RG-PRJ-6).
 
-## Critères d'Acceptation
+## Contexte (Conversation)
 
-### CA-1 (Nominal): Projet interne exclu des calculs de marge
+Aujourd'hui aucun concept de projet « interne » n'existe (`ContractType` = forfait/regie ; un projet
+sans budget se crée mais n'est pas typé). EF-PRJ-5 (Should) exige un **type/flag « interne non
+facturable »**. Conséquences (RG-PRJ-6) : ces projets sont **exclus du calcul de marge** (pas de CA
+attendu) mais **inclus dans la capacité consommée** ; le **taux d'occupation facturable** se calcule
+**par exclusion** de ces projets.
+
+## Critères d'Acceptance (Confirmation)
+
+### CA-1 (Nominal) : créer un projet interne
 ```gherkin
-GIVEN le projet PRJ-INT-001 "Formation interne IA" est qualifié "Interne" (non facturable)
-  AND 5 jours ont été imputés par deux consultants
-WHEN Élodie consulte le tableau de bord de la marge commerciale du mois
-THEN les 5 jours imputés sur PRJ-INT-001 n'apparaissent pas dans le calcul de marge
-  AND aucun chiffre d'affaires ni coût de vente n'est associé à ce projet dans les agrégats financiers
+GIVEN je crée un projet « R&D moteur IA » marqué « interne non facturable »
+WHEN le projet est créé
+THEN il n'exige pas de CA cible ni de client facturable
+  AND l'imputation de temps y est possible
 ```
 
-### CA-2 (Alternatif): Projet interne inclus dans la capacité consommée
+### CA-2 (Exclusion marge) : RG-PRJ-6
 ```gherkin
-GIVEN le projet PRJ-INT-001 "Formation interne IA" est qualifié "Interne"
-  AND le consultant Jean a imputé 5 jours sur ce projet en août 2026
-WHEN Sophie consulte le plan de charge de Jean pour août 2026
-THEN les 5 jours sur PRJ-INT-001 apparaissent dans la capacité consommée de Jean
-  AND le taux d'occupation de Jean intègre ces 5 jours
-  AND la mention "Projet interne" est clairement indiquée dans la vue
+GIVEN des temps valorisés imputés sur un projet interne
+WHEN la marge tenant/projet est calculée
+THEN ce projet est exclu du calcul de marge (aucun CA reconnu attendu)
 ```
 
-### CA-3 (Alternatif): Qualification "interne" visible et distincte dans les listes
+### CA-3 (Occupation facturable) : par exclusion
 ```gherkin
-GIVEN plusieurs projets existent dont PRJ-INT-001 "Formation interne IA" qualifié "Interne"
-WHEN Marc consulte la liste de tous les projets
-THEN PRJ-INT-001 affiche un badge "Interne" distinctif
-  AND un filtre "Type : Interne / Client" permet de trier la liste
+GIVEN un collaborateur ayant imputé 3 j sur un projet client et 2 j sur un projet interne (5 j ouvrés)
+WHEN son occupation facturable est calculée
+THEN elle vaut 3/5 = 60 % (les jours internes ne comptent pas comme facturables)
+  AND la capacité consommée totale reste 5 j (RG-PRJ-6)
 ```
 
-### CA-4 (Erreur): Tentative de facturation sur un projet interne refusée
+### CA-4 (Distinction visuelle) : pilotage
 ```gherkin
-GIVEN le projet PRJ-INT-001 est qualifié "Interne"
-WHEN le responsable facturation tente de créer une facture sur PRJ-INT-001
-THEN l'action est bloquée avec le message "Facturation impossible : projet interne non facturable (EF-PRJ-5)"
-  AND aucune facture n'est créée
+GIVEN la liste des projets
+WHEN je la consulte
+THEN les projets internes sont distingués des projets facturables
 ```
 
-### CA-5 (Alternatif): Requalification d'un projet interne en projet client tracée
+### CA-5 (Sécurité)
 ```gherkin
-GIVEN le projet PRJ-INT-001 est qualifié "Interne" avec 3 jours déjà imputés
-WHEN ADMIN requalifie le projet en "Client" en renseignant un motif
-THEN le projet devient facturable à partir de la date de requalification
-  AND les imputations antérieures restent marquées "Interne – hors marge"
-  AND la requalification est tracée : auteur, date, motif
+GIVEN un utilisateur sans CREATE_PROJECT / EDIT_PROJECT
+WHEN il tente de créer/marquer un projet interne
+THEN l'accès est refusé (403)
 ```
-
-### CA-6 (Erreur): Inclusion d'un projet interne dans le calcul de marge commerciale refusée
-```gherkin
-GIVEN le projet PRJ-INT-001 "Formation interne IA" est qualifié "Interne"
-WHEN ADMIN tente de l'ajouter manuellement au périmètre du rapport de marge commerciale via l'interface de configuration des rapports
-THEN le système refuse avec le message "Les projets internes ne peuvent pas être inclus dans le calcul de marge commerciale (RG-PRJ-6)"
-  AND PRJ-INT-001 reste absent du rapport de marge
-  AND aucune ligne de chiffre d'affaires ni de coût de vente n'est créée pour ce projet dans les agrégats financiers
-```
-
-## Tasks
-
-| ID | Type | Description | Statut | Estimation |
-|----|------|-------------|--------|------------|
-| - | - | - | 🔴 | - |
-
-## Progression
-
-0/0 tasks complétées (0%)
 
 ## Definition of Done
-
-- [ ] Tous les critères d'acceptation validés
-- [ ] Code reviewé
-- [ ] Tests unitaires passent
-- [ ] Tests d'intégration passent
-- [ ] Documentation mise à jour
-
----
+- [ ] Marqueur « interne non facturable » sur `Project` (type ou flag) + migration
+- [ ] Exclusion des projets internes du calcul de marge (`ComputeProjectMargins` / dashboard)
+- [ ] Occupation **facturable** = jours facturables / base, projets internes exclus du numérateur mais présents dans la capacité consommée (RG-PRJ-6)
+- [ ] UI : création/marquage + distinction dans la liste projets
+- [ ] Tests : exclusion marge, occupation facturable, capacité consommée inchangée, gating
+- [ ] `make ci` vert · revue de clôture
 
 ## Notes
-
-RG-PRJ-6 : les projets internes sont exclus du calcul de marge commerciale mais inclus dans la capacité consommée. EF-PRJ-5 : le flag "interne" est positionnable à la création ou modifiable par ADMIN avec traçabilité. Les projets internes typiques : formation, R&D, avant-vente, administration.
+Attention à l'occupation existante (US-060 : jours valorisés / (ouvrés − absences)) — introduire la
+notion « facturable » sans casser la définition actuelle (ajouter une mesure, ne pas remplacer).
