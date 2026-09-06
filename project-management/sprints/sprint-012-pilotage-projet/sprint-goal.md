@@ -12,7 +12,7 @@
 | Capacité (prévision) | ~20 points (1 dev ; vélocité récente ~22 hors S10, sécurité 10 %) |
 | Base git | `main` (après clôture S11, PR #62) |
 | EPIC | EPIC-002 (Projets & delivery) — reprise après la finance (EPIC-005 bouclé) |
-| Statut | 🟢 **Affiné — US-035/US-036 Ready, décomposées ; prêt pour exécution** |
+| Statut | ✅ **CLÔTURÉ (2026-09-06) — 16/16 pts Must + dette Should, goal atteint 100 %** |
 
 ## Sprint Goal (proposé — à valider en Planning P1)
 
