@@ -61,7 +61,7 @@ Mapping des 17 EF déclarées (EF-PRJ-1..5, 8..16, 19, 20, 22) à l'implémentat
 | EF-PRJ-10/11 | M/S | ✅ | Engagements externes (US-034), réallocation tracée. |
 | EF-PRJ-12/13 | M | ✅ | Avancement physique & RAF par lot (US-035). |
 | EF-PRJ-19/20/22 | M | ✅ | Affectation, restriction d'imputation, clôture (US-037/038). |
-| EF-PRJ-14 | M | 🟡 | Atterrissage livré (US-036) ; **manque** : « atterrissage = consommé + RAF » (CDC) + **export** des 5 valeurs. |
+| EF-PRJ-14 | M | ✅ | Atterrissage (US-036) + **export CSV** (US-079a, S14). Reste nuance CDC « atterrissage = consommé + RAF » (mineure). |
 | EF-PRJ-15 | M | 🟡 | Alerte de dérive précoce livrée (US-036, OBJ-2) ; **manque** : seuil paramétrable **par type de projet** + 2e seuil direction. |
 | EF-PRJ-9 | M | ✅ | Budget charge **par profil** lié aux taux historisés (US-078, S13). |
 | EF-PRJ-8 | M | ✅ | **Avenants** : budget initial / courant + historique daté (US-033, S13). Débloque INV-8. |

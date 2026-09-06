@@ -1,7 +1,7 @@
 # Statut consolidé du backlog — source de vérité réconciliée depuis git + reviews de sprint.
 # Généré par /project:sync-backlog (réconciliation complète, direction files←git).
 # Les statuts des fichiers markdown ont été alignés sur cet état.
-last_sync: "2026-09-06T13:00:00Z"
+last_sync: "2026-09-06T14:00:00Z"
 source_of_truth: "git history + project-management/sprints/*/sprint-review.md"
 resolution_strategy: "git-wins (les fichiers markdown étaient périmés)"
 
@@ -21,6 +21,7 @@ sprints:
   sprint-011: { theme: "Module de facturation (capstone EPIC-005)", points: 23, goal_met: true, stories: [US-014, US-075, US-076, US-077] }  # facturé réel > proxy CA reconnu (ADR-0022)
   sprint-012: { theme: "Pilotage projet — avancement, RAF & atterrissage charge (EPIC-002)", points: 16, goal_met: true, stories: [US-035, US-036], debt: [T-DET-01, T-R01, T-OPS-01] }  # dérive charge avant 50 % conso (OBJ-2)
   sprint-013: { theme: "Gestion budgétaire — avenants & budget par profil (EPIC-002)", points: 21, goal_met: true, stories: [US-033, US-078, US-032] }  # EF-PRJ-8/9/5 ; débloque INV-8
+  sprint-014: { theme: "Référentiels de valorisation (EPIC-001) + export pilotage", points: 11, goal_met: true, stories: [US-015, US-016, US-079a] }  # EF-REF-19/22 + EF-PRJ-14 ; US-079b/c reportés S15
 
 # État par story. status ∈ {done, ready, in-progress, backlog}
 stories:
@@ -82,7 +83,7 @@ stories:
   US-076: { title: "Facturé réel comme source de marge (supersede proxy)", sprint: 11, status: done, points: 5 }
   US-077: { title: "Export FEC sur facturé réel", sprint: 11, status: done, points: 5 }   # Should — PR #61 (acquis par source unique US-076)
   US-078: { title: "Budget charge par profil (EF-PRJ-9)", sprint: 13, status: done, points: 8 }   # S13 (complète EPIC-002)
-  US-079: { title: "Raffinements pilotage — export/courbe/seuil par type (EF-PRJ-14/15/16)", sprint: null, status: ready, points: 8 }   # affinée 2026-09-06 (Should, à découper)
+  US-079: { title: "Raffinements pilotage — export/courbe/seuil par type (EF-PRJ-14/15/16)", sprint: null, status: ready, points: 8 }   # US-079a export livré S14 (#78) ; reste US-079c courbe + US-079b seuil par type → S15
 
 # Stories techniques / dette qualité (hors vélocité) engagées au Sprint 10
 tech_stories:
