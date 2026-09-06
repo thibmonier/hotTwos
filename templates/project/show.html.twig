@@ -211,6 +211,45 @@
                         <p class="mt-3 text-xs text-muted">Coût, marge et dérive réservés aux rôles habilités (finance/direction).</p>
                     {% endif %}
                 {% endif %}
+
+                {# ── Facturation (US-075) ── #}
+                <h3 class="mb-2 mt-6 text-sm font-semibold text-ink">Factures</h3>
+                {% if invoices is empty %}
+                    <p class="text-muted">Aucune facture émise.</p>
+                {% else %}
+                    <div class="mb-3 overflow-x-auto">
+                        <table class="w-full border-collapse text-sm">
+                            <thead>
+                                <tr class="border-b-2 border-border text-left text-xs uppercase text-muted">
+                                    <th scope="col" class="py-2 pr-4">Période</th>
+                                    <th scope="col" class="py-2 pr-4 text-right">Montant</th>
+                                    <th scope="col" class="py-2">Émise le</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for inv in invoices %}
+                                    <tr class="border-b border-border">
+                                        <th scope="row" class="py-2 pr-4 font-medium text-ink">{{ inv.period }}</th>
+                                        <td class="py-2 pr-4 text-right tabular-nums">{{ (inv.amountCents / 100)|number_format(2, ',', ' ') }}&nbsp;€</td>
+                                        <td class="py-2 text-muted">{{ inv.issuedAt }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+                <form method="post" action="{{ path('project_issue_invoice', { id: project.id }) }}" class="flex flex-wrap items-end gap-2">
+                    <input type="hidden" name="_token" value="{{ csrf_token('issue_invoice') }}">
+                    <div>
+                        <label for="invoice-period" class="mb-1 block text-[13px] font-medium text-ink">Période (mois clôturé)</label>
+                        <input id="invoice-period" name="period" placeholder="AAAA-MM" pattern="\d{4}-\d{2}" required class="min-h-10 rounded border border-border-strong bg-surface px-3 text-sm text-ink">
+                    </div>
+                    <div>
+                        <label for="invoice-amount" class="mb-1 block text-[13px] font-medium text-ink">Montant (€)</label>
+                        <input id="invoice-amount" name="amountEuros" type="number" min="1" required class="min-h-10 rounded border border-border-strong bg-surface px-3 text-sm text-ink">
+                    </div>
+                    <button type="submit" class="min-h-10 rounded bg-primary px-4 text-sm font-semibold text-white hover:bg-primary/90">Émettre une facture</button>
+                </form>
             </section>
         {% endif %}
 
