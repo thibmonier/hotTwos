@@ -58,6 +58,9 @@
 ## ✅ Terminé
 | ID | Tâche | Terminé |
 |----|-------|---------|
+| US-014 | Client structuré (tranche minimale, 5 pts) — PR #57 | 2026-09-05 |
+| US-075 | Émission manuelle de factures (8 pts) — PR #58 | 2026-09-06 |
+| US-076 | Facturé réel comme source de marge (5 pts) — PR #59 | 2026-09-06 |
 | ADR-0022 | Cadrage facturation minimale + facturé réel > proxy | 2026-09-05 |
 
 ## Ordre d'exécution (phases)
@@ -67,6 +70,6 @@
 4. **US-077** (FEC sur facturé réel, Should) puis **T-R01** (Could) si capacité.
 
 ## Métriques
-- **Tâches Must** : 17 (US-014 ×6, US-075 ×7, US-076 ×4) · **Should** : US-077 ×3 · **Could** : T-R01
-- **Points engagés (Must)** : 18 (US-014 5 + US-075 8 + US-076 5) · US-077 (5) en Should
-- **Heures Must** : ~29h · capacité ~22 pts (post-fêtes)
+- **Avancement** : Must **18/18 pts livrés** (US-014 #57, US-075 #58, US-076 #59). Reste **US-077** (Should, 5) + T-R01 (Could).
+- **US-077 largement acquis** : le FEC lit `ProjectMargin` déjà re-figé sur le facturé réel (US-076) → surtout des tests de confirmation + libellé.
+- 554 tests · main gate-vert. Note de reprise (mémoire) : `sprint-011-en-cours`.
