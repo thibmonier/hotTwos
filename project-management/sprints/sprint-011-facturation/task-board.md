@@ -34,15 +34,7 @@
 | T-076-03 | [TEST] Marge sur facturé, repli CA reconnu, non-rétro, pas de double comptage | 2h |
 | T-076-04 | [REV] Revue de clôture | 0.5h |
 
-## 🔲 À Faire — Should
-### US-077 — Export FEC sur facturé réel (5 pts)
-| ID | Tâche | Estimation |
-|----|-------|------------|
-| T-077-01 | [BE] `FecGenerator`/`ExportFec` alimentés par `RevenueSource` (US-076) | 2h |
-| T-077-02 | [TEST] FEC sur facturé, repli, cohérence FEC/marge | 2h |
-| T-077-03 | [REV] Revue de clôture | 0.5h |
-
-### Could
+## 🔲 À Faire — Could
 | ID | Tâche | Estimation |
 |----|-------|------------|
 | T-R01 | [FE-WEB] Correctif onglet « Suivi budgétaire » (1er clic — contrôleur Stimulus `tabs`) | 1h |
@@ -61,6 +53,7 @@
 | US-014 | Client structuré (tranche minimale, 5 pts) — PR #57 | 2026-09-05 |
 | US-075 | Émission manuelle de factures (8 pts) — PR #58 | 2026-09-06 |
 | US-076 | Facturé réel comme source de marge (5 pts) — PR #59 | 2026-09-06 |
+| US-077 | Export FEC sur facturé réel (5 pts, Should) | 2026-09-06 |
 | ADR-0022 | Cadrage facturation minimale + facturé réel > proxy | 2026-09-05 |
 
 ## Ordre d'exécution (phases)
@@ -70,6 +63,6 @@
 4. **US-077** (FEC sur facturé réel, Should) puis **T-R01** (Could) si capacité.
 
 ## Métriques
-- **Avancement** : Must **18/18 pts livrés** (US-014 #57, US-075 #58, US-076 #59). Reste **US-077** (Should, 5) + T-R01 (Could).
-- **US-077 largement acquis** : le FEC lit `ProjectMargin` déjà re-figé sur le facturé réel (US-076) → surtout des tests de confirmation + libellé.
-- 554 tests · main gate-vert. Note de reprise (mémoire) : `sprint-011-en-cours`.
+- **Avancement** : Must **18/18 pts livrés** (US-014 #57, US-075 #58, US-076 #59) + Should **US-077 (5 pts) livrée** → **23/23 pts**. Reste seulement T-R01 (Could).
+- **US-077** : acquis par construction (source unique ARC-6, le FEC lit `ProjectMargin` re-figé sur le facturé réel) ; ajout de `FecReflectsBilledRevenueTest` (CA-1/2/3) + libellé produit neutralisé (« Revenu retenu »).
+- 558 tests · gate-vert. Note de reprise (mémoire) : `sprint-011-en-cours`.
