@@ -75,14 +75,14 @@ final class InitializeTenantCommandTest extends KernelTestCase
         self::assertSame(1, $this->countEntities(SkillLevelScale::class));
         self::assertSame(1, $this->countEntities(Profile::class));
         self::assertSame(1, $this->countEntities(Client::class));
-        self::assertSame(8, $this->countEntities(Holiday::class));
+        self::assertSame(11, $this->countEntities(Holiday::class)); // 8 fixes + 3 mobiles (US-023)
 
         // Rejeu : aucun doublon (idempotence, CA-4).
         self::assertSame(0, $this->tester()->execute(['tenantId' => $tenant->toString()]));
         self::assertSame(1, $this->countEntities(ReferenceCurrency::class));
         self::assertSame(1, $this->countEntities(Profile::class));
         self::assertSame(1, $this->countEntities(Client::class));
-        self::assertSame(8, $this->countEntities(Holiday::class));
+        self::assertSame(11, $this->countEntities(Holiday::class)); // 8 fixes + 3 mobiles (US-023)
     }
 
     public function testFailsForUnknownTenant(): void

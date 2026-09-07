@@ -23,7 +23,7 @@ stories:
     points: 2
     priority: 1
     depends_on: []
-    status: pending
+    status: done
   - id: US-023
     title: "Raffinements Review (fériés mobiles + audit étendu)"
     points: 5

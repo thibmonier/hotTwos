@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Pricing;
 
+use App\Tests\Support\Audit\InMemoryConfigAuditRecorder;
 use App\Application\Authorization\Authorizer;
 use App\Application\Pricing\ManageProfiles;
 use App\Domain\Authorization\AccessDeniedException;
@@ -28,6 +29,7 @@ final class ManageProfilesTest extends TestCase
     private TenantId $tenant;
     private InMemoryProfileRepository $profiles;
     private ManageProfiles $manage;
+    private InMemoryConfigAuditRecorder $configAudit;
     private User $admin;
     private User $collaborator;
 
@@ -40,7 +42,8 @@ final class ManageProfilesTest extends TestCase
 
         $this->profiles = new InMemoryProfileRepository();
         $audit = new RecordingSecurityAuditLogger();
-        $this->manage = new ManageProfiles(new Authorizer($roles, $audit), $this->profiles, $audit);
+        $this->configAudit = new InMemoryConfigAuditRecorder();
+        $this->manage = new ManageProfiles(new Authorizer($roles, $audit), $this->profiles, $audit, $this->configAudit);
 
         $this->admin = new User($this->tenant, 'admin@agence.test', 'hash', ['Administrateur']);
         $this->collaborator = new User($this->tenant, 'collab@agence.test', 'hash', ['Collaborateur']);
@@ -54,6 +57,8 @@ final class ManageProfilesTest extends TestCase
         self::assertNotNull($profile);
         self::assertSame('Développeur senior', $profile->name());
         self::assertSame(CalculationMode::LOADED, $profile->calculationMode());
+        // US-023 : la création alimente le journal d'audit du paramétrage.
+        self::assertTrue($this->configAudit->has('Profil'));
     }
 
     public function testCreationWithoutPermissionIsDenied(): void

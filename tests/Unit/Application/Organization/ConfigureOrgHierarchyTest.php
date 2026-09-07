@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Organization;
 
+use App\Tests\Support\Audit\InMemoryConfigAuditRecorder;
 use App\Application\Authorization\Authorizer;
 use App\Application\Organization\ConfigureOrgHierarchy;
 use App\Domain\Authorization\AccessDeniedException;
@@ -27,6 +28,7 @@ final class ConfigureOrgHierarchyTest extends TestCase
     private TenantId $tenant;
     private InMemoryOrgUnitRepository $units;
     private ConfigureOrgHierarchy $configure;
+    private InMemoryConfigAuditRecorder $configAudit;
     private User $admin;
     private User $collaborator;
 
@@ -39,7 +41,8 @@ final class ConfigureOrgHierarchyTest extends TestCase
 
         $this->units = new InMemoryOrgUnitRepository();
         $audit = new RecordingSecurityAuditLogger();
-        $this->configure = new ConfigureOrgHierarchy(new Authorizer($roles, $audit), $this->units, $audit);
+        $this->configAudit = new InMemoryConfigAuditRecorder();
+        $this->configure = new ConfigureOrgHierarchy(new Authorizer($roles, $audit), $this->units, $audit, $this->configAudit);
 
         $this->admin = new User($this->tenant, 'admin@agence.test', 'hash', ['Administrateur']);
         $this->collaborator = new User($this->tenant, 'collab@agence.test', 'hash', ['Collaborateur']);
@@ -52,6 +55,7 @@ final class ConfigureOrgHierarchyTest extends TestCase
         $unit = $this->units->find($this->tenant, $id);
         self::assertNotNull($unit);
         self::assertTrue($unit->isRoot());
+        self::assertTrue($this->configAudit->has('Organisation')); // US-023
         self::assertSame('Direction générale', $unit->name());
     }
 

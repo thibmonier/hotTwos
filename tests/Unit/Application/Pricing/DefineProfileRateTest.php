@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Pricing;
 
+use App\Tests\Support\Audit\InMemoryConfigAuditRecorder;
 use App\Application\Authorization\Authorizer;
 use App\Application\Pricing\DefineProfileRate;
 use App\Domain\Authorization\AccessDeniedException;
@@ -68,6 +69,7 @@ final class DefineProfileRateTest extends TestCase
             new MockClock(new DateTimeImmutable('2026-06-01 00:00:00', new DateTimeZone('UTC'))),
             $this->audit,
             $this->bus,
+            new InMemoryConfigAuditRecorder(),
         );
 
         $this->admin = new User($this->tenant, 'admin@agence.test', 'hash', ['Administrateur']);
@@ -172,6 +174,7 @@ final class DefineProfileRateTest extends TestCase
             new MockClock(new DateTimeImmutable('2026-06-01 14:30:00', new DateTimeZone('UTC'))),
             $this->audit,
             $this->bus,
+            new InMemoryConfigAuditRecorder(),
         );
 
         $define->define($this->tenant, $this->admin, $this->profileId, EffectivePeriod::since($this->date('2026-06-01')), 45000, 78000);

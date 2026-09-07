@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\Onboarding;
 
 use App\Application\Authorization\InitializeDefaultRoles;
+use App\Domain\Calendar\EasterCalculator;
 use App\Domain\Calendar\Holiday;
 use App\Domain\Calendar\HolidayRepository;
 use App\Domain\Client\Client;
@@ -69,8 +70,8 @@ final readonly class InitializeTenantDefaults
     }
 
     /**
-     * Jours fériés français à date fixe de l'année civile en cours (les fériés mobiles — Pâques — sont
-     * hors périmètre par défaut, ajoutables manuellement).
+     * Jours fériés français de l'année civile en cours : fixes + mobiles (Pâques/Ascension/Pentecôte,
+     * US-023) calculés par {@see EasterCalculator}.
      *
      * @return array<string, string>
      */
@@ -78,6 +79,7 @@ final readonly class InitializeTenantDefaults
     {
         $year = (int) $this->clock->now()->format('Y');
 
+        // Fériés fixes + mobiles (Pâques/Ascension/Pentecôte, US-023).
         return [
             sprintf('%d-01-01', $year) => 'Jour de l\'an',
             sprintf('%d-05-01', $year) => 'Fête du travail',
@@ -87,6 +89,7 @@ final readonly class InitializeTenantDefaults
             sprintf('%d-11-01', $year) => 'Toussaint',
             sprintf('%d-11-11', $year) => 'Armistice 1918',
             sprintf('%d-12-25', $year) => 'Noël',
+            ...EasterCalculator::mobileHolidays($year),
         ];
     }
 }
