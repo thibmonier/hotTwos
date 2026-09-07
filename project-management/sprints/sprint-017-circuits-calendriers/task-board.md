@@ -49,7 +49,8 @@
 ## 🔄 En Cours / 👀 En Review / ✅ Terminé / 🚫 Bloqué
 _(vide au démarrage)_
 
-## Métriques
-- **Tâches** : 26 total | 0 terminées (0 %)
-- **Heures** : ~53.75h estimées
-- **Points** : 21 engagés / 22 capacité
+## Métriques (clôture)
+- **Stories** : 3/3 livrées ✅ (US-022 #97, US-021 #98, US-017 #99)
+- **Points** : 21/21 livrés — **EPIC-001 bouclé**
+- **Tests** : 672 → **685** verts | `make ci` vert à chaque merge
+- **Migrations** : `closure_period`, `work_schedule`, `absence_validation_circuit` (+ `current_step`) + RLS
