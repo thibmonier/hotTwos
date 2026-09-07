@@ -1,7 +1,7 @@
-# File d'exécution — Sprint 17 (généré par /project:run-sprint 017 --auto)
-sprint: sprint-017-circuits-calendriers
+# File d'exécution — Sprint 18 (généré par /project:run-sprint 018 --auto)
+sprint: sprint-018-staffing-raffinements
 generated_at: 2026-09-07
-goal: "Achever EPIC-001 : circuits de validation paramétrables, calendriers différenciés (temps partiel), fermeture entreprise"
+goal: "Amorcer le staffing (recherche par compétence + capacité/charge ferme) ; finitions Review + schéma de test mutualisé"
 
 execution:
   mode: sequential
@@ -11,38 +11,42 @@ execution:
 
 gates:
   - id: main-green
-    desc: "main vert au démarrage S17 (672 tests)"
+    desc: "main vert au démarrage S18 (685 tests)"
     status: satisfied
   - id: dor
-    desc: "3 US affinées Ready (#95)"
+    desc: "items affinés Ready (#103)"
     status: satisfied
 
 stories:
-  - id: US-022
-    title: "Périodes de fermeture entreprise"
-    points: 5
+  - id: QUAL-3
+    title: "Schéma de test mutualisé (trait ProvisionsFullSchema)"
+    points: 2
     priority: 1
     depends_on: []
-    status: done
-    note: "Sûre. ClosurePeriod + WorkingDaysCalculator (fermetures)."
-  - id: US-021
-    title: "Calendriers de travail différenciés (temps partiel)"
-    points: 8
+    status: pending
+  - id: US-023
+    title: "Raffinements Review (fériés mobiles + audit étendu)"
+    points: 5
     priority: 2
-    depends_on: [US-022]
-    status: done
-    note: "Invasif. Variantes par utilisateur du calculateur ; tenant-level inchangé."
-  - id: US-017
-    title: "Circuit de validation des absences paramétrable"
-    points: 8
+    depends_on: []
+    status: pending
+  - id: US-041
+    title: "Plan de charge — capacité vs charge ferme"
+    points: 5
     priority: 3
     depends_on: []
-    status: done
-    note: "Flux absences ≤2 étapes, validateur par rôle."
+    status: pending
+  - id: US-040
+    title: "Recherche de staffing par compétence & disponibilité"
+    points: 8
+    priority: 4
+    depends_on: [US-041]
+    status: pending
 
-total_points: 21
+total_points: 20
 
 plan:
-  phase_1: [US-022]
-  phase_2: [US-021]
-  phase_3: [US-017]
+  phase_1: [QUAL-3]
+  phase_2: [US-023]
+  phase_3: [US-041]
+  phase_4: [US-040]
