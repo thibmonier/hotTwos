@@ -18,6 +18,7 @@ final readonly class ChargeLandingCurvePoint
         public ?float $overrunPercent,
         public ?int $physicalProgressPercent,
         public bool $isEarlyDrift,
+        public bool $isEscalated,
     ) {
     }
 }

@@ -47,6 +47,7 @@ final readonly class ViewChargeLandingCurve
                 $s->overrunPercent(),
                 $s->physicalProgressPercent(),
                 $s->isEarlyDrift(),
+                $s->isEscalated(),
             ),
             $this->snapshots->findForProject($tenant, $projectId),
         );
