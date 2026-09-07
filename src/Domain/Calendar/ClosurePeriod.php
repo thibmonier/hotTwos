@@ -17,6 +17,7 @@ use Symfony\Component\Uid\Uuid;
  */
 #[ORM\Entity]
 #[ORM\Table(name: 'closure_period')]
+#[ORM\Index(name: 'idx_closure_period_tenant', columns: ['tenant_id', 'start_date'])]
 class ClosurePeriod implements TenantOwned
 {
     #[ORM\Id]
