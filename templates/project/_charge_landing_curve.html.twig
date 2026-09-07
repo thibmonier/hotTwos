@@ -1,0 +1,51 @@
+{# US-079c (EF-PRJ-16) — courbe d'atterrissage historisée : évolution du dépassement projeté par
+   période close. Représentation accessible = table de données ; le sparkline SVG est décoratif. #}
+{% if curve is not null and curve.hasSeries %}
+    <section class="mt-6" aria-labelledby="charge-landing-curve-title">
+        <h3 id="charge-landing-curve-title" class="mb-2 text-sm font-semibold text-ink">Courbe d'atterrissage</h3>
+        <p class="mb-3 text-xs text-muted">Évolution du dépassement de charge projeté à chaque clôture de période — pour repérer <em>quand</em> la trajectoire s'est dégradée.</p>
+
+        {% set count = curve.points|length %}
+        {% if count > 1 %}
+            <svg viewBox="0 0 300 80" class="mb-3 w-full max-w-md" role="presentation" aria-hidden="true" preserveAspectRatio="none">
+                <line x1="0" y1="55" x2="300" y2="55" stroke="currentColor" stroke-width="0.5" class="text-border" />
+                <polyline
+                    fill="none" stroke="currentColor" stroke-width="1.5" class="text-primary"
+                    points="{% for p in curve.points %}{{ (loop.index0 / (count - 1) * 300)|round(2) }},{{ (55 - (min(max(p.overrunPercent ?? 0, -20), 100) + 20) / 120 * 50)|round(2) }} {% endfor %}"
+                />
+            </svg>
+        {% endif %}
+
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse text-sm">
+                <caption class="sr-only">Historique de l'atterrissage en charge par période</caption>
+                <thead>
+                    <tr class="border-b-2 border-border text-left text-xs uppercase text-muted">
+                        <th scope="col" class="py-2 pr-4">Période</th>
+                        <th scope="col" class="py-2 pr-4 text-right">Dépassement projeté</th>
+                        <th scope="col" class="py-2 pr-4 text-right">Avancement</th>
+                        {% if curve.costVisible %}<th scope="col" class="py-2 pr-4 text-right">Atterrissage (€)</th>{% endif %}
+                        <th scope="col" class="py-2 text-left">Alerte</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in curve.points %}
+                        <tr class="border-b border-border">
+                            <th scope="row" class="py-2 pr-4 font-medium text-ink">{{ p.period }}</th>
+                            <td class="py-2 pr-4 text-right {{ (p.overrunPercent ?? 0) > 0 ? 'text-danger' : 'text-success' }}">
+                                {{ (p.overrunPercent ?? 0) >= 0 ? '+' : '' }}{{ (p.overrunPercent ?? 0)|number_format(1, ',', ' ') }}&nbsp;%
+                            </td>
+                            <td class="py-2 pr-4 text-right">{{ p.physicalProgressPercent is not null ? p.physicalProgressPercent ~ '&nbsp;%'|raw : '—' }}</td>
+                            {% if curve.costVisible %}
+                                <td class="py-2 pr-4 text-right">{{ p.landingCostCents is not null ? (p.landingCostCents / 100)|number_format(0, ',', ' ') ~ '&nbsp;€'|raw : '—' }}</td>
+                            {% endif %}
+                            <td class="py-2 text-left">
+                                {% if p.isEarlyDrift %}<span class="rounded bg-danger/10 px-2 py-0.5 text-xs font-semibold text-danger">Dérive précoce</span>{% else %}<span class="text-muted">—</span>{% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+{% endif %}

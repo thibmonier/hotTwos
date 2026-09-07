@@ -212,6 +212,9 @@
                         <p class="mb-4 text-xs text-muted">Atterrissage charge indisponible — renseignez le budget de charge et l'avancement physique des lots (onglet Structure).</p>
                     {% endif %}
 
+                    {# US-079c — courbe d'atterrissage historisée (EF-PRJ-16) #}
+                    {{ include('project/_charge_landing_curve.html.twig', { curve: chargeLandingCurve }) }}
+
                     <div class="overflow-x-auto">
                         <table class="w-full border-collapse text-sm">
                             <thead>
