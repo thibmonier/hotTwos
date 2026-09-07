@@ -102,6 +102,9 @@ services:
     App\Domain\Budget\MarginDriftThresholdProvider: '@App\Infrastructure\Budget\TenantMarginDriftThresholdProvider'
     App\Domain\Budget\MarginDriftThresholdRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineMarginDriftThresholdRepository'
 
+    # Jours fériés & calcul unifié des jours ouvrés (US-012, EF-REF-6, DIP).
+    App\Domain\Calendar\HolidayRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineHolidayRepository'
+
     # Historisation de l'atterrissage en charge (US-079c, EF-PRJ-16, DIP).
     App\Domain\Budget\ChargeLandingSnapshotRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineChargeLandingSnapshotRepository'
 

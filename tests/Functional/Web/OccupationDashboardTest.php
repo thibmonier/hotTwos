@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Web;
 
 use App\Application\Authorization\InitializeDefaultRoles;
+use App\Domain\Calendar\Holiday;
 use App\Domain\Absence\AbsenceRequest;
 use App\Domain\Authorization\Role;
 use App\Domain\Project\Project;
@@ -45,6 +46,7 @@ final class OccupationDashboardTest extends WebTestCase
 
         $this->schema = [
             $this->em->getClassMetadata(Tenant::class),
+            $this->em->getClassMetadata(Holiday::class),
             $this->em->getClassMetadata(User::class),
             $this->em->getClassMetadata(Role::class),
             $this->em->getClassMetadata(Project::class),

@@ -6,6 +6,7 @@ namespace App\Application\Valuation;
 
 use App\Domain\Absence\AbsenceRequest;
 use App\Domain\Absence\AbsenceRequestRepository;
+use App\Domain\Calendar\WorkingDaysCalculator;
 use App\Domain\Tenant\TenantId;
 use App\Domain\Valuation\OccupationLine;
 use App\Domain\Valuation\OccupationOverview;
@@ -24,11 +25,10 @@ use Psr\Clock\ClockInterface;
  */
 final readonly class OccupationReport
 {
-    private const int WORKING_DAYS_PER_WEEK = 5;
-
     public function __construct(
         private TimeEntryValuationRepository $valuations,
         private AbsenceRequestRepository $absences,
+        private WorkingDaysCalculator $workingDays,
         private ClockInterface $clock,
     ) {
     }
@@ -39,7 +39,7 @@ final readonly class OccupationReport
         $from = $reference->modify('first day of this month')->setTime(0, 0);
         $to = $from->modify('+1 month');
 
-        $workingDays = $this->workingDaysBetween($from, $to);
+        $workingDays = $this->workingDays->workingDaysBetween($tenant, $from, $to);
         // `valuedDayCountByUser` ne renvoie déjà que les collaborateurs ayant une activité valorisée
         // sur le mois : on itère ce sous-ensemble plutôt que tous les utilisateurs du tenant.
         $valuedByUser = $this->valuations->valuedDayCountByUser($tenant, $from, $to);
@@ -57,18 +57,6 @@ final readonly class OccupationReport
         return new OccupationOverview($from->format('Y-m'), $lines);
     }
 
-    private function workingDaysBetween(DateTimeImmutable $from, DateTimeImmutable $to): int
-    {
-        $count = 0;
-        for ($day = $from; $day < $to; $day = $day->modify('+1 day')) {
-            if ($this->isWeekday($day)) {
-                ++$count;
-            }
-        }
-
-        return $count;
-    }
-
     private function absenceDays(TenantId $tenant, string $userId, DateTimeImmutable $from, DateTimeImmutable $to): int
     {
         $lastDay = $to->modify('-1 day');
@@ -76,7 +64,7 @@ final readonly class OccupationReport
 
         $count = 0;
         for ($day = $from; $day < $to; $day = $day->modify('+1 day')) {
-            if ($this->isWeekday($day) && $this->isAbsent($absences, $day)) {
+            if ($this->workingDays->isWorkingDay($tenant, $day) && $this->isAbsent($absences, $day)) {
                 ++$count;
             }
         }
@@ -90,10 +78,5 @@ final readonly class OccupationReport
     private function isAbsent(array $absences, DateTimeImmutable $day): bool
     {
         return array_any($absences, static fn (AbsenceRequest $absence): bool => $absence->coversDay($day));
-    }
-
-    private function isWeekday(DateTimeImmutable $day): bool
-    {
-        return (int) $day->format('N') <= self::WORKING_DAYS_PER_WEEK;
     }
 }

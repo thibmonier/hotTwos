@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\Reminder;
 
 use App\Application\Completeness\CompletenessGrid;
+use App\Domain\Calendar\WorkingDaysCalculator;
 use App\Domain\Completeness\CompletenessState;
 use App\Domain\Completeness\WeekCompleteness;
 use App\Domain\Reminder\ReminderLog;
@@ -43,6 +44,7 @@ final readonly class ScheduleReminders
         private ReminderLogRepository $logs,
         private UserRepository $users,
         private CompletenessGrid $completeness,
+        private WorkingDaysCalculator $workingDays,
     ) {
     }
 
@@ -58,8 +60,8 @@ final readonly class ScheduleReminders
         if (!$rule instanceof ReminderRule || !$rule->isActive()) {
             return [];
         }
-        // Plancher anti-spam : aucune relance émise un jour non ouvré, quelle que soit la config.
-        if (!$this->isBusinessDay($now)) {
+        // Plancher anti-spam : aucune relance émise un jour non ouvré (week-end ou férié), quelle que soit la config.
+        if (!$this->workingDays->isWorkingDay($tenant, $now)) {
             return [];
         }
 
@@ -160,10 +162,5 @@ final readonly class ScheduleReminders
         $daysElapsed = (int) $lastSentAt->setTime(0, 0)->diff($now->setTime(0, 0))->days;
 
         return $daysElapsed >= $interval;
-    }
-
-    private function isBusinessDay(DateTimeImmutable $day): bool
-    {
-        return (int) $day->format('N') <= 5;
     }
 }

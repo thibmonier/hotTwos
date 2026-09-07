@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Api;
 
+use App\Domain\Calendar\Holiday;
 use App\Domain\Project\Project;
 use App\Domain\Tenant\Tenant;
 use App\Domain\Tenant\TenantId;
@@ -37,6 +38,7 @@ final class ActivitySummaryApiTest extends WebTestCase
 
         $this->schema = [
             $this->em->getClassMetadata(Tenant::class),
+            $this->em->getClassMetadata(Holiday::class),
             $this->em->getClassMetadata(User::class),
             $this->em->getClassMetadata(Project::class),
             $this->em->getClassMetadata(TimeEntry::class),
