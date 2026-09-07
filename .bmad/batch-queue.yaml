@@ -41,7 +41,7 @@ stories:
     points: 8
     priority: 4
     depends_on: [US-041]
-    status: pending
+    status: done
 
 total_points: 20
 
