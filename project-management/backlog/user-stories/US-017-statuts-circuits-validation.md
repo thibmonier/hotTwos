@@ -1,116 +1,108 @@
-# US-017: Statuts et circuits de validation paramétrables
+# US-017: Circuit de validation des absences paramétrable
 
 ## Métadonnées
 - **ID**: US-017
 - **EPIC**: EPIC-001
-- **Sprint**: Sprint 2
-- **Statut**: 🔴 To Do
+- **Sprint**: 17
+- **Statut**: 🟢 Ready
 - **Points**: 8
-- **Persona**: ADMIN
+- **Persona**: P-ADMIN (administrateur) / manager valideur
 - **Créé le**: 2026-08-31
-- **Mis à jour**: 2026-08-31
+- **Mis à jour**: 2026-09-07 (affinage S17 — recadrage sur un flux pilote : les absences)
 
 ## Traçabilité
-- **Implémente**: EF-REF-24, EF-REF-25, RG-REF-1
-- **Dépend de**: US-001 (fondation multi-tenant)
-- **Spec Technique**: EF-REF-24 (statuts et transitions sans développement), EF-REF-25 (circuits de validation : valideurs, seuils, délégation, escalade)
+- **Implémente**: EF-REF-25 (circuit de validation : nombre d'étapes & validateurs) — **tranche pilote : absences**
+- **Dépend de**: US-001 (multi-tenant), US-054 (déclaration/validation des absences)
+- **Réutilise / ne re-spécifie pas** : le décideur d'absence existant (`Application\Absence\DecideAbsence`, permission `VALIDATE_ABSENCE`, garde anti-auto-décision) et le pattern de config tenant (`ReminderRule`).
+- **Reporté (hors périmètre, US ultérieures)** :
+  - **EF-REF-24** — transitions de statut paramétrables (refonte de `ProjectStatus::canTransitionTo`) : chantier distinct.
+  - Circuits pour les **temps** (US-055) et les **réouvertures de période** (US-057) : restent mono-étape.
+  - Résolution **hiérarchique N+1** réelle (via `OrgUnit`) et **délégation/escalade/seuils** : validateurs désignés **par rôle** ici.
 
 ## User Story
 
 **En tant qu'** administrateur tenant,
-**je veux** paramétrer librement les statuts, les transitions autorisées et les circuits de validation (valideurs, seuils financiers, délégation, escalade) de n'importe quel objet métier (devis, projet, feuille de temps, commande) sans recourir à un développement,
-**afin de** adapter le workflow de validation à l'organisation et aux contraintes légales ou commerciales du tenant, et de les faire évoluer en autonomie totale.
+**je veux** paramétrer le **circuit de validation des absences** (une ou deux étapes, avec le rôle validateur de chaque étape),
+**afin d'** adapter le niveau de contrôle des absences aux règles de mon organisation, sans développement.
 
-## Critères d'Acceptation
+## Contexte (Conversation)
+Aujourd'hui la validation d'absence est **mono-étape** : tout titulaire de `VALIDATE_ABSENCE` décide
+(`DecideAbsence`). Cette US rend le circuit **configurable** : 1 étape (comportement actuel) ou 2 étapes
+successives, chacune requérant un **rôle validateur** défini. Une absence n'est `VALIDATED` qu'après
+approbation de **toutes** les étapes, dans l'ordre ; un refus à n'importe quelle étape la `REJECTED`.
+Modèle volontairement borné (≤ 2 étapes, validateurs par rôle) pour tenir le périmètre.
 
-### CA-1 (Nominal) : Ajout d'un statut "En attente juridique" sans développement
+## Critères d'Acceptance (Confirmation)
+
+### CA-1 (Nominal) : circuit par défaut à 1 étape (comportement actuel préservé)
 ```gherkin
-GIVEN le workflow des devis est configuré avec les statuts : Brouillon → En validation → Approuvé → Refusé
-WHEN l'ADMIN ajoute le statut "En attente juridique" avec les transitions autorisées : (depuis "En validation") et (vers "En validation" ou "Approuvé")
-THEN le nouveau statut apparaît immédiatement dans le workflow des devis sans redéploiement de l'application
-  AND les utilisateurs habilités peuvent faire passer un devis vers "En attente juridique" depuis "En validation"
-  AND les devis existants en statut "En validation" ne sont pas automatiquement migrés vers le nouveau statut
-  AND le diagramme des transitions dans l'interface admin reflète le nouveau statut et ses arcs entrants/sortants
+GIVEN aucun circuit d'absence n'est configuré (défaut = 1 étape, rôle validateur d'absence)
+  AND une demande d'absence en attente
+WHEN un validateur habilité l'approuve
+THEN l'absence passe directement à « validée »
 ```
 
-### CA-2 (Nominal) : Devis > 50 000 € requiert double validation, seuil modifiable
+### CA-2 (Nominal) : circuit à 2 étapes — validée seulement après les deux approbations
 ```gherkin
-GIVEN le circuit de validation des devis est configuré avec : valideur N+1 requis pour tout montant
-  AND un seuil de double validation est fixé à 50 000 € (Direction + Commercial Senior)
-WHEN P4 Yann soumet un devis de 62 000 €
-THEN le circuit de validation déclenche deux notifications : une pour le manager N+1 et une pour le Commercial Senior
-  AND le devis ne peut passer à "Approuvé" qu'après les deux validations (AND logique, pas OR)
-  AND si l'ADMIN modifie le seuil à 75 000 €, un devis de 62 000 € ne déclenche plus la double validation à la prochaine soumission
-  AND la modification du seuil n'affecte pas les devis déjà en cours de validation (ils conservent leur circuit d'origine)
+GIVEN un circuit d'absence configuré en 2 étapes (étape 1 = rôle « Chef de projet », étape 2 = rôle « Dirigeant »)
+  AND une demande d'absence en attente
+WHEN un utilisateur ayant le rôle de l'étape 1 l'approuve
+THEN l'absence reste « en attente » à l'étape 2 (pas encore validée)
+WHEN un utilisateur ayant le rôle de l'étape 2 l'approuve à son tour
+THEN l'absence passe à « validée »
 ```
 
-### CA-3 (Alternatif) : Délégation de validation — valideur absent
+### CA-3 (Alternatif) : l'administrateur configure le circuit
 ```gherkin
-GIVEN P2 Marc est configuré comme valideur principal pour les feuilles de temps de son équipe
-  AND Marc est absent du 14/07 au 25/07 et a configuré une délégation vers "Sophie (P3)" pour cette période
-WHEN un collaborateur de l'équipe de Marc soumet une feuille de temps le 16/07
-THEN la notification de validation est envoyée à Sophie (délégataire) et non à Marc
-  AND Sophie dispose des mêmes droits de validation que Marc pour les objets délégués
-  AND après le 25/07, les notifications reviennent automatiquement à Marc
-  AND les validations effectuées par Sophie sont tracées avec la mention "par délégation de Marc"
+GIVEN un administrateur (MANAGE_ORGANIZATION) sur la page des circuits de validation
+WHEN il définit 2 étapes avec un rôle validateur pour chacune
+THEN le circuit est enregistré pour le tenant et s'applique aux nouvelles décisions
+  AND il peut revenir à 1 étape
 ```
 
-### CA-4 (Alternatif) : Escalade automatique après délai de validation dépassé
+### CA-4 (Alternatif) : un refus à une étape rejette l'absence
 ```gherkin
-GIVEN le circuit de validation des feuilles de temps configure un délai d'escalade de 48h ouvrées
-  AND une feuille de temps est soumise le lundi 01/09 à 09h00 et aucune action n'est prise
-WHEN le délai de 48h ouvrées est dépassé (jeudi 04/09 à 09h00)
-THEN une notification d'escalade est automatiquement envoyée au responsable du valideur (N+2)
-  AND le valideur initial (N+1) reçoit également un rappel indiquant que l'escalade a été déclenchée
-  AND le statut de la feuille de temps affiche "En attente validation (escaladé)" pour traçabilité
-  AND N+2 peut valider directement sans intervention de N+1
+GIVEN un circuit d'absence à 2 étapes et une demande approuvée à l'étape 1
+WHEN un validateur de l'étape 2 refuse (motif obligatoire)
+THEN l'absence passe à « refusée » (le circuit s'arrête)
 ```
 
-### CA-5 (Erreur) : Création d'une transition circulaire ou vers un statut terminal → refus
+### CA-5 (Erreur) : validateur au mauvais rôle pour l'étape courante refusé
 ```gherkin
-GIVEN le statut "Approuvé" est configuré comme statut terminal (aucune transition sortante)
-WHEN l'ADMIN tente d'ajouter une transition de "Approuvé" vers "Brouillon" sur le workflow des devis
-THEN le système refuse avec le message : "Le statut 'Approuvé' est configuré comme terminal. Retirez le marqueur 'terminal' avant d'ajouter une transition sortante."
-  AND aucune transition n'est créée
-  AND si l'ADMIN tente de créer une boucle "En validation" → "En validation" (transition sur soi-même), le système refuse avec : "Les transitions auto-référentielles ne sont pas autorisées."
+GIVEN un circuit à 2 étapes, une demande à l'étape 1 (rôle « Chef de projet »)
+WHEN un utilisateur sans le rôle requis par l'étape courante tente d'approuver
+THEN l'action est refusée (403 / erreur d'autorisation) et l'étape n'avance pas
+  AND la garde anti-auto-décision reste appliquée (on ne valide pas sa propre absence)
 ```
 
-### CA-6 (Erreur) : Activation d'un circuit de validation sans aucun valideur défini → refus
+### CA-6 (Erreur) : configuration invalide refusée
 ```gherkin
-GIVEN un circuit de validation "Validation feuilles de temps équipe RH" est créé avec ses seuils et ses transitions
-  AND aucun valideur (ni utilisateur nominatif, ni rôle, ni groupe) n'a été associé à ce circuit
-WHEN l'ADMIN tente d'activer ce circuit de validation pour le module des feuilles de temps
-THEN le système refuse avec le message : "Le circuit 'Validation feuilles de temps équipe RH' ne peut pas être activé : aucun valideur n'est défini. Associez au moins un valideur avant l'activation."
-  AND le circuit reste en état "Brouillon" et n'est pas appliqué au module des feuilles de temps
-  AND le formulaire de configuration du circuit est affiché avec la section "Valideurs" mise en évidence visuellement
+GIVEN l'administrateur configure le circuit
+WHEN il déclare 0 étape, plus de 2 étapes, ou une étape sans rôle validateur
+THEN l'enregistrement est refusé avec un message explicite ; aucune config invalide n'est enregistrée
+  AND l'accès à la page de config est réservé à MANAGE_ORGANIZATION (403 sinon)
 ```
 
-## Tasks
+## Notes techniques (pour la décomposition)
+- **Entité** `Domain\Validation\AbsenceValidationCircuit` (`TenantOwned`) : `steps` (JSON, liste ordonnée de rôles, 1..2) ; unique (tenant) ; factory `default(TenantId)` (1 étape) ; `reconfigure(steps)` avec gardes (1..2, rôle non vide) ; RLS + migration. (Pattern `ReminderRule`.)
+- **État d'avancement** : ajouter à `AbsenceRequest` un `currentStep` (int, défaut 1) ; `approve()` avance l'étape ; `VALIDATED` quand `currentStep > nbÉtapes`. Migration additive.
+- **`DecideAbsence`** : résout le circuit du tenant ; à l'approbation, vérifie que l'acteur possède le **rôle de l'étape courante** (via `Authorizer`/rôles), avance l'étape, valide au terme ; refus → `REJECTED` (inchangé). Garde anti-auto-décision conservée.
+- **UI** : page `/parametrage/circuits-validation` (Twig, gating `MANAGE_ORGANIZATION`, CSRF) — choix du nb d'étapes + rôle par étape (liste des rôles du tenant).
+- **Tests** : unit (avancement d'étapes, refus, mauvais rôle, repli 1 étape) ; fonctionnels (config CRUD, parcours 2 étapes, 403) ; **ajouter `AbsenceValidationCircuit::class` + le champ `currentStep`** aux SchemaTool des tests d'absence.
+- **Découpe si dérapage** : livrer d'abord le moteur (config + 2 étapes + décision) sans UI riche ; l'UI ensuite.
 
-| ID | Type | Description | Statut | Estimation |
-|----|------|-------------|--------|------------|
-| - | - | - | 🔴 | - |
-
-## Progression
-
-0/0 tasks complétées (0%)
+## Definition of Ready
+- [x] Description INVEST recadrée (flux pilote absences ; EF-REF-24 statuts & autres flux reportés)
+- [x] Gherkin (2 nominaux + 2 alternatifs + 2 erreurs)
+- [x] Modèle borné arrêté (≤ 2 étapes, validateurs par rôle) ; réutilise `DecideAbsence` + pattern `ReminderRule`
+- [x] Estimation 8 pts ; RLS/gating explicités
 
 ## Definition of Done
-
-- [ ] Tous les critères d'acceptation validés
-- [ ] Code reviewé
-- [ ] Tests unitaires passent
-- [ ] Tests d'intégration passent
-- [ ] Documentation mise à jour
-
----
+- [ ] CA validés (unit + fonctionnels) ; `make ci` vert (PHPStan max, Deptrac, couv. ≥ 80 %)
+- [ ] Migration + RLS (circuit) + migration additive (`currentStep`) ; code review
 
 ## Notes
-
-Le moteur de workflow est implémenté comme un state machine générique piloté par la configuration tenant (tables `workflow_state`, `workflow_transition`, `validation_circuit`). Ce moteur est utilisé par tous les modules métier (DEV, PRO, RH, FAC).
-
-EF-REF-24 impose que la configuration des statuts et transitions soit possible sans redéploiement. Les changements de workflow s'appliquent aux nouveaux objets (et aux objets existants qui passent à une nouvelle transition). Les objets existants conservent leur statut courant jusqu'à ce qu'une action les fasse évoluer.
-
-EF-REF-25 : les circuits de validation supportent des conditions multiples (montant, type de client, entité juridique). La délégation (CA-3) et l'escalade (CA-4) sont des invariants non négociables pour couvrir les situations d'indisponibilité des valideurs.
-
-Cette US est un prérequis pour toutes les stories qui implémentent des flux de validation (feuilles de temps, congés, devis, commandes).
+Recadrage assumé : « statuts & circuits paramétrables » est vaste. Cette US livre un **moteur de circuit
+multi-étapes** sur le flux **absences** (manque le plus criant : la validation ne vérifie aujourd'hui que
+la permission, pas d'étapes). Les **transitions de statut paramétrables** (EF-REF-24) et l'extension aux
+autres flux feront l'objet d'US dédiées.

@@ -48,9 +48,9 @@ Sans ce module stable, aucune saisie de temps, aucun projet ni aucune valorisati
 | US-016 | Devises & devise de référence tenant | ✅ Done | 14 | EF-REF-22 |
 | US-012 | Jours fériés & calcul unifié des jours ouvrés | ✅ Done | 16 | EF-REF-6 |
 | US-013 | Référentiel de compétences & niveaux | ✅ Done | 16 | EF-REF-10/11 |
-| US-017 | Statuts & circuits de validation paramétrables | 🔵 Backlog | 17 | EF-REF-24/25 |
-| US-021 | Calendriers de travail différenciés | 🔵 Backlog | 17 | EF-REF-7 |
-| US-022 | Périodes de fermeture entreprise | 🔵 Backlog | 17 | EF-REF-9 |
+| US-017 | Circuit de validation des absences paramétrable | 🟢 Ready | 17 | EF-REF-24/25 |
+| US-021 | Calendriers de travail différenciés (temps partiel) | 🟢 Ready | 17 | EF-REF-7 |
+| US-022 | Périodes de fermeture entreprise | 🟢 Ready | 17 | EF-REF-9 |
 | US-019 | Onboarding tenant (défauts + checklist) | ✅ Done | 16 | EF-REF-29 |
 | US-020 | Journal d'audit du paramétrage | ✅ Done | 16 | EF-REF-33 |
 
@@ -70,7 +70,7 @@ Sans ce module stable, aucune saisie de temps, aucun projet ni aucune valorisati
 | EF-REF-22 (devises + devise de référence) | M | ✅ | US-016 (S14) — `ReferenceCurrency` + `ExchangeRate` + `CurrencyConverter` |
 | EF-REF-6 (calendrier tenant + fériés) | M | ✅ | Jours fériés + calcul unifié (US-012, S16). EF-REF-7 différenciés reporté. |
 | EF-REF-10/11 (compétences + niveaux) | M | ✅ | Référentiel + échelle (US-013, S16). |
-| EF-REF-24/25 (statuts & circuits paramétrables) | M | ❌ | manquant (statuts en enum) → US-017 |
+| EF-REF-25 (circuits de validation) | M | 🟡 | Circuit multi-étapes paramétrable (flux absences) → US-017 (S17). EF-REF-24 transitions de statut paramétrables : reporté (statuts en enum). |
 | EF-REF-29 (onboarding < 15 min) | M | ✅ | tenant:init + checklist (US-019, S16). SLA analytics reporté. |
 | EF-REF-33 (audit paramétrage) | S | ✅ | Journal append-only + vue gated (US-020, S16). |
 
