@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Web;
 
 use App\Application\Authorization\InitializeDefaultRoles;
+use App\Domain\Audit\ConfigAuditEntry;
 use App\Domain\Authorization\Role;
 use App\Domain\Budget\ChargeDriftThreshold;
 use App\Domain\Budget\ChargeLandingSnapshot;
@@ -60,6 +61,7 @@ final class ChargeDriftThresholdConfigTest extends WebTestCase
 
         $this->schema = [
             $this->em->getClassMetadata(Tenant::class),
+            $this->em->getClassMetadata(ConfigAuditEntry::class),
             $this->em->getClassMetadata(User::class),
             $this->em->getClassMetadata(Role::class),
             $this->em->getClassMetadata(Project::class),

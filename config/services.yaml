@@ -105,6 +105,9 @@ services:
     # Jours fériés & calcul unifié des jours ouvrés (US-012, EF-REF-6, DIP).
     App\Domain\Calendar\HolidayRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineHolidayRepository'
 
+    # Journal d'audit du paramétrage (US-020, EF-REF-33, append-only, DIP).
+    App\Domain\Audit\ConfigAuditRecorder: '@App\Infrastructure\Persistence\Doctrine\DoctrineConfigAuditRecorder'
+
     # Référentiel de compétences (US-013, EF-REF-10/11, DIP).
     App\Domain\Skill\SkillRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineSkillRepository'
     App\Domain\Skill\SkillLevelScaleRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineSkillLevelScaleRepository'

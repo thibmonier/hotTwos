@@ -58,6 +58,7 @@ final class DefaultRoleMatrix
                 Permission::VIEW_COLLABORATOR_COST,
                 Permission::VIEW_PROJECT_FINANCIALS,
                 Permission::VIEW_TEAM_COMPLETENESS,
+                Permission::VIEW_AUDIT_LOG,
             ], DataScope::TENANT),
 
             new RoleDefinition('Administrateur', [
@@ -77,6 +78,7 @@ final class DefaultRoleMatrix
                 Permission::VALIDATE_ABSENCE,
                 Permission::VIEW_TEAM_COMPLETENESS,
                 Permission::MANAGE_REMINDERS,
+                Permission::VIEW_AUDIT_LOG,
             ], DataScope::TENANT),
         ];
     }

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\UI\Http\Controller;
 
 use App\Application\Authorization\Authorizer;
+use App\Domain\Audit\AuditAction;
+use App\Domain\Audit\ConfigAuditRecorder;
 use App\Domain\Authorization\Permission;
 use App\Domain\Calendar\Holiday;
 use App\Domain\Calendar\HolidayRepository;
@@ -26,6 +28,7 @@ final class HolidayController extends AbstractController
     public function __construct(
         private readonly Authorizer $authorizer,
         private readonly HolidayRepository $holidays,
+        private readonly ConfigAuditRecorder $audit,
     ) {
     }
 
@@ -64,6 +67,7 @@ final class HolidayController extends AbstractController
         }
 
         $this->holidays->save(new Holiday($user->tenantId(), $date, $label));
+        $this->audit->record($user->tenantId(), $user->id(), AuditAction::CREATION, 'Jour férié', sprintf('%s (%s)', $label, $date->format('Y-m-d')));
         $this->addFlash('success', sprintf('Jour férié « %s » ajouté.', $label));
 
         return $this->redirectToRoute('holiday_index');
@@ -81,7 +85,9 @@ final class HolidayController extends AbstractController
 
         $holiday = $this->holidays->find($user->tenantId(), $id);
         if ($holiday instanceof Holiday) {
+            $label = sprintf('%s (%s)', $holiday->label(), $holiday->date()->format('Y-m-d'));
             $this->holidays->delete($holiday);
+            $this->audit->record($user->tenantId(), $user->id(), AuditAction::SUPPRESSION, 'Jour férié', $label);
             $this->addFlash('success', 'Jour férié supprimé.');
         }
 

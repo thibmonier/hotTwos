@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Web;
 
 use App\Application\Authorization\InitializeDefaultRoles;
+use App\Domain\Audit\AuditAction;
 use App\Domain\Audit\ConfigAuditEntry;
 use App\Domain\Authorization\Role;
+use App\Domain\Budget\ChargeDriftThreshold;
 use App\Domain\Calendar\Holiday;
 use App\Domain\Tenant\Tenant;
 use App\Domain\Tenant\TenantId;
@@ -20,10 +22,10 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
 
 /**
- * US-012 (EF-REF-6, CA-3/CA-5/CA-6) — paramétrage des jours fériés : CRUD admin, refus de doublon,
- * gating MANAGE_ORGANIZATION.
+ * US-020 (EF-REF-33, CA-1/CA-2/CA-3/CA-4/CA-6) — journal d'audit : journalisation des changements de
+ * paramétrage, filtrage, isolation multi-tenant, gating VIEW_AUDIT_LOG.
  */
-final class HolidayConfigTest extends WebTestCase
+final class AuditLogTest extends WebTestCase
 {
     private const string PASSWORD = 'motdepasse-solide';
 
@@ -41,10 +43,11 @@ final class HolidayConfigTest extends WebTestCase
 
         $this->schema = [
             $this->em->getClassMetadata(Tenant::class),
-            $this->em->getClassMetadata(ConfigAuditEntry::class),
             $this->em->getClassMetadata(User::class),
             $this->em->getClassMetadata(Role::class),
+            $this->em->getClassMetadata(ConfigAuditEntry::class),
             $this->em->getClassMetadata(Holiday::class),
+            $this->em->getClassMetadata(ChargeDriftThreshold::class),
         ];
         $tool = new SchemaTool($this->em);
         $tool->dropSchema($this->schema);
@@ -67,45 +70,56 @@ final class HolidayConfigTest extends WebTestCase
         parent::tearDown();
     }
 
-    public function testAdminAddsAndListsHoliday(): void
+    public function testThresholdChangeIsLoggedAndVisible(): void
     {
         $this->login('admin@agence.test');
-        $crawler = $this->client->request('GET', '/parametrage/jours-feries');
-        self::assertResponseIsSuccessful();
+        $crawler = $this->client->request('GET', '/finance/config-derive-charge');
         $token = $crawler->filter('input[name="_token"]')->attr('value') ?? '';
-
-        $this->client->request('POST', '/parametrage/jours-feries', ['_token' => $token, 'date' => '2027-07-14', 'label' => 'Fête nationale']);
+        $this->client->request('POST', '/finance/config-derive-charge', [
+            '_token' => $token,
+            'alert_forfait' => '8', 'escalation_forfait' => '15',
+            'alert_regie' => '15', 'escalation_regie' => '25',
+        ]);
         self::assertResponseRedirects();
 
-        $this->client->request('GET', '/parametrage/jours-feries');
+        $this->client->request('GET', '/parametrage/audit');
+        self::assertResponseIsSuccessful();
         $content = (string) $this->client->getResponse()->getContent();
-        self::assertStringContainsString('Fête nationale', $content);
-        self::assertStringContainsString('14/07/2027', $content);
+        self::assertStringContainsString('Seuil de dérive de charge', $content);
+        self::assertStringContainsString('seuil_alerte', $content);
     }
 
-    public function testDuplicateHolidayRejected(): void
+    public function testFilterByObjectType(): void
     {
-        $this->em->persist(new Holiday($this->tenant, new DateTimeImmutable('2027-12-25'), 'Noël'));
+        // Deux types d'objet journalisés directement.
+        $this->em->persist(new ConfigAuditEntry($this->tenant, '018f9c4e-0000-7000-8000-0000000000a1', AuditAction::CREATION, 'Jour férié', 'Noël (2027-12-25)', null, null, null, new DateTimeImmutable('2027-01-01 09:00:00')));
+        $this->em->persist(new ConfigAuditEntry($this->tenant, '018f9c4e-0000-7000-8000-0000000000a1', AuditAction::CREATION, 'Compétence', 'React.js', null, null, null, new DateTimeImmutable('2027-01-02 09:00:00')));
         $this->em->flush();
 
         $this->login('admin@agence.test');
-        $crawler = $this->client->request('GET', '/parametrage/jours-feries');
-        $token = $crawler->filter('input[name="_token"]')->attr('value') ?? '';
-
-        $this->client->request('POST', '/parametrage/jours-feries', ['_token' => $token, 'date' => '2027-12-25', 'label' => 'Noël (doublon)']);
-        self::assertResponseRedirects();
-
-        // Le doublon n'a pas été créé : le libellé de la 2e tentative est absent, l'original demeure.
-        $this->client->request('GET', '/parametrage/jours-feries');
+        $this->client->request('GET', '/parametrage/audit', ['objectType' => 'Jour férié']);
+        self::assertResponseIsSuccessful();
         $content = (string) $this->client->getResponse()->getContent();
-        self::assertStringNotContainsString('Noël (doublon)', $content);
         self::assertStringContainsString('Noël', $content);
+        self::assertStringNotContainsString('React.js', $content);
     }
 
-    public function testNonAdminForbidden(): void
+    public function testTenantIsolation(): void
     {
-        $this->login('marc@agence.test');
-        $this->client->request('GET', '/parametrage/jours-feries');
+        $other = TenantId::generate();
+        $this->em->persist(new ConfigAuditEntry($other, '018f9c4e-0000-7000-8000-0000000000b2', AuditAction::CREATION, 'Compétence', 'SecretDunAutreTenant', null, null, null, new DateTimeImmutable('2027-01-01 09:00:00')));
+        $this->em->flush();
+
+        $this->login('admin@agence.test');
+        $this->client->request('GET', '/parametrage/audit');
+        self::assertResponseIsSuccessful();
+        self::assertStringNotContainsString('SecretDunAutreTenant', (string) $this->client->getResponse()->getContent());
+    }
+
+    public function testNonAuthorizedForbidden(): void
+    {
+        $this->login('marc@agence.test'); // Chef de projet : pas de VIEW_AUDIT_LOG
+        $this->client->request('GET', '/parametrage/audit');
         self::assertResponseStatusCodeSame(403);
     }
 
