@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Api;
 
 use App\Application\Authorization\InitializeDefaultRoles;
+use App\Domain\Audit\ConfigAuditEntry;
 use App\Domain\Authorization\Role;
 use App\Domain\Client\Client;
 use App\Domain\Pricing\Profile;
@@ -42,6 +43,7 @@ final class PricingApiTest extends WebTestCase
             $this->em->getClassMetadata(Tenant::class),
             $this->em->getClassMetadata(User::class),
             $this->em->getClassMetadata(Role::class),
+            $this->em->getClassMetadata(ConfigAuditEntry::class),
             $this->em->getClassMetadata(Profile::class),
             $this->em->getClassMetadata(ProfileRate::class),
             $this->em->getClassMetadata(Client::class),

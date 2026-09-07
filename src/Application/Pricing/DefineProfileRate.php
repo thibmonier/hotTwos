@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Application\Pricing;
 
 use App\Application\Authorization\Authorizer;
+use App\Domain\Audit\AuditAction;
+use App\Domain\Audit\ConfigAuditRecorder;
 use App\Application\Pricing\Message\ProfileRateDefined;
 use App\Domain\Authorization\Permission;
 use App\Domain\Authorization\SecurityAuditLogger;
@@ -40,6 +42,7 @@ final readonly class DefineProfileRate
         private ClockInterface $clock,
         private SecurityAuditLogger $audit,
         private MessageBusInterface $bus,
+        private ConfigAuditRecorder $configAudit,
     ) {
     }
 
@@ -89,6 +92,17 @@ final readonly class DefineProfileRate
             $tenant->toString(),
             $actor->getUserIdentifier(),
             ['profile' => $profileId, 'rate' => $rate->id(), 'effective_from' => $period->from()->format('Y-m-d')],
+        );
+        // US-023 : journal d'audit du paramétrage (EF-REF-33).
+        $this->configAudit->record(
+            $tenant,
+            $actor->id(),
+            AuditAction::MODIFICATION,
+            'Profil / Taux',
+            sprintf('%s (dès %s)', $profile->name(), $period->from()->format('Y-m-d')),
+            'taux_vente',
+            null,
+            (string) $sellingPriceCents,
         );
 
         // Couplage par événement (US-060, CA-4) : un nouveau tarif re-déclenche la valorisation

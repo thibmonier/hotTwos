@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Application\Organization;
 
 use App\Application\Authorization\Authorizer;
+use App\Domain\Audit\AuditAction;
+use App\Domain\Audit\ConfigAuditRecorder;
 use App\Domain\Authorization\Permission;
 use App\Domain\Authorization\SecurityAuditLogger;
 use App\Domain\Organization\OrganizationException;
@@ -30,6 +32,7 @@ final readonly class ConfigureOrgHierarchy
         private Authorizer $authorizer,
         private OrgUnitRepository $units,
         private SecurityAuditLogger $audit,
+        private ConfigAuditRecorder $configAudit,
     ) {
     }
 
@@ -48,6 +51,8 @@ final readonly class ConfigureOrgHierarchy
         $unit = new OrgUnit($tenant, $parentId, $name);
         $this->units->save($unit);
         $this->audit->record('org_unit_created', $tenant->toString(), $actor->getUserIdentifier(), ['unit' => $unit->id()]);
+        // US-023 : journal d'audit du paramétrage (EF-REF-33).
+        $this->configAudit->record($tenant, $actor->id(), AuditAction::CREATION, 'Organisation', $unit->name());
 
         return $unit->id();
     }

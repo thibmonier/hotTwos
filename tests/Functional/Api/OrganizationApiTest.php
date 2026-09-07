@@ -7,6 +7,7 @@ namespace App\Tests\Functional\Api;
 use App\Application\Authorization\InitializeDefaultRoles;
 use App\Domain\Organization\OrgMembership;
 use App\Domain\Organization\OrgUnit;
+use App\Domain\Audit\ConfigAuditEntry;
 use App\Domain\Authorization\Role;
 use App\Domain\Tenant\Tenant;
 use App\Domain\Tenant\TenantId;
@@ -41,6 +42,7 @@ final class OrganizationApiTest extends WebTestCase
             $this->em->getClassMetadata(Tenant::class),
             $this->em->getClassMetadata(User::class),
             $this->em->getClassMetadata(Role::class),
+            $this->em->getClassMetadata(ConfigAuditEntry::class),
             $this->em->getClassMetadata(OrgUnit::class),
             $this->em->getClassMetadata(OrgMembership::class),
         ];

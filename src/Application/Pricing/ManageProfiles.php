@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Application\Pricing;
 
 use App\Application\Authorization\Authorizer;
+use App\Domain\Audit\AuditAction;
+use App\Domain\Audit\ConfigAuditRecorder;
 use App\Domain\Authorization\Permission;
 use App\Domain\Authorization\SecurityAuditLogger;
 use App\Domain\Pricing\CalculationMode;
@@ -25,6 +27,7 @@ final readonly class ManageProfiles
         private Authorizer $authorizer,
         private ProfileRepository $profiles,
         private SecurityAuditLogger $audit,
+        private ConfigAuditRecorder $configAudit,
     ) {
     }
 
@@ -35,6 +38,8 @@ final readonly class ManageProfiles
         $profile = new Profile($tenant, $name, $mode);
         $this->profiles->save($profile);
         $this->audit->record('profile_created', $tenant->toString(), $actor->getUserIdentifier(), ['profile' => $profile->id()]);
+        // US-023 : journal d'audit du paramétrage (EF-REF-33).
+        $this->configAudit->record($tenant, $actor->id(), AuditAction::CREATION, 'Profil', $profile->name());
 
         return $profile->id();
     }
