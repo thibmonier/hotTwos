@@ -51,4 +51,24 @@ final readonly class DoctrineSkillAssignmentRepository implements SkillAssignmen
 
         return $map;
     }
+
+    public function levelsBySkillAtLeast(TenantId $tenant, string $skillId, int $minLevel): array
+    {
+        /** @var list<array{userId: string, level: int}> $rows */
+        $rows = $this->entityManager->createQuery(
+            'SELECT a.userId AS userId, a.level AS level FROM '.SkillAssignment::class.' a'
+            .' WHERE a.tenantId = :tenant AND a.skillId = :skill AND a.level >= :min',
+        )
+            ->setParameter('tenant', $tenant->toString())
+            ->setParameter('skill', $skillId)
+            ->setParameter('min', $minLevel)
+            ->getResult();
+
+        $map = [];
+        foreach ($rows as $row) {
+            $map[$row['userId']] = (int) $row['level'];
+        }
+
+        return $map;
+    }
 }
