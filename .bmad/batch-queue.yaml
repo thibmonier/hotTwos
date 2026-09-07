@@ -1,58 +1,43 @@
-# File d'exécution — Sprint 11 (généré par /project:decompose-tasks 011)
-sprint: sprint-011-facturation
-generated_at: 2026-09-05
-goal: "Le facturé réel devient la base de la rentabilité (facturation manuelle minimale, ADR-0022)"
+# File d'exécution — Sprint 15 (généré par /project:run-sprint 015 --auto)
+sprint: sprint-015-finition-pilotage
+generated_at: 2026-09-07
+goal: "Boucler le pilotage projet (EPIC-002) : atterrissage historisé + courbe, seuil de dérive par type de projet + 2e seuil direction"
 
 execution:
-  mode: sequential          # 1 dev, TDD, une PR par story ; merge après CI verte
+  mode: sequential          # 1 dev, TDD, une PR par story ; merge squash après CI verte
   parallel_limit: 1
   resume_on_failure: true
   checkpoint_interval: 1
 
 gates:
   - id: main-green
-    desc: "main vert au démarrage S11"
+    desc: "main vert au démarrage S15 (628 tests)"
     status: satisfied
-  - id: adr-0022
-    desc: "ADR-0022 (facturation minimale, facturé réel > proxy) acté"
+  - id: decision-079c
+    desc: "US-079c : capture via handler séparé (ComputeProjectMargins inchangé)"
+    status: satisfied
+  - id: decision-079b
+    desc: "US-079b : seuil charge par (tenant×ContractType), repli constantes OBJ-2"
     status: satisfied
 
 stories:
-  - id: US-014
-    title: "Client structuré (tranche minimale — entité + rattachement projet)"
+  - id: US-079c
+    title: "Courbe d'atterrissage historisée (capture légère)"
     points: 5
     priority: 1
     depends_on: []
     status: done
-    note: "Prérequis facturation. Entrée du sprint."
-  - id: US-075
-    title: "Émission manuelle de factures par projet/période"
-    points: 8
+    note: "Must. Handler séparé sur PeriodClosed ; snapshot idempotent (tenant, projet, période)."
+  - id: US-079b
+    title: "Seuil de dérive charge par type de projet + 2e seuil direction"
+    points: 5
     priority: 2
-    depends_on: [US-014]
+    depends_on: []
     status: done
-  - id: US-076
-    title: "Facturé réel comme source de marge (port RevenueSource, repli CA reconnu)"
-    points: 5
-    priority: 3
-    depends_on: [US-075]
-    status: done
-  - id: US-077
-    title: "Export FEC sur facturé réel (Should)"
-    points: 5
-    priority: 4
-    depends_on: [US-076]
-    status: pending
+    note: "Should. Nouvelle entité ChargeDriftThreshold (tenant×ContractType) ; repli OBJ-2."
 
-reserve:
-  - id: T-R01
-    title: "Correctif onglet Suivi budgétaire (1er clic)"
-    status: deferred
-
-total_points: 18          # US-014 + US-075 + US-076 (US-077 en Should)
+total_points: 10
 
 plan:
-  phase_1: [US-014]
-  phase_2: [US-075]
-  phase_3: [US-076]
-  phase_4: [US-077]        # Should si capacité
+  phase_1: [US-079c]
+  phase_2: [US-079b]

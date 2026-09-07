@@ -2,7 +2,7 @@
 
 ## Métadonnées
 - **ID**: EPIC-002
-- **Statut**: 🟢 Quasi terminé (toutes capacités Must+Should livrées ; reste raffinements US-079)
+- **Statut**: ✅ Terminé (100 % — toutes capacités Must+Should livrées, US-079 bouclée en S15)
 - **Priorité**: Must Have (MoSCoW)
 - **Module**: PRJ
 - **Lot**: 1
@@ -49,7 +49,7 @@ Pain point n°1 (`research-summary.md`) : la dérive est aujourd'hui détectée 
 | US-033 | Budget — initial, avenants & budget courant (EF-PRJ-8) | ✅ Done | 8 | 13 |
 | US-078 | Budget charge par profil (EF-PRJ-9) | ✅ Done | 8 | 13 |
 | US-032 | Projets internes non facturables (EF-PRJ-5) | ✅ Done | 5 | 13 |
-| US-079 | Raffinements pilotage — export/courbe/seuil par type (EF-PRJ-14/15/16) | 🟢 Ready | 8 | — |
+| US-079 | Raffinements pilotage — export/courbe/seuil par type (EF-PRJ-14/15/16) | ✅ Done | 8 | 14–15 |
 
 ## Couverture des exigences (analyse d'écart — 2026-09-06)
 
@@ -62,15 +62,15 @@ Mapping des 17 EF déclarées (EF-PRJ-1..5, 8..16, 19, 20, 22) à l'implémentat
 | EF-PRJ-12/13 | M | ✅ | Avancement physique & RAF par lot (US-035). |
 | EF-PRJ-19/20/22 | M | ✅ | Affectation, restriction d'imputation, clôture (US-037/038). |
 | EF-PRJ-14 | M | ✅ | Atterrissage (US-036) + **export CSV** (US-079a, S14). Reste nuance CDC « atterrissage = consommé + RAF » (mineure). |
-| EF-PRJ-15 | M | 🟡 | Alerte de dérive précoce livrée (US-036, OBJ-2) ; **manque** : seuil paramétrable **par type de projet** + 2e seuil direction. |
+| EF-PRJ-15 | M | ✅ | Alerte de dérive précoce (US-036, OBJ-2) + seuil paramétrable **par type de projet** & 2e seuil d'escalade direction (US-079b, S15). |
 | EF-PRJ-9 | M | ✅ | Budget charge **par profil** lié aux taux historisés (US-078, S13). |
 | EF-PRJ-8 | M | ✅ | **Avenants** : budget initial / courant + historique daté (US-033, S13). Débloque INV-8. |
 | EF-PRJ-5 | S | ✅ | **Projets internes non facturables** (exclusion marge, occupation facturable, US-032, S13). |
-| **EF-PRJ-16** | **S** | ❌ | **Courbe d'atterrissage** : historisation + évolution — reste (US-079). |
+| **EF-PRJ-16** | **S** | ✅ | **Courbe d'atterrissage** : historisation (handler séparé) + évolution sur la fiche projet (US-079c, S15). |
 
-**MMF atteinte + toutes les capacités Must complètes** (S6/S12/S13). Reste uniquement les raffinements
-*Should* regroupés dans **US-079** : export des 5 valeurs (EF-PRJ-14), courbe d'atterrissage (EF-PRJ-16),
-seuil de dérive par type de projet + 2e seuil direction (EF-PRJ-15) — ~8 pts, à découper.
+**MMF atteinte + toutes les capacités Must & Should complètes** (S6/S12/S13/S14/S15). Les raffinements
+*Should* d'**US-079** sont livrés : export des 5 valeurs (EF-PRJ-14, S14), courbe d'atterrissage
+(EF-PRJ-16, S15) et seuil de dérive par type + 2e seuil direction (EF-PRJ-15, S15). **EPIC-002 clos.**
 
 > La dérive **côté marge/montant** est déjà couverte par EPIC-005 (US-072 budget/dérive, US-018 seuil tenant).
 
@@ -97,9 +97,8 @@ seuil de dérive par type de projet + 2e seuil direction (EF-PRJ-15) — ~8 pts,
 
 ## Progression
 
-10/10 US Must+Should livrées (100 % du périmètre EF déclaré) — S6 (5), S12 (US-035/036), S13 (US-033/078/032).
-**MMF + toutes capacités Must complètes.** Reste hors périmètre EF déclaré : US-079 (raffinements Should
-export/courbe/seuil, EF-PRJ-14/15/16 — ~8 pts).
+11/11 US livrées (100 % du périmètre EF déclaré) — S6 (5), S12 (US-035/036), S13 (US-033/078/032), S14–15 (US-079).
+**MMF + toutes capacités Must & Should complètes → EPIC-002 clos** (US-079 export/courbe/seuil, EF-PRJ-14/15/16, livrée S14–15).
 
 ---
 
