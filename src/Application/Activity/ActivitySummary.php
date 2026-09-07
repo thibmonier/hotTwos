@@ -8,6 +8,7 @@ use App\Application\Timesheet\EnsureAbsenceProject;
 use App\Domain\Activity\ActivityReport;
 use App\Domain\Activity\ActivityType;
 use App\Domain\Activity\ProjectActivity;
+use App\Domain\Calendar\WorkingDaysCalculator;
 use App\Domain\Tenant\TenantId;
 use App\Domain\Timesheet\TimeEntry;
 use App\Domain\Timesheet\TimeEntryRepository;
@@ -28,6 +29,7 @@ final readonly class ActivitySummary
     public function __construct(
         private TimeEntryRepository $entries,
         private ProjectRepository $projects,
+        private WorkingDaysCalculator $workingDays,
     ) {
     }
 
@@ -66,7 +68,7 @@ final readonly class ActivitySummary
             $this->typeBreakdown($production, $absence),
             $production,
             $absence,
-            $this->expectedMinutes($start, $end),
+            $this->expectedMinutes($tenant, $start, $end),
         );
     }
 
@@ -108,16 +110,9 @@ final readonly class ActivitySummary
         return $breakdown;
     }
 
-    /** Temps ouvré attendu = jours ouvrés (Lun-Ven) de la période × durée journalière de référence. */
-    private function expectedMinutes(DateTimeImmutable $start, DateTimeImmutable $end): int
+    /** Temps ouvré attendu = jours ouvrés (hors week-ends et fériés) de la période × durée journalière. */
+    private function expectedMinutes(TenantId $tenant, DateTimeImmutable $start, DateTimeImmutable $end): int
     {
-        $weekdays = 0;
-        for ($day = $start; $day <= $end; $day = $day->modify('+1 day')) {
-            if ((int) $day->format('N') <= 5) {
-                ++$weekdays;
-            }
-        }
-
-        return $weekdays * self::DAILY_MINUTES;
+        return $this->workingDays->workingDaysBetween($tenant, $start, $end->modify('+1 day')) * self::DAILY_MINUTES;
     }
 }

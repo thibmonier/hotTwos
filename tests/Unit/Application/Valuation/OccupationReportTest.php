@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Valuation;
 
+use App\Domain\Calendar\Holiday;
+use App\Domain\Calendar\WorkingDaysCalculator;
+use App\Tests\Support\Calendar\InMemoryHolidayRepository;
 use App\Application\Valuation\OccupationReport;
 use App\Domain\Absence\AbsenceRequest;
 use App\Domain\Tenant\TenantId;
@@ -27,12 +30,14 @@ final class OccupationReportTest extends TestCase
     private TenantId $tenant;
     private InMemoryTimeEntryValuationRepository $valuations;
     private InMemoryAbsenceRequestRepository $absences;
+    private InMemoryHolidayRepository $holidays;
 
     protected function setUp(): void
     {
         $this->tenant = TenantId::generate();
         $this->valuations = new InMemoryTimeEntryValuationRepository();
         $this->absences = new InMemoryAbsenceRequestRepository();
+        $this->holidays = new InMemoryHolidayRepository();
     }
 
     public function testOccupationPerCollaboratorOnReferenceMonth(): void
@@ -111,11 +116,25 @@ final class OccupationReportTest extends TestCase
         self::assertLessThan($line->percent(), $line->billablePercent()); // facturable < total (capacité consommée inchangée)
     }
 
+    public function testHolidayReducesCapacity(): void
+    {
+        // US-012 : un jour férié tenant réduit la capacité (jours ouvrés nets de fériés).
+        $this->valuations->latestValuedWorkDate = $this->date('2026-08-31');
+        $this->valuations->valuedDayCountByUser = [self::ALICE => 10];
+        $this->holidays->save(new Holiday($this->tenant, $this->date('2026-08-17'), 'Férié test'));
+
+        $line = $this->report()->forTenant($this->tenant)->lines[0];
+
+        // Capacité = jours ouvrés du mois − 1 férié (17/08 est un lundi), sans absence.
+        self::assertSame($this->weekdaysInMonth('2026-08') - 1, $line->capacityDays);
+    }
+
     private function report(): OccupationReport
     {
         return new OccupationReport(
             $this->valuations,
             $this->absences,
+            new WorkingDaysCalculator($this->holidays),
             new MockClock(new DateTimeImmutable('2026-09-15 10:00:00', new DateTimeZone('UTC'))),
         );
     }

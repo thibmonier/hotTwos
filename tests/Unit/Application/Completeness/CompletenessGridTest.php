@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Completeness;
 
+use App\Domain\Calendar\WorkingDaysCalculator;
+use App\Tests\Support\Calendar\InMemoryHolidayRepository;
 use App\Application\Completeness\CompletenessGrid;
 use App\Domain\Absence\AbsenceRequest;
 use App\Domain\Completeness\CompletenessState;
@@ -72,7 +74,7 @@ final class CompletenessGridTest extends TestCase
 
     private function grid(): CompletenessGrid
     {
-        return new CompletenessGrid($this->entries, $this->absences);
+        return new CompletenessGrid($this->entries, $this->absences, new WorkingDaysCalculator(new InMemoryHolidayRepository()));
     }
 
     private function fill(DateTimeImmutable $day): void

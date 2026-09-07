@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Api;
 
 use App\Application\Authorization\InitializeDefaultRoles;
+use App\Domain\Calendar\Holiday;
 use App\Domain\Authorization\Role;
 use App\Domain\Project\Project;
 use App\Domain\Tenant\Tenant;
@@ -46,6 +47,7 @@ final class ValuationDashboardTest extends WebTestCase
 
         $this->schema = [
             $this->em->getClassMetadata(Tenant::class),
+            $this->em->getClassMetadata(Holiday::class),
             $this->em->getClassMetadata(User::class),
             $this->em->getClassMetadata(Role::class),
             // Ventilation par projet (T-060-04) et occupation (T-060-03) joignent time_entry ↔ project.

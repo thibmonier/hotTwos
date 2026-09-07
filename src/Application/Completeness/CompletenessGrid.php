@@ -6,6 +6,7 @@ namespace App\Application\Completeness;
 
 use App\Domain\Absence\AbsenceRequest;
 use App\Domain\Absence\AbsenceRequestRepository;
+use App\Domain\Calendar\WorkingDaysCalculator;
 use App\Domain\Completeness\CompletenessState;
 use App\Domain\Completeness\WeekCompleteness;
 use App\Domain\Tenant\TenantId;
@@ -16,18 +17,19 @@ use DateTimeImmutable;
  * Calcul de la grille de complétude de saisie (US-058, EF-TMP-24, OBJ-1).
  *
  * Pour chaque (collaborateur, semaine glissante), l'état dérive du taux de jours ouvrés saisis vs
- * attendus (Lun-Ven **moins** les jours d'absence validée), avec un délai J+2 : semaine soumise
- * (100 %), partielle, vide en retard (J+2 dépassé), ou en cours (délai non atteint).
+ * attendus (jours ouvrés **nets des jours fériés** — {@see WorkingDaysCalculator} — **moins** les jours
+ * d'absence validée), avec un délai J+2 : semaine soumise (100 %), partielle, vide en retard (J+2
+ * dépassé), ou en cours (délai non atteint).
  */
 final readonly class CompletenessGrid
 {
-    private const int WORKING_DAYS = 5;
-    /** Délai indicatif « J+2 ouvré » après la fin de semaine (raffinement jours fériés ultérieur). */
+    /** Délai indicatif « J+2 ouvré » après la fin de semaine. */
     public const int DEADLINE_OFFSET_DAYS = 8;
 
     public function __construct(
         private TimeEntryRepository $entries,
         private AbsenceRequestRepository $absences,
+        private WorkingDaysCalculator $workingDays,
     ) {
     }
 
@@ -55,13 +57,14 @@ final readonly class CompletenessGrid
         $friday = $monday->modify('+4 days');
         $absences = $this->absences->findValidatedOverlapping($tenant, $userId, $monday, $friday);
 
+        $workingDays = $this->workingDays->workingDaysBetween($tenant, $monday, $friday->modify('+1 day'));
         $absentDays = 0;
         for ($day = $monday; $day <= $friday; $day = $day->modify('+1 day')) {
-            if ($this->isAbsent($absences, $day)) {
+            if ($this->workingDays->isWorkingDay($tenant, $day) && $this->isAbsent($absences, $day)) {
                 ++$absentDays;
             }
         }
-        $expected = max(0, self::WORKING_DAYS - $absentDays);
+        $expected = max(0, $workingDays - $absentDays);
 
         $filledDates = [];
         foreach ($this->entries->findForUserInRange($tenant, $userId, $monday, $friday) as $entry) {
