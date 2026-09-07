@@ -5,17 +5,16 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Web;
 
 use App\Application\Authorization\InitializeDefaultRoles;
-use App\Domain\Authorization\Role;
 use App\Domain\Calendar\WorkSchedule;
 use App\Domain\Tenant\Tenant;
 use App\Domain\Tenant\TenantId;
 use App\Domain\User\User;
 use App\Infrastructure\Persistence\Doctrine\DoctrineRoleRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
+use App\Tests\Support\Schema\ProvisionsFullSchema;
 
 /**
  * US-021 (EF-REF-7, CA-3/CA-5/CA-6) — paramétrage des régimes de travail : CRUD admin, refus régime
@@ -23,6 +22,8 @@ use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
  */
 final class WorkScheduleConfigTest extends WebTestCase
 {
+    use ProvisionsFullSchema;
+
     private const string PASSWORD = 'motdepasse-solide';
 
     private KernelBrowser $client;
@@ -30,23 +31,12 @@ final class WorkScheduleConfigTest extends WebTestCase
     private TenantId $tenant;
     private string $collaboratorId;
 
-    /** @var list<\Doctrine\ORM\Mapping\ClassMetadata<object>> */
-    private array $schema;
-
     protected function setUp(): void
     {
         $this->client = self::createClient();
         $this->em = self::getContainer()->get(EntityManagerInterface::class);
 
-        $this->schema = [
-            $this->em->getClassMetadata(Tenant::class),
-            $this->em->getClassMetadata(User::class),
-            $this->em->getClassMetadata(Role::class),
-            $this->em->getClassMetadata(WorkSchedule::class),
-        ];
-        $tool = new SchemaTool($this->em);
-        $tool->dropSchema($this->schema);
-        $tool->createSchema($this->schema);
+        $this->provisionSchema($this->em);
 
         $this->tenant = TenantId::generate();
         new InitializeDefaultRoles(new DoctrineRoleRepository($this->em))->forTenant($this->tenant);
@@ -62,7 +52,7 @@ final class WorkScheduleConfigTest extends WebTestCase
 
     protected function tearDown(): void
     {
-        new SchemaTool($this->em)->dropSchema($this->schema);
+        $this->dropSchema($this->em);
         $this->em->close();
         parent::tearDown();
     }
