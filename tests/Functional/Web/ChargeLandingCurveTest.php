@@ -98,9 +98,9 @@ final class ChargeLandingCurveTest extends WebTestCase
         $this->projectId = $project->id();
 
         $capturedAt = new DateTimeImmutable('2026-08-31 23:00:00', new DateTimeZone('UTC'));
-        // Juillet : trajectoire saine ; Août : dérive de charge précoce (atterrissage 150 000 €).
-        $this->em->persist(ChargeLandingSnapshot::capture($this->tenant, '2026-07', $this->projectId, 'Pilotage', new ChargeLanding(true, 120_000_00, 100_000_00, 20.0, 40.0, 40, false), $capturedAt));
-        $this->em->persist(ChargeLandingSnapshot::capture($this->tenant, '2026-08', $this->projectId, 'Pilotage', new ChargeLanding(true, 150_000_00, 100_000_00, 50.0, 15.0, 10, true), $capturedAt));
+        // Juillet : dérive précoce sans escalade ; Août : franchissement du 2e seuil (escalade).
+        $this->em->persist(ChargeLandingSnapshot::capture($this->tenant, '2026-07', $this->projectId, 'Pilotage', new ChargeLanding(true, 115_000_00, 100_000_00, 15.0, 30.0, 30, true, false), $capturedAt));
+        $this->em->persist(ChargeLandingSnapshot::capture($this->tenant, '2026-08', $this->projectId, 'Pilotage', new ChargeLanding(true, 150_000_00, 100_000_00, 50.0, 15.0, 10, true, true), $capturedAt));
 
         $this->em->flush();
     }
@@ -124,6 +124,7 @@ final class ChargeLandingCurveTest extends WebTestCase
         self::assertStringContainsString('2026-08', $content);
         self::assertStringContainsString('150 000', $content); // atterrissage € visible (coût)
         self::assertStringContainsString('Dérive précoce', $content);
+        self::assertStringContainsString('Escalade direction', $content); // 2e seuil franchi (US-079b) mis en évidence
     }
 
     public function testProjectManagerSeesCurveWithoutLandingAmounts(): void

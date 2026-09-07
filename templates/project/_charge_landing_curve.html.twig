@@ -13,6 +13,14 @@
                     fill="none" stroke="currentColor" stroke-width="1.5" class="text-primary"
                     points="{% for p in curve.points %}{{ (loop.index0 / (count - 1) * 300)|round(2) }},{{ (55 - (min(max(p.overrunPercent ?? 0, -20), 100) + 20) / 120 * 50)|round(2) }} {% endfor %}"
                 />
+                {# Points escaladés (2e seuil) mis en évidence — position réelle dans la série #}
+                {% for p in curve.points %}
+                    {% if p.isEscalated %}
+                        <circle r="3.5" class="text-danger" fill="currentColor"
+                                cx="{{ (loop.index0 / (count - 1) * 300)|round(2) }}"
+                                cy="{{ (55 - (min(max(p.overrunPercent ?? 0, -20), 100) + 20) / 120 * 50)|round(2) }}" />
+                    {% endif %}
+                {% endfor %}
             </svg>
         {% endif %}
 
@@ -40,7 +48,13 @@
                                 <td class="py-2 pr-4 text-right">{{ p.landingCostCents is not null ? (p.landingCostCents / 100)|number_format(0, ',', ' ') ~ '&nbsp;€'|raw : '—' }}</td>
                             {% endif %}
                             <td class="py-2 text-left">
-                                {% if p.isEarlyDrift %}<span class="rounded bg-danger/10 px-2 py-0.5 text-xs font-semibold text-danger">Dérive précoce</span>{% else %}<span class="text-muted">—</span>{% endif %}
+                                {% if p.isEscalated %}
+                                    <span class="rounded bg-danger px-2 py-0.5 text-xs font-semibold text-white">Escalade direction</span>
+                                {% elseif p.isEarlyDrift %}
+                                    <span class="rounded bg-danger/10 px-2 py-0.5 text-xs font-semibold text-danger">Dérive précoce</span>
+                                {% else %}
+                                    <span class="text-muted">—</span>
+                                {% endif %}
                             </td>
                         </tr>
                     {% endfor %}

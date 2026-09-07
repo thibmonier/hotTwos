@@ -49,6 +49,8 @@ class ChargeLandingSnapshot implements TenantOwned
         private ?int $physicalProgressPercent,
         #[ORM\Column(name: 'is_early_drift', type: 'boolean')]
         private bool $isEarlyDrift,
+        #[ORM\Column(name: 'is_escalated', type: 'boolean')]
+        private bool $isEscalated,
         #[ORM\Column(name: 'captured_at', type: 'datetime_immutable')]
         private DateTimeImmutable $capturedAt,
     ) {
@@ -75,6 +77,7 @@ class ChargeLandingSnapshot implements TenantOwned
             $landing->consumptionPercent,
             $landing->physicalProgressPercent,
             $landing->isEarlyDrift,
+            $landing->isEscalated,
             $capturedAt,
         );
     }
@@ -127,6 +130,11 @@ class ChargeLandingSnapshot implements TenantOwned
     public function isEarlyDrift(): bool
     {
         return $this->isEarlyDrift;
+    }
+
+    public function isEscalated(): bool
+    {
+        return $this->isEscalated;
     }
 
     public function capturedAt(): DateTimeImmutable
