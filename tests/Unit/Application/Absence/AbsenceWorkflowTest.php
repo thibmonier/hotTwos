@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Absence;
 
+use App\Tests\Support\Validation\InMemoryAbsenceValidationCircuitRepository;
+use App\Domain\Validation\AbsenceValidationCircuit;
 use App\Application\Absence\DeclareAbsence;
 use App\Application\Absence\DecideAbsence;
 use App\Application\Absence\Message\AbsenceDeclared;
@@ -41,8 +43,10 @@ final class AbsenceWorkflowTest extends TestCase
     private RecordingMessageBus $bus;
     private MockClock $clock;
     private Authorizer $authorizer;
+    private InMemoryAbsenceValidationCircuitRepository $circuits;
     private User $camille;
     private User $marc;
+    private User $admin;
     private string $typeId;
 
     protected function setUp(): void
@@ -50,7 +54,9 @@ final class AbsenceWorkflowTest extends TestCase
         $this->tenant = TenantId::generate();
         $roles = new InMemoryRoleRepository();
         $roles->add(new Role($this->tenant, 'Chef de projet', [Permission::VALIDATE_ABSENCE], DataScope::OWN_PROJECTS));
+        $roles->add(new Role($this->tenant, 'Administrateur', [Permission::VALIDATE_ABSENCE], DataScope::TENANT));
         $roles->add(new Role($this->tenant, 'Collaborateur', [Permission::VIEW_PROJECT], DataScope::OWN));
+        $this->circuits = new InMemoryAbsenceValidationCircuitRepository();
 
         $this->types = new InMemoryAbsenceTypeRepository();
         $this->requests = new InMemoryAbsenceRequestRepository();
@@ -65,6 +71,32 @@ final class AbsenceWorkflowTest extends TestCase
 
         $this->camille = new User($this->tenant, 'camille@agence.test', 'hash', ['Collaborateur']);
         $this->marc = new User($this->tenant, 'marc@agence.test', 'hash', ['Chef de projet']);
+        $this->admin = new User($this->tenant, 'admin@agence.test', 'hash', ['Administrateur']);
+    }
+
+    public function testTwoStepCircuitValidatesOnlyAfterBothSteps(): void
+    {
+        $this->circuits->save(new AbsenceValidationCircuit($this->tenant, ['Chef de projet', 'Administrateur']));
+        $id = $this->declareUseCase()->declare($this->tenant, $this->camille, $this->typeId, $this->date('2026-09-01'), $this->date('2026-09-05'));
+
+        // Étape 1 (Chef de projet) : reste en attente.
+        $this->decideUseCase()->approve($this->tenant, $this->marc, $id);
+        self::assertSame(AbsenceStatus::PENDING, $this->requests->findById($this->tenant, $id)?->status());
+
+        // Étape 2 (Administrateur) : validée.
+        $this->decideUseCase()->approve($this->tenant, $this->admin, $id);
+        self::assertSame(AbsenceStatus::VALIDATED, $this->requests->findById($this->tenant, $id)?->status());
+    }
+
+    public function testWrongRoleForCurrentStepIsRejected(): void
+    {
+        $this->circuits->save(new AbsenceValidationCircuit($this->tenant, ['Chef de projet', 'Administrateur']));
+        $id = $this->declareUseCase()->declare($this->tenant, $this->camille, $this->typeId, $this->date('2026-09-01'), $this->date('2026-09-05'));
+        $this->decideUseCase()->approve($this->tenant, $this->marc, $id); // étape 1 OK
+
+        // Étape 2 requiert « Administrateur » : le Chef de projet ne peut pas la valider.
+        $this->expectException(AbsenceException::class);
+        $this->decideUseCase()->approve($this->tenant, $this->marc, $id);
     }
 
     public function testDeclareCreatesPendingRequestAndNotifies(): void
@@ -146,7 +178,7 @@ final class AbsenceWorkflowTest extends TestCase
 
     private function decideUseCase(): DecideAbsence
     {
-        return new DecideAbsence($this->authorizer, $this->requests, $this->audit, $this->bus, $this->clock);
+        return new DecideAbsence($this->authorizer, $this->requests, $this->audit, $this->bus, $this->clock, $this->circuits);
     }
 
     private function date(string $value): DateTimeImmutable

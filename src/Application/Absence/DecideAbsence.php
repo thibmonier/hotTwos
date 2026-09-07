@@ -14,6 +14,8 @@ use App\Domain\Authorization\Permission;
 use App\Domain\Authorization\SecurityAuditLogger;
 use App\Domain\Tenant\TenantId;
 use App\Domain\User\User;
+use App\Domain\Validation\AbsenceValidationCircuit;
+use App\Domain\Validation\AbsenceValidationCircuitRepository;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use InvalidArgumentException;
@@ -33,12 +35,42 @@ final readonly class DecideAbsence
         private SecurityAuditLogger $audit,
         private MessageBusInterface $bus,
         private ClockInterface $clock,
+        private AbsenceValidationCircuitRepository $circuits,
     ) {
     }
 
     public function approve(TenantId $tenant, User $manager, string $requestId): void
     {
         $request = $this->pending($tenant, $manager, $requestId);
+        $circuit = $this->circuits->findForTenant($tenant);
+
+        // Comportement historique : sans circuit configuré, 1 étape, VALIDATE_ABSENCE suffit.
+        if (!$circuit instanceof AbsenceValidationCircuit) {
+            $this->finalize($tenant, $manager, $request, $requestId);
+
+            return;
+        }
+
+        // US-017 : le validateur doit porter le rôle de l'étape courante.
+        $requiredRole = $circuit->roleForStep($request->currentStep());
+        if (!in_array($requiredRole, $manager->getRoles(), true)) {
+            throw new AbsenceException(sprintf('Cette étape de validation requiert le rôle « %s ».', $requiredRole));
+        }
+
+        if ($request->currentStep() >= $circuit->stepCount()) {
+            $this->finalize($tenant, $manager, $request, $requestId);
+
+            return;
+        }
+
+        // Étape intermédiaire approuvée : la demande reste en attente à l'étape suivante.
+        $request->advanceStep();
+        $this->requests->save($request);
+        $this->audit->record('absence_etape_validee', $tenant->toString(), $manager->getUserIdentifier(), ['request' => $requestId, 'step' => (string) ($request->currentStep() - 1)]);
+    }
+
+    private function finalize(TenantId $tenant, User $manager, AbsenceRequest $request, string $requestId): void
+    {
         $request->validate($manager->id(), $this->clock->now());
         $this->requests->save($request);
 

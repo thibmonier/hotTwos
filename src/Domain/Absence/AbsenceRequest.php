@@ -48,6 +48,10 @@ class AbsenceRequest implements TenantOwned
     #[ORM\Column(name: 'rejection_reason', type: 'text', nullable: true)]
     private ?string $rejectionReason = null;
 
+    /** US-017 — étape courante du circuit de validation (1-based ; 1 = pas encore validée). */
+    #[ORM\Column(name: 'current_step', type: 'smallint')]
+    private int $currentStep = 1;
+
     public function __construct(
         TenantId $tenantId,
         #[ORM\Column(name: 'user_id', type: 'guid')]
@@ -93,6 +97,18 @@ class AbsenceRequest implements TenantOwned
         $this->rejectionReason = null;
         $this->decidedBy = $validatorId;
         $this->decidedAt = $at;
+    }
+
+    /** US-017 — étape courante (1-based) du circuit de validation. */
+    public function currentStep(): int
+    {
+        return $this->currentStep;
+    }
+
+    /** US-017 — enregistre l'approbation de l'étape courante et passe à la suivante (reste PENDING). */
+    public function advanceStep(): void
+    {
+        ++$this->currentStep;
     }
 
     public function reject(string $validatorId, string $reason, DateTimeImmutable $at): void

@@ -30,7 +30,7 @@ stories:
     points: 8
     priority: 2
     depends_on: [US-022]
-    status: pending
+    status: done
     note: "Invasif. Variantes par utilisateur du calculateur ; tenant-level inchangé."
   - id: US-017
     title: "Circuit de validation des absences paramétrable"

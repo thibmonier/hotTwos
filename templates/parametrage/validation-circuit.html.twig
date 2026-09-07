@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Circuit de validation{% endblock %}
+{% block page_section %}Paramétrage{% endblock %}
+{% block page_title %}Circuit de validation des absences{% endblock %}
+
+{% block body %}
+    <h1 class="visually-hidden">circuit de validation des absences</h1>
+
+    <p class="mb-4 max-w-2xl text-sm text-muted">
+        Définissez jusqu'à deux étapes de validation des absences, chacune associée à un rôle validateur.
+        Sans configuration, la validation reste en une seule étape.
+    </p>
+
+    <form method="post" action="{{ path('validation_circuit_save') }}" class="max-w-lg">
+        <input type="hidden" name="_token" value="{{ csrf_token('validation_circuit_save') }}">
+
+        <div class="mb-4">
+            <label for="step1" class="mb-1 block text-[13px] font-medium text-ink">Étape 1 — rôle validateur</label>
+            <select id="step1" name="step1" required class="min-h-10 w-full rounded border border-border-strong bg-surface px-3 text-sm text-ink">
+                {% for role in roles %}<option value="{{ role }}" {{ steps[0] is defined and steps[0] == role ? 'selected' : '' }}>{{ role }}</option>{% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-4">
+            <label for="step2" class="mb-1 block text-[13px] font-medium text-ink">Étape 2 — rôle validateur (facultatif)</label>
+            <select id="step2" name="step2" class="min-h-10 w-full rounded border border-border-strong bg-surface px-3 text-sm text-ink">
+                <option value="">— Aucune (1 seule étape)</option>
+                {% for role in roles %}<option value="{{ role }}" {{ steps[1] is defined and steps[1] == role ? 'selected' : '' }}>{{ role }}</option>{% endfor %}
+            </select>
+        </div>
+
+        <button type="submit" class="min-h-10 rounded bg-primary px-4 text-sm font-semibold text-white hover:bg-primary/90">Enregistrer le circuit</button>
+    </form>
+{% endblock %}
