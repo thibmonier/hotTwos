@@ -6,10 +6,12 @@ namespace App\Tests\Unit\Domain\Calendar;
 
 use App\Domain\Calendar\Holiday;
 use App\Domain\Calendar\ClosurePeriod;
+use App\Domain\Calendar\WorkSchedule;
 use App\Domain\Calendar\WorkingDaysCalculator;
 use App\Domain\Tenant\TenantId;
 use App\Tests\Support\Calendar\InMemoryHolidayRepository;
 use App\Tests\Support\Calendar\InMemoryClosurePeriodRepository;
+use App\Tests\Support\Calendar\InMemoryWorkScheduleRepository;
 use DateTimeImmutable;
 use DateTimeZone;
 use PHPUnit\Framework\TestCase;
@@ -20,9 +22,12 @@ use PHPUnit\Framework\TestCase;
  */
 final class WorkingDaysCalculatorTest extends TestCase
 {
+    private const string USER = '018f9c4e-0000-7000-8000-0000000000a1';
+
     private TenantId $tenant;
     private InMemoryHolidayRepository $holidays;
     private InMemoryClosurePeriodRepository $closures;
+    private InMemoryWorkScheduleRepository $schedules;
     private WorkingDaysCalculator $calculator;
 
     protected function setUp(): void
@@ -30,7 +35,28 @@ final class WorkingDaysCalculatorTest extends TestCase
         $this->tenant = TenantId::generate();
         $this->holidays = new InMemoryHolidayRepository();
         $this->closures = new InMemoryClosurePeriodRepository();
-        $this->calculator = new WorkingDaysCalculator($this->holidays, $this->closures);
+        $this->schedules = new InMemoryWorkScheduleRepository();
+        $this->calculator = new WorkingDaysCalculator($this->holidays, $this->closures, $this->schedules);
+    }
+
+    public function testUserWorkScheduleReducesWorkingDays(): void
+    {
+        // Régime temps partiel : Lun-Jeu (pas le vendredi) → 4 jours ouvrés sur une semaine pleine.
+        $this->schedules->save(new WorkSchedule($this->tenant, self::USER, [1, 2, 3, 4]));
+
+        $count = $this->calculator->workingDaysForUser($this->tenant, self::USER, $this->date('2026-07-06'), $this->date('2026-07-13'));
+
+        self::assertSame(4, $count);
+        self::assertFalse($this->calculator->isWorkingDayForUser($this->tenant, self::USER, $this->date('2026-07-10'))); // vendredi non travaillé
+    }
+
+    public function testUserWithoutScheduleIsFullTime(): void
+    {
+        // Sans régime : temps plein Lun-Ven, mais fériés/fermetures s'appliquent.
+        $this->holidays->save(new Holiday($this->tenant, $this->date('2026-07-14'), 'Fête nationale'));
+
+        self::assertSame(5, $this->calculator->workingDaysForUser($this->tenant, self::USER, $this->date('2026-07-06'), $this->date('2026-07-13')));
+        self::assertSame(4, $this->calculator->workingDaysForUser($this->tenant, self::USER, $this->date('2026-07-13'), $this->date('2026-07-20')));
     }
 
     public function testExcludesClosurePeriods(): void

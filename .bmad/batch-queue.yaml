@@ -23,7 +23,7 @@ stories:
     points: 5
     priority: 1
     depends_on: []
-    status: pending
+    status: done
     note: "Sûre. ClosurePeriod + WorkingDaysCalculator (fermetures)."
   - id: US-021
     title: "Calendriers de travail différenciés (temps partiel)"
