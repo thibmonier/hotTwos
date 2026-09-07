@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Domain\Calendar;
 
 use App\Domain\Calendar\Holiday;
+use App\Domain\Calendar\ClosurePeriod;
 use App\Domain\Calendar\WorkingDaysCalculator;
 use App\Domain\Tenant\TenantId;
 use App\Tests\Support\Calendar\InMemoryHolidayRepository;
+use App\Tests\Support\Calendar\InMemoryClosurePeriodRepository;
 use DateTimeImmutable;
 use DateTimeZone;
 use PHPUnit\Framework\TestCase;
@@ -20,13 +22,26 @@ final class WorkingDaysCalculatorTest extends TestCase
 {
     private TenantId $tenant;
     private InMemoryHolidayRepository $holidays;
+    private InMemoryClosurePeriodRepository $closures;
     private WorkingDaysCalculator $calculator;
 
     protected function setUp(): void
     {
         $this->tenant = TenantId::generate();
         $this->holidays = new InMemoryHolidayRepository();
-        $this->calculator = new WorkingDaysCalculator($this->holidays);
+        $this->closures = new InMemoryClosurePeriodRepository();
+        $this->calculator = new WorkingDaysCalculator($this->holidays, $this->closures);
+    }
+
+    public function testExcludesClosurePeriods(): void
+    {
+        // Fermeture du mardi 14/07 au mercredi 15/07 → 3 jours ouvrés sur la semaine 13→19.
+        $this->closures->save(new ClosurePeriod($this->tenant, $this->date('2026-07-14'), $this->date('2026-07-15'), 'Pont'));
+
+        $count = $this->calculator->workingDaysBetween($this->tenant, $this->date('2026-07-13'), $this->date('2026-07-20'));
+
+        self::assertSame(3, $count);
+        self::assertFalse($this->calculator->isWorkingDay($this->tenant, $this->date('2026-07-14')));
     }
 
     public function testExcludesWeekends(): void

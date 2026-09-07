@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Timesheet;
 
+use App\Domain\Calendar\ClosurePeriod;
 use App\Domain\Calendar\Holiday;
 use App\Domain\Project\Project;
 use App\Domain\Project\ProjectAssignment;
@@ -42,6 +43,7 @@ final class WeekBatchTest extends WebTestCase
         $this->schema = [
             $this->em->getClassMetadata(Tenant::class),
             $this->em->getClassMetadata(Holiday::class),
+            $this->em->getClassMetadata(ClosurePeriod::class),
             $this->em->getClassMetadata(User::class),
             $this->em->getClassMetadata(Project::class),
             $this->em->getClassMetadata(TimeEntry::class),

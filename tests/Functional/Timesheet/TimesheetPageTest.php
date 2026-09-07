@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Timesheet;
 
+use App\Domain\Calendar\ClosurePeriod;
 use App\Domain\Calendar\Holiday;
 use App\Domain\Project\Project;
 use App\Domain\Reminder\ReminderPreference;
@@ -39,6 +40,7 @@ final class TimesheetPageTest extends WebTestCase
             $em->getClassMetadata(AbsenceRequest::class),
             $em->getClassMetadata(ReminderPreference::class),
             $em->getClassMetadata(Holiday::class),
+            $em->getClassMetadata(ClosurePeriod::class),
         ];
         $tool = new SchemaTool($em);
         $tool->dropSchema($schema);
@@ -89,6 +91,7 @@ final class TimesheetPageTest extends WebTestCase
             $em->getClassMetadata(AbsenceRequest::class),
             $em->getClassMetadata(ReminderPreference::class),
             $em->getClassMetadata(Holiday::class),
+            $em->getClassMetadata(ClosurePeriod::class),
         ];
         $tool = new SchemaTool($em);
         $tool->dropSchema($schema);

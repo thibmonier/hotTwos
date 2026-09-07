@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Application\Reminder;
 
 use App\Domain\Calendar\WorkingDaysCalculator;
 use App\Tests\Support\Calendar\InMemoryHolidayRepository;
+use App\Tests\Support\Calendar\InMemoryClosurePeriodRepository;
 use App\Application\Completeness\CompletenessGrid;
 use App\Application\Reminder\Message\SendDueReminders;
 use App\Application\Reminder\ScheduleReminders;
@@ -89,8 +90,8 @@ final class SendDueRemindersHandlerTest extends TestCase
             $this->preferences,
             $this->logs,
             $this->users,
-            new CompletenessGrid($this->entries, $this->absences, new WorkingDaysCalculator(new InMemoryHolidayRepository())),
-            new WorkingDaysCalculator(new InMemoryHolidayRepository()),
+            new CompletenessGrid($this->entries, $this->absences, new WorkingDaysCalculator(new InMemoryHolidayRepository(), new InMemoryClosurePeriodRepository())),
+            new WorkingDaysCalculator(new InMemoryHolidayRepository(), new InMemoryClosurePeriodRepository()),
         );
 
         return new SendDueRemindersHandler($engine, $this->logs, $this->notifier);

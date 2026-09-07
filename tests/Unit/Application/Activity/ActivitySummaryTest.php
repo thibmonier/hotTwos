@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Application\Activity;
 
 use App\Domain\Calendar\WorkingDaysCalculator;
 use App\Tests\Support\Calendar\InMemoryHolidayRepository;
+use App\Tests\Support\Calendar\InMemoryClosurePeriodRepository;
 use App\Application\Activity\ActivitySummary;
 use App\Application\Timesheet\EnsureAbsenceProject;
 use App\Domain\Activity\ActivityType;
@@ -107,7 +108,7 @@ final class ActivitySummaryTest extends TestCase
 
     private function summary(): ActivitySummary
     {
-        return new ActivitySummary($this->entries, $this->projects, new WorkingDaysCalculator(new InMemoryHolidayRepository()));
+        return new ActivitySummary($this->entries, $this->projects, new WorkingDaysCalculator(new InMemoryHolidayRepository(), new InMemoryClosurePeriodRepository()));
     }
 
     private function validated(string $projectId, string $date, int $minutes): TimeEntry
