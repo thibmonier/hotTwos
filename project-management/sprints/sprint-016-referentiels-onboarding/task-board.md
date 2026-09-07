@@ -79,7 +79,8 @@
 | ID | Raison |
 |----|--------|
 
-## Métriques
-- **Tâches** : 40 total | 0 terminées (0 %)
-- **Heures** : ~82.75h estimées | 0h consommées
-- **Points** : 16 engagés / 22 capacité
+## Métriques (clôture)
+- **Stories** : 4/4 livrées ✅ (US-012 #89, US-013 #90, US-020 #91, US-019 #92)
+- **Points** : 16/16 livrés (capacité 22)
+- **Tests** : 645 → **672** verts | `make ci` vert à chaque merge
+- **Migrations** : `holiday`, `skill*` (3), `config_audit_entry` (+ RLS)

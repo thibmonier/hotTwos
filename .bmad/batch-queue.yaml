@@ -1,7 +1,7 @@
-# File d'exécution — Sprint 15 (généré par /project:run-sprint 015 --auto)
-sprint: sprint-015-finition-pilotage
+# File d'exécution — Sprint 16 (généré par /project:run-sprint 016 --auto)
+sprint: sprint-016-referentiels-onboarding
 generated_at: 2026-09-07
-goal: "Boucler le pilotage projet (EPIC-002) : atterrissage historisé + courbe, seuil de dérive par type de projet + 2e seuil direction"
+goal: "Compléter les référentiels (fériés, compétences), rendre un tenant opérationnel <15 min (onboarding) et tracer le paramétrage"
 
 execution:
   mode: sequential          # 1 dev, TDD, une PR par story ; merge squash après CI verte
@@ -11,33 +11,45 @@ execution:
 
 gates:
   - id: main-green
-    desc: "main vert au démarrage S15 (628 tests)"
+    desc: "main vert au démarrage S16 (645 tests)"
     status: satisfied
-  - id: decision-079c
-    desc: "US-079c : capture via handler séparé (ComputeProjectMargins inchangé)"
-    status: satisfied
-  - id: decision-079b
-    desc: "US-079b : seuil charge par (tenant×ContractType), repli constantes OBJ-2"
+  - id: dor
+    desc: "4 US affinées Ready (#87)"
     status: satisfied
 
 stories:
-  - id: US-079c
-    title: "Courbe d'atterrissage historisée (capture légère)"
+  - id: US-012
+    title: "Jours fériés & calcul unifié des jours ouvrés"
     points: 5
     priority: 1
     depends_on: []
     status: done
-    note: "Must. Handler séparé sur PeriodClosed ; snapshot idempotent (tenant, projet, période)."
-  - id: US-079b
-    title: "Seuil de dérive charge par type de projet + 2e seuil direction"
-    points: 5
+    note: "Fondateur. Holiday + WorkingDaysCalculator (refactor DRY 4 duplications)."
+  - id: US-013
+    title: "Référentiel de compétences & niveaux"
+    points: 3
     priority: 2
     depends_on: []
     status: done
-    note: "Should. Nouvelle entité ChargeDriftThreshold (tenant×ContractType) ; repli OBJ-2."
+  - id: US-020
+    title: "Journal d'audit du paramétrage"
+    points: 3
+    priority: 3
+    depends_on: [US-012, US-013]
+    status: done
+    note: "Instrumente les écritures d'US-012/013. Perm VIEW_AUDIT_LOG."
+  - id: US-019
+    title: "Onboarding tenant (défauts + checklist)"
+    points: 5
+    priority: 4
+    depends_on: [US-012, US-013]
+    status: done
+    note: "En dernier. tenant:init idempotent ; checklist par comptage (pas de table)."
 
-total_points: 10
+total_points: 16
 
 plan:
-  phase_1: [US-079c]
-  phase_2: [US-079b]
+  phase_1: [US-012]
+  phase_2: [US-013]
+  phase_3: [US-020]
+  phase_4: [US-019]

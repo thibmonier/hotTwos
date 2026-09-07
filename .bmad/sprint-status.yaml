@@ -1,7 +1,7 @@
 # Statut consolidé du backlog — source de vérité réconciliée depuis git + reviews de sprint.
 # Généré par /project:sync-backlog (réconciliation complète, direction files←git).
 # Les statuts des fichiers markdown ont été alignés sur cet état.
-last_sync: "2026-09-07T10:30:00Z"
+last_sync: "2026-09-07T11:20:00Z"
 source_of_truth: "git history + project-management/sprints/*/sprint-review.md"
 resolution_strategy: "git-wins (les fichiers markdown étaient périmés)"
 
@@ -23,7 +23,7 @@ sprints:
   sprint-013: { theme: "Gestion budgétaire — avenants & budget par profil (EPIC-002)", points: 21, goal_met: true, stories: [US-033, US-078, US-032] }  # EF-PRJ-8/9/5 ; débloque INV-8
   sprint-014: { theme: "Référentiels de valorisation (EPIC-001) + export pilotage", points: 11, goal_met: true, stories: [US-015, US-016, US-079a] }  # EF-REF-19/22 + EF-PRJ-14 ; US-079b/c reportés S15
   sprint-015: { theme: "Finition pilotage projet (EPIC-002) — courbe & seuil par type", points: 10, goal_met: true, stories: [US-079c, US-079b] }  # EF-PRJ-16/15 → EPIC-002 complet à 100 %
-  sprint-016: { theme: "Référentiels de paramétrage & mise en route (EPIC-001)", points: 16, goal_met: null, stories: [US-012, US-013, US-019, US-020] }  # EN PRÉPARATION — 4 US à affiner (Ready) ; réserve US-017
+  sprint-016: { theme: "Référentiels de paramétrage & mise en route (EPIC-001)", points: 16, goal_met: true, stories: [US-012, US-013, US-019, US-020] }  # CLÔTURÉ 16/16 pts (US-012/013/020/019) ; reste US-017
 
 # État par story. status ∈ {done, ready, in-progress, backlog}
 stories:
@@ -38,15 +38,15 @@ stories:
   US-009: { title: "Outillage qualité / sécurité", sprint: 0, status: done }
   US-010: { title: "Structure organisationnelle", sprint: 4, status: done }
   US-011: { title: "Référentiel profils & taux", sprint: 4, status: done }
-  US-012: { title: "Calendriers, jours ouvrés & fériés", sprint: 16, status: ready }   # S16 — Ready (affinée 2026-09-07)
-  US-013: { title: "Référentiel compétences & niveaux", sprint: 16, status: ready }   # S16 — Ready (affinée 2026-09-07)
+  US-012: { title: "Calendriers, jours ouvrés & fériés", sprint: 16, status: done }   # S16 — Ready (affinée 2026-09-07)
+  US-013: { title: "Référentiel compétences & niveaux", sprint: 16, status: done }   # S16 — Ready (affinée 2026-09-07)
   US-014: { title: "Comptes clients & contacts (tranche minimale S11)", sprint: 11, status: done }   # prérequis facturation (ADR-0022)
   US-015: { title: "Taux de vente multi-niveaux (profil/client/projet) + priorité (EF-REF-19)", sprint: 14, status: done, points: 5 }   # S14
   US-016: { title: "Devises & devise de référence tenant (EF-REF-22)", sprint: 14, status: done, points: 3 }   # S14
   US-017: { title: "Statuts & circuits de validation", sprint: null, status: backlog }
   US-018: { title: "Seuils d'alerte paramétrables (tenant)", sprint: 10, status: done }      # S10 — override seuil dérive US-072 (PR #51)
-  US-019: { title: "Onboarding tenant (< 15 min, MMF EF-REF-29)", sprint: 16, status: ready }   # S16 — Ready (affinée 2026-09-07)
-  US-020: { title: "Journal d'audit du paramétrage", sprint: 16, status: ready }   # S16 — Ready (affinée 2026-09-07)
+  US-019: { title: "Onboarding tenant (< 15 min, MMF EF-REF-29)", sprint: 16, status: done }   # S16 — Ready (affinée 2026-09-07)
+  US-020: { title: "Journal d'audit du paramétrage", sprint: 16, status: done }   # S16 — Ready (affinée 2026-09-07)
   US-030: { title: "Création projet & statuts", sprint: 6, status: done }
   US-031: { title: "Lots & jalons", sprint: 6, status: done }
   US-032: { title: "Projets internes non facturables (EF-PRJ-5)", sprint: 13, status: done, points: 5 }   # S13 (stretch livrée)
@@ -94,7 +94,7 @@ tech_stories:
 
 # Récapitulatif
 totals:
-  done: 46          # +US-079 (S15 — EPIC-002 bouclé)
+  done: 50          # +US-012/013/019/020 (S16 — EPIC-001)
   ready: 0          # US-079 livrée (courbe + seuil par type)
   in_progress: 0
   backlog: 11
