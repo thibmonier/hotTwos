@@ -96,6 +96,11 @@ final class InMemoryTimeEntryRepository implements TimeEntryRepository
         }));
     }
 
+    public function countByTenant(TenantId $tenant): int
+    {
+        return count(array_filter($this->entries, static fn (TimeEntry $entry): bool => $entry->tenantId()->equals($tenant)));
+    }
+
     public function save(TimeEntry $entry): void
     {
         foreach ($this->entries as $existing) {

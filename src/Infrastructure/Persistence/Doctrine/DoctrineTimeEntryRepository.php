@@ -143,6 +143,15 @@ final readonly class DoctrineTimeEntryRepository implements TimeEntryRepository
             ->getSingleScalarResult();
     }
 
+    public function countByTenant(TenantId $tenant): int
+    {
+        return (int) $this->entityManager->createQuery(
+            'SELECT COUNT(e.id) FROM '.TimeEntry::class.' e WHERE e.tenantId = :tenant',
+        )
+            ->setParameter('tenant', $tenant->toString())
+            ->getSingleScalarResult();
+    }
+
     public function save(TimeEntry $entry): void
     {
         $this->entityManager->persist($entry);
