@@ -48,7 +48,9 @@ Sans ce module stable, aucune saisie de temps, aucun projet ni aucune valorisati
 | US-016 | Devises & devise de référence tenant | ✅ Done | 14 | EF-REF-22 |
 | US-012 | Jours fériés & calcul unifié des jours ouvrés | ✅ Done | 16 | EF-REF-6 |
 | US-013 | Référentiel de compétences & niveaux | ✅ Done | 16 | EF-REF-10/11 |
-| US-017 | Statuts & circuits de validation paramétrables | 🔵 Backlog | — | EF-REF-24/25 |
+| US-017 | Statuts & circuits de validation paramétrables | 🔵 Backlog | 17 | EF-REF-24/25 |
+| US-021 | Calendriers de travail différenciés | 🔵 Backlog | 17 | EF-REF-7 |
+| US-022 | Périodes de fermeture entreprise | 🔵 Backlog | 17 | EF-REF-9 |
 | US-019 | Onboarding tenant (défauts + checklist) | ✅ Done | 16 | EF-REF-29 |
 | US-020 | Journal d'audit du paramétrage | ✅ Done | 16 | EF-REF-33 |
 
