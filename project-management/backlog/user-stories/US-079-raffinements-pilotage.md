@@ -3,8 +3,8 @@
 ## Métadonnées
 - **ID**: US-079
 - **EPIC**: EPIC-002 (Projets & delivery)
-- **Sprint**: — (backlog affiné, Ready — candidate au découpage)
-- **Statut**: 🟢 Ready
+- **Sprint**: 14–15 (découpée : US-079a S14 ; US-079c + US-079b S15)
+- **Statut**: ✅ Done
 - **Points**: 8 (à découper : 3 sous-capacités)
 - **Persona**: P2 (Marc — Chef de projet) / P6 (Direction)
 - **Créé le**: 2026-09-06
@@ -59,9 +59,9 @@ THEN l'alerte est également escaladée à la direction
 
 ## Definition of Done
 - [x] **US-079a** Export CSV du tableau de pilotage (EF-PRJ-14) — gating HAB-1 sur les colonnes de coût — **livré S14 (PR #78)**
-- [ ] **US-079c** Historisation de l'atterrissage + visualisation de la courbe (EF-PRJ-16) — **reporté S15** (historisation invasive dans `ComputeProjectMargins`, décision Tech Lead)
-- [ ] **US-079b** Seuil de dérive **par type de projet** + 2e seuil direction (EF-PRJ-15) — **reporté S15** (raffinement)
-- [x] Tests par sous-capacité (export) ; `make ci` vert
+- [x] **US-079c** Historisation de l'atterrissage + visualisation de la courbe (EF-PRJ-16) — **livré S15 (PR #82)** — capture via **handler séparé** (`ComputeProjectMargins` inchangé)
+- [x] **US-079b** Seuil de dérive **par type de projet** + 2e seuil direction (EF-PRJ-15) — **livré S15 (PR #83)**
+- [x] Tests par sous-capacité ; `make ci` vert
 
 ## Note de découpage (S14)
 La story parapluie a été livrée en tranches : **US-079a export** en S14 ; **US-079c courbe** et **US-079b
