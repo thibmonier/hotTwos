@@ -42,7 +42,8 @@
 ## 🔄 En Cours / 👀 En Review / ✅ Terminé / 🚫 Bloqué
 _(vide au démarrage)_
 
-## Métriques
-- **Tâches** : 18 total | 0 terminées (0 %)
-- **Heures** : ~40h estimées
-- **Points** : 20 engagés / 22 capacité
+## Métriques (clôture)
+- **Items** : 4/4 livrés ✅ (QUAL-3 #105, US-023 #106, US-041 #107, US-040 #108)
+- **Points** : 20/20 livrés (capacité 22)
+- **Tests** : 685 → **697** verts ; make ci vert à chaque merge
+- **Écrans** : /planification/charge, /planification/recherche

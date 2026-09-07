@@ -36,8 +36,8 @@ Pain point n°2 (`research-summary.md`) : aujourd'hui les affectations sont fait
 
 | ID | Nom | Statut | Points | Sprint |
 |----|-----|--------|--------|--------|
-| US-040 | Recherche de staffing par compétence & disponibilité | 🟢 Ready | 8 | 18 |
-| US-041 | Plan de charge — capacité vs charge ferme | 🟢 Ready | 5 | 18 |
+| US-040 | Recherche de staffing par compétence & disponibilité | ✅ Done | 8 | 18 |
+| US-041 | Plan de charge — capacité vs charge ferme | ✅ Done | 5 | 18 |
 
 ---
 
