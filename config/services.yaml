@@ -105,6 +105,9 @@ services:
     # Jours fériés & calcul unifié des jours ouvrés (US-012, EF-REF-6, DIP).
     App\Domain\Calendar\HolidayRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineHolidayRepository'
 
+    # Fermetures entreprise (US-022, EF-REF-9, DIP).
+    App\Domain\Calendar\ClosurePeriodRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineClosurePeriodRepository'
+
     # Journal d'audit du paramétrage (US-020, EF-REF-33, append-only, DIP).
     App\Domain\Audit\ConfigAuditRecorder: '@App\Infrastructure\Persistence\Doctrine\DoctrineConfigAuditRecorder'
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Cli;
 
 use App\Domain\Authorization\Role;
+use App\Domain\Calendar\ClosurePeriod;
 use App\Domain\Calendar\Holiday;
 use App\Domain\Client\Client;
 use App\Domain\Currency\ReferenceCurrency;
@@ -44,6 +45,7 @@ final class InitializeTenantCommandTest extends KernelTestCase
             $this->em->getClassMetadata(Profile::class),
             $this->em->getClassMetadata(Client::class),
             $this->em->getClassMetadata(Holiday::class),
+            $this->em->getClassMetadata(ClosurePeriod::class),
         ];
         $tool = new SchemaTool($this->em);
         $tool->dropSchema($this->schema);

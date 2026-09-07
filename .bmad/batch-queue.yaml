@@ -1,55 +1,48 @@
-# File d'exécution — Sprint 16 (généré par /project:run-sprint 016 --auto)
-sprint: sprint-016-referentiels-onboarding
+# File d'exécution — Sprint 17 (généré par /project:run-sprint 017 --auto)
+sprint: sprint-017-circuits-calendriers
 generated_at: 2026-09-07
-goal: "Compléter les référentiels (fériés, compétences), rendre un tenant opérationnel <15 min (onboarding) et tracer le paramétrage"
+goal: "Achever EPIC-001 : circuits de validation paramétrables, calendriers différenciés (temps partiel), fermeture entreprise"
 
 execution:
-  mode: sequential          # 1 dev, TDD, une PR par story ; merge squash après CI verte
+  mode: sequential
   parallel_limit: 1
   resume_on_failure: true
   checkpoint_interval: 1
 
 gates:
   - id: main-green
-    desc: "main vert au démarrage S16 (645 tests)"
+    desc: "main vert au démarrage S17 (672 tests)"
     status: satisfied
   - id: dor
-    desc: "4 US affinées Ready (#87)"
+    desc: "3 US affinées Ready (#95)"
     status: satisfied
 
 stories:
-  - id: US-012
-    title: "Jours fériés & calcul unifié des jours ouvrés"
+  - id: US-022
+    title: "Périodes de fermeture entreprise"
     points: 5
     priority: 1
     depends_on: []
-    status: done
-    note: "Fondateur. Holiday + WorkingDaysCalculator (refactor DRY 4 duplications)."
-  - id: US-013
-    title: "Référentiel de compétences & niveaux"
-    points: 3
+    status: pending
+    note: "Sûre. ClosurePeriod + WorkingDaysCalculator (fermetures)."
+  - id: US-021
+    title: "Calendriers de travail différenciés (temps partiel)"
+    points: 8
     priority: 2
-    depends_on: []
-    status: done
-  - id: US-020
-    title: "Journal d'audit du paramétrage"
-    points: 3
+    depends_on: [US-022]
+    status: pending
+    note: "Invasif. Variantes par utilisateur du calculateur ; tenant-level inchangé."
+  - id: US-017
+    title: "Circuit de validation des absences paramétrable"
+    points: 8
     priority: 3
-    depends_on: [US-012, US-013]
-    status: done
-    note: "Instrumente les écritures d'US-012/013. Perm VIEW_AUDIT_LOG."
-  - id: US-019
-    title: "Onboarding tenant (défauts + checklist)"
-    points: 5
-    priority: 4
-    depends_on: [US-012, US-013]
-    status: done
-    note: "En dernier. tenant:init idempotent ; checklist par comptage (pas de table)."
+    depends_on: []
+    status: pending
+    note: "Flux absences ≤2 étapes, validateur par rôle."
 
-total_points: 16
+total_points: 21
 
 plan:
-  phase_1: [US-012]
-  phase_2: [US-013]
-  phase_3: [US-020]
-  phase_4: [US-019]
+  phase_1: [US-022]
+  phase_2: [US-021]
+  phase_3: [US-017]

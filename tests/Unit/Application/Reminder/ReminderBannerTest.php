@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Application\Reminder;
 
 use App\Domain\Calendar\WorkingDaysCalculator;
 use App\Tests\Support\Calendar\InMemoryHolidayRepository;
+use App\Tests\Support\Calendar\InMemoryClosurePeriodRepository;
 use App\Application\Completeness\CompletenessGrid;
 use App\Application\Reminder\ReminderBanner;
 use App\Domain\Tenant\TenantId;
@@ -60,7 +61,7 @@ final class ReminderBannerTest extends TestCase
     {
         return new ReminderBanner(
             $this->preferences,
-            new CompletenessGrid($this->entries, $this->absences, new WorkingDaysCalculator(new InMemoryHolidayRepository())),
+            new CompletenessGrid($this->entries, $this->absences, new WorkingDaysCalculator(new InMemoryHolidayRepository(), new InMemoryClosurePeriodRepository())),
             new MockClock($this->at('2026-09-30 09:00:00')),
         );
     }

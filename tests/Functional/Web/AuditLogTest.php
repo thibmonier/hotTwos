@@ -9,6 +9,7 @@ use App\Domain\Audit\AuditAction;
 use App\Domain\Audit\ConfigAuditEntry;
 use App\Domain\Authorization\Role;
 use App\Domain\Budget\ChargeDriftThreshold;
+use App\Domain\Calendar\ClosurePeriod;
 use App\Domain\Calendar\Holiday;
 use App\Domain\Tenant\Tenant;
 use App\Domain\Tenant\TenantId;
@@ -47,6 +48,7 @@ final class AuditLogTest extends WebTestCase
             $this->em->getClassMetadata(Role::class),
             $this->em->getClassMetadata(ConfigAuditEntry::class),
             $this->em->getClassMetadata(Holiday::class),
+            $this->em->getClassMetadata(ClosurePeriod::class),
             $this->em->getClassMetadata(ChargeDriftThreshold::class),
         ];
         $tool = new SchemaTool($this->em);

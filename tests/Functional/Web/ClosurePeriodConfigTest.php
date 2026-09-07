@@ -5,15 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Web;
 
 use App\Application\Authorization\InitializeDefaultRoles;
-use App\Domain\Audit\ConfigAuditEntry;
 use App\Domain\Authorization\Role;
 use App\Domain\Calendar\ClosurePeriod;
-use App\Domain\Calendar\Holiday;
 use App\Domain\Tenant\Tenant;
 use App\Domain\Tenant\TenantId;
 use App\Domain\User\User;
 use App\Infrastructure\Persistence\Doctrine\DoctrineRoleRepository;
-use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -21,10 +18,9 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
 
 /**
- * US-012 (EF-REF-6, CA-3/CA-5/CA-6) — paramétrage des jours fériés : CRUD admin, refus de doublon,
- * gating MANAGE_ORGANIZATION.
+ * US-022 (EF-REF-9, CA-3/CA-5/CA-6) — paramétrage des fermetures : CRUD admin, refus fin<début, gating.
  */
-final class HolidayConfigTest extends WebTestCase
+final class ClosurePeriodConfigTest extends WebTestCase
 {
     private const string PASSWORD = 'motdepasse-solide';
 
@@ -42,10 +38,8 @@ final class HolidayConfigTest extends WebTestCase
 
         $this->schema = [
             $this->em->getClassMetadata(Tenant::class),
-            $this->em->getClassMetadata(ConfigAuditEntry::class),
             $this->em->getClassMetadata(User::class),
             $this->em->getClassMetadata(Role::class),
-            $this->em->getClassMetadata(Holiday::class),
             $this->em->getClassMetadata(ClosurePeriod::class),
         ];
         $tool = new SchemaTool($this->em);
@@ -69,45 +63,39 @@ final class HolidayConfigTest extends WebTestCase
         parent::tearDown();
     }
 
-    public function testAdminAddsAndListsHoliday(): void
+    public function testAdminAddsAndListsClosure(): void
     {
         $this->login('admin@agence.test');
-        $crawler = $this->client->request('GET', '/parametrage/jours-feries');
+        $crawler = $this->client->request('GET', '/parametrage/fermetures');
         self::assertResponseIsSuccessful();
         $token = $crawler->filter('input[name="_token"]')->attr('value') ?? '';
 
-        $this->client->request('POST', '/parametrage/jours-feries', ['_token' => $token, 'date' => '2027-07-14', 'label' => 'Fête nationale']);
+        $this->client->request('POST', '/parametrage/fermetures', ['_token' => $token, 'start' => '2027-12-23', 'end' => '2027-12-31', 'label' => 'Vacances de Noel']);
         self::assertResponseRedirects();
 
-        $this->client->request('GET', '/parametrage/jours-feries');
+        $this->client->request('GET', '/parametrage/fermetures');
         $content = (string) $this->client->getResponse()->getContent();
-        self::assertStringContainsString('Fête nationale', $content);
-        self::assertStringContainsString('14/07/2027', $content);
+        self::assertStringContainsString('Vacances de Noel', $content);
+        self::assertStringContainsString('23/12/2027', $content);
     }
 
-    public function testDuplicateHolidayRejected(): void
+    public function testEndBeforeStartRejected(): void
     {
-        $this->em->persist(new Holiday($this->tenant, new DateTimeImmutable('2027-12-25'), 'Noël'));
-        $this->em->flush();
-
         $this->login('admin@agence.test');
-        $crawler = $this->client->request('GET', '/parametrage/jours-feries');
+        $crawler = $this->client->request('GET', '/parametrage/fermetures');
         $token = $crawler->filter('input[name="_token"]')->attr('value') ?? '';
 
-        $this->client->request('POST', '/parametrage/jours-feries', ['_token' => $token, 'date' => '2027-12-25', 'label' => 'Noël (doublon)']);
+        $this->client->request('POST', '/parametrage/fermetures', ['_token' => $token, 'start' => '2027-12-31', 'end' => '2027-12-23', 'label' => 'Invalide']);
         self::assertResponseRedirects();
 
-        // Le doublon n'a pas été créé : le libellé de la 2e tentative est absent, l'original demeure.
-        $this->client->request('GET', '/parametrage/jours-feries');
-        $content = (string) $this->client->getResponse()->getContent();
-        self::assertStringNotContainsString('Noël (doublon)', $content);
-        self::assertStringContainsString('Noël', $content);
+        $count = (int) $this->em->createQuery('SELECT COUNT(c.id) FROM '.ClosurePeriod::class.' c')->getSingleScalarResult();
+        self::assertSame(0, $count);
     }
 
     public function testNonAdminForbidden(): void
     {
         $this->login('marc@agence.test');
-        $this->client->request('GET', '/parametrage/jours-feries');
+        $this->client->request('GET', '/parametrage/fermetures');
         self::assertResponseStatusCodeSame(403);
     }
 

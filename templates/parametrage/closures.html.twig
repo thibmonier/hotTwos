@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Fermetures entreprise{% endblock %}
+{% block page_section %}Paramétrage{% endblock %}
+{% block page_title %}Périodes de fermeture entreprise{% endblock %}
+
+{% block body %}
+    <h1 class="visually-hidden">périodes de fermeture entreprise</h1>
+
+    <p class="mb-4 max-w-2xl text-sm text-muted">
+        Les jours d'une fermeture sont exclus des jours ouvrés (capacité, occupation, complétude) pour
+        l'ensemble des collaborateurs.
+    </p>
+
+    <form method="post" action="{{ path('closure_add') }}" class="mb-6 flex flex-wrap items-end gap-3">
+        <input type="hidden" name="_token" value="{{ csrf_token('closure_add') }}">
+        <div>
+            <label for="closure-start" class="mb-1 block text-[13px] font-medium text-ink">Début</label>
+            <input id="closure-start" name="start" type="date" required
+                   class="min-h-10 rounded border border-border-strong bg-surface px-3 text-sm text-ink">
+        </div>
+        <div>
+            <label for="closure-end" class="mb-1 block text-[13px] font-medium text-ink">Fin</label>
+            <input id="closure-end" name="end" type="date" required
+                   class="min-h-10 rounded border border-border-strong bg-surface px-3 text-sm text-ink">
+        </div>
+        <div>
+            <label for="closure-label" class="mb-1 block text-[13px] font-medium text-ink">Libellé</label>
+            <input id="closure-label" name="label" type="text" required maxlength="255" placeholder="Fermeture de fin d'année"
+                   class="min-h-10 w-64 rounded border border-border-strong bg-surface px-3 text-sm text-ink">
+        </div>
+        <button type="submit" class="min-h-10 rounded bg-primary px-4 text-sm font-semibold text-white hover:bg-primary/90">Ajouter</button>
+    </form>
+
+    <div class="overflow-x-auto">
+        <table class="w-full border-collapse text-sm">
+            <caption class="sr-only">Liste des fermetures entreprise</caption>
+            <thead>
+                <tr class="border-b-2 border-border text-left text-xs uppercase text-muted">
+                    <th scope="col" class="py-2 pr-4">Début</th>
+                    <th scope="col" class="py-2 pr-4">Fin</th>
+                    <th scope="col" class="py-2 pr-4">Libellé</th>
+                    <th scope="col" class="py-2 text-right">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for closure in closures %}
+                    <tr class="border-b border-border">
+                        <th scope="row" class="py-2 pr-4 font-medium text-ink">{{ closure.startDate|date('d/m/Y') }}</th>
+                        <td class="py-2 pr-4">{{ closure.endDate|date('d/m/Y') }}</td>
+                        <td class="py-2 pr-4">{{ closure.label }}</td>
+                        <td class="py-2 text-right">
+                            <form method="post" action="{{ path('closure_delete', { id: closure.id }) }}" class="inline">
+                                <input type="hidden" name="_token" value="{{ csrf_token('closure_delete') }}">
+                                <button type="submit" class="text-xs font-medium text-danger hover:underline">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="4" class="py-4 text-center text-muted">Aucune fermeture déclarée.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

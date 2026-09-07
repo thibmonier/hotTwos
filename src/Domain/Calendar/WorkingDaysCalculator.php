@@ -8,21 +8,24 @@ use App\Domain\Tenant\TenantId;
 use DateTimeImmutable;
 
 /**
- * US-012 (EF-REF-6) — calcul **unifié** des jours ouvrés : exclut les week-ends **et** les jours fériés
- * du tenant. Remplace les implémentations inline dupliquées (occupation, complétude, activité, relances).
+ * US-012 (EF-REF-6) / US-022 (EF-REF-9) — calcul **unifié** des jours ouvrés : exclut les week-ends,
+ * les jours **fériés** et les **fermetures entreprise** du tenant. Remplace les implémentations inline
+ * dupliquées (occupation, complétude, activité, relances).
  *
- * Les fériés du tenant sont chargés une seule fois puis mémorisés (cache par tenant sur la durée de vie
- * du service) pour éviter une requête par jour dans les boucles.
+ * Fériés et fermetures du tenant sont chargés une seule fois puis mémorisés (cache par tenant) pour
+ * éviter une requête par jour dans les boucles.
  */
 final class WorkingDaysCalculator
 {
     private const int SATURDAY = 6;
 
-    /** @var array<string, array<string, true>> tenantId => set de dates 'Y-m-d' fériées */
-    private array $holidayCache = [];
+    /** @var array<string, array<string, true>> tenantId => set de dates 'Y-m-d' non ouvrées (fériés + fermetures) */
+    private array $nonWorkingCache = [];
 
-    public function __construct(private readonly HolidayRepository $holidays)
-    {
+    public function __construct(
+        private readonly HolidayRepository $holidays,
+        private readonly ClosurePeriodRepository $closures,
+    ) {
     }
 
     /**
@@ -46,25 +49,30 @@ final class WorkingDaysCalculator
             return false;
         }
 
-        return !isset($this->holidaySet($tenant)[$day->format('Y-m-d')]);
+        return !isset($this->nonWorkingSet($tenant)[$day->format('Y-m-d')]);
     }
 
     /**
      * @return array<string, true>
      */
-    private function holidaySet(TenantId $tenant): array
+    private function nonWorkingSet(TenantId $tenant): array
     {
-        return $this->holidayCache[$tenant->toString()] ??= $this->loadHolidaySet($tenant);
+        return $this->nonWorkingCache[$tenant->toString()] ??= $this->loadNonWorkingSet($tenant);
     }
 
     /**
      * @return array<string, true>
      */
-    private function loadHolidaySet(TenantId $tenant): array
+    private function loadNonWorkingSet(TenantId $tenant): array
     {
         $set = [];
         foreach ($this->holidays->allDatesForTenant($tenant) as $date) {
             $set[$date->format('Y-m-d')] = true;
+        }
+        foreach ($this->closures->findForTenant($tenant) as $closure) {
+            for ($day = $closure->startDate(); $day <= $closure->endDate(); $day = $day->modify('+1 day')) {
+                $set[$day->format('Y-m-d')] = true;
+            }
         }
 
         return $set;
