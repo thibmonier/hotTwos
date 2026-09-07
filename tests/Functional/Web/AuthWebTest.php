@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Web;
 
+use App\Domain\Authorization\Role;
 use App\Domain\Tenant\Tenant;
 use App\Domain\Tenant\TenantId;
 use App\Domain\User\User;
@@ -37,6 +38,7 @@ final class AuthWebTest extends WebTestCase
         $this->schema = [
             $this->em->getClassMetadata(Tenant::class),
             $this->em->getClassMetadata(User::class),
+            $this->em->getClassMetadata(Role::class),
         ];
         $tool = new SchemaTool($this->em);
         $tool->dropSchema($this->schema);

@@ -60,5 +60,7 @@ interface TimeEntryRepository
      */
     public function countUnvalidatedInPeriod(TenantId $tenant, DateTimeImmutable $from, DateTimeImmutable $to): int;
 
+    public function countByTenant(TenantId $tenant): int;
+
     public function save(TimeEntry $entry): void;
 }
