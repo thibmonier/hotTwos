@@ -2,7 +2,7 @@
 
 ## Métadonnées
 - **ID**: EPIC-004
-- **Statut**: 🔴 To Do
+- **Statut**: 🟡 En cours (démarrage S18 : recherche staffing + capacité/charge ferme ; charge probable reportée — dépend EPIC-006 CRM)
 - **Priorité**: Should Have (MoSCoW)
 - **Module**: PLN
 - **Lot**: 2
@@ -36,7 +36,8 @@ Pain point n°2 (`research-summary.md`) : aujourd'hui les affectations sont fait
 
 | ID | Nom | Statut | Points | Sprint |
 |----|-----|--------|--------|--------|
-| - | À décomposer lors du Sprint Planning lot 2 | - | - | - |
+| US-040 | Recherche de staffing par compétence & disponibilité | 🔵 Backlog | 8 | 18 |
+| US-041 | Plan de charge — capacité vs charge ferme | 🔵 Backlog | 5 | 18 |
 
 ---
 
