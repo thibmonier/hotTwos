@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Recherche de staffing{% endblock %}
+{% block page_section %}Planification{% endblock %}
+{% block page_title %}Recherche de staffing{% endblock %}
+
+{% block body %}
+    <h1 class="visually-hidden">recherche de staffing</h1>
+
+    <p class="mb-4 max-w-2xl text-sm text-muted">
+        Recherchez les collaborateurs maîtrisant une compétence à un niveau minimal, et leur
+        disponibilité (jours) sur la période.
+    </p>
+
+    <form method="get" action="{{ path('staffing_search') }}" class="mb-6 flex flex-wrap items-end gap-3">
+        <div>
+            <label for="skill" class="mb-1 block text-[13px] font-medium text-ink">Compétence</label>
+            <select id="skill" name="skill" class="min-h-10 rounded border border-border-strong bg-surface px-3 text-sm text-ink">
+                <option value="">— Choisir —</option>
+                {% for s in skills %}<option value="{{ s.id }}" {{ s.id == selectedSkill ? 'selected' : '' }}>{{ s.label }}</option>{% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="level" class="mb-1 block text-[13px] font-medium text-ink">Niveau minimal</label>
+            <select id="level" name="level" class="min-h-10 rounded border border-border-strong bg-surface px-3 text-sm text-ink">
+                {% for label in levels %}<option value="{{ loop.index }}" {{ loop.index == minLevel ? 'selected' : '' }}>{{ label }}</option>{% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="period" class="mb-1 block text-[13px] font-medium text-ink">Période (mois)</label>
+            <input id="period" name="period" type="text" value="{{ period }}" pattern="\d{4}-\d{2}"
+                   class="min-h-10 w-32 rounded border border-border-strong bg-surface px-3 text-sm text-ink">
+        </div>
+        <button type="submit" class="min-h-10 rounded bg-primary px-4 text-sm font-semibold text-white hover:bg-primary/90">Rechercher</button>
+    </form>
+
+    {% if searched %}
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse text-sm">
+                <caption class="sr-only">Candidats au staffing</caption>
+                <thead>
+                    <tr class="border-b-2 border-border text-left text-xs uppercase text-muted">
+                        <th scope="col" class="py-2 pr-4">Collaborateur</th>
+                        <th scope="col" class="py-2 pr-4">Niveau</th>
+                        <th scope="col" class="py-2 text-right">Disponible (j)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in candidates %}
+                        <tr class="border-b border-border">
+                            <th scope="row" class="py-2 pr-4 font-medium text-ink">{{ c.displayName }}</th>
+                            <td class="py-2 pr-4">{{ levels[c.skillLevel - 1] ?? c.skillLevel }}</td>
+                            <td class="py-2 text-right tabular-nums">{{ c.availableDays }}</td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="3" class="py-4 text-center text-muted">Aucun collaborateur ne correspond aux critères.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+{% endblock %}
