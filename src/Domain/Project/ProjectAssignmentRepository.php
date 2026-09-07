@@ -35,4 +35,12 @@ interface ProjectAssignmentRepository
      * @return list<string>
      */
     public function assignedProjectIds(TenantId $tenant, string $userId): array;
+
+    /**
+     * US-041 — charge ferme (somme des jours planifiés) par collaborateur pour les affectations
+     * chevauchant la période [from, to]. Une affectation sans dates est réputée couvrir la période.
+     *
+     * @return array<string, int> userId => jours planifiés
+     */
+    public function plannedDaysByUser(TenantId $tenant, DateTimeImmutable $from, DateTimeImmutable $to): array;
 }

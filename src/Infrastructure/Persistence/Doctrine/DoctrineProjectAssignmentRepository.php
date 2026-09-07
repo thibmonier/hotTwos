@@ -98,4 +98,27 @@ final readonly class DoctrineProjectAssignmentRepository implements ProjectAssig
 
         return array_map(static fn (array $row): string => $row['projectId'], $rows);
     }
+
+    public function plannedDaysByUser(TenantId $tenant, DateTimeImmutable $from, DateTimeImmutable $to): array
+    {
+        /** @var list<array{userId: string, planned: int}> $rows */
+        $rows = $this->entityManager->createQuery(
+            'SELECT a.userId AS userId, SUM(a.plannedDays) AS planned FROM '.ProjectAssignment::class.' a'
+            .' WHERE a.tenantId = :tenant'
+            .' AND (a.startDate IS NULL OR a.startDate <= :to)'
+            .' AND (a.endDate IS NULL OR a.endDate >= :from)'
+            .' GROUP BY a.userId',
+        )
+            ->setParameter('tenant', $tenant->toString())
+            ->setParameter('from', $from, 'date_immutable')
+            ->setParameter('to', $to, 'date_immutable')
+            ->getResult();
+
+        $map = [];
+        foreach ($rows as $row) {
+            $map[$row['userId']] = (int) $row['planned'];
+        }
+
+        return $map;
+    }
 }
