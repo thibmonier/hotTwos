@@ -55,4 +55,7 @@ enum Permission: string
 
     /** Paramétrage des relances de retard de saisie du tenant (chef de projet / admin — US-056). */
     case MANAGE_REMINDERS = 'manage:reminders';
+
+    /** Consultation du journal d'audit du paramétrage (administrateur / dirigeant — US-020, HAB-6). */
+    case VIEW_AUDIT_LOG = 'view:audit_log';
 }

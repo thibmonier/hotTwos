@@ -6,6 +6,8 @@ namespace App\UI\Http\Controller;
 
 use App\Application\Authorization\Authorizer;
 use App\Application\Skill\ManageSkillCatalog;
+use App\Domain\Audit\AuditAction;
+use App\Domain\Audit\ConfigAuditRecorder;
 use App\Domain\Authorization\Permission;
 use App\Domain\Skill\Skill;
 use App\Domain\Skill\SkillCategory;
@@ -34,6 +36,7 @@ final class SkillController extends AbstractController
         private readonly SkillRepository $skills,
         private readonly SkillLevelScaleRepository $scales,
         private readonly UserRepository $users,
+        private readonly ConfigAuditRecorder $audit,
     ) {
     }
 
@@ -70,7 +73,8 @@ final class SkillController extends AbstractController
             if (null === $category) {
                 throw new SkillException('Catégorie invalide.');
             }
-            $this->catalog->createSkill($user, $category, (string) $request->request->get('label'));
+            $skill = $this->catalog->createSkill($user, $category, (string) $request->request->get('label'));
+            $this->audit->record($user->tenantId(), $user->id(), AuditAction::CREATION, 'Compétence', $skill->label());
             $this->addFlash('success', 'Compétence ajoutée.');
         });
     }
@@ -79,7 +83,11 @@ final class SkillController extends AbstractController
     public function deactivate(#[CurrentUser] User $user, string $id, Request $request): RedirectResponse
     {
         return $this->guarded($user, $request, 'skill_deactivate', function () use ($user, $id): void {
+            $skill = $this->skills->find($user->tenantId(), $id);
             $this->catalog->deactivateSkill($user, $id);
+            if ($skill instanceof Skill) {
+                $this->audit->record($user->tenantId(), $user->id(), AuditAction::DESACTIVATION, 'Compétence', $skill->label());
+            }
             $this->addFlash('success', 'Compétence désactivée.');
         });
     }

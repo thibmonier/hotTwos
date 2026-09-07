@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\UI\Http\Controller;
 
 use App\Application\Authorization\Authorizer;
+use App\Domain\Audit\AuditAction;
+use App\Domain\Audit\ConfigAuditRecorder;
 use App\Domain\Authorization\Permission;
 use App\Domain\Budget\ChargeDriftThreshold;
 use App\Domain\Budget\ChargeDriftThresholdProvider;
@@ -29,6 +31,7 @@ final class ChargeDriftThresholdController extends AbstractController
     public function __construct(
         private readonly Authorizer $authorizer,
         private readonly ChargeDriftThresholdRepository $thresholds,
+        private readonly ConfigAuditRecorder $audit,
     ) {
     }
 
@@ -82,12 +85,31 @@ final class ChargeDriftThresholdController extends AbstractController
 
         $existing = $this->thresholds->findFor($user->tenantId(), $type);
         if ($existing instanceof ChargeDriftThreshold) {
+            $before = $existing->alertPercent();
             $existing->reconfigure($alert, $escalation);
             $this->thresholds->save($existing);
+            if ($before !== $alert) {
+                $this->recordAlertChange($user, $type, (string) $before, (string) $alert);
+            }
 
             return;
         }
 
         $this->thresholds->save(new ChargeDriftThreshold($user->tenantId(), $type, $alert, $escalation));
+        $this->recordAlertChange($user, $type, null, (string) $alert);
+    }
+
+    private function recordAlertChange(User $user, ContractType $type, ?string $before, string $after): void
+    {
+        $this->audit->record(
+            $user->tenantId(),
+            $user->id(),
+            null === $before ? AuditAction::CREATION : AuditAction::MODIFICATION,
+            'Seuil de dérive de charge',
+            $type->label(),
+            'seuil_alerte',
+            $before,
+            $after,
+        );
     }
 }
