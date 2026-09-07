@@ -1,7 +1,7 @@
 # Statut consolidé du backlog — source de vérité réconciliée depuis git + reviews de sprint.
 # Généré par /project:sync-backlog (réconciliation complète, direction files←git).
 # Les statuts des fichiers markdown ont été alignés sur cet état.
-last_sync: "2026-09-07T13:30:00Z"
+last_sync: "2026-09-07T13:50:00Z"
 source_of_truth: "git history + project-management/sprints/*/sprint-review.md"
 resolution_strategy: "git-wins (les fichiers markdown étaient périmés)"
 
@@ -51,7 +51,7 @@ stories:
   US-020: { title: "Journal d'audit du paramétrage", sprint: 16, status: done }   # S16 — Ready (affinée 2026-09-07)
   US-021: { title: "Calendriers de travail différenciés (temps partiel, EF-REF-7)", sprint: 17, status: done }   # S17 — Ready (affinée)
   US-022: { title: "Périodes de fermeture entreprise (EF-REF-9)", sprint: 17, status: done }   # S17 — Ready (affinée)
-  US-023: { title: "Raffinements Review — fériés mobiles + audit étendu", sprint: 18, status: backlog }   # S18 (à affiner)
+  US-023: { title: "Raffinements Review — fériés mobiles + audit étendu", sprint: 18, status: ready }   # S18 (à affiner)
   US-030: { title: "Création projet & statuts", sprint: 6, status: done }
   US-031: { title: "Lots & jalons", sprint: 6, status: done }
   US-032: { title: "Projets internes non facturables (EF-PRJ-5)", sprint: 13, status: done, points: 5 }   # S13 (stretch livrée)
@@ -61,8 +61,8 @@ stories:
   US-036: { title: "Atterrissage charge & alerte de dérive précoce", sprint: 12, status: done, points: 8 }  # S12 (EF-PRJ-14/15, OBJ-2)
   US-037: { title: "Affectation & restriction d'imputation", sprint: 6, status: done }
   US-038: { title: "Clôture opérationnelle projet", sprint: 6, status: done }
-  US-040: { title: "Recherche de staffing par compétence & disponibilité (EPIC-004)", sprint: 18, status: backlog }   # S18 (à affiner)
-  US-041: { title: "Plan de charge — capacité vs charge ferme (EPIC-004)", sprint: 18, status: backlog }   # S18 (à affiner)
+  US-040: { title: "Recherche de staffing par compétence & disponibilité (EPIC-004)", sprint: 18, status: ready }   # S18 (à affiner)
+  US-041: { title: "Plan de charge — capacité vs charge ferme (EPIC-004)", sprint: 18, status: ready }   # S18 (à affiner)
   US-050: { title: "Saisie / imputation hebdo", sprint: 3, status: done }
   US-051: { title: "Saisie ≤ 2 min", sprint: 3, status: done }
   US-052: { title: "Saisie mobile", sprint: 5, status: done }
@@ -96,7 +96,7 @@ stories:
 
 # Stories techniques / dette qualité (hors vélocité) engagées au Sprint 10
 tech_stories:
-  QUAL-3: { title: "Schéma de test mutualisé (trait ProvisionsFullSchema)", sprint: 18, status: backlog }  # rétro S16/S17 — tarir la cascade SchemaTool
+  QUAL-3: { title: "Schéma de test mutualisé (trait ProvisionsFullSchema)", sprint: 18, status: ready }  # rétro S16/S17 — tarir la cascade SchemaTool
   QUAL-1: { title: "Recette navigateur sur données peuplées (finance)", sprint: 10, status: done }  # PR #52 — dette rétro soldée
   QUAL-2: { title: "Instrumentation couverture (pcov + seuil CI)", sprint: 10, status: done }        # audit S9
 
