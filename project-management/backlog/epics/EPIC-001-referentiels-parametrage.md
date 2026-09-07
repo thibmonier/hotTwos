@@ -46,11 +46,11 @@ Sans ce module stable, aucune saisie de temps, aucun projet ni aucune valorisati
 | US-018 | Seuils d'alerte paramétrables (tenant) | ✅ Done | 10 | EF-REF-26 (dérive marge) |
 | US-015 | Taux de vente multi-niveaux (profil/client/projet) + priorité | ✅ Done | 14 | EF-REF-19 |
 | US-016 | Devises & devise de référence tenant | ✅ Done | 14 | EF-REF-22 |
-| US-012 | Calendriers, jours ouvrés & fériés | 🔵 Backlog | — | EF-REF-6/7 |
-| US-013 | Référentiel de compétences & niveaux | 🔵 Backlog | — | EF-REF-10/11 |
+| US-012 | Jours fériés & calcul unifié des jours ouvrés | 🟢 Ready | 16 | EF-REF-6 |
+| US-013 | Référentiel de compétences & niveaux | 🟢 Ready | 16 | EF-REF-10/11 |
 | US-017 | Statuts & circuits de validation paramétrables | 🔵 Backlog | — | EF-REF-24/25 |
-| US-019 | Onboarding tenant (< 15 min, defaults) | 🔵 Backlog | — | EF-REF-29 |
-| US-020 | Journal d'audit du paramétrage | 🔵 Backlog | — | EF-REF-33 |
+| US-019 | Onboarding tenant (défauts + checklist) | 🟢 Ready | 16 | EF-REF-29 |
+| US-020 | Journal d'audit du paramétrage | 🟢 Ready | 16 | EF-REF-33 |
 
 ## Couverture des exigences (analyse d'écart — 2026-09-06)
 

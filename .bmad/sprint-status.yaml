@@ -1,7 +1,7 @@
 # Statut consolidé du backlog — source de vérité réconciliée depuis git + reviews de sprint.
 # Généré par /project:sync-backlog (réconciliation complète, direction files←git).
 # Les statuts des fichiers markdown ont été alignés sur cet état.
-last_sync: "2026-09-07T10:00:00Z"
+last_sync: "2026-09-07T10:30:00Z"
 source_of_truth: "git history + project-management/sprints/*/sprint-review.md"
 resolution_strategy: "git-wins (les fichiers markdown étaient périmés)"
 
@@ -38,15 +38,15 @@ stories:
   US-009: { title: "Outillage qualité / sécurité", sprint: 0, status: done }
   US-010: { title: "Structure organisationnelle", sprint: 4, status: done }
   US-011: { title: "Référentiel profils & taux", sprint: 4, status: done }
-  US-012: { title: "Calendriers, jours ouvrés & fériés", sprint: 16, status: backlog }   # S16 planifiée (à affiner Ready)
-  US-013: { title: "Référentiel compétences & niveaux", sprint: 16, status: backlog }   # S16 planifiée (à affiner Ready)
+  US-012: { title: "Calendriers, jours ouvrés & fériés", sprint: 16, status: ready }   # S16 — Ready (affinée 2026-09-07)
+  US-013: { title: "Référentiel compétences & niveaux", sprint: 16, status: ready }   # S16 — Ready (affinée 2026-09-07)
   US-014: { title: "Comptes clients & contacts (tranche minimale S11)", sprint: 11, status: done }   # prérequis facturation (ADR-0022)
   US-015: { title: "Taux de vente multi-niveaux (profil/client/projet) + priorité (EF-REF-19)", sprint: 14, status: done, points: 5 }   # S14
   US-016: { title: "Devises & devise de référence tenant (EF-REF-22)", sprint: 14, status: done, points: 3 }   # S14
   US-017: { title: "Statuts & circuits de validation", sprint: null, status: backlog }
   US-018: { title: "Seuils d'alerte paramétrables (tenant)", sprint: 10, status: done }      # S10 — override seuil dérive US-072 (PR #51)
-  US-019: { title: "Onboarding tenant (< 15 min, MMF EF-REF-29)", sprint: 16, status: backlog }   # S16 planifiée (à affiner Ready)
-  US-020: { title: "Journal d'audit du paramétrage", sprint: 16, status: backlog }   # S16 planifiée (à affiner Ready)
+  US-019: { title: "Onboarding tenant (< 15 min, MMF EF-REF-29)", sprint: 16, status: ready }   # S16 — Ready (affinée 2026-09-07)
+  US-020: { title: "Journal d'audit du paramétrage", sprint: 16, status: ready }   # S16 — Ready (affinée 2026-09-07)
   US-030: { title: "Création projet & statuts", sprint: 6, status: done }
   US-031: { title: "Lots & jalons", sprint: 6, status: done }
   US-032: { title: "Projets internes non facturables (EF-PRJ-5)", sprint: 13, status: done, points: 5 }   # S13 (stretch livrée)

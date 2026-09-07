@@ -1,124 +1,111 @@
-# US-019: Ouverture de tenant et time-to-value < 15 minutes
+# US-019: Onboarding tenant — défauts prêts à l'emploi & mise en route guidée
 
 ## Métadonnées
 - **ID**: US-019
 - **EPIC**: EPIC-001
-- **Sprint**: Sprint 1
-- **Statut**: 🔴 To Do
+- **Sprint**: 16
+- **Statut**: 🟢 Ready
 - **Points**: 5
-- **Persona**: ADMIN
+- **Persona**: P-ADMIN (administrateur tenant nouvellement créé)
 - **Créé le**: 2026-08-31
-- **Mis à jour**: 2026-08-31
+- **Mis à jour**: 2026-09-07 (affinage S16 — recadrage défauts + checklist ; hors SLA/analytics/wizard)
 
 ## Traçabilité
-- **Implémente**: EF-REF-29, RG-REF-3, ENF-SAAS-2
-- **Dépend de**: US-001 (fondation multi-tenant)
-- **Spec Technique**: EF-REF-29 (paramètres par défaut, usage immédiat), RG-REF-3 (usage productif sans configuration préalable), ENF-SAAS-2 (SLA time-to-value)
+- **Implémente**: EF-REF-29 (paramètres par défaut, usage immédiat), RG-REF-3 (usage productif sans configuration préalable)
+- **Dépend de**: US-001 (multi-tenant), US-010 (org), US-011 (profils/taux), **US-012** (fériés), **US-013** (échelle compétences), US-016 (devise EUR par défaut, livrée)
+- **Réutilise** : `Application\Authorization\InitializeDefaultRoles` (rôles par défaut, existant), la commande de seed de démo (`app:demo:seed`) comme référence, l'enum `ProjectStatus` (statuts déjà disponibles par construction).
+- **Reporté (hors périmètre)** : mesure/monitoring **SLA time-to-value** & analytics, **wizard** multi-étapes, **réinitialisation** aux défauts, **vérification email** (relève de l'auth US-002) → US ultérieures.
 
 ## User Story
 
-**En tant qu'** administrateur tenant nouvellement créé,
-**je veux** qu'à la création de mon tenant, un ensemble de paramètres par défaut cohérents et opérationnels soit automatiquement configuré,
-**afin de** pouvoir créer mon premier projet et saisir un premier temps en moins de 15 minutes, sans aucune configuration préalable, et commencer à utiliser HotOnes immédiatement après l'inscription.
+**En tant qu'** administrateur d'un tenant nouvellement créé,
+**je veux** qu'un ensemble de **paramètres par défaut cohérents** soit provisionné automatiquement et qu'une **checklist de mise en route** me guide,
+**afin de** créer mon premier projet et saisir un premier temps **immédiatement, sans configuration préalable**.
 
-## Critères d'Acceptation
+## Contexte (Conversation)
+Aujourd'hui, seuls les rôles par défaut sont provisionnés (`InitializeDefaultRoles`). Cette US ajoute un
+**provisioning de défauts idempotent** (`tenant:init`) et une **checklist d'onboarding** affichée à la
+première connexion. Objectif EF-REF-29 : un tenant vierge est **opérationnel sans paramétrage
+obligatoire** (RG-REF-3). La mesure de la performance « < 15 min » (ENF-SAAS-2) est **reportée** (pas
+d'analytics dans ce sprint) ; l'US garantit ici l'*usage immédiat*, condition nécessaire.
 
-### CA-1 (Nominal) : Tenant nouvellement créé — premier projet créé et temps saisi en < 15 min (critère SMART mesurable)
+## Critères d'Acceptance (Confirmation)
+
+### CA-1 (Nominal) : un tenant fraîchement initialisé est opérationnel sans configuration
 ```gherkin
-GIVEN un nouveau tenant "StartupAgile" est activé (sans aucune configuration manuelle préalable)
-  AND l'ADMIN "alice@startupagilile.fr" se connecte pour la première fois
-WHEN Alice suit le parcours guidé : (1) Créer un premier profil, (2) Créer un premier projet, (3) Saisir un temps
-THEN Alice peut créer un profil "Développeur" en moins de 2 minutes grâce aux valeurs par défaut pré-remplies
-  AND Alice peut créer un projet "Projet Demo" avec un client "Client Demo" en moins de 5 minutes
-  AND Alice peut saisir 1 journée de temps sur ce projet en moins de 3 minutes
-  AND la durée totale du parcours (activation → première saisie de temps soumise) est inférieure à 15 minutes
-  AND cette durée est mesurée et journalisée automatiquement par le système pour monitoring SLA (ENF-SAAS-2)
+GIVEN un nouveau tenant vient d'être initialisé (tenant:init exécuté)
+WHEN l'administrateur se connecte pour la première fois
+THEN il peut créer un projet et saisir un temps SANS aucune étape de configuration préalable obligatoire
+  AND les défauts nécessaires (rôles, profil par défaut, client interne, devise EUR, échelle de compétences, fériés de l'année en cours) sont déjà présents
 ```
 
-### CA-2 (Nominal) : Paramètres par défaut prêts à l'emploi sans configuration
+### CA-2 (Nominal) : les défauts provisionnés sont cohérents et modifiables
 ```gherkin
-GIVEN un nouveau tenant "ConsultingRapide" est créé par la plateforme SaaS
-WHEN l'ADMIN consulte le panneau de configuration immédiatement après activation
-THEN les éléments suivants sont déjà configurés par défaut :
-  - Devise de référence : EUR
-  - Calendrier de travail : France — 5 jours × 7h, jours fériés de l'année civile en cours
-  - Échelle de compétences : 4 niveaux (Débutant, Intermédiaire, Avancé, Expert)
-  - Profil par défaut : "Consultant" avec taux de vente = 700 €/j et coût de revient = 0 €/j (à renseigner)
-  - Statuts projet : Brouillon, En cours, Terminé, Archivé (avec transitions standard)
-  - Client par défaut : "Client interne" (pour les projets internes)
-  AND chaque valeur par défaut est modifiable par l'ADMIN à tout moment
-  AND le premier accès affiche un bandeau "Configuration par défaut active — personnalisez selon vos besoins"
+GIVEN un tenant initialisé
+WHEN l'administrateur consulte le paramétrage juste après activation
+THEN sont présents par défaut : rôles standard, un profil « Consultant » (taux à renseigner),
+     un client « Client interne », la devise de référence EUR, l'échelle de compétences 4 niveaux,
+     les jours fériés de l'année civile en cours
+  AND chacun de ces éléments est modifiable par l'administrateur
 ```
 
-### CA-3 (Alternatif) : Wizard d'onboarding guidé pour personnaliser les paramètres clés
+### CA-3 (Alternatif) : checklist de mise en route à la première connexion
 ```gherkin
-GIVEN un nouveau tenant est activé avec les valeurs par défaut
-WHEN l'ADMIN choisit de lancer le wizard d'onboarding (optionnel, proposé au premier accès)
-THEN le wizard guide l'ADMIN en 4 étapes : (1) Informations de la société, (2) Devise et calendrier, (3) Premiers profils, (4) Premier projet
-  AND chaque étape est pré-remplie avec les valeurs par défaut et l'ADMIN peut valider en cliquant "Suivant" sans modification
-  AND l'ADMIN peut quitter le wizard à n'importe quelle étape sans perdre les paramètres saisis précédemment
-  AND à l'issue du wizard, le tenant est opérationnel avec les paramètres personnalisés ou par défaut selon les choix de l'ADMIN
+GIVEN un tenant initialisé sans activité
+WHEN l'administrateur accède au tableau de bord pour la première fois
+THEN une checklist affiche les étapes : (1) Vérifier le profil par défaut, (2) Créer un premier projet, (3) Saisir un premier temps
+  AND chaque étape franchie est cochée automatiquement (ex. « premier projet créé »)
+  AND la checklist disparaît / se replie une fois toutes les étapes accomplies
 ```
 
-### CA-4 (Alternatif) : Réinitialisation aux valeurs par défaut tenant (hors données utilisateurs)
+### CA-4 (Alternatif) : provisioning idempotent (rejouable sans doublon)
 ```gherkin
-GIVEN un tenant "TestConfig" a des expérimentations de configuration qui ont rendu le paramétrage incohérent
-  AND aucune saisie de temps réelle ni projet productif n'a encore été créé
-WHEN l'ADMIN demande la réinitialisation du paramétrage aux valeurs par défaut
-THEN le système demande une confirmation explicite avec l'inventaire des éléments qui seront réinitialisés
-  AND après confirmation, tous les paramètres de configuration (calendriers, profils par défaut, statuts) reviennent aux valeurs initiales
-  AND aucune donnée utilisateur (comptes, projets créés, saisies de temps) n'est supprimée
-  AND un événement d'audit enregistre la réinitialisation avec l'identifiant de l'ADMIN et le timestamp
+GIVEN un tenant déjà initialisé (défauts présents)
+WHEN tenant:init est exécuté à nouveau pour ce tenant
+THEN aucun doublon n'est créé (profil/client/échelle/fériés existants conservés)
+  AND l'opération se termine sans erreur (idempotence)
 ```
 
-### CA-5 (Erreur) : Création d'un tenant sans email valide → refus avant activation
+### CA-5 (Erreur) : initialisation d'un tenant inexistant → refus explicite
 ```gherkin
-GIVEN le processus d'activation d'un nouveau tenant requiert un email d'administrateur valide et vérifié
-WHEN l'email "admin@" (format invalide) est soumis lors de la création du tenant
-THEN le système refuse avec le message : "L'adresse email 'admin@' n'est pas valide. Saisissez une adresse email complète."
-  AND le tenant n'est pas créé et aucun identifiant de tenant n'est généré
-WHEN un email valide mais non vérifié est soumis (lien de confirmation non cliqué après 24h)
-THEN le tenant est créé à l'état "En attente de vérification" et aucun accès n'est possible
-  AND un email de relance est envoyé automatiquement après 24h si le lien de confirmation n'a pas été cliqué
+GIVEN aucun tenant n'existe pour l'identifiant fourni
+WHEN tenant:init est invoqué avec cet identifiant
+THEN l'opération échoue avec un message explicite (« Tenant introuvable »)
+  AND aucun élément par défaut n'est créé
 ```
 
-### CA-6 (Erreur) : Dépassement du délai time-to-value de 15 min → journalisé comme échec SLA et alerte Customer Success
+### CA-6 (Erreur) : la checklist et le provisioning respectent l'isolation multi-tenant
 ```gherkin
-GIVEN un nouveau tenant "LenteConfig" est activé et l'ADMIN démarre le parcours guidé
-  AND l'ADMIN effectue de nombreuses personnalisations manuelles et marque des pauses prolongées
-WHEN le système détecte que la durée entre l'activation du tenant et la première saisie de temps soumise dépasse 15 minutes
-THEN l'événement est journalisé comme "time_to_value_exceeded" avec la durée réelle (ex : 23 min 47 s) et l'identifiant du tenant (ENF-SAAS-2)
-  AND la métrique SLA du tableau de bord plateforme est mise à jour et le tenant est comptabilisé hors objectif
-  AND aucune action bloquante n'est déclenchée pour l'utilisateur (le dépassement est loggé, pas bloquant)
-  AND une alerte interne est envoyée à l'équipe Customer Success pour proposer un accompagnement au tenant concerné
+GIVEN deux tenants A et B initialisés
+WHEN on consulte la checklist et les défauts du tenant A
+THEN seuls les éléments du tenant A sont visibles (RLS) ; jamais ceux de B
+  AND l'avancement de la checklist de A est indépendant de celui de B
 ```
 
-## Tasks
+## Notes techniques (pour la décomposition)
+- **Service/commande** `tenant:init` (`Application\Onboarding\InitializeTenantDefaults` + commande console) : orchestre `InitializeDefaultRoles` (existant) + création idempotente : profil par défaut (`Pricing\Profile`), client interne (`Client`), devise EUR (US-016), échelle de compétences (US-013), fériés année en cours (US-012).
+- **Idempotence** : chaque défaut vérifié avant création (upsert) — rejouable.
+- **Checklist** : état d'onboarding par tenant (ex. `TenantOnboarding` `TenantOwned`, ou dérivé de l'existence projet/temps) + bandeau/encart Twig sur le dashboard (gating : administrateur). Étapes cochées par requêtes de comptage (projets, saisies).
+- **Statuts projet** : déjà disponibles via l'enum `ProjectStatus` (aucun provisioning nécessaire).
+- **Tests** : unit (idempotence, tenant inexistant) + fonctionnels (dashboard checklist, isolation, parcours création projet→temps sans config) ; ajouter les entités aux SchemaTool.
+- **Deptrac/RLS** : provisioning via ports du Domaine ; toute nouvelle table `TenantOwned` + RLS.
 
-| ID | Type | Description | Statut | Estimation |
-|----|------|-------------|--------|------------|
-| - | - | - | 🔴 | - |
-
-## Progression
-
-0/0 tasks complétées (0%)
+## Definition of Ready
+- [x] Description INVEST recadrée (défauts + checklist ; SLA/wizard/reset reportés)
+- [x] Gherkin (2 nominaux + 2 alternatifs + 2 erreurs)
+- [x] Estimation 5 pts confirmée
+- [x] Dépendances explicites (US-012/013/016 ; réutilise InitializeDefaultRoles) — **à ordonnancer en dernier** dans le sprint
+- [x] Impact multi-tenant/RLS et gating explicités
 
 ## Definition of Done
-
-- [ ] Tous les critères d'acceptation validés
-- [ ] Code reviewé
-- [ ] Tests unitaires passent
-- [ ] Tests d'intégration passent
-- [ ] Documentation mise à jour
+- [ ] CA validés (unit + fonctionnels), `make ci` vert (PHPStan max, Deptrac, couv. ≥ 80 %)
+- [ ] `tenant:init` idempotent ; migration + RLS pour toute nouvelle table ; code review
 
 ---
 
 ## Notes
-
-RG-REF-3 : le tenant doit être utilisable immédiatement après activation, sans configuration obligatoire. Les valeurs par défaut sont définies dans un fichier de seeds `tenant_defaults.yaml` versionné et appliqué via une commande `tenant:init` exécutée automatiquement à la création de chaque tenant.
-
-ENF-SAAS-2 (SLA time-to-value) : la durée du parcours activation → première saisie est mesurée via des événements d'analytics (tenant_created, first_project_created, first_timesheet_submitted). L'objectif contractuel est < 15 minutes pour 90 % des nouveaux tenants.
-
-Le critère CA-1 est un critère de performance fonctionnel mesurable (SMART). Un test de régression automatisé doit simuler le parcours complet et valider qu'il reste sous 15 minutes à chaque release.
-
-Cette US dépend de US-001 (multi-tenant foundation) et préfigure le contenu du Sprint 1 en garantissant qu'un tenant vierge est immédiatement opérationnel. Les US-010 à US-016 enrichissent les paramètres par défaut, mais ne les bloquent pas.
+La mesure du **time-to-value < 15 min** (ENF-SAAS-2, analytics `tenant_created`/`first_project_created`/
+`first_timesheet_submitted`) est **reportée** à une US d'observabilité dédiée. Cette US garantit la
+**condition** (usage immédiat sans config) et la mise en route guidée. Le provisioning s'appuie sur les
+référentiels livrés plus tôt dans le sprint (US-012 fériés, US-013 échelle), d'où l'ordre d'exécution
+« onboarding en dernier ».
