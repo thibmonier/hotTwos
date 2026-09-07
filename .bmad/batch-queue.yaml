@@ -37,7 +37,7 @@ stories:
     points: 8
     priority: 3
     depends_on: []
-    status: pending
+    status: done
     note: "Flux absences ≤2 étapes, validateur par rôle."
 
 total_points: 21
