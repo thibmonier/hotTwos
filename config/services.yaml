@@ -105,6 +105,10 @@ services:
     # Historisation de l'atterrissage en charge (US-079c, EF-PRJ-16, DIP).
     App\Domain\Budget\ChargeLandingSnapshotRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineChargeLandingSnapshotRepository'
 
+    # Seuil de dérive de charge par type de projet + escalade (US-079b, EF-PRJ-15) — repli constantes OBJ-2.
+    App\Domain\Budget\ChargeDriftThresholdProvider: '@App\Infrastructure\Budget\TenantChargeDriftThresholdProvider'
+    App\Domain\Budget\ChargeDriftThresholdRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineChargeDriftThresholdRepository'
+
     # Port configuration comptable FEC (US-074, DIP).
     App\Domain\Fec\FecConfigurationRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineFecConfigurationRepository'
 

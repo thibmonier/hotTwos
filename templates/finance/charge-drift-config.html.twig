@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Seuil de dérive de charge{% endblock %}
+{% block page_section %}Finance &amp; rentabilité{% endblock %}
+{% block page_title %}Seuil de dérive de charge par type de projet{% endblock %}
+
+{% block body %}
+    <h1 class="visually-hidden">seuil de dérive de charge par type de projet</h1>
+
+    <p class="mb-4 max-w-2xl text-sm text-muted">
+        Seuil de dépassement projeté du budget de charge (atterrissage, US-036/OBJ-2) au-delà duquel un
+        projet est signalé, réglable <strong>par type de projet</strong>. Un 2e seuil (escalade) déclenche
+        une alerte à la direction. À défaut, les valeurs de référence sont
+        {{ defaultAlert|number_format(0, ',', ' ') }}&nbsp;% (alerte) et
+        {{ defaultEscalation|number_format(0, ',', ' ') }}&nbsp;% (escalade).
+    </p>
+
+    <form method="post" action="{{ path('charge_drift_config_save') }}" class="max-w-2xl">
+        <input type="hidden" name="_token" value="{{ csrf_token('charge_drift_config') }}">
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse text-sm">
+                <thead>
+                    <tr class="border-b-2 border-border text-left text-xs uppercase text-muted">
+                        <th scope="col" class="py-2 pr-4">Type de projet</th>
+                        <th scope="col" class="py-2 pr-4">Seuil d'alerte (%)</th>
+                        <th scope="col" class="py-2">Seuil d'escalade direction (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for type in contractTypes %}
+                        {% set current = configured[type.value] ?? null %}
+                        <tr class="border-b border-border">
+                            <th scope="row" class="py-2 pr-4 font-medium text-ink">{{ type.label }}</th>
+                            <td class="py-2 pr-4">
+                                <label for="alert-{{ type.value }}" class="sr-only">Seuil d'alerte {{ type.label }}</label>
+                                <input id="alert-{{ type.value }}" name="alert_{{ type.value }}" type="number" step="0.1" min="0" max="100" required
+                                       value="{{ current ? current.alertPercent : defaultAlert }}"
+                                       class="min-h-10 w-32 rounded border border-border-strong bg-surface px-3 text-sm text-ink">
+                            </td>
+                            <td class="py-2">
+                                <label for="escalation-{{ type.value }}" class="sr-only">Seuil d'escalade {{ type.label }}</label>
+                                <input id="escalation-{{ type.value }}" name="escalation_{{ type.value }}" type="number" step="0.1" min="0" max="100" required
+                                       value="{{ current ? current.escalationPercent : defaultEscalation }}"
+                                       class="min-h-10 w-32 rounded border border-border-strong bg-surface px-3 text-sm text-ink">
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-4 flex gap-2">
+            <button type="submit" class="min-h-10 rounded bg-primary px-4 text-sm font-semibold text-white hover:bg-primary/90">Enregistrer</button>
+            <a href="{{ path('finance_dashboard') }}" class="min-h-10 inline-flex items-center rounded border border-border-strong px-4 text-sm text-muted hover:text-ink">Retour</a>
+        </div>
+    </form>
+{% endblock %}

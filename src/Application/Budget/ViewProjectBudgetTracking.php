@@ -8,6 +8,7 @@ use App\Application\Authorization\Authorizer;
 use App\Domain\Authorization\Permission;
 use App\Domain\Budget\BudgetTracking;
 use App\Domain\Budget\BudgetTrackingCalculator;
+use App\Domain\Budget\ChargeDriftThresholdProvider;
 use App\Domain\Budget\ChargeLanding;
 use App\Domain\Budget\ChargeLandingCalculator;
 use App\Domain\Budget\MarginDriftThresholdProvider;
@@ -43,6 +44,7 @@ final readonly class ViewProjectBudgetTracking
         private ProjectLotRepository $lots,
         private ProjectProgressCalculator $progress,
         private ChargeLandingCalculator $landing,
+        private ChargeDriftThresholdProvider $chargeDriftThresholds,
         private BudgetAmendmentRepository $amendments,
         private CurrentProjectBudget $currentBudget,
     ) {
@@ -81,7 +83,8 @@ final readonly class ViewProjectBudgetTracking
 
         // US-036 : atterrissage charge à partir de l'avancement physique agrégé des lots (US-035).
         $physicalProgress = $this->progress->weightedPhysicalProgress($this->lots->findForProject($tenant, $projectId));
-        $landing = $this->landing->land($current->costCents, $realized->costCents, $physicalProgress);
+        $driftThreshold = $this->chargeDriftThresholds->resolve($tenant, $project->contractType());
+        $landing = $this->landing->land($current->costCents, $realized->costCents, $physicalProgress, $driftThreshold);
 
         return $this->toView($projectId, $project->name(), $tracking, $landing, $costVisible);
     }
@@ -127,6 +130,7 @@ final readonly class ViewProjectBudgetTracking
             $costVisible ? $landing->consumptionPercent : null,
             $landing->physicalProgressPercent,
             $landing->isEarlyDrift,
+            $landing->isEscalated,
         );
     }
 }

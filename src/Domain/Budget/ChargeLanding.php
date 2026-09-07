@@ -20,6 +20,7 @@ final readonly class ChargeLanding
         public ?float $consumptionPercent,
         public ?int $physicalProgressPercent,
         public bool $isEarlyDrift,
+        public bool $isEscalated = false,
     ) {
     }
 }

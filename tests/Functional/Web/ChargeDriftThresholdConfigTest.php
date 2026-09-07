@@ -7,7 +7,6 @@ namespace App\Tests\Functional\Web;
 use App\Application\Authorization\InitializeDefaultRoles;
 use App\Domain\Authorization\Role;
 use App\Domain\Budget\ChargeDriftThreshold;
-use App\Domain\Budget\ChargeLanding;
 use App\Domain\Budget\ChargeLandingSnapshot;
 use App\Domain\Budget\MarginDriftThreshold;
 use App\Domain\Client\Client;
@@ -38,12 +37,13 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
 
 /**
- * US-079c (EF-PRJ-16, CA-2) — la fiche projet expose la « Courbe d'atterrissage » : la série des
- * snapshots par période (évolution du dépassement projeté), avec gating HAB-1 sur les montants de coût.
+ * US-079b (EF-PRJ-15, CA-3/CA-4, HAB-1) — configuration du seuil de dérive de charge par type de projet
+ * (alerte + escalade direction), gating MANAGE_ORGANIZATION, et prise en compte sur la fiche projet.
  */
-final class ChargeLandingCurveTest extends WebTestCase
+final class ChargeDriftThresholdConfigTest extends WebTestCase
 {
     private const string PASSWORD = 'motdepasse-solide';
+    private const string RESPONSIBLE = '018f9c4e-0000-7000-8000-0000000000c1';
 
     private KernelBrowser $client;
     private EntityManagerInterface $em;
@@ -73,7 +73,6 @@ final class ChargeLandingCurveTest extends WebTestCase
             $this->em->getClassMetadata(TimeEntryValuation::class),
             $this->em->getClassMetadata(MarginDriftThreshold::class),
             $this->em->getClassMetadata(ChargeDriftThreshold::class),
-
             $this->em->getClassMetadata(ChargeLandingSnapshot::class),
             $this->em->getClassMetadata(Client::class),
             $this->em->getClassMetadata(Invoice::class),
@@ -90,17 +89,12 @@ final class ChargeLandingCurveTest extends WebTestCase
 
         $hasher = new SodiumPasswordHasher();
         $this->em->persist(new Tenant($this->tenant, 'Agence A'));
-        $this->em->persist(new User($this->tenant, 'marc@agence.test', $hasher->hash(self::PASSWORD), ['Chef de projet']));
+        $this->em->persist(new User($this->tenant, 'admin@agence.test', $hasher->hash(self::PASSWORD), ['Administrateur']));
         $this->em->persist(new User($this->tenant, 'dg@agence.test', $hasher->hash(self::PASSWORD), ['Dirigeant']));
 
-        $project = Project::createBusiness($this->tenant, 'PRJ-0001', 'Pilotage', 'ACME', '018f9c4e-0000-7000-8000-0000000000c1', 100_000_00, ContractType::FORFAIT, null, null, 120_000_00);
+        $project = Project::createBusiness($this->tenant, 'PRJ-0001', 'Pilotage', 'ACME', self::RESPONSIBLE, 100_000_00, ContractType::FORFAIT, null, null, 120_000_00);
         $this->em->persist($project);
         $this->projectId = $project->id();
-
-        $capturedAt = new DateTimeImmutable('2026-08-31 23:00:00', new DateTimeZone('UTC'));
-        // Juillet : trajectoire saine ; Août : dérive de charge précoce (atterrissage 150 000 €).
-        $this->em->persist(ChargeLandingSnapshot::capture($this->tenant, '2026-07', $this->projectId, 'Pilotage', new ChargeLanding(true, 120_000_00, 100_000_00, 20.0, 40.0, 40, false), $capturedAt));
-        $this->em->persist(ChargeLandingSnapshot::capture($this->tenant, '2026-08', $this->projectId, 'Pilotage', new ChargeLanding(true, 150_000_00, 100_000_00, 50.0, 15.0, 10, true), $capturedAt));
 
         $this->em->flush();
     }
@@ -112,30 +106,73 @@ final class ChargeLandingCurveTest extends WebTestCase
         parent::tearDown();
     }
 
-    public function testExecutiveSeesCurveWithLandingAmounts(): void
+    public function testAdminConfiguresPerTypeThresholds(): void
     {
-        $this->login('dg@agence.test');
-        $this->client->request('GET', '/projets/'.$this->projectId);
+        $this->login('admin@agence.test');
 
+        $crawler = $this->client->request('GET', '/finance/config-derive-charge');
         self::assertResponseIsSuccessful();
         $content = (string) $this->client->getResponse()->getContent();
-        self::assertStringContainsString('Courbe d\'atterrissage', $content);
-        self::assertStringContainsString('2026-07', $content);
-        self::assertStringContainsString('2026-08', $content);
-        self::assertStringContainsString('150 000', $content); // atterrissage € visible (coût)
-        self::assertStringContainsString('Dérive précoce', $content);
+        self::assertStringContainsString('Forfait', $content);
+        self::assertStringContainsString('Régie', $content);
+        $token = $crawler->filter('input[name="_token"]')->attr('value') ?? '';
+
+        $this->client->request('POST', '/finance/config-derive-charge', [
+            '_token' => $token,
+            'alert_forfait' => '8', 'escalation_forfait' => '15',
+            'alert_regie' => '15', 'escalation_regie' => '25',
+        ]);
+        self::assertResponseRedirects();
+
+        $saved = (string) $this->client->request('GET', '/finance/config-derive-charge')->filter('#alert-forfait')->attr('value');
+        self::assertSame('8', $saved);
     }
 
-    public function testProjectManagerSeesCurveWithoutLandingAmounts(): void
+    public function testRejectsEscalationBelowAlert(): void
     {
-        $this->login('marc@agence.test');
-        $this->client->request('GET', '/projets/'.$this->projectId);
+        $this->login('admin@agence.test');
+        $crawler = $this->client->request('GET', '/finance/config-derive-charge');
+        $token = $crawler->filter('input[name="_token"]')->attr('value') ?? '';
 
+        // Escalade (5) < alerte (10) → refus métier, aucun enregistrement.
+        $this->client->request('POST', '/finance/config-derive-charge', [
+            '_token' => $token,
+            'alert_forfait' => '10', 'escalation_forfait' => '5',
+            'alert_regie' => '15', 'escalation_regie' => '25',
+        ]);
+        self::assertResponseRedirects();
+        $value = (string) $this->client->request('GET', '/finance/config-derive-charge')->filter('#alert-forfait')->attr('value');
+        self::assertSame((string) 10.0, $value); // repli défaut (aucun seuil forfait enregistré)
+    }
+
+    public function testProjectManagerCannotAccessConfiguration(): void
+    {
+        $this->login('dg@agence.test'); // Dirigeant : pas de MANAGE_ORGANIZATION
+        $this->client->request('GET', '/finance/config-derive-charge');
+        self::assertResponseStatusCodeSame(403);
+    }
+
+    public function testPilotageReflectsPerTypeEscalation(): void
+    {
+        // Seuils forfait bas : alerte 5 %, escalade 10 %.
+        $this->em->persist(new ChargeDriftThreshold($this->tenant, ContractType::FORFAIT, 5.0, 10.0));
+        // Budget 100 000 € ; consommé 24 000 € à 20 % → atterrissage 120 000 € (+20 %) → escalade (> 10 %).
+        $lot = new ProjectLot($this->tenant, $this->projectId, 'Développement', 10, 8_000_000);
+        $lot->recordProgress(20, null);
+        $this->em->persist($lot);
+        $rateDate = new DateTimeImmutable('2026-01-01 00:00:00', new DateTimeZone('UTC'));
+        $when = new DateTimeImmutable('2026-08-20 10:00:00', new DateTimeZone('UTC'));
+        $entry = new TimeEntry($this->tenant, self::RESPONSIBLE, $this->projectId, new DateTimeImmutable('2026-08-18'), 420);
+        $this->em->persist($entry);
+        $this->em->persist(TimeEntryValuation::valued($this->tenant, $entry->id(), 24_000_00, 6_000_00, 24_000_00, 6_000_00, $rateDate, $when));
+        $this->em->flush();
+
+        $this->login('dg@agence.test');
+        $this->client->request('GET', '/projets/'.$this->projectId);
         self::assertResponseIsSuccessful();
         $content = (string) $this->client->getResponse()->getContent();
-        self::assertStringContainsString('Courbe d\'atterrissage', $content);
-        self::assertStringContainsString('2026-08', $content);
-        self::assertStringNotContainsString('150 000', $content); // montant de coût masqué (HAB-1)
+        self::assertStringContainsString('Escalade direction', $content);
+        self::assertStringContainsString('Dérive de charge précoce', $content);
     }
 
     private function login(string $email): void
