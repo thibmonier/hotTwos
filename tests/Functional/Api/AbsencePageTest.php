@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Api;
 
 use App\Domain\Absence\AbsenceRequest;
+use App\Domain\Validation\AbsenceValidationCircuit;
 use App\Domain\Absence\AbsenceType;
 use App\Domain\Tenant\Tenant;
 use App\Domain\Tenant\TenantId;
@@ -39,6 +40,7 @@ final class AbsencePageTest extends WebTestCase
             $this->em->getClassMetadata(User::class),
             $this->em->getClassMetadata(AbsenceType::class),
             $this->em->getClassMetadata(AbsenceRequest::class),
+            $this->em->getClassMetadata(AbsenceValidationCircuit::class),
         ];
         $tool = new SchemaTool($this->em);
         $tool->dropSchema($this->schema);

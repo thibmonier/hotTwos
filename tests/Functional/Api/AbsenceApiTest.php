@@ -6,6 +6,7 @@ namespace App\Tests\Functional\Api;
 
 use App\Application\Authorization\InitializeDefaultRoles;
 use App\Domain\Absence\AbsenceRequest;
+use App\Domain\Validation\AbsenceValidationCircuit;
 use App\Domain\Absence\AbsenceType;
 use App\Domain\Authorization\Role;
 use App\Domain\Tenant\Tenant;
@@ -42,6 +43,7 @@ final class AbsenceApiTest extends WebTestCase
             $this->em->getClassMetadata(Role::class),
             $this->em->getClassMetadata(AbsenceType::class),
             $this->em->getClassMetadata(AbsenceRequest::class),
+            $this->em->getClassMetadata(AbsenceValidationCircuit::class),
         ];
         $tool = new SchemaTool($this->em);
         $tool->dropSchema($this->schema);

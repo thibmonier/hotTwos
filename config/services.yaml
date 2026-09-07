@@ -111,6 +111,9 @@ services:
     # Régimes de travail différenciés (US-021, EF-REF-7, DIP).
     App\Domain\Calendar\WorkScheduleRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineWorkScheduleRepository'
 
+    # Circuit de validation des absences (US-017, EF-REF-25, DIP).
+    App\Domain\Validation\AbsenceValidationCircuitRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineAbsenceValidationCircuitRepository'
+
     # Journal d'audit du paramétrage (US-020, EF-REF-33, append-only, DIP).
     App\Domain\Audit\ConfigAuditRecorder: '@App\Infrastructure\Persistence\Doctrine\DoctrineConfigAuditRecorder'
 
