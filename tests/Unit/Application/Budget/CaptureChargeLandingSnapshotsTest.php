@@ -13,6 +13,8 @@ use App\Domain\Project\ProjectLot;
 use App\Domain\Project\ProjectProgressCalculator;
 use App\Domain\Tenant\TenantId;
 use App\Domain\Valuation\ProjectValuationLine;
+use App\Infrastructure\Budget\TenantChargeDriftThresholdProvider;
+use App\Tests\Support\Budget\InMemoryChargeDriftThresholdRepository;
 use App\Tests\Support\Budget\InMemoryChargeLandingSnapshotRepository;
 use App\Tests\Support\Project\InMemoryBudgetAmendmentRepository;
 use App\Tests\Support\Project\InMemoryProjectLotRepository;
@@ -54,6 +56,7 @@ final class CaptureChargeLandingSnapshotsTest extends TestCase
             $this->lots,
             new ProjectProgressCalculator(),
             new ChargeLandingCalculator(),
+            new TenantChargeDriftThresholdProvider(new InMemoryChargeDriftThresholdRepository()),
             $this->snapshots,
             new MockClock(new DateTimeImmutable('2026-08-31 23:00:00', new DateTimeZone('UTC'))),
         );

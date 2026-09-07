@@ -41,6 +41,8 @@ final readonly class ProjectBudgetTrackingView
         public ?float $landingConsumptionPercent,
         public ?int $landingProgressPercent,
         public bool $landingEarlyDrift,
+        // US-079b — escalade direction (2e seuil de dérive de charge, par type de projet).
+        public bool $landingEscalated = false,
     ) {
     }
 }

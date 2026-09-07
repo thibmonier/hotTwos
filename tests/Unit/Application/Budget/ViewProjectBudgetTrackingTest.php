@@ -22,8 +22,10 @@ use App\Domain\Tenant\TenantId;
 use App\Domain\User\User;
 use App\Domain\Valuation\ProjectValuationLine;
 use App\Infrastructure\Budget\DefaultMarginDriftThresholdProvider;
+use App\Infrastructure\Budget\TenantChargeDriftThresholdProvider;
 use App\Tests\Support\Authorization\InMemoryRoleRepository;
 use App\Tests\Support\Authorization\RecordingSecurityAuditLogger;
+use App\Tests\Support\Budget\InMemoryChargeDriftThresholdRepository;
 use App\Tests\Support\Project\InMemoryBudgetAmendmentRepository;
 use App\Tests\Support\Project\InMemoryProjectLotRepository;
 use App\Tests\Support\Timesheet\InMemoryProjectRepository;
@@ -88,6 +90,7 @@ final class ViewProjectBudgetTrackingTest extends TestCase
             $this->lots,
             new ProjectProgressCalculator(),
             new ChargeLandingCalculator(),
+            new TenantChargeDriftThresholdProvider(new InMemoryChargeDriftThresholdRepository()),
             new InMemoryBudgetAmendmentRepository(),
             new CurrentProjectBudget(),
         );

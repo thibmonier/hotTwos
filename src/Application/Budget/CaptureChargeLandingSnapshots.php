@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Budget;
 
+use App\Domain\Budget\ChargeDriftThresholdProvider;
 use App\Domain\Budget\ChargeLanding;
 use App\Domain\Budget\ChargeLandingCalculator;
 use App\Domain\Budget\ChargeLandingSnapshot;
@@ -36,6 +37,7 @@ final readonly class CaptureChargeLandingSnapshots
         private ProjectLotRepository $lots,
         private ProjectProgressCalculator $progress,
         private ChargeLandingCalculator $landing,
+        private ChargeDriftThresholdProvider $chargeDriftThresholds,
         private ChargeLandingSnapshotRepository $snapshots,
         private ClockInterface $clock,
     ) {
@@ -78,7 +80,9 @@ final readonly class CaptureChargeLandingSnapshots
             $this->lots->findForProject($tenant, $project->id()),
         );
 
-        return $this->landing->land($current->costCents, $realizedCostCents, $physicalProgress);
+        $threshold = $this->chargeDriftThresholds->resolve($tenant, $project->contractType());
+
+        return $this->landing->land($current->costCents, $realizedCostCents, $physicalProgress, $threshold);
     }
 
     /**
