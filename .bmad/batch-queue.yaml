@@ -29,7 +29,7 @@ stories:
     points: 5
     priority: 2
     depends_on: []
-    status: pending
+    status: done
   - id: US-041
     title: "Plan de charge — capacité vs charge ferme"
     points: 5

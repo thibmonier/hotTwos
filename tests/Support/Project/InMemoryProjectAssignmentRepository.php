@@ -69,4 +69,23 @@ final class InMemoryProjectAssignmentRepository implements ProjectAssignmentRepo
 
         return array_keys($ids);
     }
+
+    public function plannedDaysByUser(TenantId $tenant, DateTimeImmutable $from, DateTimeImmutable $to): array
+    {
+        $fromKey = $from->format('Y-m-d');
+        $toKey = $to->format('Y-m-d');
+        $map = [];
+        foreach ($this->assignments as $a) {
+            if (!$a->tenantId()->equals($tenant)) {
+                continue;
+            }
+            $start = $a->startDate()?->format('Y-m-d');
+            $end = $a->endDate()?->format('Y-m-d');
+            if ((null === $start || $start <= $toKey) && (null === $end || $end >= $fromKey)) {
+                $map[$a->userId()] = ($map[$a->userId()] ?? 0) + $a->plannedDays();
+            }
+        }
+
+        return $map;
+    }
 }
