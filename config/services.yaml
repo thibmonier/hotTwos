@@ -105,6 +105,11 @@ services:
     # Jours fériés & calcul unifié des jours ouvrés (US-012, EF-REF-6, DIP).
     App\Domain\Calendar\HolidayRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineHolidayRepository'
 
+    # Référentiel de compétences (US-013, EF-REF-10/11, DIP).
+    App\Domain\Skill\SkillRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineSkillRepository'
+    App\Domain\Skill\SkillLevelScaleRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineSkillLevelScaleRepository'
+    App\Domain\Skill\SkillAssignmentRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineSkillAssignmentRepository'
+
     # Historisation de l'atterrissage en charge (US-079c, EF-PRJ-16, DIP).
     App\Domain\Budget\ChargeLandingSnapshotRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineChargeLandingSnapshotRepository'
 

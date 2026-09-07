@@ -1,0 +1,104 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Compétences{% endblock %}
+{% block page_section %}Paramétrage{% endblock %}
+{% block page_title %}Référentiel de compétences{% endblock %}
+
+{% block body %}
+    <h1 class="visually-hidden">référentiel de compétences</h1>
+
+    {# Échelle de niveaux #}
+    <section class="mb-8" aria-labelledby="scale-title">
+        <h2 id="scale-title" class="mb-2 text-sm font-semibold text-ink">Échelle de niveaux</h2>
+        <p class="mb-3 text-xs text-muted">Niveaux ordonnés, séparés par des virgules (du plus bas au plus haut).</p>
+        <form method="post" action="{{ path('skill_scale') }}" class="flex flex-wrap items-end gap-2">
+            <input type="hidden" name="_token" value="{{ csrf_token('skill_scale') }}">
+            <input name="levels" type="text" value="{{ levels|join(', ') }}" required
+                   class="min-h-10 w-96 max-w-full rounded border border-border-strong bg-surface px-3 text-sm text-ink">
+            <button type="submit" class="min-h-10 rounded bg-primary px-4 text-sm font-semibold text-white hover:bg-primary/90">Enregistrer l'échelle</button>
+        </form>
+    </section>
+
+    {# Ajout de compétence #}
+    <section class="mb-8" aria-labelledby="add-title">
+        <h2 id="add-title" class="mb-2 text-sm font-semibold text-ink">Ajouter une compétence</h2>
+        <form method="post" action="{{ path('skill_add') }}" class="flex flex-wrap items-end gap-2">
+            <input type="hidden" name="_token" value="{{ csrf_token('skill_add') }}">
+            <div>
+                <label for="skill-category" class="mb-1 block text-[13px] font-medium text-ink">Catégorie</label>
+                <select id="skill-category" name="category" class="min-h-10 rounded border border-border-strong bg-surface px-3 text-sm text-ink">
+                    {% for category in categories %}<option value="{{ category.value }}">{{ category.label }}</option>{% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="skill-label" class="mb-1 block text-[13px] font-medium text-ink">Libellé</label>
+                <input id="skill-label" name="label" type="text" required maxlength="255"
+                       class="min-h-10 w-64 rounded border border-border-strong bg-surface px-3 text-sm text-ink">
+            </div>
+            <button type="submit" class="min-h-10 rounded bg-primary px-4 text-sm font-semibold text-white hover:bg-primary/90">Ajouter</button>
+        </form>
+    </section>
+
+    {# Référentiel #}
+    <section class="mb-8" aria-labelledby="list-title">
+        <h2 id="list-title" class="mb-2 text-sm font-semibold text-ink">Compétences</h2>
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse text-sm">
+                <thead>
+                    <tr class="border-b-2 border-border text-left text-xs uppercase text-muted">
+                        <th scope="col" class="py-2 pr-4">Catégorie</th>
+                        <th scope="col" class="py-2 pr-4">Compétence</th>
+                        <th scope="col" class="py-2 pr-4">Statut</th>
+                        <th scope="col" class="py-2 text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for skill in skills %}
+                        <tr class="border-b border-border {{ skill.active ? '' : 'opacity-60' }}">
+                            <td class="py-2 pr-4 text-muted">{{ skill.category }}</td>
+                            <th scope="row" class="py-2 pr-4 font-medium text-ink">{{ skill.label }}</th>
+                            <td class="py-2 pr-4">{{ skill.active ? 'Active' : 'Désactivée' }}</td>
+                            <td class="py-2 text-right">
+                                {% if skill.active %}
+                                    <form method="post" action="{{ path('skill_deactivate', { id: skill.id }) }}" class="inline">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('skill_deactivate') }}">
+                                        <button type="submit" class="text-xs font-medium text-danger hover:underline">Désactiver</button>
+                                    </form>
+                                {% else %}<span class="text-muted">—</span>{% endif %}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="4" class="py-4 text-center text-muted">Aucune compétence.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    {# Association collaborateur ↔ compétence #}
+    <section aria-labelledby="assign-title">
+        <h2 id="assign-title" class="mb-2 text-sm font-semibold text-ink">Associer une compétence</h2>
+        <form method="post" action="{{ path('skill_assign') }}" class="flex flex-wrap items-end gap-2">
+            <input type="hidden" name="_token" value="{{ csrf_token('skill_assign') }}">
+            <div>
+                <label for="assign-collaborator" class="mb-1 block text-[13px] font-medium text-ink">Collaborateur</label>
+                <select id="assign-collaborator" name="collaborator" class="min-h-10 rounded border border-border-strong bg-surface px-3 text-sm text-ink">
+                    {% for id, name in collaborators %}<option value="{{ id }}">{{ name }}</option>{% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="assign-skill" class="mb-1 block text-[13px] font-medium text-ink">Compétence</label>
+                <select id="assign-skill" name="skill" class="min-h-10 rounded border border-border-strong bg-surface px-3 text-sm text-ink">
+                    {% for skill in skills|filter(s => s.active) %}<option value="{{ skill.id }}">{{ skill.label }}</option>{% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="assign-level" class="mb-1 block text-[13px] font-medium text-ink">Niveau</label>
+                <select id="assign-level" name="level" class="min-h-10 rounded border border-border-strong bg-surface px-3 text-sm text-ink">
+                    {% for level in levels %}<option value="{{ loop.index }}">{{ level }}</option>{% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="min-h-10 rounded bg-primary px-4 text-sm font-semibold text-white hover:bg-primary/90">Associer</button>
+        </form>
+    </section>
+{% endblock %}

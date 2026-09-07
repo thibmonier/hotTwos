@@ -18,7 +18,6 @@ final class Version20260907130000 extends AbstractMigration
     {
         $this->addSql('CREATE TABLE holiday (id UUID NOT NULL, tenant_id UUID NOT NULL, date DATE NOT NULL, label VARCHAR(255) NOT NULL, PRIMARY KEY (id))');
         $this->addSql('CREATE UNIQUE INDEX uniq_holiday_tenant_date ON holiday (tenant_id, date)');
-        $this->addSql('COMMENT ON COLUMN holiday.date IS \'(DC2Type:date_immutable)\'');
         $this->addSql('ALTER TABLE holiday ENABLE ROW LEVEL SECURITY');
         $this->addSql('ALTER TABLE holiday FORCE ROW LEVEL SECURITY');
         $this->addSql("CREATE POLICY tenant_isolation ON holiday USING (tenant_id::text = current_setting('app.current_tenant', true))");
