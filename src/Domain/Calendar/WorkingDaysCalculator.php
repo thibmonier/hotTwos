@@ -22,9 +22,13 @@ final class WorkingDaysCalculator
     /** @var array<string, array<string, true>> tenantId => set de dates 'Y-m-d' non ouvrées (fériés + fermetures) */
     private array $nonWorkingCache = [];
 
+    /** @var array<string, ?WorkSchedule> "tenantId|userId" => régime (ou null si temps plein) */
+    private array $scheduleCache = [];
+
     public function __construct(
         private readonly HolidayRepository $holidays,
         private readonly ClosurePeriodRepository $closures,
+        private readonly WorkScheduleRepository $schedules,
     ) {
     }
 
@@ -50,6 +54,46 @@ final class WorkingDaysCalculator
         }
 
         return !isset($this->nonWorkingSet($tenant)[$day->format('Y-m-d')]);
+    }
+
+    /**
+     * US-021 — jours ouvrés d'un **collaborateur** : jour ouvré du tenant (week-end/férié/fermeture)
+     * ET jour travaillé selon son régime (temps plein Lun-Ven si aucun régime).
+     */
+    public function workingDaysForUser(TenantId $tenant, string $userId, DateTimeImmutable $from, DateTimeImmutable $to): int
+    {
+        $count = 0;
+        for ($day = $from; $day < $to; $day = $day->modify('+1 day')) {
+            if ($this->isWorkingDayForUser($tenant, $userId, $day)) {
+                ++$count;
+            }
+        }
+
+        return $count;
+    }
+
+    public function isWorkingDayForUser(TenantId $tenant, string $userId, DateTimeImmutable $day): bool
+    {
+        if (!$this->isWorkingDay($tenant, $day)) {
+            return false;
+        }
+
+        $schedule = $this->scheduleFor($tenant, $userId);
+        if (!$schedule instanceof WorkSchedule) {
+            return true; // temps plein par défaut
+        }
+
+        return $schedule->worksOn((int) $day->format('N'));
+    }
+
+    private function scheduleFor(TenantId $tenant, string $userId): ?WorkSchedule
+    {
+        $key = $tenant->toString().'|'.$userId;
+        if (!array_key_exists($key, $this->scheduleCache)) {
+            $this->scheduleCache[$key] = $this->schedules->find($tenant, $userId);
+        }
+
+        return $this->scheduleCache[$key];
     }
 
     /**

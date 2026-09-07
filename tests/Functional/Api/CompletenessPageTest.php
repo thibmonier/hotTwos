@@ -6,6 +6,7 @@ namespace App\Tests\Functional\Api;
 
 use App\Application\Authorization\InitializeDefaultRoles;
 use App\Domain\Calendar\ClosurePeriod;
+use App\Domain\Calendar\WorkSchedule;
 use App\Domain\Calendar\Holiday;
 use App\Domain\Absence\AbsenceRequest;
 use App\Domain\Authorization\Role;
@@ -41,6 +42,7 @@ final class CompletenessPageTest extends WebTestCase
             $this->em->getClassMetadata(Tenant::class),
             $this->em->getClassMetadata(Holiday::class),
             $this->em->getClassMetadata(ClosurePeriod::class),
+            $this->em->getClassMetadata(WorkSchedule::class),
             $this->em->getClassMetadata(User::class),
             $this->em->getClassMetadata(Role::class),
             $this->em->getClassMetadata(TimeEntry::class),

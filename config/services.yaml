@@ -108,6 +108,9 @@ services:
     # Fermetures entreprise (US-022, EF-REF-9, DIP).
     App\Domain\Calendar\ClosurePeriodRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineClosurePeriodRepository'
 
+    # Régimes de travail différenciés (US-021, EF-REF-7, DIP).
+    App\Domain\Calendar\WorkScheduleRepository: '@App\Infrastructure\Persistence\Doctrine\DoctrineWorkScheduleRepository'
+
     # Journal d'audit du paramétrage (US-020, EF-REF-33, append-only, DIP).
     App\Domain\Audit\ConfigAuditRecorder: '@App\Infrastructure\Persistence\Doctrine\DoctrineConfigAuditRecorder'
 

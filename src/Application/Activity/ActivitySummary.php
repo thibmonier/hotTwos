@@ -68,7 +68,7 @@ final readonly class ActivitySummary
             $this->typeBreakdown($production, $absence),
             $production,
             $absence,
-            $this->expectedMinutes($tenant, $start, $end),
+            $this->expectedMinutes($tenant, $userId, $start, $end),
         );
     }
 
@@ -110,9 +110,9 @@ final readonly class ActivitySummary
         return $breakdown;
     }
 
-    /** Temps ouvré attendu = jours ouvrés (hors week-ends et fériés) de la période × durée journalière. */
-    private function expectedMinutes(TenantId $tenant, DateTimeImmutable $start, DateTimeImmutable $end): int
+    /** Temps ouvré attendu = jours ouvrés du collaborateur (régime, hors week-ends/fériés/fermetures) × durée journalière. */
+    private function expectedMinutes(TenantId $tenant, string $userId, DateTimeImmutable $start, DateTimeImmutable $end): int
     {
-        return $this->workingDays->workingDaysBetween($tenant, $start, $end->modify('+1 day')) * self::DAILY_MINUTES;
+        return $this->workingDays->workingDaysForUser($tenant, $userId, $start, $end->modify('+1 day')) * self::DAILY_MINUTES;
     }
 }

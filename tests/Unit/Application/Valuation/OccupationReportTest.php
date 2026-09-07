@@ -8,6 +8,7 @@ use App\Domain\Calendar\Holiday;
 use App\Domain\Calendar\WorkingDaysCalculator;
 use App\Tests\Support\Calendar\InMemoryHolidayRepository;
 use App\Tests\Support\Calendar\InMemoryClosurePeriodRepository;
+use App\Tests\Support\Calendar\InMemoryWorkScheduleRepository;
 use App\Application\Valuation\OccupationReport;
 use App\Domain\Absence\AbsenceRequest;
 use App\Domain\Tenant\TenantId;
@@ -135,7 +136,7 @@ final class OccupationReportTest extends TestCase
         return new OccupationReport(
             $this->valuations,
             $this->absences,
-            new WorkingDaysCalculator($this->holidays, new InMemoryClosurePeriodRepository()),
+            new WorkingDaysCalculator($this->holidays, new InMemoryClosurePeriodRepository(), new InMemoryWorkScheduleRepository()),
             new MockClock(new DateTimeImmutable('2026-09-15 10:00:00', new DateTimeZone('UTC'))),
         );
     }

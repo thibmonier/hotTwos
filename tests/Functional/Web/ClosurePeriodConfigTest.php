@@ -7,6 +7,7 @@ namespace App\Tests\Functional\Web;
 use App\Application\Authorization\InitializeDefaultRoles;
 use App\Domain\Authorization\Role;
 use App\Domain\Calendar\ClosurePeriod;
+use App\Domain\Calendar\WorkSchedule;
 use App\Domain\Tenant\Tenant;
 use App\Domain\Tenant\TenantId;
 use App\Domain\User\User;
@@ -41,6 +42,7 @@ final class ClosurePeriodConfigTest extends WebTestCase
             $this->em->getClassMetadata(User::class),
             $this->em->getClassMetadata(Role::class),
             $this->em->getClassMetadata(ClosurePeriod::class),
+            $this->em->getClassMetadata(WorkSchedule::class),
         ];
         $tool = new SchemaTool($this->em);
         $tool->dropSchema($this->schema);

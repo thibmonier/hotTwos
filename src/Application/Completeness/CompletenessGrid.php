@@ -57,10 +57,10 @@ final readonly class CompletenessGrid
         $friday = $monday->modify('+4 days');
         $absences = $this->absences->findValidatedOverlapping($tenant, $userId, $monday, $friday);
 
-        $workingDays = $this->workingDays->workingDaysBetween($tenant, $monday, $friday->modify('+1 day'));
+        $workingDays = $this->workingDays->workingDaysForUser($tenant, $userId, $monday, $friday->modify('+1 day'));
         $absentDays = 0;
         for ($day = $monday; $day <= $friday; $day = $day->modify('+1 day')) {
-            if ($this->workingDays->isWorkingDay($tenant, $day) && $this->isAbsent($absences, $day)) {
+            if ($this->workingDays->isWorkingDayForUser($tenant, $userId, $day) && $this->isAbsent($absences, $day)) {
                 ++$absentDays;
             }
         }

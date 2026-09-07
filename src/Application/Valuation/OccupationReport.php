@@ -39,7 +39,6 @@ final readonly class OccupationReport
         $from = $reference->modify('first day of this month')->setTime(0, 0);
         $to = $from->modify('+1 month');
 
-        $workingDays = $this->workingDays->workingDaysBetween($tenant, $from, $to);
         // `valuedDayCountByUser` ne renvoie déjà que les collaborateurs ayant une activité valorisée
         // sur le mois : on itère ce sous-ensemble plutôt que tous les utilisateurs du tenant.
         $valuedByUser = $this->valuations->valuedDayCountByUser($tenant, $from, $to);
@@ -48,6 +47,8 @@ final readonly class OccupationReport
 
         $lines = [];
         foreach ($valuedByUser as $userId => $valued) {
+            // US-021 : jours ouvrés propres au régime du collaborateur (temps partiel), nets d'absences.
+            $workingDays = $this->workingDays->workingDaysForUser($tenant, $userId, $from, $to);
             $capacity = max(0, $workingDays - $this->absenceDays($tenant, $userId, $from, $to));
             $lines[] = new OccupationLine($userId, $valued, $capacity, $billableByUser[$userId] ?? 0);
         }
@@ -64,7 +65,7 @@ final readonly class OccupationReport
 
         $count = 0;
         for ($day = $from; $day < $to; $day = $day->modify('+1 day')) {
-            if ($this->workingDays->isWorkingDay($tenant, $day) && $this->isAbsent($absences, $day)) {
+            if ($this->workingDays->isWorkingDayForUser($tenant, $userId, $day) && $this->isAbsent($absences, $day)) {
                 ++$count;
             }
         }
