@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\UI\Http\Controller;
 
 use App\Application\Authorization\Authorizer;
+use App\Application\Budget\ViewChargeLandingCurve;
 use App\Application\Budget\ViewProjectBudgetTracking;
 use App\Application\Project\AddBudgetAmendment;
 use App\Application\Project\ChangeProjectStatus;
@@ -72,6 +73,7 @@ final class ProjectPageController extends AbstractController
         private readonly ExternalCommitmentRepository $commitments,
         private readonly ProjectReopeningRepository $reopenings,
         private readonly ViewProjectBudgetTracking $budgetTracking,
+        private readonly ViewChargeLandingCurve $chargeLandingCurve,
         private readonly ClientRepository $clients,
         private readonly InvoiceRepository $invoices,
         private readonly IssueInvoice $issueInvoice,
@@ -172,6 +174,8 @@ final class ProjectPageController extends AbstractController
             'project' => $this->row($project),
             'canViewFinancials' => $canViewFinancials,
             'budgetTracking' => $canViewFinancials ? $this->budgetTracking->forProject($user, $project->id()) : null,
+            // US-079c — courbe d'atterrissage historisée (série de snapshots par période close).
+            'chargeLandingCurve' => $canViewFinancials ? $this->chargeLandingCurve->forProject($user, $project->id()) : null,
             'clientId' => $project->clientId(),
             'clients' => array_map(
                 static fn (Client $c): array => ['id' => $c->id(), 'name' => $c->name()],
