@@ -13,6 +13,10 @@
     <php>
         <ini name="display_errors" value="1" />
         <ini name="error_reporting" value="-1" />
+        <!-- L'image fixe memory_limit=128M ; l'ajout du socle tailsfadmin-bundle (services form/
+             translation/ux-twig-component bootés en env test) fait franchir ce plafond à la mémoire
+             cumulée de la suite (fatal dom-crawler). Aligné sur l'esprit du memory-limit 1G de PHPStan. -->
+        <ini name="memory_limit" value="512M" />
         <server name="APP_ENV" value="test" force="true" />
         <!-- DATABASE_URL n'est PAS forcé : l'environnement fournit l'hôte réel de la base.
              En Docker (make test), le conteneur pointe vers le service `database`; en CI GitHub,

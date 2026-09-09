@@ -15,4 +15,6 @@ return [
     Sentry\SentryBundle\SentryBundle::class => ['all' => true],
     Symfonycasts\TailwindBundle\SymfonycastsTailwindBundle::class => ['all' => true],
     SymfonyCasts\Bundle\ResetPassword\SymfonyCastsResetPasswordBundle::class => ['all' => true],
+    Symfony\UX\TwigComponent\TwigComponentBundle::class => ['all' => true],
+    Tailsfadmin\TailsfadminBundle::class => ['all' => true],
 ];

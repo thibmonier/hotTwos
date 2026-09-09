@@ -34,6 +34,7 @@
         "symfony/yaml": "8.1.*",
         "symfonycasts/reset-password-bundle": "^1.25",
         "symfonycasts/tailwind-bundle": "^1.0",
+        "tailsfadmin/tailsfadmin-bundle": "^1.1",
         "twig/extra-bundle": "^2.12|^3.0",
         "twig/twig": "^2.12|^3.0"
     },
