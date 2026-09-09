@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7cc4aab791581ab60770796cd8d02988",
+    "content-hash": "de4e7eb910c283782c51171bdabef0a0",
     "packages": [
         {
             "name": "api-platform/core",
@@ -8255,16 +8255,16 @@
         },
         {
             "name": "tailsfadmin/tailsfadmin-bundle",
-            "version": "v1.1.0",
+            "version": "v1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thibmonier/tailsfadmin.git",
-                "reference": "dad13425854720120723f94e5b1f28e93b9c599e"
+                "reference": "b14ce3ff9a4e5dca3a8eefb85673cf8095656478"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thibmonier/tailsfadmin/zipball/dad13425854720120723f94e5b1f28e93b9c599e",
-                "reference": "dad13425854720120723f94e5b1f28e93b9c599e",
+                "url": "https://api.github.com/repos/thibmonier/tailsfadmin/zipball/b14ce3ff9a4e5dca3a8eefb85673cf8095656478",
+                "reference": "b14ce3ff9a4e5dca3a8eefb85673cf8095656478",
                 "shasum": ""
             },
             "require": {
@@ -8283,7 +8283,11 @@
                 "phpstan/phpstan": "^2.1",
                 "phpunit/phpunit": "^12.2 || ^13.0",
                 "symfony/browser-kit": "^7.3 || ^8.0",
-                "symfony/http-client": "^7.3 || ^8.0"
+                "symfony/http-client": "^7.3 || ^8.0",
+                "symfony/security-core": "^7.3 || ^8.0"
+            },
+            "suggest": {
+                "symfony/security-bundle": "Pour filtrer les items de la sidebar par permission (clé `permission` + is_granted)"
             },
             "type": "symfony-bundle",
             "extra": {
@@ -8322,7 +8326,7 @@
                 "issues": "https://github.com/thibmonier/tailsfadmin/issues",
                 "source": "https://github.com/thibmonier/tailsfadmin"
             },
-            "time": "2026-09-08T21:16:28+00:00"
+            "time": "2026-09-09T09:34:06+00:00"
         },
         {
             "name": "twig/extra-bundle",

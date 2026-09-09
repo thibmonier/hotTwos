@@ -154,7 +154,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         cookie_name?: scalar|Param|null, // The name of the cookie to use when using stateless protection. // Default: "csrf-token"
  *     },
  *     form?: bool|array{ // Form configuration
- *         enabled?: bool|Param, // Default: false
+ *         enabled?: bool|Param, // Default: true
  *         csrf_protection?: bool|array{
  *             enabled?: scalar|Param|null, // Default: null
  *             token_id?: scalar|Param|null, // Default: null
@@ -305,7 +305,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         },
  *     },
  *     translator?: bool|array{ // Translator configuration
- *         enabled?: bool|Param, // Default: false
+ *         enabled?: bool|Param, // Default: true
  *         fallbacks?: Param|string|list<scalar|Param|null>,
  *         logging?: bool|Param, // Default: false
  *         formatter?: scalar|Param|null, // Default: "translator.formatter.default"
@@ -1866,6 +1866,37 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     throttle_limit?: int|Param, // Another password reset cannot be made faster than this throttle time in seconds. // Default: 3600
  *     enable_garbage_collection?: bool|Param, // Enable/Disable automatic garbage collection. // Default: true
  * }
+ * @psalm-type TwigComponentConfig = array{
+ *     defaults?: array<string, Param|string|array{ // Default: []
+ *         template_directory?: scalar|Param|null, // Default: "components"
+ *         name_prefix?: scalar|Param|null, // Default: ""
+ *     }>,
+ *     anonymous_template_directory?: scalar|Param|null, // Defaults to `components`
+ *     profiler?: bool|array{ // Enables the profiler for Twig Component
+ *         enabled?: bool|Param, // Default: "%kernel.debug%"
+ *         collect_components?: bool|Param, // Collect components instances // Default: true
+ *     },
+ * }
+ * @psalm-type TailsfadminConfig = array{
+ *     menu?: list<array{ // Default: []
+ *         group?: scalar|Param|null,
+ *         items?: list<array{ // Default: []
+ *             label?: scalar|Param|null,
+ *             path?: scalar|Param|null, // Default: "#"
+ *             icon?: scalar|Param|null, // Default: ""
+ *             permission?: scalar|Param|null, // Default: null
+ *             children?: list<array{ // Default: []
+ *                 label?: scalar|Param|null,
+ *                 path?: scalar|Param|null, // Default: "#"
+ *                 icon?: scalar|Param|null, // Default: ""
+ *                 permission?: scalar|Param|null, // Default: null
+ *             }>,
+ *         }>,
+ *     }>,
+ *     default_locale?: scalar|Param|null, // Default: "fr"
+ *     locales?: list<scalar|Param|null>,
+ *     rtl_locales?: list<scalar|Param|null>,
+ * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,
@@ -1883,6 +1914,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     sentry?: SentryConfig,
  *     symfonycasts_tailwind?: SymfonycastsTailwindConfig,
  *     symfonycasts_reset_password?: SymfonycastsResetPasswordConfig,
+ *     twig_component?: TwigComponentConfig,
+ *     tailsfadmin?: TailsfadminConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
@@ -1901,6 +1934,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         sentry?: SentryConfig,
  *         symfonycasts_tailwind?: SymfonycastsTailwindConfig,
  *         symfonycasts_reset_password?: SymfonycastsResetPasswordConfig,
+ *         twig_component?: TwigComponentConfig,
+ *         tailsfadmin?: TailsfadminConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
@@ -1919,6 +1954,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         sentry?: SentryConfig,
  *         symfonycasts_tailwind?: SymfonycastsTailwindConfig,
  *         symfonycasts_reset_password?: SymfonycastsResetPasswordConfig,
+ *         twig_component?: TwigComponentConfig,
+ *         tailsfadmin?: TailsfadminConfig,
  *     },
  *     "when@test"?: array{
  *         imports?: ImportsConfig,
@@ -1937,6 +1974,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         sentry?: SentryConfig,
  *         symfonycasts_tailwind?: SymfonycastsTailwindConfig,
  *         symfonycasts_reset_password?: SymfonycastsResetPasswordConfig,
+ *         twig_component?: TwigComponentConfig,
+ *         tailsfadmin?: TailsfadminConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,
