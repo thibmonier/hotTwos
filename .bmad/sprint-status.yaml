@@ -4,6 +4,8 @@
 last_sync: "2026-09-07T14:30:00Z"
 source_of_truth: "git history + project-management/sprints/*/sprint-review.md"
 resolution_strategy: "git-wins (les fichiers markdown étaient périmés)"
+# Ajout manuel 2026-09-09 : US-086 (socle tailsfadmin-bundle, ADR-0023) + US-080→085 (EPIC-013 conception UX).
+# Non issu d'un /project:sync-backlog complet ; stories en backlog, non encore planifiées.
 
 # Résumé par sprint (goal atteint d'après sprint-review.md)
 sprints:
@@ -93,6 +95,15 @@ stories:
   US-077: { title: "Export FEC sur facturé réel", sprint: 11, status: done, points: 5 }   # Should — PR #61 (acquis par source unique US-076)
   US-078: { title: "Budget charge par profil (EF-PRJ-9)", sprint: 13, status: done, points: 8 }   # S13 (complète EPIC-002)
   US-079: { title: "Raffinements pilotage — export/courbe/seuil par type (EF-PRJ-14/15/16)", sprint: 15, status: done, points: 8 }   # US-079a export S14 (#78) ; US-079c courbe S15 (#82) ; US-079b seuil par type S15 (#83) → EPIC-002 complet
+  # — Chantier technique socle de thème (bundle d'abord — ADR-0023, créée 2026-09-09) —
+  US-086: { title: "Adoption du socle de thème tailsfadmin-bundle (externalisation layout)", sprint: null, status: backlog, points: 5 }   # EPIC-012 — remplace US-063 (caduque, ADR-0023)
+  # — EPIC-013 : Recensement pages cibles, parcours par persona & conception UX (créées 2026-09-09) —
+  US-080: { title: "Référentiel exhaustif des pages cibles", sprint: null, status: backlog, points: 5 }   # EPIC-013
+  US-081: { title: "Cartographie des parcours par persona (P1–P6)", sprint: null, status: backlog, points: 5 }   # EPIC-013
+  US-082: { title: "Audit & critique UX de l'existant (inspiré hotones)", sprint: null, status: backlog, points: 5 }   # EPIC-013 — nécessite accès hotones
+  US-083: { title: "Mapping pages ↔ composants tailsfadmin (+ gaps)", sprint: null, status: backlog, points: 3 }   # EPIC-013
+  US-084: { title: "Maquettes haute-fidélité des écrans prioritaires (validées PO)", sprint: null, status: backlog, points: 8 }   # EPIC-013 — nécessite accès hotones
+  US-085: { title: "Backlog de refonte/reskin priorisé (MoSCoW)", sprint: null, status: backlog, points: 3 }   # EPIC-013
 
 # Stories techniques / dette qualité (hors vélocité) engagées au Sprint 10
 tech_stories:
@@ -105,6 +116,6 @@ totals:
   done: 53          # +US-017/021/022 (S17 — EPIC-001 bouclé)
   ready: 0          # US-079 livrée (courbe + seuil par type)
   in_progress: 0
-  backlog: 11
+  backlog: 18       # +US-086 (socle bundle) +US-080→085 (EPIC-013 conception UX) — ajoutées 2026-09-09
   orphans: [US-014, US-015, US-016, US-018, US-032]  # dans aucun sprint (US-017→S17)
   referenced_not_delivered: [US-033, US-035, US-036, US-053]
