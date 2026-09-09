@@ -6,6 +6,7 @@ framework:
         paths:
             'assets/': ''
             'vendor/tailsfadmin/tailsfadmin-bundle/assets/controllers': 'bundles/tailsfadmin'
+            'vendor/tailsfadmin/tailsfadmin-bundle/assets/vendor-src': 'bundles/tailsfadmin-vendor'
         missing_import_mode: strict
 
 when@prod:
