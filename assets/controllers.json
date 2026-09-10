@@ -14,7 +14,75 @@
             }
         },
         "@tailsfadmin/tailsfadmin-bundle": {
+            "preloader": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "theme": {
+                "enabled": true,
+                "fetch": "eager"
+            },
             "sidebar": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "dropdown": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "tabs": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "search": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "alert-dismiss": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "modal": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "clipboard": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "kanban": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "otp": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "datepicker": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "dropzone": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "apexcharts": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "calendar": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "vectormap": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "submenu": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "assets-check": {
                 "enabled": true,
                 "fetch": "eager"
             }
