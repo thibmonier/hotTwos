@@ -7,11 +7,6 @@
 
 | ID | US | Tâche | Type | Estimation |
 |----|-----|-------|------|------------|
-| T-080-01 | US-080 | Extraire l'inventaire des routes/écrans existants | [DOC] | 2h |
-| T-080-02 | US-080 | Documenter chaque page (objectif, persona, infos, actions, données) | [DOC] | 4h |
-| T-080-03 | US-080 | Identifier les pages cibles manquantes par module | [DOC] | 3h |
-| T-080-04 | US-080 | Consolider `page-inventory.md` | [DOC] | 2h |
-| T-080-05 | US-080 | Validation PO — couverture 100 % existant | [REV] | 1h |
 | T-081-01 | US-081 | Identifier les JTBD par persona (P1–P6) | [DOC] | 3h |
 | T-081-02 | US-081 | Tracer les diagrammes de parcours Mermaid (P1–P6) | [DOC] | 5h |
 | T-081-03 | US-081 | Croiser : ruptures & pages orphelines | [DOC] | 2h |
@@ -32,10 +27,15 @@
 ## 👀 En Review
 | ID | US | Tâche | Reviewer |
 |----|-----|-------|----------|
+| T-080-05 | US-080 | Validation PO — couverture 100 % existant (`page-inventory.md`) | PO (via PR) |
 
 ## ✅ Terminé
 | ID | US | Tâche | Réel | Terminé |
 |----|-----|-------|------|---------|
+| T-080-01 | US-080 | Extraire l'inventaire des routes/écrans (`debug:router`) | ~1h | 2026-09-10 |
+| T-080-02 | US-080 | Documenter chaque page (objectif, persona, infos, actions, données) | ~3h | 2026-09-10 |
+| T-080-03 | US-080 | Identifier les pages cibles manquantes par module | ~1h | 2026-09-10 |
+| T-080-04 | US-080 | Consolider `page-inventory.md` | ~1h | 2026-09-10 |
 
 ## 🚫 Bloqué
 | ID | US | Raison | Action |
@@ -44,6 +44,7 @@
 | — | US-084 | Accès `hotones` + sortie US-080→085 | Reporté hors sprint |
 
 ## Métriques
-- **Tâches** : 17 total | 0 terminées (0 %)
-- **Heures** : 38h estimées | 0h consommées | 38h restantes
-- **Points** : 16 engagés (US-080/081/083/085)
+- **Tâches** : 17 total | 4 terminées + 1 en review (US-080) | 12 à faire
+- **Heures** : 38h estimées | ~6h consommées (US-080) | ~32h restantes
+- **Points** : 16 engagés | US-080 (5 pts) livrable produit, en validation PO
+- **Livrables produits** : `project-management/architecture/page-inventory.md` (US-080)
