@@ -8,6 +8,12 @@
 /* Purge (JIT) : scanne tous les templates Twig. */
 @source "../../templates";
 
+/* Scanne aussi les composants du socle (tsf:Ui:Tabs, ProgressBar, Ribbon, …) et leurs
+   contrôleurs Stimulus, pour générer leurs classes utilitaires propres (bg-brand-500,
+   text-theme-sm, h-1.5, …) absentes des templates de l'app (US-086). */
+@source "../../vendor/tailsfadmin/tailsfadmin-bundle/templates";
+@source "../../vendor/tailsfadmin/tailsfadmin-bundle/assets/controllers";
+
 /*
  * ─────────────────────────────────────────────────────────────────────────
  * Design system HotOnes (ADR-0019) — tokens clair/sombre en variables CSS.

@@ -250,7 +250,7 @@ final class ProjectPageTest extends WebTestCase
         self::assertResponseRedirects();
         $this->em->clear();
 
-        $content = $this->client->request('GET', '/projets/'.$id)->filter('#panel-structure')->html();
+        $content = $this->client->request('GET', '/projets/'.$id)->filter('#tsf-panel-structure')->html();
         self::assertStringContainsString('32 000', $content); // équivalent € vente
         self::assertStringContainsString('Senior', $content);
     }

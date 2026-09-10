@@ -235,7 +235,7 @@ final class ProjectBudgetTrackingTest extends WebTestCase
         ]);
         self::assertResponseRedirects();
 
-        $content = $this->client->request('GET', '/projets/'.$this->budgetedProjectId)->filter('#panel-budget')->html();
+        $content = $this->client->request('GET', '/projets/'.$this->budgetedProjectId)->filter('#tsf-panel-budget')->html();
         self::assertStringContainsString('55 000', $content);                  // budget de charge courant (40 000 + 15 000)
         self::assertStringContainsString('périmètre étendu — lot 3', $content); // historique de l'avenant
     }
@@ -251,7 +251,7 @@ final class ProjectBudgetTrackingTest extends WebTestCase
         ]);
         self::assertResponseRedirects();
         // Aucun avenant enregistré : budget courant inchangé (pas de « 1 avenant »).
-        $content = $this->client->request('GET', '/projets/'.$this->budgetedProjectId)->filter('#panel-budget')->html();
+        $content = $this->client->request('GET', '/projets/'.$this->budgetedProjectId)->filter('#tsf-panel-budget')->html();
         self::assertStringNotContainsString('avenant(s)', $content);
     }
 

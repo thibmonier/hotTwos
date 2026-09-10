@@ -30,15 +30,25 @@
 {# ─── Sidebar HotOnes (sombre invariante, nav filtrée par permissions) ─── #}
 {% block sidebar %}
     <aside id="app-sidebar" data-tailsfadmin--sidebar-target="sidebar" aria-label="Navigation principale"
-           class="fixed inset-y-0 left-0 z-30 flex w-[250px] shrink-0 -translate-x-full flex-col bg-sidebar text-sidebar-text transition-transform lg:static lg:translate-x-0">
-        <a href="{{ path('home') }}" class="flex h-[70px] items-center gap-3 border-b border-sidebar-alt px-5">
-            <span class="grid h-7 w-7 place-items-center rounded-lg bg-primary-surface text-sm font-bold text-white">H</span>
-            <span class="text-lg font-semibold text-white">HotOnes</span>
-        </a>
+           class="sidebar fixed inset-y-0 left-0 z-30 flex w-[290px] shrink-0 -translate-x-full flex-col bg-sidebar text-sidebar-text transition-[transform,width] duration-300 lg:static lg:translate-x-0">
+        <div class="flex h-[70px] items-center justify-between gap-2 border-b border-sidebar-alt px-3">
+            <a href="{{ path('home') }}" class="flex items-center gap-2.5 overflow-hidden">
+                <span class="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-primary-surface text-sm font-bold text-white">H</span>
+                <span class="menu-item-text whitespace-nowrap text-lg font-semibold text-white">HotOnes</span>
+            </a>
+            {# Repli/déploiement desktop — contrôleur du socle (persistance localStorage). #}
+            <button type="button" data-action="click->tailsfadmin--sidebar#toggle"
+                    aria-label="Réduire ou déployer le menu"
+                    class="hidden h-8 w-8 shrink-0 place-items-center rounded text-sidebar-icon transition-colors hover:bg-white/5 hover:text-white lg:grid">
+                <svg aria-hidden="true" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+                </svg>
+            </button>
+        </div>
         {% if is_granted('ROLE_USER') %}
         {% set r = app.request.attributes.get('_route') %}
-        <p class="px-5 pt-4 pb-1.5 text-xs font-semibold uppercase tracking-wider text-sidebar-label">Menu</p>
-        <nav aria-label="Navigation principale" class="flex flex-col gap-0.5 px-3">
+        <nav aria-label="Navigation principale" class="flex flex-col gap-0.5 px-3 pt-4">
+            <h3 class="px-2 pb-1.5 text-xs font-semibold uppercase tracking-wider text-sidebar-label">Menu</h3>
             {% set items = [
                 {label:'Accueil', route:'home', match:['home'], perm:null, icon:'home'},
                 {label:'Saisie', route:'timesheet_week', match:['timesheet_week', 'timesheet_day'], perm:null, icon:'pencil'},
@@ -74,7 +84,7 @@
                        class="flex min-h-11 items-center gap-3 rounded px-3 text-[13px] {{ active ? 'bg-primary font-medium text-white' : 'hover:bg-white/5 hover:text-white' }}"
                        {% if active %}aria-current="page"{% endif %}>
                         <svg aria-hidden="true" class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">{{ icons[it.icon]|raw }}</svg>
-                        <span>{{ it.label }}</span>
+                        <span class="menu-item-text whitespace-nowrap">{{ it.label }}</span>
                     </a>
                 {% endif %}
             {% endfor %}
