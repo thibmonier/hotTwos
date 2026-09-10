@@ -8,7 +8,7 @@
 - **Points**: 5
 - **Persona**: P1–P6
 - **Créé le**: 2026-09-10
-- **Mis à jour**: 2026-09-10
+- **Mis à jour**: 2026-09-10 (affinage S19)
 
 ## Traçabilité
 - **Implémente**: EPIC-013 (C2 — Cartographier les parcours par persona)
@@ -35,10 +35,11 @@ Chaque diagramme identifie :
 - les points de rupture (pages manquantes, actions impossibles, allers-retours inutiles) ;
 - les pages orphelines (non atteintes par aucun parcours persona).
 
-Points à clarifier :
-- Se limiter au parcours principal de chaque persona (1 diagramme principal + 1 variante max si utile).
-- Les ruptures et pages orphelines sont annotées directement sur le diagramme ou dans un tableau récapitulatif associé au fichier.
-- Accessibilité WCAG 2.2 AA : les ruptures sur le parcours de P1 (saisie de temps) sont signalées comme prioritaires (critère de rejet : saisie > 2 min).
+Décisions d'affinage (S19) — arrêtées :
+- **Portée bornée** : 1 diagramme de parcours **principal** par persona (P1–P6) + **1 variante maximum** si un scénario secondaire majeur l'exige (ex. P3 simulation d'affaire).
+- **Notation des ruptures** : annotées sur le diagramme (class Mermaid dédiée) **et** consolidées dans un tableau récapitulatif (Impact bloquant/dégradé/cosmétique + Priorité refonte).
+- **Accessibilité WCAG 2.2 AA** : les ruptures du parcours P1 (saisie de temps, mobile, lundi matin) sont prioritaires (critère de rejet : saisie > 2 min).
+- **JTBD de référence** : dérivés des scénarios d'utilisation clés de `personas.md` (pas de réinvention) ; le critère de rejet de chaque persona est annoté sur son diagramme.
 
 ## Critères d'Acceptance (Confirmation)
 
@@ -110,9 +111,11 @@ THEN l'incohérence est signalée et corrigée avant validation
 ## Definition of Ready
 - [x] Description INVEST (borné : 1 diagramme principal par persona, variantes optionnelles ; 5 pts)
 - [x] Gherkin (2 nominaux + 2 alternatifs + 2 erreurs)
-- [x] Dépend d'US-080 (IDs de pages disponibles avant de démarrer)
 - [x] Format Mermaid défini, emplacement des livrables précisé
+- [x] **Condition d'entrée** : `page-inventory.md` (US-080) **validé PO** — les nœuds des diagrammes référencent ses IDs. US-081 démarre après le feu vert PO d'US-080 (pré-condition stricte). ⏳ *À lever au démarrage effectif.*
+- [x] **Portée arrêtée** : 1 parcours principal/persona (+1 variante max) — cf. décisions d'affinage
 - [x] Validation INVEST : Independent ✓ (démarrée après US-080) / Negotiable ✓ (nombre de variantes par diagramme adaptable) / Valuable ✓ (révèle ruptures et orphelins, base de priorisation) / Estimable ✓ (6 parcours × effort moyen, 5 pts) / Sized ✓ (≤ 8 pts) / Testable ✓ (présence des 6 diagrammes et cohérence IDs vérifiables)
+- **DoR : ✅ LEVÉE sous réserve de la condition d'entrée (US-080 validée)**
 
 ## Definition of Done
 - [ ] 6 diagrammes Mermaid (P1–P6) produits et syntaxiquement valides

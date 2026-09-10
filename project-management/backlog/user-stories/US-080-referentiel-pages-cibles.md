@@ -8,7 +8,7 @@
 - **Points**: 5
 - **Persona**: Tous (P1–P6)
 - **Créé le**: 2026-09-10
-- **Mis à jour**: 2026-09-10
+- **Mis à jour**: 2026-09-10 (affinage S19)
 
 ## Traçabilité
 - **Implémente**: EPIC-013 (C1 — Recenser les pages cibles)
@@ -32,11 +32,13 @@ applicatives existantes ET les pages cibles manquantes (marquées « À créer �
 Il constitue le socle de US-081 (parcours par persona), US-083 (mapping composants tailsfadmin)
 et US-085 (backlog reskin).
 
-Points à clarifier :
-- Inclure les pages transverses (Auth, erreurs 403/404/500, profil utilisateur, tableau de bord accueil).
-- Format retenu : tableau Markdown avec colonnes (ID, Module, Nom, Route, Statut, Persona primaire, Objectif, Informations affichées, Actions, Données sources).
-- Accessibilité WCAG 2.2 AA : la colonne « Objectif » signale les contraintes d'accessibilité spécifiques pour les écrans à fort enjeu (ex. saisie P1 : cibles ≥ 44 px, pas de captcha temporel).
-- Routes Symfony internes (`_profiler`, `_wdt`) et routes API Platform hors périmètre.
+Décisions d'affinage (S19) — arrêtées :
+- **Source de vérité des routes existantes** : `make console c="debug:router"` sur `main` (post-US-086) ; recouper avec `templates/**/*.html.twig` pour les vues sans route directe (modales, volets).
+- **Taxonomie de modules figée** : Auth/Common, Temps, Projets, Finance, Staffing, Pilotage, Référentiels, Administration ; modules futurs (CRM, RH, Recrutement) présents avec statut « À créer ».
+- **Pages transverses incluses** : Auth (connexion, mot de passe oublié), erreurs 403/404/500, profil utilisateur, tableau de bord d'accueil → section « Auth/Common ».
+- **Format retenu** : tableau Markdown, colonnes (ID, Module, Nom, Route, Statut, Persona primaire, Objectif, Informations affichées, Actions, Données sources).
+- **Accessibilité WCAG 2.2 AA** : la colonne « Objectif » signale les contraintes d'accessibilité des écrans à fort enjeu (ex. saisie P1 : cibles ≥ 44 px, pas de captcha temporel).
+- **Hors périmètre** : routes Symfony internes (`_profiler`, `_wdt`) ; routes API Platform (documentées via OpenAPI).
 
 ## Critères d'Acceptance (Confirmation)
 
@@ -103,7 +105,11 @@ THEN il refuse la validation et demande la complétion du champ
 - [x] Description INVEST (livrable documentaire borné ; persona « Tous » via PO ; estimé 5 pts)
 - [x] Gherkin (2 nominaux + 2 alternatifs + 2 erreurs)
 - [x] Format du livrable défini (tableau Markdown, colonnes identifiées)
+- [x] **Source de vérité arrêtée** : `debug:router` sur `main` + scan `templates/` (affinage S19)
+- [x] **Taxonomie de modules figée** (Auth/Common, Temps, Projets, Finance, Staffing, Pilotage, Référentiels, Administration, + CRM/RH/Recrutement « À créer »)
+- [x] **Condition d'entrée** : aucune (US-080 est la 1ʳᵉ story du sprint — **démarrable immédiatement**, seul ADR-0023/US-086 requis, livré)
 - [x] Validation INVEST : Independent ✓ (aucune US à compléter pour démarrer, seul ADR-0023 requis) / Negotiable ✓ (format adaptable) / Valuable ✓ (socle de toute la conception) / Estimable ✓ (5 pts — inventaire exhaustif des routes) / Sized ✓ (≤ 8 pts) / Testable ✓ (couverture 100 % vérifiable)
+- **DoR : ✅ LEVÉE — prête pour `/sprint:dev`**
 
 ## Definition of Done
 - [ ] `project-management/architecture/page-inventory.md` créé et commité
