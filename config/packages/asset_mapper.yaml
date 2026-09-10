@@ -1,8 +1,12 @@
 framework:
     asset_mapper:
         # The paths to make available to the asset mapper.
+        # Le path des contrôleurs Stimulus du bundle tailsfadmin doit être déclaré
+        # côté hôte (le prepend() du bundle ne survit pas au merge Flex — cf. README §1).
         paths:
-            - assets/
+            'assets/': ''
+            'vendor/tailsfadmin/tailsfadmin-bundle/assets/controllers': 'bundles/tailsfadmin'
+            'vendor/tailsfadmin/tailsfadmin-bundle/assets/vendor-src': 'bundles/tailsfadmin-vendor'
         missing_import_mode: strict
 
 when@prod:

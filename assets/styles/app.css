@@ -1,10 +1,18 @@
 @import "tailwindcss";
 
+/* Socle de thème externalisé (US-086 / ADR-0023) : layout, composants, chrome et
+   variante `dark` (par classe .dark) fournis par le bundle tailsfadmin.
+   La police Poppins reste chargée via <link> dans le layout (bloc stylesheets). */
+@import "../../vendor/tailsfadmin/tailsfadmin-bundle/assets/styles/theme.css";
+
 /* Purge (JIT) : scanne tous les templates Twig. */
 @source "../../templates";
 
-/* Thème sombre piloté par [data-theme="dark"] sur <html> (bascule Stimulus). */
-@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+/* Scanne aussi les composants du socle (tsf:Ui:Tabs, ProgressBar, Ribbon, …) et leurs
+   contrôleurs Stimulus, pour générer leurs classes utilitaires propres (bg-brand-500,
+   text-theme-sm, h-1.5, …) absentes des templates de l'app (US-086). */
+@source "../../vendor/tailsfadmin/tailsfadmin-bundle/templates";
+@source "../../vendor/tailsfadmin/tailsfadmin-bundle/assets/controllers";
 
 /*
  * ─────────────────────────────────────────────────────────────────────────
@@ -14,6 +22,10 @@
  * ─────────────────────────────────────────────────────────────────────────
  */
 :root {
+    /* Le layout du bundle applique `font-outfit` sur <body> ; on re-pointe ce token
+       sur la police historique HotOnes (Poppins) pour préserver la typo de l'app. */
+    --font-outfit: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+
     --ds-primary: #4e65d4;         /* 5.08:1 avec blanc */
     --ds-primary-fg: #ffffff;
     --ds-primary-surface: #556ee6; /* décoratif, non-texte */
@@ -34,7 +46,7 @@
     --ds-focus: #0b5fff;
 }
 
-[data-theme="dark"] {
+.dark {
     --ds-primary: #8092ec;
     --ds-primary-fg: #14183a;
     --ds-success: #85dbbc;

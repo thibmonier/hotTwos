@@ -12,6 +12,12 @@
                 "enabled": false,
                 "fetch": "eager"
             }
+        },
+        "@tailsfadmin/tailsfadmin-bundle": {
+            "sidebar": {
+                "enabled": true,
+                "fetch": "eager"
+            }
         }
     },
     "entrypoints": []

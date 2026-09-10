@@ -26,6 +26,19 @@
                 <span class="status-badge status-badge-neutral">Interne — non facturable</span>
             {% endif %}
         </h1>
+        {# Copie du code projet dans le presse-papiers (socle : tailsfadmin--clipboard, retour visuel). #}
+        <button type="button"
+                data-controller="tailsfadmin--clipboard"
+                data-tailsfadmin--clipboard-text-value="{{ project.code }}"
+                data-tailsfadmin--clipboard-feedback-value="Code copié"
+                data-action="tailsfadmin--clipboard#copy"
+                title="Copier le code projet « {{ project.code }} »"
+                class="mb-2 inline-flex min-h-8 items-center gap-1.5 rounded border border-border-strong px-2.5 text-xs font-medium text-muted transition-colors hover:bg-surface-alt hover:text-ink data-[copied=true]:border-success data-[copied=true]:text-success">
+            <svg aria-hidden="true" class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184"/>
+            </svg>
+            <span data-tailsfadmin--clipboard-target="label">Copier le code</span>
+        </button>
         <p class="text-sm text-muted">
             Client&nbsp;: {{ project.client ?? '—' }}
             &nbsp;·&nbsp; Contractualisation&nbsp;: {{ project.contractType ?? '—' }}
@@ -43,41 +56,22 @@
         {% endfor %}
     {% endfor %}
 
-    <div data-controller="tabs">
-        {# ── Barre d'onglets ── #}
-        <div class="mb-4 flex overflow-x-auto [-webkit-overflow-scrolling:touch] border-b-2 border-border"
-             role="tablist" aria-label="Sections du projet">
-            <button class="min-h-11 flex-shrink-0 border-b-2 border-transparent -mb-[2px] px-4 text-sm font-semibold text-muted transition-colors duration-150 hover:border-border-strong hover:text-ink aria-[selected=true]:border-primary aria-[selected=true]:text-primary"
-                    role="tab" id="tab-lifecycle" aria-controls="panel-lifecycle"
-                    aria-selected="true" data-tabs-target="tab"
-                    data-action="tabs#select keydown->tabs#keydown">Cycle de vie</button>
-            <button class="min-h-11 flex-shrink-0 border-b-2 border-transparent -mb-[2px] px-4 text-sm font-semibold text-muted transition-colors duration-150 hover:border-border-strong hover:text-ink aria-[selected=true]:border-primary aria-[selected=true]:text-primary"
-                    role="tab" id="tab-structure" aria-controls="panel-structure"
-                    aria-selected="false" tabindex="-1" data-tabs-target="tab"
-                    data-action="tabs#select keydown->tabs#keydown">Structure</button>
-            <button class="min-h-11 flex-shrink-0 border-b-2 border-transparent -mb-[2px] px-4 text-sm font-semibold text-muted transition-colors duration-150 hover:border-border-strong hover:text-ink aria-[selected=true]:border-primary aria-[selected=true]:text-primary"
-                    role="tab" id="tab-team" aria-controls="panel-team"
-                    aria-selected="false" tabindex="-1" data-tabs-target="tab"
-                    data-action="tabs#select keydown->tabs#keydown">Équipe</button>
-            <button class="min-h-11 flex-shrink-0 border-b-2 border-transparent -mb-[2px] px-4 text-sm font-semibold text-muted transition-colors duration-150 hover:border-border-strong hover:text-ink aria-[selected=true]:border-primary aria-[selected=true]:text-primary"
-                    role="tab" id="tab-commitments" aria-controls="panel-commitments"
-                    aria-selected="false" tabindex="-1" data-tabs-target="tab"
-                    data-action="tabs#select keydown->tabs#keydown">Engagements</button>
-            <button class="min-h-11 flex-shrink-0 border-b-2 border-transparent -mb-[2px] px-4 text-sm font-semibold text-muted transition-colors duration-150 hover:border-border-strong hover:text-ink aria-[selected=true]:border-primary aria-[selected=true]:text-primary"
-                    role="tab" id="tab-closure" aria-controls="panel-closure"
-                    aria-selected="false" tabindex="-1" data-tabs-target="tab"
-                    data-action="tabs#select keydown->tabs#keydown">Clôture</button>
-            {% if canViewFinancials %}
-                <button class="min-h-11 flex-shrink-0 border-b-2 border-transparent -mb-[2px] px-4 text-sm font-semibold text-muted transition-colors duration-150 hover:border-border-strong hover:text-ink aria-[selected=true]:border-primary aria-[selected=true]:text-primary"
-                        role="tab" id="tab-budget" aria-controls="panel-budget"
-                        aria-selected="false" tabindex="-1" data-tabs-target="tab"
-                        data-action="tabs#select keydown->tabs#keydown">Suivi budgétaire</button>
-            {% endif %}
-        </div>
-
+    {# Onglets accessibles fournis par le socle tailsfadmin (tsf:Ui:Tabs, contrôleur
+       tailsfadmin--tabs) — remplace le contrôleur « tabs » maison (corrige R-01 :
+       bascule au premier clic + navigation clavier ARIA). #}
+    {% set tabItems = [
+        { id: 'lifecycle',   label: 'Cycle de vie' },
+        { id: 'structure',   label: 'Structure' },
+        { id: 'team',        label: 'Équipe' },
+        { id: 'commitments', label: 'Engagements' },
+        { id: 'closure',     label: 'Clôture' },
+    ] %}
+    {% if canViewFinancials %}
+        {% set tabItems = tabItems|merge([{ id: 'budget', label: 'Suivi budgétaire' }]) %}
+    {% endif %}
+    <twig:tsf:Ui:Tabs :items="tabItems" variant="underline">
         {# ── Cycle de vie ── #}
-        <section id="panel-lifecycle" role="tabpanel"
-                 aria-labelledby="tab-lifecycle" data-tabs-target="panel">
+        <twig:block name="lifecycle">
             <h2 class="mb-3 text-sm font-semibold text-ink">Cycle de vie</h2>
             <p class="text-body">Statut actuel&nbsp;: <strong>{{ project.status }}</strong>.</p>
             {% if canEdit and transitions is not empty %}
@@ -126,13 +120,12 @@
                     <button type="submit" class="min-h-10 rounded border border-border-strong px-3 text-sm font-semibold text-muted hover:bg-surface-alt hover:text-ink">Rattacher</button>
                 </form>
             {% endif %}
-        </section>
+        </twig:block>
 
-        {# ── Suivi budgétaire (US-072) ── #}
-        {% if canViewFinancials %}
+        {# ── Suivi budgétaire (US-072) — rendu uniquement si « budget » est présent
+           dans tabItems, c.-à-d. canViewFinancials (cf. plus haut). ── #}
+        <twig:block name="budget">
             {% set bt = budgetTracking %}
-            <section id="panel-budget" role="tabpanel"
-                     aria-labelledby="tab-budget" data-tabs-target="panel" hidden>
                 <h2 class="mb-3 text-sm font-semibold text-ink">Suivi budgétaire — budget vs réalisé
                     <a href="{{ path('project_pilotage_export', { id: project.id }) }}" class="ml-2 text-xs font-medium text-primary hover:underline">Exporter (CSV)</a>
                 </h2>
@@ -337,12 +330,10 @@
                     </div>
                     <button type="submit" class="min-h-10 rounded bg-primary px-4 text-sm font-semibold text-white hover:bg-primary/90">Émettre une facture</button>
                 </form>
-            </section>
-        {% endif %}
+        </twig:block>
 
         {# ── Structure ── #}
-        <section id="panel-structure" role="tabpanel"
-                 aria-labelledby="tab-structure" data-tabs-target="panel" hidden>
+        <twig:block name="structure">
             <h2 class="mb-3 text-sm font-semibold text-ink">Structure — lots</h2>
             {% if structure.roots is empty %}
                 <p class="text-muted">Aucun lot défini.</p>
@@ -541,11 +532,10 @@
                     </button>
                 </form>
             {% endif %}
-        </section>
+        </twig:block>
 
         {# ── Équipe ── #}
-        <section id="panel-team" role="tabpanel"
-                 aria-labelledby="tab-team" data-tabs-target="panel" hidden>
+        <twig:block name="team">
             <h2 class="mb-3 text-sm font-semibold text-ink">Équipe — affectations</h2>
             {% if assignments is empty %}
                 <p class="text-muted">
@@ -678,11 +668,10 @@
                     </button>
                 </form>
             {% endif %}
-        </section>
+        </twig:block>
 
         {# ── Engagements ── #}
-        <section id="panel-commitments" role="tabpanel"
-                 aria-labelledby="tab-commitments" data-tabs-target="panel" hidden>
+        <twig:block name="commitments">
             <h2 class="mb-3 text-sm font-semibold text-ink">Engagements externes</h2>
             {% if commitments.rows is empty %}
                 <p class="text-muted">Aucun engagement externe.</p>
@@ -763,11 +752,10 @@
             {% elseif project.status == 'Clôturé' %}
                 <p class="text-xs text-muted">Projet clôturé : aucun nouvel engagement (RG-PRJ-5).</p>
             {% endif %}
-        </section>
+        </twig:block>
 
         {# ── Clôture ── #}
-        <section id="panel-closure" role="tabpanel"
-                 aria-labelledby="tab-closure" data-tabs-target="panel" hidden>
+        <twig:block name="closure">
             <h2 class="mb-3 text-sm font-semibold text-ink">Clôture opérationnelle</h2>
             {% if closed %}
                 <p>
@@ -853,6 +841,6 @@
                     </form>
                 {% endif %}
             {% endif %}
-        </section>
-    </div>
+        </twig:block>
+    </twig:tsf:Ui:Tabs>
 {% endblock %}
