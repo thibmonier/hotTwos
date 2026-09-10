@@ -11,7 +11,7 @@
 | Capacité (prévision) | ~16 points (sprint de conception — livrables documentaires) |
 | Base git | `main` (après clôture US-086 — socle tailsfadmin, PR #112/#113) |
 | EPIC | EPIC-013 (Recensement pages cibles, parcours par persona & conception UX) |
-| Statut | 🟡 En préparation — 4 items à affiner en Ready avant lancement |
+| Statut | 🟢 Affiné (2026-09-10) — DoR levée sur les 4 US ; prêt à lancer (US-080 en 1er) |
 
 ## Sprint Goal
 
@@ -30,10 +30,10 @@ produit antérieur `hotones` (non disponible) — à planifier dès l'accès fou
 
 | Priorité | ID | Titre | Points | EF / Origine | DoR |
 |----------|-----|-------|--------|--------------|-----|
-| 🔴 Must | US-080 | Référentiel exhaustif des pages cibles | 5 | EPIC-013 | ⏳ à affiner |
-| 🔴 Must | US-081 | Cartographie des parcours par persona (P1–P6) | 5 | EPIC-013 | ⏳ à affiner |
-| 🟡 Should | US-083 | Mapping pages ↔ composants tailsfadmin (+ gaps) | 3 | EPIC-013 | ⏳ à affiner |
-| 🟡 Should | US-085 | Backlog de refonte/reskin priorisé (MoSCoW) | 3 | EPIC-013 | ⏳ à affiner |
+| 🔴 Must | US-080 | Référentiel exhaustif des pages cibles | 5 | EPIC-013 | ✅ levée |
+| 🔴 Must | US-081 | Cartographie des parcours par persona (P1–P6) | 5 | EPIC-013 | ✅ levée |
+| 🟡 Should | US-083 | Mapping pages ↔ composants tailsfadmin (+ gaps) | 3 | EPIC-013 | ✅ levée |
+| 🟡 Should | US-085 | Backlog de refonte/reskin priorisé (MoSCoW) | 3 | EPIC-013 | ✅ levée |
 
 **Engagé : 16 pts** (capacité ~16).
 
@@ -50,12 +50,14 @@ produit antérieur `hotones` (non disponible) — à planifier dès l'accès fou
 3. **US-083** (mapping ↔ composants) — associe chaque page aux composants tailsfadmin, identifie les *gaps* (composants manquants à demander au bundle).
 4. **US-085** (backlog reskin MoSCoW) — synthétise le tout en un backlog priorisé, entrée des sprints de refonte.
 
-## Definition of Ready (avant lancement)
-- [ ] US-080 : périmètre = toutes les routes applicatives actuelles + écrans cibles manquants ; format tableau (page, route, persona(s), statut existant/à créer).
-- [ ] US-081 : 1 diagramme de parcours (Mermaid) par persona P1–P6 ; s'appuie sur `personas.md`.
-- [ ] US-083 : chaque page → composants `tsf:*` mobilisables ; lister les *gaps* comme demandes d'évolution du bundle (issues tailsfadmin).
-- [ ] US-085 : critères de priorisation MoSCoW explicites (valeur métier, fréquence d'usage, effort de reskin) ; sortie = liste ordonnée d'US de refonte.
-- [ ] Livrables rangés dans `project-management/architecture/design-canvas/` et/ou `project-management/` (documents versionnés).
+## Definition of Ready (avant lancement) — ✅ LEVÉE en affinage (2026-09-10)
+- [x] US-080 : périmètre = routes applicatives actuelles (`debug:router` sur `main`) + écrans cibles manquants ; taxonomie de modules figée ; format tableau arrêté. **Démarrable immédiatement.**
+- [x] US-081 : 1 diagramme Mermaid par persona P1–P6 (+1 variante max) ; JTBD dérivés de `personas.md`. **Entrée : US-080 validée PO.**
+- [x] US-083 : chaque page → composants `<twig:tsf:…>` **réels confirmés** (v1.4.2) ; *gaps* formalisés en demandes d'évolution bundle. **Entrée : US-080 + US-081 validées.**
+- [x] US-085 : critères MoSCoW explicites et pondérés (valeur métier > fréquence P1 > effort > gaps). **Entrée : US-083 validée.**
+- [x] Livrables versionnés dans `project-management/architecture/` (`page-inventory.md`, `parcours-personas.md`, `page-component-mapping.md`, `backlog-reskin-priorise.md`) ; maquettes (US-084) → `design-canvas/` quand débloqué.
+
+> **Séquencement** : DoR levée sur les 4 US, mais l'exécution reste **strictement ordonnée** (US-080 → US-081 → US-083 → US-085) — chaque story a pour condition d'entrée la validation PO du livrable amont. Les mentions ⏳ des fichiers stories signalent ces conditions à confirmer au démarrage effectif de chaque story.
 
 ## Definition of Done (rappel — adapté sprint de conception)
 - [ ] Livrables documentaires revus et **validés par le PO**.
@@ -73,7 +75,7 @@ produit antérieur `hotones` (non disponible) — à planifier dès l'accès fou
 ## Cérémonies
 - **Planning (Part 1 & 2)** : à programmer.
 - **Daily** : quotidien.
-- **Affinage** : lever la DoR des 4 US avant lancement.
+- **Affinage** : ✅ réalisé le 2026-09-10 — DoR levée sur les 4 US (décisions arrêtées, conditions d'entrée explicites, composants confirmés).
 - **Review** : présentation des livrables au PO (validation).
 - **Rétrospective** : *Directive Fondamentale* incluse.
 

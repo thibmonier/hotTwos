@@ -8,7 +8,7 @@
 - **Points**: 3
 - **Persona**: Tous (P1–P6)
 - **Créé le**: 2026-09-10
-- **Mis à jour**: 2026-09-10
+- **Mis à jour**: 2026-09-10 (affinage S19)
 
 ## Traçabilité
 - **Implémente**: EPIC-013 (C6 — Déduire le backlog de refonte priorisé MoSCoW)
@@ -38,13 +38,11 @@ Chaque item du backlog correspond à un écran (ou groupe d'écrans cohérents) 
 Les items Won't sont conservés dans le backlog avec justification (reportés à une version ultérieure
 ou hors périmètre actuel), afin de ne pas les perdre.
 
-Points à clarifier :
-- Format : tableau Markdown (colonnes : ID page, Nom, Module, MoSCoW, Critère de priorisation,
-  EPIC cible, Gaps liés, Effort reskin (pts indicatif), Statut US).
-- Critères de priorisation explicites : valeur métier (OBJ), fréquence d'usage persona (P1 prioritaire),
-  effort de reskin estimé, dépendances de gaps composants.
-- Un item de backlog peut regrouper plusieurs pages (ex. « Tableau de bord dirigeant — 3 pages »)
-  si leur refonte forme un tout cohérent.
+Décisions d'affinage (S19) — arrêtées :
+- **Format** : tableau Markdown (colonnes : ID page, Nom, Module, MoSCoW, Critère de priorisation, EPIC cible, Gaps liés, Effort reskin (pts indicatif), Statut US).
+- **Critères de priorisation figés** (pondération dans cet ordre) : (1) valeur métier / OBJ ; (2) fréquence d'usage persona (**P1 prioritaire — 80 % des utilisateurs**) ; (3) effort de reskin estimé ; (4) dépendances de gaps composants (US-083).
+- **Regroupement autorisé** : un item peut couvrir plusieurs pages formant un tout cohérent (ex. « Tableau de bord dirigeant — 3 pages »).
+- **Items Won't conservés** avec justification (jamais supprimés) pour référence future.
 
 ## Critères d'Acceptance (Confirmation)
 
@@ -117,9 +115,10 @@ THEN le backlog n'est pas reconnu comme source de vérité officielle
 ## Definition of Ready
 - [x] Description INVEST (borné : synthèse du recensement en backlog MoSCoW ; 3 pts)
 - [x] Gherkin (2 nominaux + 2 alternatifs + 2 erreurs)
-- [x] Dépend d'US-083 (effort reskin connu), US-080 (périmètre complet), US-081 (valeur par persona)
-- [x] Critères de priorisation MoSCoW définis (valeur métier OBJ, fréquence d'usage persona, effort reskin, dépendances gaps)
+- [x] Critères de priorisation MoSCoW définis et **pondérés** (valeur métier OBJ > fréquence persona P1 > effort reskin > dépendances gaps)
+- [x] **Condition d'entrée** : `page-component-mapping.md` (US-083) validé PO — fournit effort reskin + gaps ; s'appuie aussi sur US-080 (périmètre) et US-081 (valeur par persona). ⏳ *À lever au démarrage effectif (dernière story du sprint).*
 - [x] Validation INVEST : Independent ✓ (une fois US-083 livrée) / Negotiable ✓ (granularité du regroupement d'items adaptable) / Valuable ✓ (transforme la conception en plan d'action actionnable pour les EPICs modules) / Estimable ✓ (3 pts — synthèse tabulaire) / Sized ✓ (≤ 8 pts) / Testable ✓ (présence, cohérence et validation PO vérifiables)
+- **DoR : ✅ LEVÉE sous réserve de la condition d'entrée (US-083 validée)**
 
 ## Definition of Done
 - [ ] `project-management/architecture/backlog-reskin-priorise.md` créé et commité
