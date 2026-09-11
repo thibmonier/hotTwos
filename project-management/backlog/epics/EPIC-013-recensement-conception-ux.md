@@ -2,7 +2,7 @@
 
 ## Métadonnées
 - **ID**: EPIC-013
-- **Statut**: 🔴 To Do
+- **Statut**: 🔄 In Progress (S19 : 4/6 livrées · S20 : US-082 + US-084 en cours)
 - **Priorité**: High — Must Have (MoSCoW)
 - **Module**: UX (transverse)
 - **Lot**: transverse (fast-track — précède l'extension du dev front des lots suivants)
@@ -110,7 +110,9 @@ flowchart TD
 
 ## Progression
 
-0/6 US (US-080 → US-085) · 0 % · ~29 points indicatifs (à confirmer en affinage)
+4/6 US · 67 % · 29 points · **S19** : US-080, US-081, US-083, US-085 ✅ (16 pts livrés).
+**S20 (en cours, démarré 2026-09-14)** : US-082 (audit) + US-084 (maquettes HF) — accès `hotones` débloqué →
+bouclage attendu **6/6** en clôture S20.
 
 ---
 
