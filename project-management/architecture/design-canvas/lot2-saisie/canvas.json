@@ -1,0 +1,15 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "title": "DSH-COLLAB — Dashboard collaborateur", "x": 0, "y": 0, "w": 1280, "h": 860 },
+    { "file": "SaisieHebdo.dc.html", "title": "PG-TMP-01 — Saisie hebdomadaire", "x": 1360, "y": 0, "w": 1280, "h": 860 },
+    { "file": "SaisieHebdoEtats.dc.html", "title": "PG-TMP-01 — États (vide / erreur)", "x": 2720, "y": 0, "w": 1280, "h": 720 },
+    { "file": "Absences.dc.html", "title": "PG-ABS-01 — Mes absences", "x": 0, "y": 980, "w": 1280, "h": 860 },
+    { "file": "Completude.dc.html", "title": "PG-CPL-01 — Complétude (manager)", "x": 1360, "y": 980, "w": 1280, "h": 860 },
+    { "file": "SaisieHebdoMobile.dc.html", "title": "PG-TMP-01 — Mobile (~390px)", "x": 2720, "y": 980, "w": 390, "h": 844 },
+    { "file": "SaisieJour.dc.html", "title": "PG-TMP-02/03 — Saisie du jour (mobile)", "x": 3190, "y": 980, "w": 390, "h": 844 }
+  ],
+  "annotations": [
+    { "id": "intent", "x": 0, "y": -170, "w": 720, "text": "Lot 2 (Sprint 20, EPIC-013) — Maquettes HF du parcours de saisie collaborateur P1, sur le bundle tailsfadmin (Outfit, brand #465fff). Améliore hotones + intègre l'audit US-082. Gaps matérialisés + notés (G1 StatCard, G4 PageHeader) : à développer au Sprint 21, jamais ici. Accessibilité WCAG 2.2 AA by design (cibles 44px, focus, statut texte+icône+couleur, e-mails jamais userId[:8])." }
+  ],
+  "launch": { "view": "canvas" }
+}

@@ -1,0 +1,86 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "Outfit", system-ui, -apple-system, sans-serif; color: #344054; }
+    a { color: #465fff; text-decoration: none; } a:hover { color: #3641d9; }
+    button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid #465fff; outline-offset: 2px; }
+  </style>
+</helmet>
+
+<div style="width:390px; height:844px; background:#f9fafb; display:flex; flex-direction:column; font-size:14px; line-height:1.5;">
+
+  <!-- App bar mobile (pas de fausse status bar) -->
+  <header style="height:56px; flex-shrink:0; background:#fff; border-bottom:1px solid #e4e7ec; display:flex; align-items:center; justify-content:space-between; padding:0 16px;">
+    <button type="button" aria-label="Menu" style="width:40px; height:40px; display:inline-flex; align-items:center; justify-content:center; border:none; background:none; color:#344054; cursor:pointer;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+    <span style="font-weight:600; color:#101828;">Saisie de la semaine</span>
+    <span style="width:32px; height:32px; border-radius:9999px; background:#ecf3ff; color:#465fff; display:inline-flex; align-items:center; justify-content:center; font-weight:600; font-size:12px;">CM</span>
+  </header>
+
+  <div style="flex:1; overflow:auto; padding:16px;">
+
+    <!-- Semaine + objectif -->
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+      <a href="#" aria-label="Semaine précédente" style="width:36px; height:36px; display:inline-flex; align-items:center; justify-content:center; border:1px solid #e4e7ec; border-radius:8px; color:#344054;">←</a>
+      <span style="font-weight:600; color:#101828; font-size:13px;">8 – 12 sept. 2026</span>
+      <a href="#" aria-label="Semaine suivante" style="width:36px; height:36px; display:inline-flex; align-items:center; justify-content:center; border:1px solid #e4e7ec; border-radius:8px; color:#344054;">→</a>
+    </div>
+    <div style="background:#fff; border:1px solid #e4e7ec; border-radius:12px; padding:14px 16px; margin-bottom:16px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+        <span style="font-size:12px; color:#667085;">Objectif semaine</span>
+        <span style="font-weight:600; color:#101828; font-size:13px;">21,5 / 35 h · 61 %</span>
+      </div>
+      <div style="height:8px; background:#eaecf0; border-radius:9999px; overflow:hidden;"><span style="display:block; height:100%; width:61%; background:#465fff; border-radius:9999px;"></span></div>
+    </div>
+
+    <!-- Sélecteur de jour (chips) : le tableau devient un jour à la fois sur mobile -->
+    <div role="tablist" aria-label="Jour de la semaine" style="display:flex; gap:8px; margin-bottom:16px;">
+      <button role="tab" aria-label="Lundi 8 — saisie complète" style="flex:1; min-height:56px; border-radius:10px; border:1px solid #e4e7ec; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; cursor:pointer;"><span style="font-size:11px; color:#667085;">Lun</span><span style="font-weight:600; color:#101828;">8</span><span style="width:6px; height:6px; border-radius:9999px; background:#12b76a;" aria-hidden="true"></span></button>
+      <button role="tab" aria-label="Mardi 9 — saisie complète" style="flex:1; min-height:56px; border-radius:10px; border:1px solid #e4e7ec; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; cursor:pointer;"><span style="font-size:11px; color:#667085;">Mar</span><span style="font-weight:600; color:#101828;">9</span><span style="width:6px; height:6px; border-radius:9999px; background:#12b76a;" aria-hidden="true"></span></button>
+      <button role="tab" aria-selected="true" aria-label="Mercredi 10 — saisie complète, jour sélectionné" style="flex:1; min-height:56px; border-radius:10px; border:2px solid #465fff; background:#ecf3ff; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; cursor:pointer;"><span style="font-size:11px; color:#465fff;">Mer</span><span style="font-weight:700; color:#465fff;">10</span><span style="width:6px; height:6px; border-radius:9999px; background:#12b76a;" aria-hidden="true"></span></button>
+      <button role="tab" aria-label="Jeudi 11 — saisie partielle" style="flex:1; min-height:56px; border-radius:10px; border:1px solid #e4e7ec; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; cursor:pointer;"><span style="font-size:11px; color:#667085;">Jeu</span><span style="font-weight:600; color:#101828;">11</span><span style="width:6px; height:6px; border-radius:9999px; background:#f79009;" aria-hidden="true"></span></button>
+      <button role="tab" aria-label="Vendredi 12 — à saisir" style="flex:1; min-height:56px; border-radius:10px; border:1px solid #e4e7ec; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; cursor:pointer;"><span style="font-size:11px; color:#667085;">Ven</span><span style="font-weight:600; color:#101828;">12</span><span style="width:6px; height:6px; border-radius:9999px; background:#d0d5dd;" aria-hidden="true"></span></button>
+    </div>
+
+    <!-- Cartes projet pour le jour sélectionné -->
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+      <span style="font-weight:600; color:#101828;">Mercredi 10 septembre</span>
+      <span style="font-size:12px; font-weight:600; color:#465fff;">Total 10,5 h</span>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:16px;">
+      <div style="background:#fff; border:1px solid #e4e7ec; border-radius:12px; padding:14px 16px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+          <div><div style="font-weight:500; color:#101828;">Projet Boréal</div><div style="font-size:11px; color:#667085;">BOR-114</div></div>
+          <input type="number" value="3.5" aria-label="Projet Boréal — heures du mercredi 10" style="width:88px; height:48px; text-align:center; border:1px solid #d0d5dd; border-radius:10px; font-size:16px; color:#101828;">
+        </div>
+      </div>
+      <div style="background:#fff; border:1px solid #e4e7ec; border-radius:12px; padding:14px 16px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+          <div><div style="font-weight:500; color:#101828;">Congés</div><div style="font-size:11px; color:#667085;">Absence</div></div>
+          <input type="number" value="7" aria-label="Congés — heures du mercredi 10" style="width:88px; height:48px; text-align:center; border:1px solid #d0d5dd; border-radius:10px; font-size:16px; color:#101828; background:#f9fafb;">
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Barre d'action collante -->
+  <div style="flex-shrink:0; background:#fff; border-top:1px solid #e4e7ec; padding:12px 16px; display:flex; gap:10px;">
+    <button type="button" style="flex:1; min-height:48px; border:1px solid #d0d5dd; border-radius:10px; background:#fff; color:#344054; font-weight:600; cursor:pointer;">Reprendre la veille</button>
+    <button type="button" style="flex:1; min-height:48px; border:none; border-radius:10px; background:#465fff; color:#fff; font-weight:600; cursor:pointer;">Enregistrer</button>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

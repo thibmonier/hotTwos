@@ -1,0 +1,127 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "Outfit", system-ui, -apple-system, sans-serif; color: #344054; }
+    a { color: #465fff; text-decoration: none; } a:hover { color: #3641d9; }
+    .nav:hover { background:#f2f4f7; color:#101828; }
+    button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid #465fff; outline-offset: 2px; }
+    .badge { display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:600; border-radius:9999px; padding:3px 10px; }
+  </style>
+</helmet>
+
+<div style="display:flex; width:1280px; height:860px; background:#f9fafb; font-size:14px; line-height:1.5;">
+
+  <!-- Sidebar -->
+  <aside style="width:260px; flex-shrink:0; background:#fff; border-right:1px solid #e4e7ec; display:flex; flex-direction:column;">
+    <div style="height:64px; display:flex; align-items:center; gap:10px; padding:0 20px; border-bottom:1px solid #f2f4f7;">
+      <span style="width:28px; height:28px; border-radius:8px; background:#465fff; display:inline-flex; align-items:center; justify-content:center; color:#fff; font-weight:700;">h2</span>
+      <span style="font-weight:700; color:#101828; font-size:16px;">hotTwos</span>
+    </div>
+    <nav style="display:flex; flex-direction:column; gap:2px; padding:16px 12px;" aria-label="Navigation principale">
+      <a class="nav" href="#" style="display:flex; align-items:center; gap:12px; min-height:44px; padding:0 12px; border-radius:8px; color:#475467;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Tableau de bord</a>
+      <a class="nav" href="#" style="display:flex; align-items:center; gap:12px; min-height:44px; padding:0 12px; border-radius:8px; color:#475467;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>Saisie des temps</a>
+      <a class="nav" href="#" style="display:flex; align-items:center; gap:12px; min-height:44px; padding:0 12px; border-radius:8px; background:#ecf3ff; color:#465fff; font-weight:600;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 2v4M16 2v4M3 10h18"/><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M9 16l2 2 4-4"/></svg>Mes absences</a>
+      <a class="nav" href="#" style="display:flex; align-items:center; gap:12px; min-height:44px; padding:0 12px; border-radius:8px; color:#475467;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 19V5M10 19V9M16 19v-6M22 19H2"/></svg>Complétude</a>
+      <a class="nav" href="#" style="display:flex; align-items:center; gap:12px; min-height:44px; padding:0 12px; border-radius:8px; color:#475467;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg>Mes projets</a>
+    </nav>
+  </aside>
+
+  <div style="display:flex; flex-direction:column; flex:1; min-width:0;">
+    <header style="height:64px; flex-shrink:0; background:#fff; border-bottom:1px solid #e4e7ec; display:flex; align-items:center; justify-content:space-between; padding:0 24px;">
+      <div style="display:flex; align-items:center; gap:8px; color:#667085; font-size:13px;"><span>Accueil</span><span aria-hidden="true">/</span><span style="color:#101828; font-weight:600;">Mes absences</span></div>
+      <div style="display:flex; align-items:center; gap:10px;"><span style="width:36px; height:36px; border-radius:9999px; background:#ecf3ff; color:#465fff; display:inline-flex; align-items:center; justify-content:center; font-weight:600;">CM</span><span style="font-size:13px; color:#344054; font-weight:500;">camille@acme.fr</span></div>
+    </header>
+
+    <main style="flex:1; padding:24px; overflow:auto;">
+
+      <!-- Compteurs (StatCards) -->
+      <div style="display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:16px; margin-bottom:20px;">
+        <div style="background:#fff; border:1px solid #e4e7ec; border-radius:12px; padding:16px; box-shadow:0 1px 2px rgba(16,24,40,.05);"><div style="font-size:13px; color:#667085;">Acquis</div><div style="font-size:22px; font-weight:700; color:#101828;">25,0 j</div></div>
+        <div style="background:#fff; border:1px solid #e4e7ec; border-radius:12px; padding:16px; box-shadow:0 1px 2px rgba(16,24,40,.05);"><div style="font-size:13px; color:#667085;">Pris</div><div style="font-size:22px; font-weight:700; color:#101828;">12,5 j</div></div>
+        <div style="background:#fff; border:1px solid #e4e7ec; border-radius:12px; padding:16px; box-shadow:0 1px 2px rgba(16,24,40,.05);"><div style="font-size:13px; color:#667085;">En attente</div><div style="font-size:22px; font-weight:700; color:#b54708;">2,0 j</div></div>
+        <div style="background:#fff; border:1px solid #a6f4c5; border-radius:12px; padding:16px; box-shadow:0 1px 2px rgba(16,24,40,.05); background:#f6fef9;"><div style="font-size:13px; color:#667085;">Solde</div><div style="font-size:22px; font-weight:700; color:#027a48;">12,5 j</div></div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1.1fr 1fr; gap:20px;">
+
+        <!-- Colonne gauche : déclarer + calendrier -->
+        <section style="display:flex; flex-direction:column; gap:20px;">
+          <div style="background:#fff; border:1px solid #e4e7ec; border-radius:12px; box-shadow:0 1px 2px rgba(16,24,40,.05);">
+            <div style="padding:14px 20px; border-bottom:1px solid #f2f4f7;"><h2 style="margin:0; font-size:15px; font-weight:600; color:#101828;">Déclarer une absence</h2></div>
+            <div style="padding:20px;">
+              <label style="display:block; font-size:13px; font-weight:500; color:#475467; margin-bottom:4px;">Type <abbr title="obligatoire" aria-label="obligatoire" style="color:#f04438; text-decoration:none;">*</abbr></label>
+              <select required aria-required="true" aria-label="Type d'absence (obligatoire)" style="width:100%; height:44px; border:1px solid #d0d5dd; border-radius:8px; padding:0 12px; color:#101828; margin-bottom:16px; background:#fff;"><option>Congés payés</option><option>RTT</option><option>Sans solde</option></select>
+
+              <div style="display:flex; gap:12px; margin-bottom:16px;">
+                <div style="flex:1;"><label style="display:block; font-size:13px; font-weight:500; color:#475467; margin-bottom:4px;">Du <abbr title="obligatoire" aria-label="obligatoire" style="color:#f04438; text-decoration:none;">*</abbr></label><input type="text" value="15/09/2026" required aria-required="true" aria-label="Date de début (obligatoire)" style="width:100%; height:44px; border:1px solid #d0d5dd; border-radius:8px; padding:0 12px; color:#101828;"></div>
+                <div style="flex:1;"><label style="display:block; font-size:13px; font-weight:500; color:#475467; margin-bottom:4px;">Au <abbr title="obligatoire" aria-label="obligatoire" style="color:#f04438; text-decoration:none;">*</abbr></label><input type="text" value="17/09/2026" required aria-required="true" aria-label="Date de fin (obligatoire)" style="width:100%; height:44px; border:1px solid #d0d5dd; border-radius:8px; padding:0 12px; color:#101828;"></div>
+              </div>
+
+              <div style="display:flex; gap:12px; margin-bottom:16px;">
+                <label style="flex:1; display:flex; align-items:center; gap:8px; min-height:44px; border:1px solid #d0d5dd; border-radius:8px; padding:0 12px; cursor:pointer;"><input type="radio" name="duree" checked style="accent-color:#465fff;"> <span style="font-size:13px;">Journées entières</span></label>
+                <label style="flex:1; display:flex; align-items:center; gap:8px; min-height:44px; border:1px solid #d0d5dd; border-radius:8px; padding:0 12px; cursor:pointer;"><input type="radio" name="duree" style="accent-color:#465fff;"> <span style="font-size:13px;">Demi-journées</span></label>
+              </div>
+
+              <!-- Impact solde contextualisé (reco ABS-02) -->
+              <div style="display:flex; align-items:center; gap:10px; background:#eff8ff; border:1px solid #b2ddff; border-radius:8px; padding:10px 12px; margin-bottom:16px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#175cd3" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+                <span style="font-size:13px; color:#175cd3;">3 jours ouvrés · solde après validation : <strong>9,5 j</strong></span>
+              </div>
+
+              <label style="display:block; font-size:13px; font-weight:500; color:#475467; margin-bottom:4px;">Commentaire (optionnel)</label>
+              <input type="text" placeholder="ex. Vacances d'automne" style="width:100%; height:44px; border:1px solid #d0d5dd; border-radius:8px; padding:0 12px; color:#101828; margin-bottom:6px;">
+              <p style="display:flex; align-items:flex-start; gap:6px; margin:0 0 16px; font-size:12px; color:#667085;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f79009" stroke-width="2" aria-hidden="true" style="flex-shrink:0; margin-top:1px;"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="9"/></svg>Ne renseignez <strong style="color:#667085;">aucune donnée de santé</strong> (motif médical) — RGPD.</p>
+
+              <button type="button" style="min-height:44px; padding:0 18px; border:none; border-radius:8px; background:#465fff; color:#fff; font-weight:600; cursor:pointer;">Soumettre la demande</button>
+            </div>
+          </div>
+
+          <!-- Mini calendrier avec fériés/fermetures/absences (reco ABS-03) -->
+          <div style="background:#fff; border:1px solid #e4e7ec; border-radius:12px; box-shadow:0 1px 2px rgba(16,24,40,.05);">
+            <div style="padding:14px 20px; border-bottom:1px solid #f2f4f7; display:flex; align-items:center; justify-content:space-between;"><h2 style="margin:0; font-size:15px; font-weight:600; color:#101828;">Septembre 2026</h2><span style="font-size:12px; color:#667085;">Vérifiez les conflits</span></div>
+            <div style="padding:16px 20px;">
+              <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:6px; text-align:center; font-size:11px; color:#667085; margin-bottom:6px;"><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
+              <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:6px; text-align:center; font-size:12px;">
+                <span style="padding:8px 0; color:#667085;">1</span><span style="padding:8px 0; color:#344054;">2</span><span style="padding:8px 0; color:#344054;">3</span><span style="padding:8px 0; color:#344054;">4</span><span style="padding:8px 0; color:#344054;">5</span><span style="padding:8px 0; color:#d0d5dd;">6</span><span style="padding:8px 0; color:#d0d5dd;">7</span>
+                <span style="padding:8px 0; color:#344054;">8</span><span style="padding:8px 0; color:#344054;">9</span><span style="padding:8px 0; color:#344054;">10</span><span style="padding:8px 0; color:#344054;">11</span><span style="padding:8px 0; color:#344054;">12</span><span style="padding:8px 0; color:#d0d5dd;">13</span><span style="padding:8px 0; color:#d0d5dd;">14</span>
+                <span style="padding:8px 0; border-radius:8px; background:#ecf3ff; color:#465fff; font-weight:700;" aria-label="15 — ma demande d'absence">15</span><span style="padding:8px 0; border-radius:8px; background:#ecf3ff; color:#465fff; font-weight:700;" aria-label="16 — ma demande d'absence">16</span><span style="padding:8px 0; border-radius:8px; background:#ecf3ff; color:#465fff; font-weight:700;" aria-label="17 — ma demande d'absence">17</span><span style="padding:8px 0; color:#344054;">18</span><span style="padding:8px 0; border-radius:8px; background:#fef3f2; color:#b42318; font-weight:600;" aria-label="19 — fermeture entreprise">19</span><span style="padding:8px 0; color:#d0d5dd;">20</span><span style="padding:8px 0; color:#d0d5dd;">21</span>
+                <span style="padding:8px 0; color:#344054;">22</span><span style="padding:8px 0; color:#344054;">23</span><span style="padding:8px 0; color:#344054;">24</span><span style="padding:8px 0; color:#344054;">25</span><span style="padding:8px 0; color:#344054;">26</span><span style="padding:8px 0; color:#d0d5dd;">27</span><span style="padding:8px 0; color:#d0d5dd;">28</span>
+              </div>
+              <div style="display:flex; flex-wrap:wrap; gap:12px; margin-top:14px; font-size:11px; color:#667085;">
+                <span style="display:inline-flex; align-items:center; gap:5px;"><span style="width:10px; height:10px; border-radius:3px; background:#ecf3ff; border:1px solid #465fff;"></span>Ma demande</span>
+                <span style="display:inline-flex; align-items:center; gap:5px;"><span style="width:10px; height:10px; border-radius:3px; background:#fef3f2; border:1px solid #f04438;"></span>Fermeture / férié</span>
+                <span style="display:inline-flex; align-items:center; gap:5px;"><span style="width:10px; height:10px; border-radius:3px; background:#fff; border:1px solid #d0d5dd;"></span>Week-end</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Colonne droite : mes demandes -->
+        <section style="background:#fff; border:1px solid #e4e7ec; border-radius:12px; box-shadow:0 1px 2px rgba(16,24,40,.05); align-self:flex-start;">
+          <div style="padding:14px 20px; border-bottom:1px solid #f2f4f7;"><h2 style="margin:0; font-size:15px; font-weight:600; color:#101828;">Mes demandes</h2></div>
+          <table style="width:100%; border-collapse:collapse; text-align:left; font-size:13px;">
+            <thead><tr style="background:#f9fafb; border-bottom:1px solid #e4e7ec;"><th scope="col" style="padding:10px 20px; font-weight:600; color:#344054;">Période</th><th scope="col" style="padding:10px 12px; font-weight:600; color:#344054;">Jours</th><th scope="col" style="padding:10px 12px; font-weight:600; color:#344054;">Statut</th></tr></thead>
+            <tbody>
+              <tr style="border-bottom:1px solid #f2f4f7;"><td style="padding:12px 20px; color:#101828;">15 → 17 sept.</td><td style="padding:12px 12px; color:#344054;">3,0 j</td><td style="padding:12px 12px;"><span class="badge" style="color:#b54708; background:#fffaeb;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>En attente</span></td></tr>
+              <tr style="border-bottom:1px solid #f2f4f7;"><td style="padding:12px 20px; color:#101828;">21 → 22 juil.</td><td style="padding:12px 12px; color:#344054;">2,0 j</td><td style="padding:12px 12px;"><span class="badge" style="color:#027a48; background:#ecfdf3;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Validée</span></td></tr>
+              <tr><td style="padding:12px 20px; color:#101828;">02 → 06 juin<div style="margin-top:4px; font-size:12px; color:#b42318;">Motif : effectif insuffisant sur la période.</div></td><td style="padding:12px 12px; color:#344054; vertical-align:top;">5,0 j</td><td style="padding:12px 12px; vertical-align:top;"><span class="badge" style="color:#b42318; background:#fef3f2;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>Refusée</span></td></tr>
+            </tbody>
+          </table>
+        </section>
+
+      </div>
+    </main>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>
