@@ -122,10 +122,12 @@ THEN il refuse la validation
 - **DoR : ✅ LEVÉE — prête pour `/sprint:dev`** (sous réserve du dépôt des captures hotones)
 
 ## Definition of Done
-- [ ] `project-management/architecture/audit-ux-existant.md` créé et commité
-- [ ] 4 écrans existants du parcours saisie EPIC-003 audités (saisie hebdo/jour, absences, complétude) ; DSH-COLLAB noté hors audit
-- [ ] Comparaison hotones documentée là où une capture comparable existe (patterns à reprendre / faiblesses à éviter)
-- [ ] Recommandations priorisées, actionnables, rattachées à une heuristique/critère et une sévérité
-- [ ] Findings recette antérieurs pertinents référencés
+- [x] `project-management/architecture/audit-ux-existant.md` créé et commité
+- [x] 4 écrans existants du parcours saisie EPIC-003 audités (saisie hebdo/jour, absences, complétude) ; DSH-COLLAB noté hors audit
+- [x] Comparaison hotones documentée là où une capture comparable existe (patterns à reprendre / faiblesses à éviter)
+- [x] Recommandations priorisées, actionnables, rattachées à une heuristique/critère et une sévérité
+- [x] Findings recette antérieurs pertinents référencés (F-S5-4, F-S5-5, F1 ; R-01 noté hors périmètre P1)
 - [ ] Revue et validation PO formalisées (commentaire de PR ou annotation)
 - [ ] Branche versionnée, PR mergée sur la branche de sprint 20
+
+> **Statut** : livrable produit, en attente de **revue PO** (PR). Statut passé de 🟢 Ready → 🟡 To Review.
