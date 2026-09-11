@@ -1,0 +1,177 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "Outfit", system-ui, -apple-system, sans-serif; color: #344054; }
+    a { color: #465fff; text-decoration: none; } a:hover { color: #3641d9; }
+    .nav:hover { background: #f2f4f7; color: #101828; }
+    .cell:focus-within { outline: 3px solid #465fff; outline-offset: 1px; border-radius:8px; }
+    button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid #465fff; outline-offset: 2px; }
+    input[type=number]{ -moz-appearance:textfield; }
+  </style>
+</helmet>
+
+<div style="display:flex; width:1280px; height:860px; background:#f9fafb; font-size:14px; line-height:1.5;">
+
+  <!-- Sidebar -->
+  <aside style="width:260px; flex-shrink:0; background:#fff; border-right:1px solid #e4e7ec; display:flex; flex-direction:column;">
+    <div style="height:64px; display:flex; align-items:center; gap:10px; padding:0 20px; border-bottom:1px solid #f2f4f7;">
+      <span style="width:28px; height:28px; border-radius:8px; background:#465fff; display:inline-flex; align-items:center; justify-content:center; color:#fff; font-weight:700;">h2</span>
+      <span style="font-weight:700; color:#101828; font-size:16px;">hotTwos</span>
+    </div>
+    <nav style="display:flex; flex-direction:column; gap:2px; padding:16px 12px;" aria-label="Navigation principale">
+      <a class="nav" href="#" style="display:flex; align-items:center; gap:12px; min-height:44px; padding:0 12px; border-radius:8px; color:#475467;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        Tableau de bord
+      </a>
+      <a class="nav" href="#" style="display:flex; align-items:center; gap:12px; min-height:44px; padding:0 12px; border-radius:8px; background:#ecf3ff; color:#465fff; font-weight:600;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>
+        Saisie des temps
+      </a>
+      <a class="nav" href="#" style="display:flex; align-items:center; gap:12px; min-height:44px; padding:0 12px; border-radius:8px; color:#475467;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 2v4M16 2v4M3 10h18"/><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M9 16l2 2 4-4"/></svg>
+        Mes absences
+      </a>
+      <a class="nav" href="#" style="display:flex; align-items:center; gap:12px; min-height:44px; padding:0 12px; border-radius:8px; color:#475467;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 19V5M10 19V9M16 19v-6M22 19H2"/></svg>
+        Complétude
+      </a>
+      <a class="nav" href="#" style="display:flex; align-items:center; gap:12px; min-height:44px; padding:0 12px; border-radius:8px; color:#475467;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg>
+        Mes projets
+      </a>
+    </nav>
+  </aside>
+
+  <div style="display:flex; flex-direction:column; flex:1; min-width:0;">
+    <!-- Topbar -->
+    <header style="height:64px; flex-shrink:0; background:#fff; border-bottom:1px solid #e4e7ec; display:flex; align-items:center; justify-content:space-between; padding:0 24px;">
+      <div style="display:flex; align-items:center; gap:8px; color:#667085; font-size:13px;">
+        <span>Accueil</span><span aria-hidden="true">/</span><span style="color:#101828; font-weight:600;">Saisie des temps</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="width:36px; height:36px; border-radius:9999px; background:#ecf3ff; color:#465fff; display:inline-flex; align-items:center; justify-content:center; font-weight:600;">CM</span>
+        <span style="font-size:13px; color:#344054; font-weight:500;">camille@acme.fr</span>
+      </div>
+    </header>
+
+    <main style="flex:1; padding:24px; overflow:auto;">
+
+      <!-- Barre de navigation semaine + vues + toggle week-ends (reco TMP1-04 / pattern hotones) -->
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:16px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <a href="#" aria-label="Semaine précédente" style="width:40px; height:40px; display:inline-flex; align-items:center; justify-content:center; border:1px solid #e4e7ec; border-radius:8px; color:#344054;">←</a>
+          <span style="min-width:220px; text-align:center; font-weight:600; color:#101828;">Semaine du 8 au 12 sept. 2026</span>
+          <a href="#" aria-label="Semaine suivante" style="width:40px; height:40px; display:inline-flex; align-items:center; justify-content:center; border:1px solid #e4e7ec; border-radius:8px; color:#344054;">→</a>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <label style="display:inline-flex; align-items:center; gap:8px; min-height:40px; padding:0 12px; border:1px solid #e4e7ec; border-radius:8px; font-size:13px; color:#475467; cursor:pointer;">
+            <input type="checkbox" style="width:16px; height:16px; accent-color:#465fff;"> Afficher les week-ends
+          </label>
+          <a href="#" style="display:inline-flex; align-items:center; gap:6px; min-height:40px; padding:0 12px; border:1px solid #e4e7ec; border-radius:8px; font-size:13px; color:#475467;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg> Vue calendrier
+          </a>
+          <a href="#" style="display:inline-flex; align-items:center; min-height:40px; padding:0 12px; border:1px solid #e4e7ec; border-radius:8px; font-size:13px; color:#475467;">Vue jour</a>
+        </div>
+      </div>
+
+      <!-- Objectif / complétude de la semaine (reco TMP1-02 : visible hors dialog) -->
+      <div style="background:#fff; border:1px solid #e4e7ec; border-radius:12px; padding:16px 20px; margin-bottom:16px; box-shadow:0 1px 2px rgba(16,24,40,.05); display:flex; align-items:center; gap:24px; flex-wrap:wrap;">
+        <div style="flex:1; min-width:260px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+            <span style="font-size:13px; color:#667085;">Objectif de la semaine</span>
+            <span style="font-weight:600; color:#101828;">21,5 h <span style="color:#667085; font-weight:400;">/ 35 h</span> · 61 %</span>
+          </div>
+          <div style="height:10px; background:#eaecf0; border-radius:9999px; overflow:hidden;"><span style="display:block; height:100%; width:61%; background:#465fff; border-radius:9999px;"></span></div>
+        </div>
+        <div style="display:inline-flex; align-items:center; gap:8px; color:#027a48; font-size:13px; font-weight:600; background:#ecfdf3; border:1px solid #a6f4c5; border-radius:9999px; padding:6px 12px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+          Enregistré à 09:41
+        </div>
+      </div>
+
+      <!-- Grille de saisie -->
+      <div style="background:#fff; border:1px solid #e4e7ec; border-radius:12px; overflow:hidden; box-shadow:0 1px 2px rgba(16,24,40,.05); margin-bottom:16px;">
+        <table style="width:100%; border-collapse:collapse; text-align:left;">
+          <caption style="position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0);">Grille de saisie des temps — semaine du 8 au 12 septembre 2026</caption>
+          <thead>
+            <tr style="background:#f9fafb; border-bottom:1px solid #e4e7ec;">
+              <th scope="col" style="padding:12px 20px; font-weight:600; color:#344054; font-size:13px;">Projet</th>
+              <th scope="col" style="padding:12px 8px; text-align:center; font-weight:600; color:#344054; font-size:13px;">Lun 08</th>
+              <th scope="col" style="padding:12px 8px; text-align:center; font-weight:600; color:#344054; font-size:13px;">Mar 09</th>
+              <th scope="col" style="padding:12px 8px; text-align:center; font-weight:600; color:#344054; font-size:13px;">Mer 10</th>
+              <th scope="col" style="padding:12px 8px; text-align:center; font-weight:600; color:#344054; font-size:13px;">Jeu 11</th>
+              <th scope="col" style="padding:12px 8px; text-align:center; font-weight:600; color:#344054; font-size:13px;">Ven 12</th>
+              <th scope="col" style="padding:12px 20px; text-align:right; font-weight:600; color:#344054; font-size:13px;">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Ligne projet 1 -->
+            <tr style="border-bottom:1px solid #f2f4f7;">
+              <th scope="row" style="padding:10px 20px; font-weight:500; color:#101828;">Projet Atlas <span style="display:block; font-size:11px; font-weight:400; color:#667085;">ATL-2026</span></th>
+              <td class="cell" style="padding:8px; text-align:center;"><input type="number" value="7" aria-label="Projet Atlas — lundi 8 (heures)" style="width:64px; height:44px; text-align:center; border:1px solid #d0d5dd; border-radius:8px; font-size:14px; color:#101828;"></td>
+              <td class="cell" style="padding:8px; text-align:center;"><input type="number" value="7" aria-label="Projet Atlas — mardi 9 (heures)" style="width:64px; height:44px; text-align:center; border:1px solid #d0d5dd; border-radius:8px; font-size:14px; color:#101828;"></td>
+              <td class="cell" style="padding:8px; text-align:center;"><input type="number" value="" aria-label="Projet Atlas — mercredi 10 (heures)" style="width:64px; height:44px; text-align:center; border:1px solid #d0d5dd; border-radius:8px; font-size:14px; color:#101828;"></td>
+              <td class="cell" style="padding:8px; text-align:center;"><input type="number" value="" aria-label="Projet Atlas — jeudi 11 (heures)" style="width:64px; height:44px; text-align:center; border:1px solid #d0d5dd; border-radius:8px; font-size:14px; color:#101828;"></td>
+              <td class="cell" style="padding:8px; text-align:center;"><input type="number" value="" aria-label="Projet Atlas — vendredi 12 (heures)" style="width:64px; height:44px; text-align:center; border:1px solid #d0d5dd; border-radius:8px; font-size:14px; color:#101828;"></td>
+              <td style="padding:10px 20px; text-align:right; font-weight:600; color:#101828; font-variant-numeric:tabular-nums;">14,0</td>
+            </tr>
+            <!-- Ligne projet 2 -->
+            <tr style="border-bottom:1px solid #f2f4f7;">
+              <th scope="row" style="padding:10px 20px; font-weight:500; color:#101828;">Projet Boréal <span style="display:block; font-size:11px; font-weight:400; color:#667085;">BOR-114</span></th>
+              <td class="cell" style="padding:8px; text-align:center;"><input type="number" value="" aria-label="Projet Boréal — lundi 8 (heures)" style="width:64px; height:44px; text-align:center; border:1px solid #d0d5dd; border-radius:8px; font-size:14px; color:#101828;"></td>
+              <td class="cell" style="padding:8px; text-align:center;"><input type="number" value="" aria-label="Projet Boréal — mardi 9 (heures)" style="width:64px; height:44px; text-align:center; border:1px solid #d0d5dd; border-radius:8px; font-size:14px; color:#101828;"></td>
+              <td class="cell" style="padding:8px; text-align:center;"><input type="number" value="3.5" aria-label="Projet Boréal — mercredi 10 (heures)" style="width:64px; height:44px; text-align:center; border:1px solid #d0d5dd; border-radius:8px; font-size:14px; color:#101828;"></td>
+              <td class="cell" style="padding:8px; text-align:center;"><input type="number" value="4" aria-label="Projet Boréal — jeudi 11 (heures)" style="width:64px; height:44px; text-align:center; border:1px solid #d0d5dd; border-radius:8px; font-size:14px; color:#101828;"></td>
+              <td class="cell" style="padding:8px; text-align:center;"><input type="number" value="" aria-label="Projet Boréal — vendredi 12 (heures)" style="width:64px; height:44px; text-align:center; border:1px solid #d0d5dd; border-radius:8px; font-size:14px; color:#101828;"></td>
+              <td style="padding:10px 20px; text-align:right; font-weight:600; color:#101828; font-variant-numeric:tabular-nums;">7,5</td>
+            </tr>
+            <!-- Ligne absence -->
+            <tr>
+              <th scope="row" style="padding:10px 20px; font-weight:500; color:#101828;">Congés <span style="display:block; font-size:11px; font-weight:400; color:#667085;">Absence</span></th>
+              <td class="cell" style="padding:8px; text-align:center;"><input type="number" value="" aria-label="Congés — lundi 8 (heures)" style="width:64px; height:44px; text-align:center; border:1px solid #d0d5dd; border-radius:8px; font-size:14px; color:#101828; background:#f9fafb;"></td>
+              <td class="cell" style="padding:8px; text-align:center;"><input type="number" value="" aria-label="Congés — mardi 9 (heures)" style="width:64px; height:44px; text-align:center; border:1px solid #d0d5dd; border-radius:8px; font-size:14px; color:#101828; background:#f9fafb;"></td>
+              <td class="cell" style="padding:8px; text-align:center;"><input type="number" value="7" aria-label="Congés — mercredi 10 (heures)" style="width:64px; height:44px; text-align:center; border:1px solid #d0d5dd; border-radius:8px; font-size:14px; color:#101828; background:#f9fafb;"></td>
+              <td class="cell" style="padding:8px; text-align:center;"><input type="number" value="" aria-label="Congés — jeudi 11 (heures)" style="width:64px; height:44px; text-align:center; border:1px solid #d0d5dd; border-radius:8px; font-size:14px; color:#101828; background:#f9fafb;"></td>
+              <td class="cell" style="padding:8px; text-align:center;"><input type="number" value="" aria-label="Congés — vendredi 12 (heures)" style="width:64px; height:44px; text-align:center; border:1px solid #d0d5dd; border-radius:8px; font-size:14px; color:#101828; background:#f9fafb;"></td>
+              <td style="padding:10px 20px; text-align:right; font-weight:600; color:#101828; font-variant-numeric:tabular-nums;">7,0</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr style="border-top:2px solid #e4e7ec; background:#f9fafb;">
+              <th scope="row" style="padding:12px 20px; text-align:right; font-weight:600; color:#344054;">Total / jour</th>
+              <td style="padding:12px 8px; text-align:center; font-weight:600; color:#101828; font-variant-numeric:tabular-nums;">7,0</td>
+              <td style="padding:12px 8px; text-align:center; font-weight:600; color:#101828; font-variant-numeric:tabular-nums;">7,0</td>
+              <td style="padding:12px 8px; text-align:center; font-weight:600; color:#101828; font-variant-numeric:tabular-nums;">10,5</td>
+              <td style="padding:12px 8px; text-align:center; font-weight:600; color:#101828; font-variant-numeric:tabular-nums;">4,0</td>
+              <td style="padding:12px 8px; text-align:center; font-weight:600; color:#667085; font-variant-numeric:tabular-nums;">0,0</td>
+              <td style="padding:12px 20px; text-align:right; font-weight:700; color:#465fff; font-variant-numeric:tabular-nums;">28,5</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <!-- Actions -->
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <button type="button" style="display:inline-flex; align-items:center; min-height:44px; padding:0 16px; border:1px solid #d0d5dd; border-radius:8px; background:#fff; color:#344054; font-weight:600; font-size:13px; cursor:pointer;">Dupliquer la semaine précédente</button>
+        <button type="button" style="display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:0 18px; border:none; border-radius:8px; background:#465fff; color:#fff; font-weight:600; font-size:14px; cursor:pointer;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+          Tout enregistrer
+        </button>
+        <span style="font-size:12px; color:#667085;">Entrée = valider et descendre · Tab = cellule suivante · saisie possible sans souris.</span>
+      </div>
+
+    </main>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>
