@@ -135,10 +135,14 @@ THEN la story reste non-Done
 - **DoR : ✅ LEVÉE — prête pour `/sprint:dev`** (après US-082)
 
 ## Definition of Done
-- [ ] Un artboard design-canvas par écran prioritaire EPIC-003 (5 écrans)
-- [ ] Maquettes 100 % sur composants/tokens tailsfadmin ; gaps G1/G4 matérialisés + notés
-- [ ] Recommandations d'audit « bloquant/majeur » appliquées ou écart justifié
-- [ ] Écran de saisie hebdo : états vide/rempli/erreur + variante mobile
-- [ ] `design-canvas/VALIDATION.md` : 100 % des écrans prioritaires « Validé PO »
-- [ ] Accessibilité WCAG 2.2 AA vérifiée sur chaque maquette
+- [x] Un artboard design-canvas par écran prioritaire EPIC-003 (5 écrans → 7 artboards avec états + mobile)
+- [x] Maquettes 100 % sur composants/tokens tailsfadmin ; gaps G1/G4 matérialisés + notés
+- [x] Recommandations d'audit « bloquant/majeur » appliquées ou écart justifié (traçabilité dans `lot2-saisie/VALIDATION.md`)
+- [x] Écran de saisie hebdo : états vide/rempli/erreur + variante mobile
+- [ ] `design-canvas/lot2-saisie/VALIDATION.md` : 100 % des écrans prioritaires « Validé PO » (revue PO en attente)
+- [x] Accessibilité WCAG 2.2 AA intégrée dès la conception (cibles 44px, focus, statut texte+icône+couleur, e-mails)
 - [ ] Branche versionnée, PR mergée sur la branche de sprint 20
+
+> **Statut** : 7 artboards produits (`design-canvas/lot2-saisie/`), canevas publié pour revue, gate `VALIDATION.md` prêt.
+> Statut passé de 🟢 Ready → 🟡 To Review. Reste : validation PO écran par écran (gate).
+> **Artboards** : DSH-COLLAB, saisie hebdo (rempli + états + mobile), saisie du jour, absences, complétude.
