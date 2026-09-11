@@ -28,7 +28,7 @@ sprints:
   sprint-016: { theme: "Référentiels de paramétrage & mise en route (EPIC-001)", points: 16, goal_met: true, stories: [US-012, US-013, US-019, US-020] }  # CLÔTURÉ 16/16 pts (US-012/013/020/019) ; reste US-017
   sprint-017: { theme: "Circuits, calendriers différenciés & fermeture (EPIC-001)", points: 21, goal_met: true, stories: [US-017, US-021, US-022] }  # CLÔTURÉ 21/21 pts → EPIC-001 bouclé (reste EF-REF-24 statuts + suites Review)
   sprint-018: { theme: "Démarrage staffing (EPIC-004) + finitions Review & qualité", points: 20, goal_met: true, stories: [US-040, US-041, US-023] }  # CLÔTURÉ 20/20 pts (+ QUAL-3) ; EPIC-004 démarré
-  sprint-019: { theme: "Conception UX — recensement, parcours & mapping sur le socle (EPIC-013)", points: 16, goal_met: false, stories: [US-080, US-081, US-083, US-085] }  # EN PRÉPARATION (2026-09-10) ; US-082/084 reportés (accès hotones requis)
+  sprint-019: { theme: "Conception UX — recensement, parcours & mapping sur le socle (EPIC-013)", points: 16, goal_met: true, stories: [US-080, US-081, US-083, US-085] }  # CLÔTURÉ 16/16 pts (2026-09-11) ; livrables architecture/ ; US-082/084 reportés (accès hotones)
 
 # État par story. status ∈ {done, ready, in-progress, backlog}
 stories:
@@ -104,7 +104,7 @@ stories:
   US-082: { title: "Audit & critique UX de l'existant (inspiré hotones)", sprint: null, status: backlog, points: 5 }   # EPIC-013 — nécessite accès hotones
   US-083: { title: "Mapping pages ↔ composants tailsfadmin (+ gaps)", sprint: 19, status: done, points: 3 }   # EPIC-013 — S19 ; page-component-mapping.md validé PO, PR #118
   US-084: { title: "Maquettes haute-fidélité des écrans prioritaires (validées PO)", sprint: null, status: backlog, points: 8 }   # EPIC-013 — nécessite accès hotones
-  US-085: { title: "Backlog de refonte/reskin priorisé (MoSCoW)", sprint: 19, status: in-progress, points: 3 }   # EPIC-013 — S19 ; démarrée (US-083 validée)
+  US-085: { title: "Backlog de refonte/reskin priorisé (MoSCoW)", sprint: 19, status: done, points: 3 }   # EPIC-013 — S19 ; backlog-reskin-priorise.md validé PO, PR #119
 
 # Stories techniques / dette qualité (hors vélocité) engagées au Sprint 10
 tech_stories:
@@ -114,9 +114,9 @@ tech_stories:
 
 # Récapitulatif
 totals:
-  done: 57          # +US-081 (PR #117) ; +US-083 (mapping, PR #118)
+  done: 58          # +US-083 (PR #118) ; +US-085 (backlog reskin, PR #119) — Sprint 19 clôturé 16/16
   ready: 0          # Sprint 19 : toutes démarrées
-  in_progress: 1    # US-085 (backlog reskin) ; US-080/081/083 done
+  in_progress: 0
   backlog: 13       # dont US-082/084 (EPIC-013, reportés — accès hotones) + US-053 + reliquat
   orphans: [US-014, US-015, US-016, US-018, US-032]  # dans aucun sprint (US-017→S17)
   referenced_not_delivered: [US-033, US-035, US-036, US-053]
