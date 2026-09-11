@@ -100,9 +100,9 @@ stories:
   US-086: { title: "Adoption du socle de thème tailsfadmin-bundle (externalisation layout)", sprint: null, status: done, points: 5 }   # EPIC-012 — remplace US-063 (caduque, ADR-0023) ; livrée PR #112 + adoption composants 1.4.2 + fix contrôleurs #113 (2026-09-10)
   # — EPIC-013 : Recensement pages cibles, parcours par persona & conception UX (créées 2026-09-09) —
   US-080: { title: "Référentiel exhaustif des pages cibles", sprint: 19, status: done, points: 5 }   # EPIC-013 — S19 ; page-inventory.md v2 validé PO, PR #116
-  US-081: { title: "Cartographie des parcours par persona (P1–P6)", sprint: 19, status: in-progress, points: 5 }   # EPIC-013 — S19 ; démarrée (US-080 validée)
+  US-081: { title: "Cartographie des parcours par persona (P1–P6)", sprint: 19, status: done, points: 5 }   # EPIC-013 — S19 ; parcours-personas.md validé PO, PR #117
   US-082: { title: "Audit & critique UX de l'existant (inspiré hotones)", sprint: null, status: backlog, points: 5 }   # EPIC-013 — nécessite accès hotones
-  US-083: { title: "Mapping pages ↔ composants tailsfadmin (+ gaps)", sprint: 19, status: ready, points: 3 }   # EPIC-013 — S19
+  US-083: { title: "Mapping pages ↔ composants tailsfadmin (+ gaps)", sprint: 19, status: in-progress, points: 3 }   # EPIC-013 — S19 ; démarrée (US-080+081 validées)
   US-084: { title: "Maquettes haute-fidélité des écrans prioritaires (validées PO)", sprint: null, status: backlog, points: 8 }   # EPIC-013 — nécessite accès hotones
   US-085: { title: "Backlog de refonte/reskin priorisé (MoSCoW)", sprint: 19, status: ready, points: 3 }   # EPIC-013 — S19
 
@@ -114,9 +114,9 @@ tech_stories:
 
 # Récapitulatif
 totals:
-  done: 55          # +US-086 (socle) ; +US-080 (référentiel pages, PR #116)
-  ready: 2          # US-083/085 — Sprint 19
-  in_progress: 1    # US-081 (parcours par persona) ; US-080 done
+  done: 56          # +US-080 (PR #116) ; +US-081 (parcours, PR #117)
+  ready: 1          # US-085 — Sprint 19
+  in_progress: 1    # US-083 (mapping composants) ; US-080/081 done
   backlog: 13       # dont US-082/084 (EPIC-013, reportés — accès hotones) + US-053 + reliquat
   orphans: [US-014, US-015, US-016, US-018, US-032]  # dans aucun sprint (US-017→S17)
   referenced_not_delivered: [US-033, US-035, US-036, US-053]
