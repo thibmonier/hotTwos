@@ -47,11 +47,16 @@ final class TimesheetPageController extends AbstractController
         $reference = $this->referenceDate($request->query->get('date'));
         $monday = $reference->modify('monday this week');
 
-        /** @var list<array{date: string, label: string}> $days */
+        /** @var list<array{date: string, label: string, weekend: bool}> $days */
         $days = [];
+        $workingDays = 0;
         for ($offset = 0; $offset < 7; ++$offset) {
             $day = $monday->modify(sprintf('+%d day', $offset));
-            $days[] = ['date' => $day->format('Y-m-d'), 'label' => $day->format('D d/m')];
+            $isWeekend = (int) $day->format('N') >= 6;
+            $days[] = ['date' => $day->format('Y-m-d'), 'label' => $day->format('D d/m'), 'weekend' => $isWeekend];
+            if (!$isWeekend) {
+                ++$workingDays;
+            }
         }
         $sunday = $monday->modify('+6 day');
 
@@ -71,6 +76,25 @@ final class TimesheetPageController extends AbstractController
             $this->projects->findAllActive($user->tenantId()),
         );
 
+        // Totaux rendus côté serveur (reco audit TMP1-01) : la grille est correcte
+        // au premier rendu ; le contrôleur Stimulus ne fait que recalculer à la saisie.
+        /** @var array<string, int> $rowTotals projectId => minutes */
+        $rowTotals = [];
+        /** @var array<string, int> $dayTotals Y-m-d => minutes */
+        $dayTotals = [];
+        $grandTotal = 0;
+        foreach ($grid as $projectId => $byDate) {
+            foreach ($byDate as $date => $minutes) {
+                $rowTotals[$projectId] = ($rowTotals[$projectId] ?? 0) + $minutes;
+                $dayTotals[$date] = ($dayTotals[$date] ?? 0) + $minutes;
+                $grandTotal += $minutes;
+            }
+        }
+
+        // Objectif hebdomadaire (reco TMP1-02) : jours ouvrés × 7 h, présenté hors dialog.
+        $targetMinutes = $workingDays * 420;
+        $objectivePercent = $targetMinutes > 0 ? (int) min(100, round($grandTotal / $targetMinutes * 100)) : 0;
+
         $reminderLateWeeks = $this->reminderBanner->lateWeeksForOptedOut($user);
         $summary = $this->activitySummary->forUser($user->tenantId(), $user->id(), $this->clock->now(), self::SUMMARY_WEEKS);
 
@@ -78,6 +102,11 @@ final class TimesheetPageController extends AbstractController
             'days' => $days,
             'projects' => $projects,
             'grid' => $grid,
+            'rowTotals' => $rowTotals,
+            'dayTotals' => $dayTotals,
+            'grandTotal' => $grandTotal,
+            'targetMinutes' => $targetMinutes,
+            'objectivePercent' => $objectivePercent,
             'reminderLateWeeks' => $reminderLateWeeks > 0 ? $reminderLateWeeks : null,
             'summary' => $this->summaryView($summary),
             'weekStart' => $monday->format('Y-m-d'),
