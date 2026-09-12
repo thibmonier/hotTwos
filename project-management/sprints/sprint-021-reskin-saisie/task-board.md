@@ -5,15 +5,14 @@
 
 ## Kanban
 
-| 🔵 To Do | 🔄 En cours | 👀 Review | ✅ Done | 🚫 Bloqué |
-|----------|-------------|-----------|---------|-----------|
-| — | — | — | US-087 (3) · US-088 (5) · US-089 (3) · US-090 (2) · US-091 (2)* · US-092 (3) | — |
+| 🔵 To Do | 🔄 En cours (→ S22) | 👀 Review | ✅ Done | 🚫 Bloqué |
+|----------|---------------------|-----------|---------|-----------|
+| — | US-091 (2)* | — | US-087 (3) · US-088 (5) · US-089 (3) · US-090 (2) · US-092 (3) | — |
 
-> **Sprint clôturé** — 6 US mergées (bundle v1.6.0 + 6 écrans). *US-091 ⚠️ partielle : calendrier de conflits (ABS-03) + solde dynamique reportés S22. Dette : US-092 relance inline (CPL-04) + filtre (CPL-05), US-089 tests d'états, WCAG en CI. Voir `sprint-review.md`.
+> **Sprint clôturé (goal ⚠️ partiellement atteint)** — bundle v1.6.0 + 6 écrans portés, code mergé. *US-091 **non Done** : Must CA « calendrier de conflits » (ABS-03) + solde dynamique (CA-2) manquants → reste à finir S22 (US-091b). Dette tracée : US-092 relance inline (CPL-04)/filtre (CPL-05), US-089 tests d'états, WCAG en CI. Voir `sprint-review.md` + `sprint-retro.md`.
 
 ## Engagement
-- **Total engagé** : 18 pts (~15 en DoD stricte)
-- **Livrés** : 18 pts mergés (5/6 DoD complètes)
+- **Total engagé** : 18 pts · **Livrés (DoD stricte)** : ~15 pts (5/6 US complètes ; US-091 partielle reportée S22)
 - **Reste** : 18 pts
 
 ## Séquencement
