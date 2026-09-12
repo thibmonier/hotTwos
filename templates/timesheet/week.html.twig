@@ -5,32 +5,35 @@
 {% block page_section %}Temps & activité{% endblock %}
 {% block page_title %}Saisie des temps{% endblock %}
 
+{% macro hours(minutes) %}{{ (minutes / 60)|number_format(1, ',', ' ') }}{% endmacro %}
+
 {% block body %}
-<h1 class="visually-hidden">Saisie des temps</h1>
+{% import _self as fmt %}
+<h1 class="sr-only">Saisie des temps</h1>
 
 <div data-controller="timesheet" data-timesheet-week-start-value="{{ weekStart }}">
 
     {# Bannière relances — textes assertés : "désactivé les relances" et "en retard" #}
     {% if reminderLateWeeks %}
-        <p class="flex items-start gap-2 rounded-md border border-warning px-4 py-3 text-sm text-body mb-4" role="status">
+        <p class="mb-4 flex items-start gap-2 rounded-xl border border-warning-200 bg-warning-50 px-4 py-3 text-theme-sm text-warning-700 dark:border-warning-500/30 dark:bg-warning-500/10 dark:text-warning-400" role="status">
             <span aria-hidden="true">⏳</span>
             Vous avez désactivé les relances automatiques. Il vous reste {{ reminderLateWeeks }} semaine{{ reminderLateWeeks > 1 ? 's' : '' }} en retard à compléter.
         </p>
     {% endif %}
 
-    {# Barre de navigation + lien vue jour #}
-    <div class="flex items-center justify-between gap-3 mb-4 flex-wrap">
+    {# Barre de navigation semaine + vues #}
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
         <nav class="flex items-center gap-2" aria-label="Navigation entre les semaines">
             <a href="{{ path('timesheet_week', { date: prevDate }) }}"
-               class="w-10 h-10 inline-flex items-center justify-center border border-border-strong rounded-md bg-surface text-body no-underline hover:bg-surface-alt hover:text-ink"
+               class="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-700 no-underline hover:bg-gray-50 dark:border-gray-800 dark:bg-white/[0.03] dark:text-gray-300"
                rel="prev" aria-label="Semaine précédente">←</a>
-            <span class="min-w-[220px] text-center font-semibold text-body text-sm">{{ weekLabel }}</span>
+            <span class="min-w-[220px] text-center text-theme-sm font-semibold text-gray-800 dark:text-white/90">{{ weekLabel }}</span>
             <a href="{{ path('timesheet_week', { date: nextDate }) }}"
-               class="w-10 h-10 inline-flex items-center justify-center border border-border-strong rounded-md bg-surface text-body no-underline hover:bg-surface-alt hover:text-ink"
+               class="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-700 no-underline hover:bg-gray-50 dark:border-gray-800 dark:bg-white/[0.03] dark:text-gray-300"
                rel="next" aria-label="Semaine suivante">→</a>
         </nav>
         <a href="{{ path('timesheet_day', { date: weekStart }) }}"
-           class="inline-flex min-h-9 items-center rounded border border-border-strong px-3 text-xs font-semibold text-muted hover:bg-surface-alt hover:text-ink">
+           class="inline-flex min-h-9 items-center rounded-lg border border-gray-200 bg-white px-3 text-theme-xs font-semibold text-gray-600 hover:bg-gray-50 dark:border-gray-800 dark:bg-white/[0.03] dark:text-gray-300">
             Vue jour (mobile)
         </a>
     </div>
@@ -38,7 +41,7 @@
     {# Bouton Ma synthèse + dialog — "Ma synthèse" asserté dans le HTML #}
     <div class="mb-4" data-controller="activity-summary">
         <button type="button"
-                class="inline-flex min-h-9 items-center rounded border border-primary px-3 text-xs font-semibold text-primary hover:bg-surface-alt"
+                class="inline-flex min-h-9 items-center gap-2 rounded-lg border border-brand-500 px-3 text-theme-xs font-semibold text-brand-500 hover:bg-brand-50 dark:hover:bg-brand-500/10"
                 data-activity-summary-target="trigger"
                 data-action="activity-summary#open">
             📊 Ma synthèse
@@ -46,46 +49,44 @@
 
         {# dialog.summary-dialog asserté par TimesheetPageTest (count inputs = 0 à la fermeture) #}
         <dialog class="summary-dialog" aria-modal="true" aria-labelledby="summary-title" data-activity-summary-target="dialog">
-            <div class="flex items-center justify-between pb-4 mb-4 border-b border-border">
-                <h2 id="summary-title" class="m-0 text-base font-semibold text-ink">Ma synthèse</h2>
+            <div class="mb-4 flex items-center justify-between border-b border-gray-100 pb-4 dark:border-gray-800">
+                <h2 id="summary-title" class="m-0 text-base font-semibold text-gray-800 dark:text-white/90">Ma synthèse</h2>
                 <button type="button"
-                        class="text-sm text-muted hover:text-ink"
+                        class="text-theme-sm text-gray-500 hover:text-gray-800 dark:hover:text-white/90"
                         data-action="activity-summary#close"
                         aria-label="Fermer la synthèse">✕ Fermer</button>
             </div>
             <div>
-                <p class="text-xs text-muted mb-3">Période du {{ summary.periodStart }} au {{ summary.periodEnd }}.</p>
+                <p class="mb-3 text-theme-xs text-gray-500 dark:text-gray-400">Période du {{ summary.periodStart }} au {{ summary.periodEnd }}.</p>
 
                 {% if summary.empty %}
                     <p>Aucune saisie enregistrée sur cette période.</p>
                 {% else %}
                     {# "Taux d'occupation" asserté #}
                     <section aria-labelledby="summary-occupation" class="mb-4">
-                        <h3 id="summary-occupation" class="text-sm font-semibold mb-1 text-ink">Taux d'occupation : {{ summary.occupationPercent }} %</h3>
-                        <p class="text-xs text-muted mb-2">Part du temps de production déclaré sur les jours ouvrés de la période.</p>
-                        <div class="h-1.5 bg-border rounded-full overflow-hidden mt-1">
-                            <span class="block h-full bg-primary rounded-full" style="width: {{ summary.occupationPercent > 100 ? 100 : summary.occupationPercent }}%" aria-hidden="true"></span>
-                        </div>
+                        <h3 id="summary-occupation" class="mb-1 text-theme-sm font-semibold text-gray-800 dark:text-white/90">Taux d'occupation : {{ summary.occupationPercent }} %</h3>
+                        <p class="mb-2 text-theme-xs text-gray-500 dark:text-gray-400">Part du temps de production déclaré sur les jours ouvrés de la période.</p>
+                        <twig:tsf:Ui:ProgressBar :value="summary.occupationPercent" size="sm" />
                     </section>
 
                     <section aria-labelledby="summary-type" class="mb-4">
-                        <h3 id="summary-type" class="text-sm font-semibold mb-2 text-ink">Répartition par type</h3>
-                        <ul class="list-none p-0 m-0 flex flex-col gap-3 text-sm">
+                        <h3 id="summary-type" class="mb-2 text-theme-sm font-semibold text-gray-800 dark:text-white/90">Répartition par type</h3>
+                        <ul class="m-0 flex list-none flex-col gap-3 p-0 text-theme-sm">
                             <li>Production — {{ summary.productionDuration }} ({{ summary.productionPercent }} %)
-                                <div class="h-1.5 bg-border rounded-full overflow-hidden mt-1"><span class="block h-full bg-primary rounded-full" style="width: {{ summary.productionPercent }}%" aria-hidden="true"></span></div>
+                                <twig:tsf:Ui:ProgressBar :value="summary.productionPercent" size="sm" />
                             </li>
                             <li>Absence — {{ summary.absenceDuration }} ({{ summary.absencePercent }} %)
-                                <div class="h-1.5 bg-border rounded-full overflow-hidden mt-1"><span class="block h-full bg-primary rounded-full" style="width: {{ summary.absencePercent }}%" aria-hidden="true"></span></div>
+                                <twig:tsf:Ui:ProgressBar :value="summary.absencePercent" size="sm" />
                             </li>
                         </ul>
                     </section>
 
                     <section aria-labelledby="summary-projects" class="mb-4">
-                        <h3 id="summary-projects" class="text-sm font-semibold mb-2 text-ink">Répartition par projet</h3>
-                        <ul class="list-none p-0 m-0 flex flex-col gap-3 text-sm">
+                        <h3 id="summary-projects" class="mb-2 text-theme-sm font-semibold text-gray-800 dark:text-white/90">Répartition par projet</h3>
+                        <ul class="m-0 flex list-none flex-col gap-3 p-0 text-theme-sm">
                             {% for project in summary.projects %}
                                 <li>{{ project.label }} — {{ project.duration }} ({{ project.percent }} %)
-                                    <div class="h-1.5 bg-border rounded-full overflow-hidden mt-1"><span class="block h-full bg-primary rounded-full" style="width: {{ project.percent }}%" aria-hidden="true"></span></div>
+                                    <twig:tsf:Ui:ProgressBar :value="project.percent" size="sm" />
                                 </li>
                             {% endfor %}
                             {% if summary.othersCount > 0 %}
@@ -96,43 +97,69 @@
                 {% endif %}
 
                 {# "Planning à venir" asserté #}
-                <section aria-labelledby="summary-planning" class="border-t border-border pt-3 mt-3">
-                    <h3 id="summary-planning" class="text-sm font-semibold mb-1 text-ink">Planning à venir</h3>
-                    <p class="text-xs text-muted mb-0">Le module d'affectation n'est pas encore activé — le planning s'affichera ici prochainement.</p>
+                <section aria-labelledby="summary-planning" class="mt-3 border-t border-gray-100 pt-3 dark:border-gray-800">
+                    <h3 id="summary-planning" class="mb-1 text-theme-sm font-semibold text-gray-800 dark:text-white/90">Planning à venir</h3>
+                    <p class="mb-0 text-theme-xs text-gray-500 dark:text-gray-400">Le module d'affectation n'est pas encore activé — le planning s'affichera ici prochainement.</p>
                 </section>
             </div>
         </dialog>
     </div>
 
     {% if projects is empty %}
-        <div class="rounded-md border border-border bg-surface p-4 text-muted">
+        <div class="rounded-2xl border border-gray-200 bg-white p-4 text-gray-500 dark:border-gray-800 dark:bg-white/[0.03] dark:text-gray-400">
             Aucun projet actif : demandez à un administrateur d'en créer un pour saisir votre temps.
         </div>
     {% else %}
-        {# Grille de saisie — "input[value=210]" asserté ; "inputmode=numeric" asserté dans day, mais grille inclut aussi ces attributs #}
-        <div class="rounded-md border border-border bg-surface mb-3">
+        {# Objectif de la semaine (reco TMP1-02) : visible hors dialog. #}
+        <div class="mb-4 flex flex-wrap items-center gap-6 rounded-2xl border border-gray-200 bg-white p-4 shadow-theme-sm dark:border-gray-800 dark:bg-white/[0.03]">
+            <div class="min-w-[260px] flex-1">
+                <div class="mb-1.5 flex items-center justify-between">
+                    <span class="text-theme-sm text-gray-500 dark:text-gray-400">Objectif de la semaine</span>
+                    <span class="text-theme-sm font-semibold text-gray-800 dark:text-white/90">
+                        {{ fmt.hours(grandTotal) }} h <span class="font-normal text-gray-400">/ {{ fmt.hours(targetMinutes) }} h</span> · {{ objectivePercent }} %
+                    </span>
+                </div>
+                <twig:tsf:Ui:ProgressBar :value="objectivePercent" size="sm" />
+            </div>
+            <span class="inline-flex items-center gap-2 rounded-full border border-gray-200 px-3 py-1.5 text-theme-xs text-gray-500 dark:border-gray-800 dark:text-gray-400"
+                  data-timesheet-target="status" aria-live="polite">
+                Enregistrement automatique à chaque saisie.
+            </span>
+        </div>
+
+        {# Bannière d'erreur de validation (reco TMP1-05), pilotée par le contrôleur Stimulus. #}
+        <p class="mb-3 hidden items-start gap-2 rounded-xl border border-error-200 bg-error-50 px-4 py-3 text-theme-sm text-error-700 dark:border-error-500/30 dark:bg-error-500/10 dark:text-error-400"
+           role="alert" data-timesheet-target="errorBanner"></p>
+
+        {# Grille de saisie #}
+        <div class="mb-3 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-theme-sm dark:border-gray-800 dark:bg-white/[0.03]">
             <div class="overflow-x-auto">
                 <table class="w-full border-collapse text-left" data-timesheet-target="grid">
-                    <caption class="visually-hidden">Grille de saisie des temps — {{ weekLabel }}</caption>
+                    <caption class="sr-only">Grille de saisie des temps — {{ weekLabel }}</caption>
                     <thead>
-                        <tr class="bg-surface-alt">
-                            <th scope="col" class="px-4 py-3 font-semibold text-body">Projet</th>
+                        <tr class="border-b border-gray-100 bg-gray-50 dark:border-gray-800 dark:bg-white/[0.02]">
+                            <th scope="col" class="px-4 py-3 text-theme-sm font-semibold text-gray-700 dark:text-gray-300">Projet</th>
                             {% for day in days %}
-                                <th scope="col" class="px-3 py-3 text-center font-semibold text-body">{{ day.label }}</th>
+                                <th scope="col" class="px-3 py-3 text-center text-theme-sm font-semibold {{ day.weekend ? 'text-gray-400 dark:text-gray-500' : 'text-gray-700 dark:text-gray-300' }}">
+                                    {{ day.label }}{% if day.weekend %} <span class="sr-only">(week-end)</span>{% endif %}
+                                </th>
                             {% endfor %}
-                            <th scope="col" class="px-3 py-3 text-right font-semibold text-body">Total</th>
+                            <th scope="col" class="px-4 py-3 text-right text-theme-sm font-semibold text-gray-700 dark:text-gray-300">Total</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for project in projects %}
-                            <tr class="border-t border-border">
-                                <th scope="row" class="px-4 py-2 font-normal text-ink" title="{{ project.code }}">{{ project.name }}</th>
+                            <tr class="border-t border-gray-100 dark:border-gray-800">
+                                <th scope="row" class="px-4 py-2 font-normal text-gray-800 dark:text-white/90">
+                                    {{ project.name }}
+                                    <span class="block text-theme-xs font-normal text-gray-400">{{ project.code }}</span>
+                                </th>
                                 {% for day in days %}
                                     {% set minutes = grid[project.id][day.date] ?? null %}
-                                    <td class="px-3 py-2 text-center">
+                                    <td class="px-3 py-2 text-center {{ day.weekend ? 'bg-gray-50 dark:bg-white/[0.02]' : '' }}">
                                         <input
                                             type="number"
-                                            class="w-14 min-h-11 text-center border border-border-strong rounded-md bg-surface text-body text-sm px-1"
+                                            class="min-h-11 w-16 rounded-lg border border-gray-300 bg-white px-1 text-center text-theme-sm text-gray-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:bg-white/[0.03] dark:text-white/90"
                                             min="0"
                                             max="24"
                                             step="0.25"
@@ -146,43 +173,39 @@
                                         >
                                     </td>
                                 {% endfor %}
-                                <td class="px-3 py-2 text-right font-semibold text-ink tabular-nums"
-                                    data-timesheet-target="rowTotal" data-project-id="{{ project.id }}" aria-label="Total {{ project.name }}">—</td>
+                                <td class="px-4 py-2 text-right font-semibold text-gray-800 tabular-nums dark:text-white/90"
+                                    data-timesheet-target="rowTotal" data-project-id="{{ project.id }}" aria-label="Total {{ project.name }}">{{ fmt.hours(rowTotals[project.id] ?? 0) }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
                     <tfoot>
-                        <tr class="border-t-2 border-border-strong bg-surface-alt">
-                            <th scope="row" class="px-4 py-2 text-right font-semibold text-body">Total</th>
+                        <tr class="border-t-2 border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-white/[0.02]">
+                            <th scope="row" class="px-4 py-2 text-right text-theme-sm font-semibold text-gray-700 dark:text-gray-300">Total</th>
                             {% for day in days %}
-                                <td class="px-3 py-2 text-center font-semibold text-ink tabular-nums"
-                                    data-timesheet-target="dayTotal" data-date="{{ day.date }}" aria-label="Total {{ day.label }}">—</td>
+                                <td class="px-3 py-2 text-center font-semibold tabular-nums {{ day.weekend ? 'text-gray-400 dark:text-gray-500' : 'text-gray-800 dark:text-white/90' }}"
+                                    data-timesheet-target="dayTotal" data-date="{{ day.date }}" aria-label="Total {{ day.label }}">{{ fmt.hours(dayTotals[day.date] ?? 0) }}</td>
                             {% endfor %}
-                            <td class="px-3 py-2 text-right font-bold text-primary tabular-nums"
-                                data-timesheet-target="grandTotal" aria-label="Total de la semaine">—</td>
+                            <td class="px-4 py-2 text-right font-bold text-brand-500 tabular-nums"
+                                data-timesheet-target="grandTotal" aria-label="Total de la semaine">{{ fmt.hours(grandTotal) }}</td>
                         </tr>
                     </tfoot>
                 </table>
             </div>
         </div>
 
-        <div class="flex items-center gap-3 flex-wrap mb-3">
+        <div class="mb-3 flex flex-wrap items-center gap-3">
             <button type="button"
-                    class="inline-flex min-h-9 items-center rounded border border-border-strong px-3 text-xs font-semibold text-muted hover:bg-surface-alt hover:text-ink"
+                    class="inline-flex min-h-9 items-center rounded-lg border border-gray-300 bg-white px-3 text-theme-xs font-semibold text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-white/[0.03] dark:text-gray-300"
                     data-action="timesheet#duplicatePreviousWeek">
                 Dupliquer la semaine précédente
             </button>
             <button type="button"
-                    class="inline-flex min-h-11 items-center rounded bg-primary px-4 text-sm font-semibold text-white hover:opacity-90"
+                    class="inline-flex min-h-11 items-center gap-2 rounded-lg bg-brand-500 px-4 text-theme-sm font-semibold text-white hover:bg-brand-600"
                     data-action="timesheet#saveWeek">
                 Tout enregistrer
             </button>
-            <span class="text-xs text-muted">Entrée = valider et descendre · Tab = cellule suivante · saisie possible sans souris.</span>
+            <span class="text-theme-xs text-gray-400">Entrée = valider et descendre · Tab = cellule suivante · saisie possible sans souris.</span>
         </div>
-
-        <p class="text-xs text-muted" aria-live="polite" data-timesheet-target="status">
-            Saisissez les heures par projet et par jour (ex. 7,5 = 7h30). Vos modifications sont enregistrées automatiquement ; « Tout enregistrer » force l'envoi de toute la grille.
-        </p>
     {% endif %}
 
 </div>
