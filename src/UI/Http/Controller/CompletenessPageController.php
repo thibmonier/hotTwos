@@ -55,11 +55,29 @@ final class CompletenessPageController extends AbstractController
         // F-S5-4 → US-067 : identifier les collaborateurs par leur nom d'affichage (repli e-mail).
         $userDisplayNames = $this->users->findDisplayNamesByIds($user->tenantId(), array_keys($rows));
 
+        // US-092 (reco CPL-03) : synthèse de la semaine la plus récente pour un diagnostic < 5 s.
+        $weekKeys = array_keys($weeks);
+        $latestWeek = [] === $weekKeys ? null : end($weekKeys);
+        $summary = ['total' => count($rows), 'late' => 0, 'partial' => 0, 'submitted' => 0];
+        if (null !== $latestWeek) {
+            foreach ($rows as $cells) {
+                $state = $cells[$latestWeek]['state'] ?? null;
+                if ('empty_late' === $state) {
+                    ++$summary['late'];
+                } elseif ('partial' === $state) {
+                    ++$summary['partial'];
+                } elseif ('submitted' === $state) {
+                    ++$summary['submitted'];
+                }
+            }
+        }
+
         return $this->render('completeness/index.html.twig', [
             'team' => $team,
             'weeks' => array_keys($weeks),
             'rows' => $rows,
             'userDisplayNames' => $userDisplayNames,
+            'summary' => $summary,
         ]);
     }
 }
