@@ -1,0 +1,5 @@
+{
+  "established": false,
+  "note": "US-093 — baseline des violations WCAG serious/critical héritées du parcours P1 (approche B, axe via pa11y). established:false = mode rapport (le gate n'échoue pas). Après revue du 1er rapport CI (artifact a11y-reports), lister ici les violations héritées « slug:règle » puis passer established:true pour bloquer les NOUVELLES violations (décision PO 2026-09-12). Contraste (color-contrast) exclu : faux positifs en file:// sans CSS résolu — suivi dédié.",
+  "violations": []
+}
