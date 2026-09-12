@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "eaa828c48dd69fcb54f4f67baffae835",
+    "content-hash": "cba4c7d5a26df925f472361d8bdb2823",
     "packages": [
         {
             "name": "api-platform/core",
@@ -8255,20 +8255,20 @@
         },
         {
             "name": "tailsfadmin/tailsfadmin-bundle",
-            "version": "v1.4.2",
+            "version": "v1.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thibmonier/tailsfadmin.git",
-                "reference": "a9ef1a5bd4669dd79daaed011806b19452fe104e"
+                "reference": "b097c81fbeff5950288aedc6f3272777aa4cbbd6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thibmonier/tailsfadmin/zipball/a9ef1a5bd4669dd79daaed011806b19452fe104e",
-                "reference": "a9ef1a5bd4669dd79daaed011806b19452fe104e",
+                "url": "https://api.github.com/repos/thibmonier/tailsfadmin/zipball/b097c81fbeff5950288aedc6f3272777aa4cbbd6",
+                "reference": "b097c81fbeff5950288aedc6f3272777aa4cbbd6",
                 "shasum": ""
             },
             "require": {
-                "php": ">=8.5",
+                "php": ">=8.2",
                 "symfony/asset": "^7.3 || ^8.0",
                 "symfony/asset-mapper": "^7.3 || ^8.0",
                 "symfony/console": "^7.3 || ^8.0",
@@ -8326,7 +8326,7 @@
                 "issues": "https://github.com/thibmonier/tailsfadmin/issues",
                 "source": "https://github.com/thibmonier/tailsfadmin"
             },
-            "time": "2026-09-10T08:08:20+00:00"
+            "time": "2026-09-12T09:02:37+00:00"
         },
         {
             "name": "twig/extra-bundle",
