@@ -31,6 +31,7 @@ sprints:
   sprint-019: { theme: "Conception UX — recensement, parcours & mapping sur le socle (EPIC-013)", points: 16, goal_met: true, stories: [US-080, US-081, US-083, US-085] }  # CLÔTURÉ 16/16 pts (2026-09-11) ; livrables architecture/ ; US-082/084 reportés (accès hotones)
   sprint-020: { theme: "Conception UX du parcours de saisie collaborateur (EPIC-013 bouclage)", points: 13, goal_met: true, stories: [US-082, US-084] }  # CLÔTURÉ 13/13 pts (2026-09-11) ; audit #122 + maquettes HF #124 validées PO 100% (canevas design-canvas) → dev reskin S21 débloqué ; EPIC-013 bouclé 6/6
   sprint-021: { theme: "Reskin du parcours de saisie collaborateur (EPIC-003 front)", points: 18, points_delivered: 15, goal_met: false, stories: [US-087, US-088, US-089, US-090, US-091, US-092], debt: [US-091-ABS-03, US-091-CA2-solde, US-092-CPL-04, US-092-CPL-05, US-089-tests-etats, WCAG-CI] }  # CLÔTURÉ 2026-09-12 — bundle v1.6.0 (G1/G4) + 6 écrans portés. Goal ⚠️ PARTIELLEMENT atteint (goal_met:false pour cohérence avec sprint-review.md, corrigé suite rétro) : US-091 partielle (ABS-03 Must + CA-2 reportés S22). ~15/18 pts DoD stricte
+  sprint-022: { theme: "Finition & durcissement du parcours de saisie (EPIC-003) + WCAG en CI", points: 12, goal_met: null, stories: [US-091b, US-093, US-092b, US-094, US-095] }  # DÉMARRÉ 2026-10-12 — solde dette S21 (US-091b ABS-03/CA-2 Must, US-092b CPL-04/05, US-093 WCAG CI + tests US-089) + Should EPIC-003 (US-094 validation temps, US-095 relances) ; puis reskin EPIC-002 au S23
 
 # État par story. status ∈ {done, ready, in-progress, backlog}
 stories:
@@ -106,6 +107,11 @@ stories:
   US-090: { title: "PG-TMP-02/03 — Reskin saisie du jour (mobile)", sprint: 21, status: done, points: 2 }   # EPIC-003 — maquette SaisieJour ; recos TMP2-*
   US-091: { title: "PG-ABS-01 — Reskin Mes absences", sprint: 21, status: in-progress, points: 2 }   # EPIC-003 — reskin mergé #130 MAIS DoD incomplète (Must CA ABS-03 calendrier conflits + CA-2 solde dynamique manquants) → NON done ; reste à finir S22 (US-091b à créer)
   US-092: { title: "PG-CPL-01 — Reskin Complétude", sprint: 21, status: done, points: 3 }   # EPIC-003 — maquette Completude ; F-S5-4 (bloquant) + F-S5-5 ; dépend US-087 (G1)
+  US-091b: { title: "Absences — calendrier de conflits (ABS-03) + solde projeté dynamique (CA-2)", sprint: 22, status: ready, points: 3 }   # EPIC-003 — finition US-091 (Must non livré S21)
+  US-092b: { title: "Complétude — relance inline (CPL-04) + filtre/recherche (CPL-05)", sprint: 22, status: ready, points: 2 }   # EPIC-003 — finition US-092 ; réutilise reminders_update
+  US-093: { title: "Qualité — WCAG axe/pa11y en CI + tests d'états saisie hebdo", sprint: 22, status: ready, points: 3 }   # dette S21 transversale (rétro) ; runner a11y sans-Node à trancher
+  US-094: { title: "PG-VLD-01 — Reskin validation des temps", sprint: 22, status: ready, points: 2 }   # EPIC-003 Should (backlog reskin)
+  US-095: { title: "PG-REL-01 — Reskin relances", sprint: 22, status: ready, points: 2 }   # EPIC-003 Should (backlog reskin) ; cohérence avec complétude
   # — EPIC-013 : Recensement pages cibles, parcours par persona & conception UX (créées 2026-09-09) —
   US-080: { title: "Référentiel exhaustif des pages cibles", sprint: 19, status: done, points: 5 }   # EPIC-013 — S19 ; page-inventory.md v2 validé PO, PR #116
   US-081: { title: "Cartographie des parcours par persona (P1–P6)", sprint: 19, status: done, points: 5 }   # EPIC-013 — S19 ; parcours-personas.md validé PO, PR #117
@@ -123,7 +129,7 @@ tech_stories:
 # Récapitulatif
 totals:
   done: 65          # +US-087..090,092 (5 done) — Sprint 21 ; US-091 in-progress (DoD partielle → S22)
-  ready: 0          # Sprint 21 clôturé
+  ready: 5          # Sprint 22 démarré : US-091b, US-092b, US-093, US-094, US-095 (finition EPIC-003, 12 pts)
   in_progress: 1   # US-091 (reskin mergé, Must CA ABS-03 restant → S22)
   backlog: 11       # US-082/084 passées en ready (S20) ; reste US-053 (EPIC-010) + reliquat modules non ouverts
   orphans: [US-014, US-015, US-016, US-018, US-032]  # dans aucun sprint (US-017→S17)
