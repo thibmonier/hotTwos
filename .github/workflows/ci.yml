@@ -105,6 +105,43 @@ jobs:
       - name: Gate couverture (lignes ≥ 80 %)
         run: php bin/coverage-gate.php coverage.xml 80
 
+      # (a11y — US-093) Scan WCAG 2.2 AA des écrans du parcours P1.
+      # Approche B : A11yHtmlExportTest (lancé dans la suite ci-dessus) a écrit le HTML rendu serveur
+      # dans var/a11y/*.html ; on le scanne avec axe-core (via pa11y, qui embarque Chromium). Node en CI
+      # uniquement (ADR-0019 ne vise que l'image app). Contraste différé ; gate en mode rapport tant que
+      # la baseline n'est pas établie (bascule blocante après revue — cf. tests/a11y/baseline.json).
+      - name: Setup Node.js (scan a11y)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install pa11y (axe runner)
+        continue-on-error: true   # introduction US-093 : une défaillance d'install (Chromium) ne bloque pas la PR ; le gate (mode rapport) reste l'autorité
+        run: npm install -g pa11y@8
+
+      - name: Scan a11y (axe via pa11y, WCAG2AA)
+        continue-on-error: true
+        run: |
+          mkdir -p var/a11y/reports
+          shopt -s nullglob
+          for f in var/a11y/*.html; do
+            slug="$(basename "$f" .html)"
+            echo "=== a11y scan : $slug ==="
+            pa11y --runner axe --standard WCAG2AA --reporter json "file://$(realpath "$f")" \
+              > "var/a11y/reports/${slug}.json" || true
+          done
+
+      - name: Gate a11y (nouvelles violations serious/critical)
+        run: php bin/a11y-gate.php var/a11y/reports tests/a11y/baseline.json
+
+      - name: Upload rapports a11y
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a11y-reports
+          path: var/a11y/
+          if-no-files-found: warn
+
       # (5)(6)(10)(11) — étapes prêtes, activées avec le code correspondant :
       #  (5) tests d'isolation multi-tenant (groupe @multitenant) → US-001
       #  (6) tests en mode worker (ARC-50) → runtime FrankenPHP worker (T-006-02)

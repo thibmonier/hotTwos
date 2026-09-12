@@ -75,6 +75,31 @@ final class TimesheetPageTest extends WebTestCase
         // US-069 (T-069-04) : la dialog signale son rôle modal aux technologies d'assistance (a11y).
         self::assertSame(1, $crawler->filter('dialog.summary-dialog[aria-modal="true"]')->count());
 
+        // US-089 / CA-2 (reco TMP1-01) — totaux rendus CÔTÉ SERVEUR au premier rendu (210 min = 3,5 h).
+        $grandTotal = $crawler->filter('[data-timesheet-target="grandTotal"]');
+        self::assertSame(1, $grandTotal->count(), 'Cellule grandTotal (SSR) absente.');
+        self::assertStringContainsString('3,5', $grandTotal->text(), 'grandTotal SSR incorrect (attendu 3,5 h).');
+        $monday = new DateTimeImmutable('monday this week')->format('Y-m-d');
+        $dayTotal = $crawler->filter(sprintf('[data-timesheet-target="dayTotal"][data-date="%s"]', $monday));
+        self::assertSame(1, $dayTotal->count(), 'Cellule dayTotal du lundi absente.');
+        self::assertStringContainsString('3,5', $dayTotal->text(), 'dayTotal lundi SSR incorrect.');
+        // Bandeau objectif rendu serveur : 3,5 h / 35,0 h (5 jours ouvrés × 7 h) · 10 %.
+        self::assertStringContainsString('3,5 h', $body);
+        self::assertStringContainsString('35,0 h', $body);
+        self::assertStringContainsString('10 %', $body);
+
+        // US-089 / CA-3 (reco TMP1-05) — conteneur de bannière d'erreur présent dans le DOM (role=alert).
+        self::assertSame(
+            1,
+            $crawler->filter('[data-timesheet-target="errorBanner"][role="alert"]')->count(),
+            'Le conteneur errorBanner role="alert" est absent du DOM.',
+        );
+
+        // US-089 / CA-4 — lien « Vue jour (mobile) » vers la saisie du jour (semaine courante).
+        $dayLink = $crawler->selectLink('Vue jour (mobile)');
+        self::assertSame(1, $dayLink->count(), 'Le lien « Vue jour (mobile) » est absent.');
+        self::assertStringContainsString($monday, (string) $dayLink->first()->attr('href'));
+
         $tool->dropSchema($schema);
         $em->close();
     }
