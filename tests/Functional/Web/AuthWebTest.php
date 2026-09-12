@@ -39,6 +39,14 @@ final class AuthWebTest extends WebTestCase
             $this->em->getClassMetadata(Tenant::class),
             $this->em->getClassMetadata(User::class),
             $this->em->getClassMetadata(Role::class),
+            // US-088 : la home d'un collaborateur rend le tableau de bord (services complétude,
+            // activité, absences) → ces tables doivent exister après login.
+            $this->em->getClassMetadata(\App\Domain\Project\Project::class),
+            $this->em->getClassMetadata(\App\Domain\Timesheet\TimeEntry::class),
+            $this->em->getClassMetadata(\App\Domain\Absence\AbsenceRequest::class),
+            $this->em->getClassMetadata(\App\Domain\Calendar\Holiday::class),
+            $this->em->getClassMetadata(\App\Domain\Calendar\ClosurePeriod::class),
+            $this->em->getClassMetadata(\App\Domain\Calendar\WorkSchedule::class),
         ];
         $tool = new SchemaTool($this->em);
         $tool->dropSchema($this->schema);
