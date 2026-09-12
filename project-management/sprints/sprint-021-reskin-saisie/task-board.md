@@ -1,17 +1,19 @@
 # Task Board — Sprint 21 (Reskin parcours de saisie, EPIC-003)
 
 > Sprint Goal : porter le parcours de saisie P1 sur le socle tailsfadmin (bundle G1/G4 puis 5 écrans), accessible et conforme aux maquettes validées.
-> Mis à jour : 2026-09-28 (démarrage).
+> Mis à jour : 2026-09-12 (clôture — review vérifiée indépendamment).
 
 ## Kanban
 
 | 🔵 To Do | 🔄 En cours | 👀 Review | ✅ Done | 🚫 Bloqué |
 |----------|-------------|-----------|---------|-----------|
-| US-087 (3) · US-088 (5) · US-089 (3) · US-090 (2) · US-091 (2) · US-092 (3) | — | — | — | — |
+| — | — | — | US-087 (3) · US-088 (5) · US-089 (3) · US-090 (2) · US-091 (2)* · US-092 (3) | — |
+
+> **Sprint clôturé** — 6 US mergées (bundle v1.6.0 + 6 écrans). *US-091 ⚠️ partielle : calendrier de conflits (ABS-03) + solde dynamique reportés S22. Dette : US-092 relance inline (CPL-04) + filtre (CPL-05), US-089 tests d'états, WCAG en CI. Voir `sprint-review.md`.
 
 ## Engagement
-- **Total engagé** : 18 pts
-- **Livrés** : 0 pts
+- **Total engagé** : 18 pts (~15 en DoD stricte)
+- **Livrés** : 18 pts mergés (5/6 DoD complètes)
 - **Reste** : 18 pts
 
 ## Séquencement

@@ -30,7 +30,7 @@ sprints:
   sprint-018: { theme: "Démarrage staffing (EPIC-004) + finitions Review & qualité", points: 20, goal_met: true, stories: [US-040, US-041, US-023] }  # CLÔTURÉ 20/20 pts (+ QUAL-3) ; EPIC-004 démarré
   sprint-019: { theme: "Conception UX — recensement, parcours & mapping sur le socle (EPIC-013)", points: 16, goal_met: true, stories: [US-080, US-081, US-083, US-085] }  # CLÔTURÉ 16/16 pts (2026-09-11) ; livrables architecture/ ; US-082/084 reportés (accès hotones)
   sprint-020: { theme: "Conception UX du parcours de saisie collaborateur (EPIC-013 bouclage)", points: 13, goal_met: true, stories: [US-082, US-084] }  # CLÔTURÉ 13/13 pts (2026-09-11) ; audit #122 + maquettes HF #124 validées PO 100% (canevas design-canvas) → dev reskin S21 débloqué ; EPIC-013 bouclé 6/6
-  sprint-021: { theme: "Reskin du parcours de saisie collaborateur (EPIC-003 front)", points: 18, goal_met: null, stories: [US-087, US-088, US-089, US-090, US-091, US-092] }  # DÉMARRÉ 2026-09-28 ; dev reskin sur maquettes validées S20 ; bundle G1/G4 (externe tailsfadmin) puis 5 écrans
+  sprint-021: { theme: "Reskin du parcours de saisie collaborateur (EPIC-003 front)", points: 18, goal_met: true, stories: [US-087, US-088, US-089, US-090, US-091, US-092], debt: [US-091-ABS-03, US-091-CA2-solde, US-092-CPL-04, US-092-CPL-05, US-089-tests-etats, WCAG-CI] }  # CLÔTURÉ 2026-09-12 — bundle v1.6.0 (G1/G4) + 6 écrans portés ; review vérifiée indépendamment (5/6 DoD complètes, US-091 ⚠️ partielle : calendrier conflits ABS-03 + solde dynamique reportés S22) ; ~15/18 pts en DoD stricte
 
 # État par story. status ∈ {done, ready, in-progress, backlog}
 stories:
@@ -100,12 +100,12 @@ stories:
   US-079: { title: "Raffinements pilotage — export/courbe/seuil par type (EF-PRJ-14/15/16)", sprint: 15, status: done, points: 8 }   # US-079a export S14 (#78) ; US-079c courbe S15 (#82) ; US-079b seuil par type S15 (#83) → EPIC-002 complet
   # — Chantier technique socle de thème (bundle d'abord — ADR-0023, créée 2026-09-09) —
   US-086: { title: "Adoption du socle de thème tailsfadmin-bundle (externalisation layout)", sprint: null, status: done, points: 5 }   # EPIC-012 — remplace US-063 (caduque, ADR-0023) ; livrée PR #112 + adoption composants 1.4.2 + fix contrôleurs #113 (2026-09-10)
-  US-087: { title: "Bundle — composants Ui:StatCard (G1) + Layout:PageHeader (G4)", sprint: 21, status: ready, points: 3 }   # EPIC-003 enabler — dev bundle externe tailsfadmin + bump version ; débloque US-088/092
-  US-088: { title: "DSH-COLLAB — Dashboard collaborateur (build)", sprint: 21, status: ready, points: 5 }   # EPIC-003 — maquette Main.dc.html ; dépend US-087 (G1/G4)
-  US-089: { title: "PG-TMP-01 — Reskin saisie hebdomadaire", sprint: 21, status: ready, points: 3 }   # EPIC-003 — maquettes SaisieHebdo/États/Mobile ; recos TMP1-*
-  US-090: { title: "PG-TMP-02/03 — Reskin saisie du jour (mobile)", sprint: 21, status: ready, points: 2 }   # EPIC-003 — maquette SaisieJour ; recos TMP2-*
-  US-091: { title: "PG-ABS-01 — Reskin Mes absences", sprint: 21, status: ready, points: 2 }   # EPIC-003 — maquette Absences ; recos ABS-*
-  US-092: { title: "PG-CPL-01 — Reskin Complétude", sprint: 21, status: ready, points: 3 }   # EPIC-003 — maquette Completude ; F-S5-4 (bloquant) + F-S5-5 ; dépend US-087 (G1)
+  US-087: { title: "Bundle — composants Ui:StatCard (G1) + Layout:PageHeader (G4)", sprint: 21, status: done, points: 3 }   # EPIC-003 enabler — dev bundle externe tailsfadmin + bump version ; débloque US-088/092
+  US-088: { title: "DSH-COLLAB — Dashboard collaborateur (build)", sprint: 21, status: done, points: 5 }   # EPIC-003 — maquette Main.dc.html ; dépend US-087 (G1/G4)
+  US-089: { title: "PG-TMP-01 — Reskin saisie hebdomadaire", sprint: 21, status: done, points: 3 }   # EPIC-003 — maquettes SaisieHebdo/États/Mobile ; recos TMP1-*
+  US-090: { title: "PG-TMP-02/03 — Reskin saisie du jour (mobile)", sprint: 21, status: done, points: 2 }   # EPIC-003 — maquette SaisieJour ; recos TMP2-*
+  US-091: { title: "PG-ABS-01 — Reskin Mes absences", sprint: 21, status: done, points: 2 }   # EPIC-003 — reskin mergé #130 ; ⚠️ DoD partielle : calendrier conflits ABS-03 (Must) + solde dynamique CA-2 reportés S22
+  US-092: { title: "PG-CPL-01 — Reskin Complétude", sprint: 21, status: done, points: 3 }   # EPIC-003 — maquette Completude ; F-S5-4 (bloquant) + F-S5-5 ; dépend US-087 (G1)
   # — EPIC-013 : Recensement pages cibles, parcours par persona & conception UX (créées 2026-09-09) —
   US-080: { title: "Référentiel exhaustif des pages cibles", sprint: 19, status: done, points: 5 }   # EPIC-013 — S19 ; page-inventory.md v2 validé PO, PR #116
   US-081: { title: "Cartographie des parcours par persona (P1–P6)", sprint: 19, status: done, points: 5 }   # EPIC-013 — S19 ; parcours-personas.md validé PO, PR #117
@@ -122,8 +122,8 @@ tech_stories:
 
 # Récapitulatif
 totals:
-  done: 60          # +US-082 (#122) +US-084 (#124) — Sprint 20 clôturé 13/13, EPIC-013 bouclé 6/6
-  ready: 6          # Sprint 21 démarré : US-087→092 (reskin EPIC-003, 18 pts)
+  done: 66          # +US-087..092 (#128-#133) — Sprint 21 clôturé (6 US ; US-091 partielle, dette S22)
+  ready: 0          # Sprint 21 clôturé
   in_progress: 0
   backlog: 11       # US-082/084 passées en ready (S20) ; reste US-053 (EPIC-010) + reliquat modules non ouverts
   orphans: [US-014, US-015, US-016, US-018, US-032]  # dans aucun sprint (US-017→S17)
