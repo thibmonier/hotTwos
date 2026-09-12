@@ -60,6 +60,12 @@ final class TimesheetDayController extends AbstractController
             }
         }
 
+        // Total du jour rendu côté serveur (reco audit TMP2-02) : correct au premier
+        // rendu ; le contrôleur Stimulus recalcule ensuite à la saisie.
+        $dayTotalMinutes = array_sum($minutesByProject);
+        // Objectif journalier (reco TMP2-03) : 7 h en jour ouvré, 0 le week-end.
+        $targetMinutes = (int) $day->format('N') >= 6 ? 0 : 420;
+
         return $this->render('timesheet/day.html.twig', [
             'date' => $today,
             'dayLabel' => $this->label($day),
@@ -70,6 +76,8 @@ final class TimesheetDayController extends AbstractController
             'projects' => $projects,
             'minutesByProject' => $minutesByProject,
             'previousMinutesByProject' => $previousMinutesByProject,
+            'dayTotalMinutes' => $dayTotalMinutes,
+            'targetMinutes' => $targetMinutes,
         ]);
     }
 
