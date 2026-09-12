@@ -5,66 +5,79 @@
 {% block page_section %}Temps & activité{% endblock %}
 {% block page_title %}Saisie du jour{% endblock %}
 
+{% macro hours(minutes) %}{{ (minutes / 60)|number_format(1, ',', ' ') }}{% endmacro %}
+
 {% block body %}
+{% import _self as fmt %}
 {# data-controller="timesheet-day" asserté par TimesheetDayPageTest #}
-<div data-controller="timesheet-day"
+<div class="mx-auto max-w-2xl" data-controller="timesheet-day"
      data-timesheet-day-date-value="{{ date }}"
      data-timesheet-day-prev-value="{{ prevDate }}"
      data-timesheet-day-next-value="{{ nextDate }}">
 
-    <h1 class="visually-hidden">Saisie du jour</h1>
+    <h1 class="sr-only">Saisie du jour</h1>
 
     {# Navigation entre les jours #}
-    <nav class="flex items-center gap-2 mb-4" aria-label="Navigation entre les jours">
+    <nav class="mb-4 flex items-center justify-between gap-2" aria-label="Navigation entre les jours">
         <a href="{{ path('timesheet_day', { date: prevDate }) }}"
-           class="w-11 h-11 inline-flex items-center justify-center border border-border-strong rounded-md bg-surface text-body no-underline hover:bg-surface-alt hover:text-ink"
+           class="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-700 no-underline hover:bg-gray-50 dark:border-gray-800 dark:bg-white/[0.03] dark:text-gray-300"
            rel="prev" aria-label="Jour précédent">←</a>
         <a href="{{ path('timesheet_day', { date: todayDate }) }}"
-           class="font-semibold text-body text-sm no-underline hover:text-primary">{{ dayLabel }} — semaine {{ weekNumber }}</a>
+           class="text-theme-sm font-semibold text-gray-800 no-underline hover:text-brand-500 dark:text-white/90">{{ dayLabel }} — semaine {{ weekNumber }}</a>
         <a href="{{ path('timesheet_day', { date: nextDate }) }}"
-           class="w-11 h-11 inline-flex items-center justify-center border border-border-strong rounded-md bg-surface text-body no-underline hover:bg-surface-alt hover:text-ink"
+           class="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-700 no-underline hover:bg-gray-50 dark:border-gray-800 dark:bg-white/[0.03] dark:text-gray-300"
            rel="next" aria-label="Jour suivant">→</a>
     </nav>
 
-    {# Total journalier (mis à jour par Stimulus) #}
-    <p class="text-base font-semibold text-ink min-h-6 mb-3" data-timesheet-day-target="total" aria-live="polite"></p>
+    {# Total + objectif du jour (recos TMP2-02 rendu serveur, TMP2-03 objectif) #}
+    <div class="mb-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-theme-sm dark:border-gray-800 dark:bg-white/[0.03]">
+        <div class="mb-1.5 flex items-center justify-between">
+            <span class="text-theme-sm text-gray-500 dark:text-gray-400">Total du jour</span>
+            <span class="text-base font-bold text-gray-800 dark:text-white/90" data-timesheet-day-target="total" aria-live="polite">
+                {{ fmt.hours(dayTotalMinutes) }} h{% if targetMinutes > 0 %} <span class="text-theme-sm font-normal text-gray-400">/ {{ fmt.hours(targetMinutes) }} h attendues</span>{% endif %}
+            </span>
+        </div>
+        {% if targetMinutes > 0 %}
+            <twig:tsf:Ui:ProgressBar :value="(dayTotalMinutes / targetMinutes * 100)|round" variant="success" size="sm" />
+        {% endif %}
+    </div>
 
-    {# Bannières hors-ligne #}
-    <p class="flex items-center gap-2 rounded-md border border-border bg-surface-alt px-4 py-3 text-sm text-muted mb-3"
+    {# Bannières hors-ligne (atout TMP2-01 préservé) #}
+    <p class="mb-3 hidden items-center gap-2 rounded-xl border border-warning-200 bg-warning-50 px-4 py-3 text-theme-sm text-warning-700 dark:border-warning-500/30 dark:bg-warning-500/10 dark:text-warning-400"
        role="status" aria-live="polite" hidden data-timesheet-day-target="offlineBanner">
         <span aria-hidden="true">📴</span> Pas de connexion — vos saisies sont conservées sur cet appareil.
     </p>
-    <p class="flex items-center gap-2 rounded-md border border-border bg-surface-alt px-4 py-3 text-sm text-muted mb-3"
+    <p class="mb-3 hidden items-center gap-2 rounded-xl border border-blue-light-200 bg-blue-light-50 px-4 py-3 text-theme-sm text-blue-light-700 dark:border-blue-light-500/30 dark:bg-blue-light-500/10 dark:text-blue-light-400"
        role="status" aria-live="polite" hidden data-timesheet-day-target="resyncBanner">
         <span aria-hidden="true">🔄</span> Saisies en attente de synchronisation.
-        <button type="button" class="text-sm text-primary hover:underline ml-1 p-0" data-action="timesheet-day#resync">Resynchroniser</button>
+        <button type="button" class="ml-1 p-0 text-theme-sm font-semibold text-brand-500 hover:underline" data-action="timesheet-day#resync">Resynchroniser</button>
     </p>
 
     {% if projects is empty %}
-        <div class="rounded-md border border-border bg-surface p-4 text-muted">
+        <div class="rounded-2xl border border-gray-200 bg-white p-4 text-gray-500 dark:border-gray-800 dark:bg-white/[0.03] dark:text-gray-400">
             Aucun projet actif : demandez à un administrateur d'en créer un pour saisir votre temps.
         </div>
     {% else %}
         <div class="mb-3">
             <button type="button"
-                    class="inline-flex min-h-11 items-center rounded border border-border-strong px-3 text-xs font-semibold text-muted hover:bg-surface-alt hover:text-ink"
+                    class="inline-flex min-h-11 items-center rounded-lg border border-gray-300 bg-white px-3 text-theme-xs font-semibold text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-white/[0.03] dark:text-gray-300"
                     data-action="timesheet-day#duplicatePrevious">
                 Reprendre la saisie de la veille
             </button>
         </div>
 
-        <ul class="flex flex-col gap-3 p-0 m-0 list-none mb-2" aria-label="Saisie des temps par projet">
+        <ul class="mb-2 flex list-none flex-col gap-3 p-0" aria-label="Saisie des temps par projet">
             {% for project in projects %}
                 {% set minutes = minutesByProject[project.id] ?? null %}
-                <li class="rounded-md border border-border bg-surface p-4">
-                    <div class="font-semibold text-ink mb-2">
-                        {{ project.name }} <small class="font-normal text-muted text-xs ml-2">{{ project.code }}</small>
+                <li class="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
+                    <div class="mb-2 font-semibold text-gray-800 dark:text-white/90">
+                        {{ project.name }} <small class="ml-2 text-theme-xs font-normal text-gray-400">{{ project.code }}</small>
                     </div>
 
                     <div class="mb-2">
-                        <label class="block text-xs font-medium text-body mb-1" for="duration-{{ loop.index }}">Durée (heures)</label>
+                        <label class="mb-1 block text-theme-xs font-medium text-gray-600 dark:text-gray-300" for="duration-{{ loop.index }}">Durée (heures)</label>
                         <input type="number" id="duration-{{ loop.index }}"
-                               class="w-[100px] min-h-11 text-center text-base border border-border-strong rounded-md bg-surface text-body px-2"
+                               class="min-h-11 w-[110px] rounded-lg border border-gray-300 bg-white px-2 text-center text-base text-gray-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:bg-white/[0.03] dark:text-white/90"
                                inputmode="decimal" min="0" max="24" step="0.25"
                                value="{{ minutes is not null ? (minutes / 60)|round(2) : '' }}"
                                data-timesheet-day-target="entry"
@@ -75,33 +88,33 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-medium text-body mb-1" for="comment-{{ loop.index }}">Commentaire (optionnel)</label>
-                        <input type="text" id="comment-{{ loop.index }}"
-                               class="w-full min-h-11 text-base border border-border-strong rounded-md bg-surface text-body px-3"
+                        <label class="mb-1 block text-theme-xs font-medium text-gray-600 dark:text-gray-300" for="comment-{{ loop.index }}">Commentaire (optionnel)</label>
+                        <textarea id="comment-{{ loop.index }}" rows="2"
+                               class="w-full resize-y rounded-lg border border-gray-300 bg-white px-3 py-2 text-base text-gray-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:bg-white/[0.03] dark:text-white/90"
                                maxlength="500"
                                data-timesheet-day-target="comment"
-                               data-project-id="{{ project.id }}">
+                               data-project-id="{{ project.id }}"></textarea>
                     </div>
                 </li>
             {% endfor %}
         </ul>
 
-        <p id="duration-help" class="text-xs text-muted mb-3">Durée en heures, par pas de 0,25 (ex. 1,5 pour 1h30).</p>
+        <p id="duration-help" class="mb-3 text-theme-xs text-gray-400">Durée en heures, par pas de 0,25 (ex. 1,5 pour 1h30).</p>
 
         {# "Enregistrer la journée" asserté par TimesheetDayPageTest #}
-        <div class="flex items-center gap-3 flex-wrap mt-4">
+        <div class="mt-4 flex flex-wrap items-center gap-3">
             <button type="button"
-                    class="inline-flex min-h-11 items-center rounded bg-primary px-4 text-sm font-semibold text-white hover:opacity-90"
+                    class="inline-flex min-h-11 items-center rounded-lg bg-brand-500 px-4 text-theme-sm font-semibold text-white hover:bg-brand-600"
                     data-timesheet-day-target="submit"
                     data-action="timesheet-day#submitDay">
                 Enregistrer la journée
             </button>
-            <span class="text-xs text-muted" role="status" aria-live="polite" data-timesheet-day-target="status"></span>
+            <span class="text-theme-xs text-gray-400" role="status" aria-live="polite" data-timesheet-day-target="status"></span>
         </div>
     {% endif %}
 
     <div class="mt-4">
-        <a href="{{ path('timesheet_week', { date: date }) }}" class="text-sm text-primary hover:underline">← Vue semaine (bureau)</a>
+        <a href="{{ path('timesheet_week', { date: date }) }}" class="text-theme-sm text-brand-500 hover:underline">← Vue semaine (bureau)</a>
     </div>
 
 </div>
