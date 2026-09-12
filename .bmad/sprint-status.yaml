@@ -29,7 +29,7 @@ sprints:
   sprint-017: { theme: "Circuits, calendriers différenciés & fermeture (EPIC-001)", points: 21, goal_met: true, stories: [US-017, US-021, US-022] }  # CLÔTURÉ 21/21 pts → EPIC-001 bouclé (reste EF-REF-24 statuts + suites Review)
   sprint-018: { theme: "Démarrage staffing (EPIC-004) + finitions Review & qualité", points: 20, goal_met: true, stories: [US-040, US-041, US-023] }  # CLÔTURÉ 20/20 pts (+ QUAL-3) ; EPIC-004 démarré
   sprint-019: { theme: "Conception UX — recensement, parcours & mapping sur le socle (EPIC-013)", points: 16, goal_met: true, stories: [US-080, US-081, US-083, US-085] }  # CLÔTURÉ 16/16 pts (2026-09-11) ; livrables architecture/ ; US-082/084 reportés (accès hotones)
-  sprint-020: { theme: "Conception UX du parcours de saisie collaborateur (EPIC-013 bouclage)", points: 13, goal_met: null, stories: [US-082, US-084] }  # DÉMARRÉ 2026-09-14 ; audit + maquettes HF validées PO (hotones débloqué) → maquettes avant dev reskin S21 ; clôt EPIC-013 6/6
+  sprint-020: { theme: "Conception UX du parcours de saisie collaborateur (EPIC-013 bouclage)", points: 13, goal_met: true, stories: [US-082, US-084] }  # CLÔTURÉ 13/13 pts (2026-09-11) ; audit #122 + maquettes HF #124 validées PO 100% (canevas design-canvas) → dev reskin S21 débloqué ; EPIC-013 bouclé 6/6
 
 # État par story. status ∈ {done, ready, in-progress, backlog}
 stories:
@@ -102,9 +102,9 @@ stories:
   # — EPIC-013 : Recensement pages cibles, parcours par persona & conception UX (créées 2026-09-09) —
   US-080: { title: "Référentiel exhaustif des pages cibles", sprint: 19, status: done, points: 5 }   # EPIC-013 — S19 ; page-inventory.md v2 validé PO, PR #116
   US-081: { title: "Cartographie des parcours par persona (P1–P6)", sprint: 19, status: done, points: 5 }   # EPIC-013 — S19 ; parcours-personas.md validé PO, PR #117
-  US-082: { title: "Audit & critique UX de l'existant (inspiré hotones)", sprint: 20, status: ready, points: 5 }   # EPIC-013 — S20 ; accès hotones débloqué (2026-09-11), affinée DoR levée
+  US-082: { title: "Audit & critique UX de l'existant (inspiré hotones)", sprint: 20, status: done, points: 5 }   # EPIC-013 — S20 ; livré #122 (audit-ux-existant.md), findings F-S5-4/F-S5-5/F1
   US-083: { title: "Mapping pages ↔ composants tailsfadmin (+ gaps)", sprint: 19, status: done, points: 3 }   # EPIC-013 — S19 ; page-component-mapping.md validé PO, PR #118
-  US-084: { title: "Maquettes haute-fidélité des écrans prioritaires (validées PO)", sprint: 20, status: ready, points: 8 }   # EPIC-013 — S20 ; écrans saisie EPIC-003, gate design-canvas/VALIDATION.md ; prérequis dev reskin S21
+  US-084: { title: "Maquettes haute-fidélité des écrans prioritaires (validées PO)", sprint: 20, status: done, points: 8 }   # EPIC-013 — S20 ; livré #124 (7 artboards design-canvas/lot2-saisie, tokens tailsfadmin), validé PO 100% ; gaps G1/G4 notés → dev reskin S21
   US-085: { title: "Backlog de refonte/reskin priorisé (MoSCoW)", sprint: 19, status: done, points: 3 }   # EPIC-013 — S19 ; backlog-reskin-priorise.md validé PO, PR #119
 
 # Stories techniques / dette qualité (hors vélocité) engagées au Sprint 10
@@ -115,8 +115,8 @@ tech_stories:
 
 # Récapitulatif
 totals:
-  done: 58          # +US-083 (PR #118) ; +US-085 (backlog reskin, PR #119) — Sprint 19 clôturé 16/16
-  ready: 2          # Sprint 20 démarré : US-082 + US-084 (EPIC-013 bouclage, hotones débloqué)
+  done: 60          # +US-082 (#122) +US-084 (#124) — Sprint 20 clôturé 13/13, EPIC-013 bouclé 6/6
+  ready: 0          # Sprint 20 clôturé (US-082 + US-084 done)
   in_progress: 0
   backlog: 11       # US-082/084 passées en ready (S20) ; reste US-053 (EPIC-010) + reliquat modules non ouverts
   orphans: [US-014, US-015, US-016, US-018, US-032]  # dans aucun sprint (US-017→S17)

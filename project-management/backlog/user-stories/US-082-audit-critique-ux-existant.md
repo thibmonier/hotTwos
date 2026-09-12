@@ -127,7 +127,7 @@ THEN il refuse la validation
 - [x] Comparaison hotones documentée là où une capture comparable existe (patterns à reprendre / faiblesses à éviter)
 - [x] Recommandations priorisées, actionnables, rattachées à une heuristique/critère et une sévérité
 - [x] Findings recette antérieurs pertinents référencés (F-S5-4, F-S5-5, F1 ; R-01 noté hors périmètre P1)
-- [ ] Revue et validation PO formalisées (commentaire de PR ou annotation)
-- [ ] Branche versionnée, PR mergée sur la branche de sprint 20
+- [x] Revue et validation PO formalisées (revue + merge PR #122, 2026-09-14)
+- [x] Branche versionnée, PR #122 mergée
 
-> **Statut** : livrable produit, en attente de **revue PO** (PR). Statut passé de 🟢 Ready → 🟡 To Review.
+> **Statut : ✅ DONE** (2026-09-14) — audit validé PO, PR #122 mergée.

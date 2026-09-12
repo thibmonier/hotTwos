@@ -7,9 +7,9 @@
 
 | 🔵 To Do | 🔄 En cours | 👀 Review | ✅ Done | 🚫 Bloqué |
 |----------|-------------|-----------|---------|-----------|
-| — | — | US-082 (5) · US-084 (8) | — | — |
+| — | — | — | US-082 (5) · US-084 (8) | — |
 
-> US-082 : PR #122 (audit) — en revue PO. US-084 : canevas publié + gate `lot2-saisie/VALIDATION.md` — en revue PO écran par écran.
+> **Sprint clôturé — 13/13 pts.** US-082 : audit mergé (#122). US-084 : 7 artboards validés PO 100 % (`lot2-saisie/VALIDATION.md`), mergé (#124). EPIC-013 bouclé 6/6.
 
 ## Engagement
 - **Total engagé** : 13 pts (US-082 5 + US-084 8)
