@@ -4,7 +4,7 @@
 - **ID**: US-093
 - **EPIC**: EPIC-003 (Temps & activité) — dette qualité transversale
 - **Sprint**: 22
-- **Statut**: 🟢 Ready
+- **Statut**: ✅ Done
 - **Points**: 3
 - **Persona**: Équipe (qualité produit, au service de P1–P3)
 - **Créé le**: 2026-09-12 (dette S21 : rétro action)
