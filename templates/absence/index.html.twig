@@ -39,6 +39,41 @@
         </div>
     </section>
 
+    {# ── Calendrier des conflits (US-091b, CA-1) ─────────────────── #}
+    <section aria-labelledby="cal-heading" class="mb-5 rounded-2xl border border-gray-200 bg-white shadow-theme-sm dark:border-gray-800 dark:bg-white/[0.03]">
+        <div class="flex items-center justify-between border-b border-gray-100 px-5 py-4 dark:border-gray-800">
+            <h2 id="cal-heading" class="text-theme-sm font-semibold text-gray-800 dark:text-white/90">{{ calendar.monthLabel }}</h2>
+            <span class="text-theme-xs text-gray-500 dark:text-gray-400">Vérifiez les conflits avant de déclarer</span>
+        </div>
+        <div class="p-5">
+            {# Initiales des jours (lundi → dimanche), décoratives : la date complète est portée par chaque cellule. #}
+            <div class="mb-1.5 grid grid-cols-7 gap-1.5 text-center text-theme-xs text-gray-500 dark:text-gray-400" aria-hidden="true">
+                <span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span>
+            </div>
+            <div class="grid grid-cols-7 gap-1.5 text-center text-theme-sm" role="list" aria-label="Jours de {{ calendar.monthLabel }}">
+                {% for day in calendar.days %}
+                    {% if day.type == 'blank' %}
+                        <span aria-hidden="true"></span>
+                    {% elseif day.type == 'request' %}
+                        <span role="listitem" class="rounded-lg bg-brand-50 py-2 font-bold text-brand-500 dark:bg-brand-500/15 dark:text-brand-400" aria-label="{{ day.number }} — {{ day.label }}">{{ day.number }}</span>
+                    {% elseif day.type == 'closure' %}
+                        <span role="listitem" class="rounded-lg bg-error-50 py-2 font-semibold text-error-700 dark:bg-error-500/15 dark:text-error-400" aria-label="{{ day.number }} — {{ day.label }}">{{ day.number }}</span>
+                    {% elseif day.type == 'weekend' %}
+                        <span role="listitem" class="py-2 text-gray-300 dark:text-gray-600" aria-label="{{ day.number }} — {{ day.label }}">{{ day.number }}</span>
+                    {% else %}
+                        <span role="listitem" class="py-2 text-gray-700 dark:text-gray-300">{{ day.number }}</span>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {# Légende : le libellé texte à côté de chaque pastille rend l'information non colorée (WCAG 1.4.1). #}
+            <ul class="mt-3.5 flex flex-wrap gap-3 text-theme-xs text-gray-500 dark:text-gray-400">
+                <li class="inline-flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-[3px] border border-brand-500 bg-brand-50" aria-hidden="true"></span>Ma demande</li>
+                <li class="inline-flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-[3px] border border-error-500 bg-error-50" aria-hidden="true"></span>Fermeture / férié</li>
+                <li class="inline-flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-[3px] border border-gray-300 bg-white" aria-hidden="true"></span>Week-end</li>
+            </ul>
+        </div>
+    </section>
+
     {# ── Déclarer une absence ────────────────────────────────────── #}
     <section aria-labelledby="declare-heading" class="mb-5 rounded-2xl border border-gray-200 bg-white shadow-theme-sm dark:border-gray-800 dark:bg-white/[0.03]">
         <div class="border-b border-gray-100 px-5 py-4 dark:border-gray-800">
@@ -69,7 +104,8 @@
                         <input type="date" id="absence-start"
                                class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-theme-sm text-gray-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:bg-white/[0.03] dark:text-white/90"
                                required aria-required="true"
-                               data-absence-target="startDate">
+                               data-absence-target="startDate"
+                               data-action="change->absence#refreshImpact">
                     </div>
                     <div class="min-w-0 flex-1">
                         <label for="absence-end" class="mb-1 block text-theme-sm font-medium text-gray-600 dark:text-gray-300">
@@ -78,7 +114,8 @@
                         <input type="date" id="absence-end"
                                class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-theme-sm text-gray-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:bg-white/[0.03] dark:text-white/90"
                                required aria-required="true"
-                               data-absence-target="endDate">
+                               data-absence-target="endDate"
+                               data-action="change->absence#refreshImpact">
                     </div>
                 </div>
 
@@ -97,10 +134,16 @@
                     </label>
                 </div>
 
-                {# Solde projeté rappelé au moment de la déclaration (reco ABS-02). #}
-                <div class="mb-4 flex items-center gap-2 rounded-lg border border-blue-light-200 bg-blue-light-50 px-3 py-2.5 dark:border-blue-light-500/30 dark:bg-blue-light-500/10">
+                {# Solde projeté rappelé au moment de la déclaration (reco ABS-02) ; US-091b (CA-2) : #}
+                {# recalculé dynamiquement en jours ouvrés à la sélection des dates (Stimulus). #}
+                <div class="mb-4 flex items-center gap-2 rounded-lg border border-blue-light-200 bg-blue-light-50 px-3 py-2.5 dark:border-blue-light-500/30 dark:bg-blue-light-500/10" aria-live="polite">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="text-blue-light-500" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
-                    <span class="text-theme-sm text-blue-light-700 dark:text-blue-light-400">Solde projeté après vos demandes en attente : <strong>{{ counters.projected }} j</strong>.</span>
+                    <span class="text-theme-sm text-blue-light-700 dark:text-blue-light-400" data-absence-target="impact">Solde projeté après vos demandes en attente : <strong>{{ counters.projected }} j</strong>.</span>
+                </div>
+                {# US-091b (CA-3) — avertissement de conflit accessible, révélé par Stimulus si chevauchement. #}
+                <div class="mb-4 flex items-start gap-2 rounded-lg border border-warning-200 bg-warning-50 px-3 py-2.5 dark:border-warning-500/30 dark:bg-warning-500/10" role="alert" data-absence-target="conflict" hidden>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-warning-500 shrink-0" aria-hidden="true"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="9"/></svg>
+                    <span class="text-theme-sm text-warning-700 dark:text-warning-400" data-absence-target="conflictMessage"></span>
                 </div>
 
                 <div class="mb-5">

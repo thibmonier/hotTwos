@@ -9,9 +9,14 @@ use App\Domain\Absence\AbsenceRequest;
 use App\Domain\Validation\AbsenceValidationCircuit;
 use App\Domain\Absence\AbsenceType;
 use App\Domain\Authorization\Role;
+use App\Domain\Calendar\ClosurePeriod;
+use App\Domain\Calendar\Holiday;
+use App\Domain\Calendar\WorkSchedule;
 use App\Domain\Tenant\Tenant;
 use App\Domain\Tenant\TenantId;
 use App\Domain\User\User;
+use DateTimeImmutable;
+use DateTimeZone;
 use App\Infrastructure\Persistence\Doctrine\DoctrineRoleRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -28,6 +33,7 @@ final class AbsenceApiTest extends WebTestCase
     private KernelBrowser $client;
     private EntityManagerInterface $em;
     private string $typeId;
+    private TenantId $tenant;
 
     /** @var list<\Doctrine\ORM\Mapping\ClassMetadata<object>> */
     private array $schema;
@@ -44,12 +50,17 @@ final class AbsenceApiTest extends WebTestCase
             $this->em->getClassMetadata(AbsenceType::class),
             $this->em->getClassMetadata(AbsenceRequest::class),
             $this->em->getClassMetadata(AbsenceValidationCircuit::class),
+            // US-091b — endpoint d'impact : jours ouvrés (fériés/fermetures/régime) + conflits.
+            $this->em->getClassMetadata(Holiday::class),
+            $this->em->getClassMetadata(ClosurePeriod::class),
+            $this->em->getClassMetadata(WorkSchedule::class),
         ];
         $tool = new SchemaTool($this->em);
         $tool->dropSchema($this->schema);
         $tool->createSchema($this->schema);
 
         $tenant = TenantId::generate();
+        $this->tenant = $tenant;
         new InitializeDefaultRoles(new DoctrineRoleRepository($this->em))->forTenant($tenant);
 
         $hasher = new SodiumPasswordHasher();
@@ -112,6 +123,80 @@ final class AbsenceApiTest extends WebTestCase
         self::assertSame('validated', $this->decodeObject()['status'] ?? null);
     }
 
+    public function testImpactRequiresAuthentication(): void
+    {
+        // US-091b — /api/absences/impact est couvert par le firewall ^/api/absences (ROLE_USER).
+        $this->client->request('GET', '/api/absences/impact?from=2026-09-07&to=2026-09-11', server: ['HTTP_ACCEPT' => 'application/json']);
+
+        self::assertResponseStatusCodeSame(401);
+    }
+
+    public function testImpactReturnsBusinessDaysAndProjectedBalance(): void
+    {
+        // CA-2 : 5 jours ouvrés (lun.→ven., aucun férié/fermeture) ; solde projeté = 25 − 5 = 20.
+        $this->login('camille@agence.test');
+
+        $impact = $this->getImpact('2026-09-07', '2026-09-11');
+
+        self::assertSame(5, $impact['businessDays'] ?? null);
+        self::assertSame(20.0, $impact['projectedBalance'] ?? null);
+        self::assertFalse($impact['hasConflict'] ?? null);
+    }
+
+    public function testImpactExcludesClosedDaysAndFlagsClosureConflict(): void
+    {
+        // CA-2 + CA-3 : une fermeture le mercredi 9 sept. → 4 jours ouvrés au lieu de 5 + conflit signalé.
+        $this->em->persist(new ClosurePeriod($this->tenant, $this->day('2026-09-09'), $this->day('2026-09-09'), 'Pont'));
+        $this->em->flush();
+
+        $this->login('camille@agence.test');
+
+        $impact = $this->getImpact('2026-09-07', '2026-09-11');
+
+        self::assertSame(4, $impact['businessDays'] ?? null);
+        self::assertSame(21.0, $impact['projectedBalance'] ?? null);
+        self::assertTrue($impact['hasConflict'] ?? null);
+        $message = $impact['conflictMessage'] ?? null;
+        self::assertIsString($message);
+        self::assertStringContainsString('fermeture', $message);
+    }
+
+    public function testImpactFlagsOverlapWithAlreadyPostedAbsence(): void
+    {
+        // CA-3 : une demande déjà posée qui chevauche la période sélectionnée est signalée.
+        $this->login('camille@agence.test');
+        $this->postJson('/api/absences', ['typeId' => $this->typeId, 'startDate' => '2026-09-07', 'endDate' => '2026-09-08']);
+        self::assertResponseStatusCodeSame(201);
+
+        $impact = $this->getImpact('2026-09-08', '2026-09-09');
+
+        self::assertTrue($impact['hasConflict'] ?? null);
+        $message = $impact['conflictMessage'] ?? null;
+        self::assertIsString($message);
+        self::assertStringContainsString('demande', $message);
+    }
+
+    public function testImpactRejectsInvalidRange(): void
+    {
+        // Erreur : date de fin antérieure à la date de début → 422.
+        $this->login('camille@agence.test');
+
+        $this->client->request('GET', '/api/absences/impact?from=2026-09-11&to=2026-09-07', server: ['HTTP_ACCEPT' => 'application/json']);
+
+        self::assertResponseStatusCodeSame(422);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function getImpact(string $from, string $to): array
+    {
+        $this->client->request('GET', sprintf('/api/absences/impact?from=%s&to=%s', $from, $to), server: ['HTTP_ACCEPT' => 'application/json']);
+        self::assertResponseIsSuccessful();
+
+        return $this->decodeObject();
+    }
+
     /**
      * @param array<string, mixed> $payload
      */
@@ -146,5 +231,10 @@ final class AbsenceApiTest extends WebTestCase
     {
         $this->client->request('POST', '/api/login', server: ['CONTENT_TYPE' => 'application/json'], content: json_encode(['email' => $email, 'password' => 'motdepasse-solide'], JSON_THROW_ON_ERROR));
         self::assertResponseIsSuccessful();
+    }
+
+    private function day(string $value): DateTimeImmutable
+    {
+        return new DateTimeImmutable($value.' 00:00:00', new DateTimeZone('UTC'));
     }
 }
