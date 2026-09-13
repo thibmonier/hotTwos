@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cba4c7d5a26df925f472361d8bdb2823",
+    "content-hash": "5444cc9beb0ac924e6aa0078d27da063",
     "packages": [
         {
             "name": "api-platform/core",
@@ -8255,16 +8255,16 @@
         },
         {
             "name": "tailsfadmin/tailsfadmin-bundle",
-            "version": "v1.6.0",
+            "version": "v1.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thibmonier/tailsfadmin.git",
-                "reference": "b097c81fbeff5950288aedc6f3272777aa4cbbd6"
+                "reference": "814dd01bd0cb166850fa7ec11c2a865f09cb0441"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thibmonier/tailsfadmin/zipball/b097c81fbeff5950288aedc6f3272777aa4cbbd6",
-                "reference": "b097c81fbeff5950288aedc6f3272777aa4cbbd6",
+                "url": "https://api.github.com/repos/thibmonier/tailsfadmin/zipball/814dd01bd0cb166850fa7ec11c2a865f09cb0441",
+                "reference": "814dd01bd0cb166850fa7ec11c2a865f09cb0441",
                 "shasum": ""
             },
             "require": {
@@ -8326,7 +8326,7 @@
                 "issues": "https://github.com/thibmonier/tailsfadmin/issues",
                 "source": "https://github.com/thibmonier/tailsfadmin"
             },
-            "time": "2026-09-12T09:02:37+00:00"
+            "time": "2026-09-13T18:43:45+00:00"
         },
         {
             "name": "twig/extra-bundle",
