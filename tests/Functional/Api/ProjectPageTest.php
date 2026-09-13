@@ -143,6 +143,26 @@ final class ProjectPageTest extends WebTestCase
         self::assertStringContainsString('Nouveau projet', $content); // canCreate (chef de projet)
     }
 
+    public function testProjectShowHasLifecycleStepper(): void
+    {
+        // US-098 (CA-2) : la fiche affiche un repère de cycle de vie avec l'étape courante (aria-current).
+        $marc = $this->em->getRepository(User::class)->findOneBy(['email' => 'marc@agence.test']);
+        self::assertInstanceOf(User::class, $marc);
+        $project = new Project($this->tenant, 'PRJ-1', 'Refonte SI', true, $marc->id());
+        $this->em->persist($project);
+        $this->em->flush();
+
+        $this->login('marc@agence.test');
+        $this->client->request('GET', '/projets/'.$project->id());
+
+        self::assertResponseIsSuccessful();
+        $content = (string) $this->client->getResponse()->getContent();
+        self::assertStringContainsString('Cycle de vie du projet', $content);
+        self::assertStringContainsString('aria-current="step"', $content);
+        self::assertStringContainsString('Facturation', $content);
+        self::assertStringNotContainsString('status-badge', $content); // reskin : plus d'ancien composant de badge
+    }
+
     public function testManagerCreatesProjectWithSequentialCode(): void
     {
         $this->login('marc@agence.test');

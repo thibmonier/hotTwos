@@ -6,24 +6,49 @@
 {% block page_title %}{{ project.code }} — {{ project.name }}{% endblock %}
 
 {% block body %}
+    {# US-098 : badges de statut sur tokens tailsfadmin (texte + couleur, jamais la couleur seule). #}
+    {% set badge_base = 'inline-flex items-center rounded-full px-2.5 py-1 text-theme-xs font-medium' %}
+    {% set badge_neutral = 'bg-gray-100 text-gray-600 dark:bg-white/[0.06] dark:text-gray-300' %}
     {% set status_badge_map = {
-        'active':    'status-badge-success',
-        'cancelled': 'status-badge-danger',
-        'closed':    'status-badge-neutral'
+        'active':    'bg-success-50 text-success-700 dark:bg-success-500/15 dark:text-success-400',
+        'cancelled': 'bg-error-50 text-error-700 dark:bg-error-500/15 dark:text-error-400',
+        'closed':    badge_neutral
     } %}
 
-    <p class="mb-3 text-sm text-muted">
-        <a href="{{ path('project_index') }}" class="text-primary hover:underline">← Projets</a>
+    <p class="mb-3 text-sm text-gray-500 dark:text-gray-400">
+        <a href="{{ path('project_index') }}" class="text-brand-500 dark:text-brand-400 hover:underline">← Projets</a>
     </p>
 
+    {# US-098 (G5) : repère de cycle de vie Client → Projet → Facturation ; étape courante annoncée (aria-current), jamais la couleur seule. #}
+    {% set lc_client = clientId is not null %}
+    {% set lc_facture = invoices is not empty %}
+    {% set lc_current = lc_facture ? 'facture' : 'projet' %}
+    <nav aria-label="Cycle de vie du projet" class="mb-4">
+        <ol class="flex flex-wrap items-center gap-2 text-theme-xs">
+            {% for step in [
+                { key: 'client',  label: 'Client',       done: lc_client },
+                { key: 'projet',  label: 'Projet',       done: true },
+                { key: 'facture', label: 'Facturation',  done: lc_facture }
+            ] %}
+                <li class="inline-flex items-center gap-2">
+                    <span {% if step.key == lc_current %}aria-current="step"{% endif %}
+                          class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 {{ step.key == lc_current ? 'font-semibold' : 'font-medium' }} {{ step.done ? 'bg-brand-50 text-brand-500 dark:bg-brand-500/15 dark:text-brand-400' : 'bg-gray-100 text-gray-500 dark:bg-white/[0.06] dark:text-gray-400' }}">
+                        {{ step.label }}{% if step.done %} <span aria-hidden="true">✓</span>{% endif %}
+                    </span>
+                    {% if not loop.last %}<span aria-hidden="true" class="text-gray-300 dark:text-gray-600">→</span>{% endif %}
+                </li>
+            {% endfor %}
+        </ol>
+    </nav>
+
     <div class="mb-4">
-        <h1 class="mb-2 flex flex-wrap items-center gap-2 text-xl font-semibold text-ink">
+        <h1 class="mb-2 flex flex-wrap items-center gap-2 text-xl font-semibold text-gray-800 dark:text-white/90">
             {{ project.code }} — {{ project.name }}
-            <span class="status-badge {{ status_badge_map[project.statusFamily] ?? 'status-badge-neutral' }}">
+            <span class="{{ badge_base }} {{ status_badge_map[project.statusFamily] ?? badge_neutral }}">
                 {{ project.status }}
             </span>
             {% if project.internal %}
-                <span class="status-badge status-badge-neutral">Interne — non facturable</span>
+                <span class="{{ badge_base }} {{ badge_neutral }}">Interne — non facturable</span>
             {% endif %}
         </h1>
         {# Copie du code projet dans le presse-papiers (socle : tailsfadmin--clipboard, retour visuel). #}
@@ -33,13 +58,13 @@
                 data-tailsfadmin--clipboard-feedback-value="Code copié"
                 data-action="tailsfadmin--clipboard#copy"
                 title="Copier le code projet « {{ project.code }} »"
-                class="mb-2 inline-flex min-h-8 items-center gap-1.5 rounded border border-border-strong px-2.5 text-xs font-medium text-muted transition-colors hover:bg-surface-alt hover:text-ink data-[copied=true]:border-success data-[copied=true]:text-success">
+                class="mb-2 inline-flex min-h-8 items-center gap-1.5 rounded border border-gray-300 dark:border-gray-700 px-2.5 text-xs font-medium text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-50 dark:bg-white/[0.02] hover:text-gray-800 dark:text-white/90 data-[copied=true]:border-success data-[copied=true]:text-success">
             <svg aria-hidden="true" class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184"/>
             </svg>
             <span data-tailsfadmin--clipboard-target="label">Copier le code</span>
         </button>
-        <p class="text-sm text-muted">
+        <p class="text-sm text-gray-500 dark:text-gray-400">
             Client&nbsp;: {{ project.client ?? '—' }}
             &nbsp;·&nbsp; Contractualisation&nbsp;: {{ project.contractType ?? '—' }}
             &nbsp;·&nbsp; Budget&nbsp;: {{ project.budgetEuros is not null ? (project.budgetEuros|number_format(0, ',', ' ') ~ ' €') : '—' }}
@@ -72,35 +97,35 @@
     <twig:tsf:Ui:Tabs :items="tabItems" variant="underline">
         {# ── Cycle de vie ── #}
         <twig:block name="lifecycle">
-            <h2 class="mb-3 text-sm font-semibold text-ink">Cycle de vie</h2>
-            <p class="text-body">Statut actuel&nbsp;: <strong>{{ project.status }}</strong>.</p>
+            <h2 class="mb-3 text-sm font-semibold text-gray-800 dark:text-white/90">Cycle de vie</h2>
+            <p class="text-gray-700 dark:text-gray-300">Statut actuel&nbsp;: <strong>{{ project.status }}</strong>.</p>
             {% if canEdit and transitions is not empty %}
-                <p class="text-sm text-muted">Actions disponibles&nbsp;:</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Actions disponibles&nbsp;:</p>
                 <div class="mt-3 flex flex-wrap gap-2">
                     {% for t in transitions %}
                         <form method="post" action="{{ path('project_change_status', { id: project.id }) }}" class="inline">
                             <input type="hidden" name="_token" value="{{ csrf_token('change_project_status') }}">
                             <input type="hidden" name="status" value="{{ t.value }}">
                             <button type="submit"
-                                    class="inline-flex min-h-9 items-center rounded border border-border-strong px-3 text-xs font-semibold text-muted hover:bg-surface-alt hover:text-ink">
+                                    class="inline-flex min-h-9 items-center rounded border border-gray-300 dark:border-gray-700 px-3 text-xs font-semibold text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:bg-white/[0.02] hover:text-gray-800 dark:text-white/90">
                                 Passer à « {{ t.label }} »
                             </button>
                         </form>
                     {% endfor %}
                 </div>
             {% elseif transitions is empty %}
-                <p class="text-xs text-muted">Aucune transition disponible depuis ce statut.</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Aucune transition disponible depuis ce statut.</p>
             {% endif %}
 
             {# Projet interne non facturable (US-032) — après les transitions (préserve le 1er jeton CSRF). #}
             {% if canEdit %}
                 <form method="post" action="{{ path('project_toggle_internal', { id: project.id }) }}" class="mt-4 flex items-center gap-2">
                     <input type="hidden" name="_token" value="{{ csrf_token('toggle_internal') }}">
-                    <label class="text-sm text-body">
+                    <label class="text-sm text-gray-700 dark:text-gray-300">
                         <input type="checkbox" name="internal" value="1" {{ project.internal ? 'checked' : '' }}>
                         Projet interne non facturable (R&D, avant-vente, congés)
                     </label>
-                    <button type="submit" class="inline-flex min-h-9 items-center rounded border border-border-strong px-3 text-xs font-semibold text-muted hover:bg-surface-alt hover:text-ink">Appliquer</button>
+                    <button type="submit" class="inline-flex min-h-9 items-center rounded border border-gray-300 dark:border-gray-700 px-3 text-xs font-semibold text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:bg-white/[0.02] hover:text-gray-800 dark:text-white/90">Appliquer</button>
                 </form>
             {% endif %}
 
@@ -109,15 +134,15 @@
                 <form method="post" action="{{ path('project_attach_client', { id: project.id }) }}" class="mt-4 flex flex-wrap items-end gap-2">
                     <input type="hidden" name="_token" value="{{ csrf_token('attach_client') }}">
                     <div>
-                        <label for="project-client" class="mb-1 block text-[13px] font-medium text-ink">Client rattaché</label>
-                        <select id="project-client" name="clientId" class="min-h-10 rounded border border-border-strong bg-surface px-3 text-sm text-ink">
+                        <label for="project-client" class="mb-1 block text-[13px] font-medium text-gray-800 dark:text-white/90">Client rattaché</label>
+                        <select id="project-client" name="clientId" class="min-h-10 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-white/[0.03] px-3 text-sm text-gray-800 dark:text-white/90">
                             <option value="">— Aucun —</option>
                             {% for c in clients %}
                                 <option value="{{ c.id }}" {{ c.id == clientId ? 'selected' : '' }}>{{ c.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
-                    <button type="submit" class="min-h-10 rounded border border-border-strong px-3 text-sm font-semibold text-muted hover:bg-surface-alt hover:text-ink">Rattacher</button>
+                    <button type="submit" class="min-h-10 rounded border border-gray-300 dark:border-gray-700 px-3 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:bg-white/[0.02] hover:text-gray-800 dark:text-white/90">Rattacher</button>
                 </form>
             {% endif %}
         </twig:block>
@@ -126,22 +151,22 @@
            dans tabItems, c.-à-d. canViewFinancials (cf. plus haut). ── #}
         <twig:block name="budget">
             {% set bt = budgetTracking %}
-                <h2 class="mb-3 text-sm font-semibold text-ink">Suivi budgétaire — budget vs réalisé
-                    <a href="{{ path('project_pilotage_export', { id: project.id }) }}" class="ml-2 text-xs font-medium text-primary hover:underline">Exporter (CSV)</a>
+                <h2 class="mb-3 text-sm font-semibold text-gray-800 dark:text-white/90">Suivi budgétaire — budget vs réalisé
+                    <a href="{{ path('project_pilotage_export', { id: project.id }) }}" class="ml-2 text-xs font-medium text-brand-500 dark:text-brand-400 hover:underline">Exporter (CSV)</a>
                 </h2>
 
                 {# ── Budget : initial, avenants & courant (US-033, EF-PRJ-8) ── #}
-                <div class="mb-4 rounded border border-border p-3">
-                    <p class="text-sm text-body">
+                <div class="mb-4 rounded border border-gray-200 dark:border-gray-800 p-3">
+                    <p class="text-sm text-gray-700 dark:text-gray-300">
                         Budget de charge&nbsp;: initial
                         <span class="font-medium">{{ initialBudgetEuros is not null ? initialBudgetEuros|number_format(0, ',', ' ') ~ ' €' : '—' }}</span>
                         {% if budgetAmendments is not empty %}
-                            → courant <span class="font-semibold text-ink">{{ currentBudgetEuros is not null ? currentBudgetEuros|number_format(0, ',', ' ') ~ ' €' : '—' }}</span>
-                            <span class="text-xs text-muted">({{ budgetAmendments|length }} avenant(s))</span>
+                            → courant <span class="font-semibold text-gray-800 dark:text-white/90">{{ currentBudgetEuros is not null ? currentBudgetEuros|number_format(0, ',', ' ') ~ ' €' : '—' }}</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400">({{ budgetAmendments|length }} avenant(s))</span>
                         {% endif %}
                     </p>
                     {% if budgetAmendments is not empty %}
-                        <ul class="mt-2 list-none p-0 text-xs text-muted">
+                        <ul class="mt-2 list-none p-0 text-xs text-gray-500 dark:text-gray-400">
                             {% for a in budgetAmendments %}
                                 <li class="py-0.5">
                                     {{ a.at }} — charge {{ a.deltaCostEuros >= 0 ? '+' : '' }}{{ a.deltaCostEuros|number_format(0, ',', ' ') }} €,
@@ -153,27 +178,27 @@
                     {% if canEdit %}
                         <form method="post" action="{{ path('project_budget_amend', { id: project.id }) }}" class="mt-3 flex flex-wrap items-end gap-2">
                             <input type="hidden" name="_token" value="{{ csrf_token('budget_amend') }}">
-                            <label class="text-[11px] font-medium text-ink">Δ charge (€)
+                            <label class="text-[11px] font-medium text-gray-800 dark:text-white/90">Δ charge (€)
                                 <input type="number" name="deltaCostEuros" inputmode="numeric" value="0"
-                                       class="ml-1 w-24 rounded border border-border bg-surface px-2 py-1 text-[12px] text-body focus:border-primary focus:outline-none">
+                                       class="ml-1 w-24 rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] px-2 py-1 text-[12px] text-gray-700 dark:text-gray-300 focus:border-brand-500 focus:outline-none">
                             </label>
-                            <label class="text-[11px] font-medium text-ink">Δ CA (€)
+                            <label class="text-[11px] font-medium text-gray-800 dark:text-white/90">Δ CA (€)
                                 <input type="number" name="deltaRevenueEuros" inputmode="numeric" value="0"
-                                       class="ml-1 w-24 rounded border border-border bg-surface px-2 py-1 text-[12px] text-body focus:border-primary focus:outline-none">
+                                       class="ml-1 w-24 rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] px-2 py-1 text-[12px] text-gray-700 dark:text-gray-300 focus:border-brand-500 focus:outline-none">
                             </label>
-                            <label class="text-[11px] font-medium text-ink">Motif
+                            <label class="text-[11px] font-medium text-gray-800 dark:text-white/90">Motif
                                 <input type="text" name="reason" required
-                                       class="ml-1 w-56 rounded border border-border bg-surface px-2 py-1 text-[12px] text-body focus:border-primary focus:outline-none">
+                                       class="ml-1 w-56 rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] px-2 py-1 text-[12px] text-gray-700 dark:text-gray-300 focus:border-brand-500 focus:outline-none">
                             </label>
-                            <button type="submit" class="inline-flex min-h-8 items-center rounded bg-surface-2 px-3 text-[12px] font-semibold text-ink hover:bg-border">Ajouter un avenant</button>
+                            <button type="submit" class="inline-flex min-h-8 items-center rounded bg-white dark:bg-white/[0.03]-2 px-3 text-[12px] font-semibold text-gray-800 dark:text-white/90 hover:bg-border">Ajouter un avenant</button>
                         </form>
                     {% endif %}
                 </div>
 
                 {% if not bt.hasBudget %}
-                    <p class="text-muted">Aucun budget défini pour ce projet.</p>
+                    <p class="text-gray-500 dark:text-gray-400">Aucun budget défini pour ce projet.</p>
                     {% if canEdit %}
-                        <p class="mt-1 text-xs text-muted">Définissez le budget prévisionnel (coût et CA cible) pour activer la comparaison et l'alerte de dérive.</p>
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Définissez le budget prévisionnel (coût et CA cible) pour activer la comparaison et l'alerte de dérive.</p>
                     {% endif %}
                 {% else %}
                     {% if bt.isDrifting %}
@@ -182,7 +207,7 @@
                                 ⚠ Dérive financière défavorable&nbsp;: −{{ bt.marginRateDriftPoints|number_format(1, ',', ' ') }}&nbsp;pts de marge
                                 (réel {{ bt.realizedMarginRatePercent|number_format(1, ',', ' ') }}&nbsp;% vs cible {{ bt.targetMarginRatePercent|number_format(1, ',', ' ') }}&nbsp;%).
                             </p>
-                            <p class="text-xs text-muted">Seuil d'alerte&nbsp;: {{ bt.driftThresholdPoints|number_format(1, ',', ' ') }}&nbsp;pts. Dérive de marge — distincte de la dérive de charge (US-036).</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Seuil d'alerte&nbsp;: {{ bt.driftThresholdPoints|number_format(1, ',', ' ') }}&nbsp;pts. Dérive de marge — distincte de la dérive de charge (US-036).</p>
                         </div>
                     {% endif %}
 
@@ -192,7 +217,7 @@
                             <p class="text-sm font-semibold text-danger">
                                 ⚠ Dérive de charge précoce&nbsp;: dépassement projeté +{{ bt.landingOverrunPercent|number_format(1, ',', ' ') }}&nbsp;% du budget de charge, avant 50&nbsp;% de consommation (avancement {{ bt.landingProgressPercent }}&nbsp;%).
                             </p>
-                            <p class="text-xs text-muted">Alerte OBJ-2 — agir tôt. Atterrissage = coût consommé / avancement physique.</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Alerte OBJ-2 — agir tôt. Atterrissage = coût consommé / avancement physique.</p>
                         </div>
                     {% endif %}
                     {# US-079b — 2e seuil : escalade direction #}
@@ -204,13 +229,13 @@
                         </div>
                     {% endif %}
                     {% if bt.landingAvailable %}
-                        <p class="mb-4 text-sm text-body">
+                        <p class="mb-4 text-sm text-gray-700 dark:text-gray-300">
                             Atterrissage charge (projeté)&nbsp;:
                             {% if bt.landingCostCents is not null %}{{ (bt.landingCostCents / 100)|number_format(0, ',', ' ') }}&nbsp;€ — {% endif %}
                             dépassement {{ bt.landingOverrunPercent >= 0 ? '+' : '' }}{{ bt.landingOverrunPercent|number_format(1, ',', ' ') }}&nbsp;% (avancement physique {{ bt.landingProgressPercent }}&nbsp;%).
                         </p>
                     {% elseif canEdit %}
-                        <p class="mb-4 text-xs text-muted">Atterrissage charge indisponible — renseignez le budget de charge et l'avancement physique des lots (onglet Structure).</p>
+                        <p class="mb-4 text-xs text-gray-500 dark:text-gray-400">Atterrissage charge indisponible — renseignez le budget de charge et l'avancement physique des lots (onglet Structure).</p>
                     {% endif %}
 
                     {# US-079c — courbe d'atterrissage historisée (EF-PRJ-16) #}
@@ -219,7 +244,7 @@
                     <div class="overflow-x-auto">
                         <table class="w-full border-collapse text-sm">
                             <thead>
-                                <tr class="border-b-2 border-border text-left text-xs uppercase text-muted">
+                                <tr class="border-b-2 border-gray-200 dark:border-gray-800 text-left text-xs uppercase text-gray-500 dark:text-gray-400">
                                     <th scope="col" class="py-2 pr-4">Indicateur</th>
                                     <th scope="col" class="py-2 pr-4 text-right">Cible</th>
                                     <th scope="col" class="py-2 pr-4 text-right">Réalisé</th>
@@ -228,8 +253,8 @@
                             </thead>
                             <tbody>
                                 {# CA — visible dès VIEW_PROJECT_FINANCIALS #}
-                                <tr class="border-b border-border">
-                                    <th scope="row" class="py-2 pr-4 font-medium text-ink">CA reconnu</th>
+                                <tr class="border-b border-gray-200 dark:border-gray-800">
+                                    <th scope="row" class="py-2 pr-4 font-medium text-gray-800 dark:text-white/90">CA reconnu</th>
                                     <td class="py-2 pr-4 text-right">{{ bt.revenueBudgetCents is not null ? (bt.revenueBudgetCents / 100)|number_format(2, ',', ' ') ~ ' €' : '—' }}</td>
                                     <td class="py-2 pr-4 text-right">{{ (bt.realizedRevenueCents / 100)|number_format(2, ',', ' ') }}&nbsp;€</td>
                                     <td class="py-2 text-right">
@@ -243,8 +268,8 @@
                                 </tr>
 
                                 {% if bt.costVisible %}
-                                    <tr class="border-b border-border">
-                                        <th scope="row" class="py-2 pr-4 font-medium text-ink">Coût</th>
+                                    <tr class="border-b border-gray-200 dark:border-gray-800">
+                                        <th scope="row" class="py-2 pr-4 font-medium text-gray-800 dark:text-white/90">Coût</th>
                                         <td class="py-2 pr-4 text-right">{{ bt.costBudgetCents is not null ? (bt.costBudgetCents / 100)|number_format(2, ',', ' ') ~ ' €' : '—' }}</td>
                                         <td class="py-2 pr-4 text-right">{{ (bt.realizedCostCents / 100)|number_format(2, ',', ' ') }}&nbsp;€</td>
                                         <td class="py-2 text-right">
@@ -257,15 +282,15 @@
                                             {% else %}—{% endif %}
                                         </td>
                                     </tr>
-                                    <tr class="border-b border-border">
-                                        <th scope="row" class="py-2 pr-4 font-medium text-ink">Marge</th>
+                                    <tr class="border-b border-gray-200 dark:border-gray-800">
+                                        <th scope="row" class="py-2 pr-4 font-medium text-gray-800 dark:text-white/90">Marge</th>
                                         <td class="py-2 pr-4 text-right">
                                             {{ bt.targetMarginCents is not null ? (bt.targetMarginCents / 100)|number_format(2, ',', ' ') ~ ' €' : '—' }}
-                                            {% if bt.targetMarginRatePercent is not null %}<span class="text-muted"> ({{ bt.targetMarginRatePercent|number_format(1, ',', ' ') }}&nbsp;%)</span>{% endif %}
+                                            {% if bt.targetMarginRatePercent is not null %}<span class="text-gray-500 dark:text-gray-400"> ({{ bt.targetMarginRatePercent|number_format(1, ',', ' ') }}&nbsp;%)</span>{% endif %}
                                         </td>
                                         <td class="py-2 pr-4 text-right">
                                             {{ (bt.realizedMarginCents / 100)|number_format(2, ',', ' ') }}&nbsp;€
-                                            {% if bt.realizedMarginRatePercent is not null %}<span class="text-muted"> ({{ bt.realizedMarginRatePercent|number_format(1, ',', ' ') }}&nbsp;%)</span>{% endif %}
+                                            {% if bt.realizedMarginRatePercent is not null %}<span class="text-gray-500 dark:text-gray-400"> ({{ bt.realizedMarginRatePercent|number_format(1, ',', ' ') }}&nbsp;%)</span>{% endif %}
                                         </td>
                                         <td class="py-2 text-right">
                                             {% if bt.marginVarianceCents is not null %}
@@ -282,25 +307,25 @@
                     </div>
 
                     {% if bt.costVisible and bt.consumptionPercent is not null %}
-                        <p class="mt-3 text-sm text-body">
+                        <p class="mt-3 text-sm text-gray-700 dark:text-gray-300">
                             Consommation budgétaire (coût)&nbsp;:
-                            <strong class="{{ bt.consumptionPercent > 100 ? 'text-danger' : 'text-ink' }}">{{ bt.consumptionPercent|number_format(1, ',', ' ') }}&nbsp;%</strong>
+                            <strong class="{{ bt.consumptionPercent > 100 ? 'text-danger' : 'text-gray-800 dark:text-white/90' }}">{{ bt.consumptionPercent|number_format(1, ',', ' ') }}&nbsp;%</strong>
                             {% if bt.consumptionPercent > 100 %}<span class="text-danger"> (budget de charge dépassé)</span>{% endif %}
                         </p>
                     {% elseif not bt.costVisible %}
-                        <p class="mt-3 text-xs text-muted">Coût, marge et dérive réservés aux rôles habilités (finance/direction).</p>
+                        <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">Coût, marge et dérive réservés aux rôles habilités (finance/direction).</p>
                     {% endif %}
                 {% endif %}
 
                 {# ── Facturation (US-075) ── #}
-                <h3 class="mb-2 mt-6 text-sm font-semibold text-ink">Factures</h3>
+                <h3 class="mb-2 mt-6 text-sm font-semibold text-gray-800 dark:text-white/90">Factures</h3>
                 {% if invoices is empty %}
-                    <p class="text-muted">Aucune facture émise.</p>
+                    <p class="text-gray-500 dark:text-gray-400">Aucune facture émise.</p>
                 {% else %}
                     <div class="mb-3 overflow-x-auto">
                         <table class="w-full border-collapse text-sm">
                             <thead>
-                                <tr class="border-b-2 border-border text-left text-xs uppercase text-muted">
+                                <tr class="border-b-2 border-gray-200 dark:border-gray-800 text-left text-xs uppercase text-gray-500 dark:text-gray-400">
                                     <th scope="col" class="py-2 pr-4">Période</th>
                                     <th scope="col" class="py-2 pr-4 text-right">Montant</th>
                                     <th scope="col" class="py-2">Émise le</th>
@@ -308,10 +333,10 @@
                             </thead>
                             <tbody>
                                 {% for inv in invoices %}
-                                    <tr class="border-b border-border">
-                                        <th scope="row" class="py-2 pr-4 font-medium text-ink">{{ inv.period }}</th>
+                                    <tr class="border-b border-gray-200 dark:border-gray-800">
+                                        <th scope="row" class="py-2 pr-4 font-medium text-gray-800 dark:text-white/90">{{ inv.period }}</th>
                                         <td class="py-2 pr-4 text-right tabular-nums">{{ (inv.amountCents / 100)|number_format(2, ',', ' ') }}&nbsp;€</td>
-                                        <td class="py-2 text-muted">{{ inv.issuedAt }}</td>
+                                        <td class="py-2 text-gray-500 dark:text-gray-400">{{ inv.issuedAt }}</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
@@ -321,26 +346,26 @@
                 <form method="post" action="{{ path('project_issue_invoice', { id: project.id }) }}" class="flex flex-wrap items-end gap-2">
                     <input type="hidden" name="_token" value="{{ csrf_token('issue_invoice') }}">
                     <div>
-                        <label for="invoice-period" class="mb-1 block text-[13px] font-medium text-ink">Période (mois clôturé)</label>
-                        <input id="invoice-period" name="period" placeholder="AAAA-MM" pattern="\d{4}-\d{2}" required class="min-h-10 rounded border border-border-strong bg-surface px-3 text-sm text-ink">
+                        <label for="invoice-period" class="mb-1 block text-[13px] font-medium text-gray-800 dark:text-white/90">Période (mois clôturé)</label>
+                        <input id="invoice-period" name="period" placeholder="AAAA-MM" pattern="\d{4}-\d{2}" required class="min-h-10 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-white/[0.03] px-3 text-sm text-gray-800 dark:text-white/90">
                     </div>
                     <div>
-                        <label for="invoice-amount" class="mb-1 block text-[13px] font-medium text-ink">Montant (€)</label>
-                        <input id="invoice-amount" name="amountEuros" type="number" min="1" required class="min-h-10 rounded border border-border-strong bg-surface px-3 text-sm text-ink">
+                        <label for="invoice-amount" class="mb-1 block text-[13px] font-medium text-gray-800 dark:text-white/90">Montant (€)</label>
+                        <input id="invoice-amount" name="amountEuros" type="number" min="1" required class="min-h-10 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-white/[0.03] px-3 text-sm text-gray-800 dark:text-white/90">
                     </div>
-                    <button type="submit" class="min-h-10 rounded bg-primary px-4 text-sm font-semibold text-white hover:bg-primary/90">Émettre une facture</button>
+                    <button type="submit" class="min-h-10 rounded bg-brand-500 hover:bg-brand-600 px-4 text-sm font-semibold text-white hover:bg-brand-500 hover:bg-brand-600/90">Émettre une facture</button>
                 </form>
         </twig:block>
 
         {# ── Structure ── #}
         <twig:block name="structure">
-            <h2 class="mb-3 text-sm font-semibold text-ink">Structure — lots</h2>
+            <h2 class="mb-3 text-sm font-semibold text-gray-800 dark:text-white/90">Structure — lots</h2>
             {% if structure.roots is empty %}
-                <p class="text-muted">Aucun lot défini.</p>
+                <p class="text-gray-500 dark:text-gray-400">Aucun lot défini.</p>
             {% else %}
                 {% macro lot_progress(lot, projectId, canEdit) %}
                     {# US-035 — avancement physique & RAF, distincts de la consommation (INV-4) #}
-                    <span class="text-xs text-muted">
+                    <span class="text-xs text-gray-500 dark:text-gray-400">
                         Avancement&nbsp;: {{ lot.progress is not null ? lot.progress ~ ' %' : '—' }}
                         · RAF&nbsp;: {{ lot.raf is not null ? lot.raf ~ ' j' : '—' }}
                     </span>
@@ -348,22 +373,22 @@
                         <form method="post" action="{{ path('project_lot_progress', { id: projectId, lotId: lot.id }) }}"
                               class="mt-1 flex flex-wrap items-end gap-2">
                             <input type="hidden" name="_token" value="{{ csrf_token('project_structure') }}">
-                            <label class="text-[11px] font-medium text-ink">Avancement&nbsp;%
+                            <label class="text-[11px] font-medium text-gray-800 dark:text-white/90">Avancement&nbsp;%
                                 <input type="number" name="progress" min="0" max="100" inputmode="numeric" value="{{ lot.progress }}"
-                                       class="ml-1 w-16 rounded border border-border bg-surface px-2 py-1 text-[12px] text-body focus:border-primary focus:outline-none">
+                                       class="ml-1 w-16 rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] px-2 py-1 text-[12px] text-gray-700 dark:text-gray-300 focus:border-brand-500 focus:outline-none">
                             </label>
-                            <label class="text-[11px] font-medium text-ink">RAF&nbsp;(j)
+                            <label class="text-[11px] font-medium text-gray-800 dark:text-white/90">RAF&nbsp;(j)
                                 <input type="number" name="raf" min="0" inputmode="numeric" value="{{ lot.raf }}"
-                                       class="ml-1 w-16 rounded border border-border bg-surface px-2 py-1 text-[12px] text-body focus:border-primary focus:outline-none">
+                                       class="ml-1 w-16 rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] px-2 py-1 text-[12px] text-gray-700 dark:text-gray-300 focus:border-brand-500 focus:outline-none">
                             </label>
-                            <button type="submit" class="inline-flex min-h-8 items-center rounded bg-surface-2 px-2 text-[12px] font-semibold text-ink hover:bg-border">Enregistrer</button>
+                            <button type="submit" class="inline-flex min-h-8 items-center rounded bg-white dark:bg-white/[0.03]-2 px-2 text-[12px] font-semibold text-gray-800 dark:text-white/90 hover:bg-border">Enregistrer</button>
                         </form>
                     {% endif %}
                 {% endmacro %}
 
                 {% macro lot_profile_budget(lot, projectId, profiles, view, canEdit) %}
                     {# US-078 — budget de charge par profil → équivalents € vente/coût aux taux en vigueur #}
-                    <div class="mt-1 text-xs text-muted">
+                    <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
                         Budget par profil&nbsp;:
                         {% if view %}
                             {{ view.days }}&nbsp;j → vente {{ view.sellingEuros|number_format(0, ',', ' ') }}&nbsp;€ / coût {{ view.costEuros|number_format(0, ',', ' ') }}&nbsp;€
@@ -371,7 +396,7 @@
                         {% else %}—{% endif %}
                     </div>
                     {% if view and view.rows is not empty %}
-                        <ul class="list-none pl-4 text-[11px] text-muted">
+                        <ul class="list-none pl-4 text-[11px] text-gray-500 dark:text-gray-400">
                             {% for r in view.rows %}<li>{{ r.profile }}&nbsp;: {{ r.days }}&nbsp;j</li>{% endfor %}
                         </ul>
                     {% endif %}
@@ -379,31 +404,31 @@
                         <form method="post" action="{{ path('project_lot_profile_budget', { id: projectId, lotId: lot.id }) }}"
                               class="mt-1 flex flex-wrap items-end gap-2">
                             <input type="hidden" name="_token" value="{{ csrf_token('project_structure') }}">
-                            <label class="text-[11px] font-medium text-ink">Profil
-                                <select name="profileId" class="ml-1 rounded border border-border bg-surface px-2 py-1 text-[12px] text-body focus:border-primary focus:outline-none">
+                            <label class="text-[11px] font-medium text-gray-800 dark:text-white/90">Profil
+                                <select name="profileId" class="ml-1 rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] px-2 py-1 text-[12px] text-gray-700 dark:text-gray-300 focus:border-brand-500 focus:outline-none">
                                     {% for p in profiles %}<option value="{{ p.id }}">{{ p.name }}</option>{% endfor %}
                                 </select>
                             </label>
-                            <label class="text-[11px] font-medium text-ink">Jours
+                            <label class="text-[11px] font-medium text-gray-800 dark:text-white/90">Jours
                                 <input type="number" name="days" min="0" inputmode="numeric"
-                                       class="ml-1 w-16 rounded border border-border bg-surface px-2 py-1 text-[12px] text-body focus:border-primary focus:outline-none">
+                                       class="ml-1 w-16 rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] px-2 py-1 text-[12px] text-gray-700 dark:text-gray-300 focus:border-brand-500 focus:outline-none">
                             </label>
-                            <button type="submit" class="inline-flex min-h-8 items-center rounded bg-surface-2 px-2 text-[12px] font-semibold text-ink hover:bg-border">Définir</button>
+                            <button type="submit" class="inline-flex min-h-8 items-center rounded bg-white dark:bg-white/[0.03]-2 px-2 text-[12px] font-semibold text-gray-800 dark:text-white/90 hover:bg-border">Définir</button>
                         </form>
                     {% endif %}
                 {% endmacro %}
 
                 <ul class="mb-3 list-none p-0">
                     {% for lot in structure.roots %}
-                        <li class="border-b border-border py-2 text-sm last:border-b-0">
-                            <span class="font-semibold text-ink">{{ lot.name }}</span>
+                        <li class="border-b border-gray-200 dark:border-gray-800 py-2 text-sm last:border-b-0">
+                            <span class="font-semibold text-gray-800 dark:text-white/90">{{ lot.name }}</span>
                             — {{ lot.days }}&nbsp;j / {{ lot.euros|number_format(0, ',', ' ') }}&nbsp;€
                             <div class="mt-1">{{ _self.lot_progress(lot, project.id, canEdit) }}</div>
                             <div class="mt-1">{{ _self.lot_profile_budget(lot, project.id, profiles, lotProfileBudgets[lot.id]|default(null), canEdit) }}</div>
                             {% if lot.children is not empty %}
                                 <ul class="mt-1 list-none pl-6">
                                     {% for child in lot.children %}
-                                        <li class="py-1 text-body">
+                                        <li class="py-1 text-gray-700 dark:text-gray-300">
                                             {{ child.name }} — {{ child.days }}&nbsp;j / {{ child.euros|number_format(0, ',', ' ') }}&nbsp;€
                                             <div class="mt-0.5">{{ _self.lot_progress(child, project.id, canEdit) }}</div>
                                         </li>
@@ -413,7 +438,7 @@
                         </li>
                     {% endfor %}
                 </ul>
-                <p class="text-xs text-muted">
+                <p class="text-xs text-gray-500 dark:text-gray-400">
                     Total lots&nbsp;: {{ structure.sumDays }}&nbsp;j / {{ structure.sumEuros|number_format(0, ',', ' ') }}&nbsp;€
                     {% if structure.budgetEuros is not null %}
                         — Budget projet&nbsp;: {{ structure.budgetEuros|number_format(0, ',', ' ') }}&nbsp;€
@@ -427,33 +452,33 @@
             {% endif %}
 
             {% if canEdit %}
-                <h3 class="mb-2 mt-4 text-sm font-semibold text-ink">Ajouter un lot</h3>
+                <h3 class="mb-2 mt-4 text-sm font-semibold text-gray-800 dark:text-white/90">Ajouter un lot</h3>
                 <form method="post" action="{{ path('project_lot_add', { id: project.id }) }}"
                       class="mt-3 max-w-[540px]">
                     <input type="hidden" name="_token" value="{{ csrf_token('project_structure') }}">
                     <div class="mb-3">
-                        <label for="lot-name" class="mb-1 block text-[13px] font-medium text-ink">Nom du lot</label>
+                        <label for="lot-name" class="mb-1 block text-[13px] font-medium text-gray-800 dark:text-white/90">Nom du lot</label>
                         <input type="text"
-                               class="w-full rounded border border-border bg-surface px-3 py-2 text-[13px] text-body focus:border-primary focus:outline-none"
+                               class="w-full rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] px-3 py-2 text-[13px] text-gray-700 dark:text-gray-300 focus:border-brand-500 focus:outline-none"
                                id="lot-name" name="name" required>
                     </div>
                     <div class="mb-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
                         <div>
-                            <label for="lot-days" class="mb-1 block text-[13px] font-medium text-ink">Charge (jours)</label>
+                            <label for="lot-days" class="mb-1 block text-[13px] font-medium text-gray-800 dark:text-white/90">Charge (jours)</label>
                             <input type="number"
-                                   class="w-full rounded border border-border bg-surface px-3 py-2 text-[13px] text-body focus:border-primary focus:outline-none"
+                                   class="w-full rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] px-3 py-2 text-[13px] text-gray-700 dark:text-gray-300 focus:border-brand-500 focus:outline-none"
                                    id="lot-days" name="budgetDays" min="0" inputmode="numeric" required>
                         </div>
                         <div>
-                            <label for="lot-euros" class="mb-1 block text-[13px] font-medium text-ink">Montant (€)</label>
+                            <label for="lot-euros" class="mb-1 block text-[13px] font-medium text-gray-800 dark:text-white/90">Montant (€)</label>
                             <input type="number"
-                                   class="w-full rounded border border-border bg-surface px-3 py-2 text-[13px] text-body focus:border-primary focus:outline-none"
+                                   class="w-full rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] px-3 py-2 text-[13px] text-gray-700 dark:text-gray-300 focus:border-brand-500 focus:outline-none"
                                    id="lot-euros" name="budgetEuros" min="0" inputmode="numeric" required>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="lot-parent" class="mb-1 block text-[13px] font-medium text-ink">Lot parent (optionnel — pour un sous-lot)</label>
-                        <select class="w-full rounded border border-border bg-surface px-3 py-2 text-[13px] text-body focus:border-primary focus:outline-none"
+                        <label for="lot-parent" class="mb-1 block text-[13px] font-medium text-gray-800 dark:text-white/90">Lot parent (optionnel — pour un sous-lot)</label>
+                        <select class="w-full rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] px-3 py-2 text-[13px] text-gray-700 dark:text-gray-300 focus:border-brand-500 focus:outline-none"
                                 id="lot-parent" name="parentLotId">
                             <option value="">— Lot racine —</option>
                             {% for lot in structure.roots %}<option value="{{ lot.id }}">{{ lot.name }}</option>{% endfor %}
@@ -462,27 +487,27 @@
                     <div class="mb-3 flex items-start gap-2">
                         <input type="checkbox" id="confirm-overrun" name="confirmOverrun" value="1"
                                class="mt-0.5 h-[18px] w-[18px] flex-shrink-0 cursor-pointer">
-                        <label for="confirm-overrun" class="text-[13px] font-medium text-ink">
+                        <label for="confirm-overrun" class="text-[13px] font-medium text-gray-800 dark:text-white/90">
                             Confirmer un éventuel dépassement du budget projet
                         </label>
                     </div>
                     <button type="submit"
-                            class="inline-flex min-h-11 items-center rounded bg-primary px-4 text-sm font-semibold text-primary-fg hover:opacity-90">
+                            class="inline-flex min-h-11 items-center rounded bg-brand-500 hover:bg-brand-600 px-4 text-sm font-semibold text-white">
                         Ajouter le lot
                     </button>
                 </form>
             {% endif %}
 
-            <h2 class="mb-3 mt-5 text-sm font-semibold text-ink">Jalons</h2>
+            <h2 class="mb-3 mt-5 text-sm font-semibold text-gray-800 dark:text-white/90">Jalons</h2>
             {% if milestones is empty %}
-                <p class="text-muted">Aucun jalon défini.</p>
+                <p class="text-gray-500 dark:text-gray-400">Aucun jalon défini.</p>
             {% else %}
                 <ul class="mb-3 list-none p-0">
                     {% for m in milestones %}
-                        <li class="flex flex-wrap items-start justify-between gap-2 border-b border-border py-2 text-sm last:border-b-0">
+                        <li class="flex flex-wrap items-start justify-between gap-2 border-b border-gray-200 dark:border-gray-800 py-2 text-sm last:border-b-0">
                             <div>
-                                <strong class="text-ink">{{ m.name }}</strong> — {{ m.due }} —
-                                <span class="status-badge status-badge-{{ m.status == 'Atteint' ? 'success' : 'neutral' }}">{{ m.status }}</span>
+                                <strong class="text-gray-800 dark:text-white/90">{{ m.name }}</strong> — {{ m.due }} —
+                                <span class="{{ badge_base }} {{ m.status == 'Atteint' ? 'bg-success-50 text-success-700 dark:bg-success-500/15 dark:text-success-400' : badge_neutral }}">{{ m.status }}</span>
                                 {% if m.reached %} (atteint le {{ m.reached }}){% endif %}
                                 {% if m.billing is not null %}
                                     — <span aria-hidden="true">💰</span>
@@ -493,7 +518,7 @@
                                 <form method="post" action="{{ path('project_milestone_reach', { id: project.id, milestoneId: m.id }) }}">
                                     <input type="hidden" name="_token" value="{{ csrf_token('project_structure') }}">
                                     <button type="submit"
-                                            class="inline-flex min-h-9 items-center rounded bg-success px-3 text-xs font-semibold text-white hover:opacity-90">
+                                            class="inline-flex min-h-9 items-center rounded bg-success px-3 text-xs font-semibold text-white">
                                         Marquer atteint
                                     </button>
                                 </form>
@@ -504,30 +529,30 @@
             {% endif %}
 
             {% if canEdit %}
-                <h3 class="mb-2 mt-4 text-sm font-semibold text-ink">Ajouter un jalon</h3>
+                <h3 class="mb-2 mt-4 text-sm font-semibold text-gray-800 dark:text-white/90">Ajouter un jalon</h3>
                 <form method="post" action="{{ path('project_milestone_add', { id: project.id }) }}"
                       class="mt-3 max-w-[540px]">
                     <input type="hidden" name="_token" value="{{ csrf_token('project_structure') }}">
                     <div class="mb-3">
-                        <label for="ms-name" class="mb-1 block text-[13px] font-medium text-ink">Nom du jalon</label>
+                        <label for="ms-name" class="mb-1 block text-[13px] font-medium text-gray-800 dark:text-white/90">Nom du jalon</label>
                         <input type="text"
-                               class="w-full rounded border border-border bg-surface px-3 py-2 text-[13px] text-body focus:border-primary focus:outline-none"
+                               class="w-full rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] px-3 py-2 text-[13px] text-gray-700 dark:text-gray-300 focus:border-brand-500 focus:outline-none"
                                id="ms-name" name="name" required>
                     </div>
                     <div class="mb-3">
-                        <label for="ms-due" class="mb-1 block text-[13px] font-medium text-ink">Date prévisionnelle</label>
+                        <label for="ms-due" class="mb-1 block text-[13px] font-medium text-gray-800 dark:text-white/90">Date prévisionnelle</label>
                         <input type="date"
-                               class="w-full rounded border border-border bg-surface px-3 py-2 text-[13px] text-body focus:border-primary focus:outline-none"
+                               class="w-full rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] px-3 py-2 text-[13px] text-gray-700 dark:text-gray-300 focus:border-brand-500 focus:outline-none"
                                id="ms-due" name="dueDate" required>
                     </div>
                     <div class="mb-3">
-                        <label for="ms-billing" class="mb-1 block text-[13px] font-medium text-ink">Déclencheur de facturation (€, optionnel)</label>
+                        <label for="ms-billing" class="mb-1 block text-[13px] font-medium text-gray-800 dark:text-white/90">Déclencheur de facturation (€, optionnel)</label>
                         <input type="number"
-                               class="w-full rounded border border-border bg-surface px-3 py-2 text-[13px] text-body focus:border-primary focus:outline-none"
+                               class="w-full rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] px-3 py-2 text-[13px] text-gray-700 dark:text-gray-300 focus:border-brand-500 focus:outline-none"
                                id="ms-billing" name="billingEuros" min="0" inputmode="numeric">
                     </div>
                     <button type="submit"
-                            class="inline-flex min-h-11 items-center rounded bg-primary px-4 text-sm font-semibold text-primary-fg hover:opacity-90">
+                            class="inline-flex min-h-11 items-center rounded bg-brand-500 hover:bg-brand-600 px-4 text-sm font-semibold text-white">
                         Ajouter le jalon
                     </button>
                 </form>
@@ -536,32 +561,32 @@
 
         {# ── Équipe ── #}
         <twig:block name="team">
-            <h2 class="mb-3 text-sm font-semibold text-ink">Équipe — affectations</h2>
+            <h2 class="mb-3 text-sm font-semibold text-gray-800 dark:text-white/90">Équipe — affectations</h2>
             {% if assignments is empty %}
-                <p class="text-muted">
+                <p class="text-gray-500 dark:text-gray-400">
                     Aucune affectation. Tant qu'aucun collaborateur n'est affecté, le projet reste ouvert
                     à la saisie ; dès la première affectation, seuls les affectés peuvent imputer.
                 </p>
             {% else %}
-                <div class="overflow-x-auto rounded-md border border-border bg-surface">
+                <div class="overflow-x-auto rounded-md border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03]">
                     <table class="w-full border-collapse text-left">
-                        <caption class="visually-hidden">Collaborateurs affectés au projet</caption>
+                        <caption class="sr-only">Collaborateurs affectés au projet</caption>
                         <thead>
-                            <tr class="bg-surface-alt">
-                                <th scope="col" class="px-4 py-3 font-semibold text-body">Collaborateur</th>
-                                <th scope="col" class="px-4 py-3 font-semibold text-body">Rôle</th>
-                                <th scope="col" class="px-4 py-3 font-semibold text-body">Charge (j)</th>
-                                <th scope="col" class="px-4 py-3 font-semibold text-body">Période</th>
-                                {% if canEdit %}<th scope="col" class="px-4 py-3 font-semibold text-body">Action</th>{% endif %}
+                            <tr class="bg-gray-50 dark:bg-white/[0.02]">
+                                <th scope="col" class="px-4 py-3 font-semibold text-gray-700 dark:text-gray-300">Collaborateur</th>
+                                <th scope="col" class="px-4 py-3 font-semibold text-gray-700 dark:text-gray-300">Rôle</th>
+                                <th scope="col" class="px-4 py-3 font-semibold text-gray-700 dark:text-gray-300">Charge (j)</th>
+                                <th scope="col" class="px-4 py-3 font-semibold text-gray-700 dark:text-gray-300">Période</th>
+                                {% if canEdit %}<th scope="col" class="px-4 py-3 font-semibold text-gray-700 dark:text-gray-300">Action</th>{% endif %}
                             </tr>
                         </thead>
                         <tbody>
                             {% for a in assignments %}
-                                <tr class="border-t border-border hover:bg-surface-alt">
-                                    <td class="px-4 py-3"><code class="font-mono text-primary">{{ a.userId[:8] }}</code></td>
-                                    <td class="px-4 py-3 text-body">{{ a.role }}</td>
-                                    <td class="px-4 py-3 text-body">{{ a.plannedDays }}</td>
-                                    <td class="px-4 py-3 text-body">{{ a.start ?? '—' }}{% if a.end %} → {{ a.end }}{% endif %}</td>
+                                <tr class="border-t border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:bg-white/[0.02]">
+                                    <td class="px-4 py-3"><code class="font-mono text-brand-500 dark:text-brand-400">{{ a.userId[:8] }}</code></td>
+                                    <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ a.role }}</td>
+                                    <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ a.plannedDays }}</td>
+                                    <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ a.start ?? '—' }}{% if a.end %} → {{ a.end }}{% endif %}</td>
                                     {% if canEdit %}
                                         <td class="px-4 py-3">
                                             <form method="post" action="{{ path('project_assignment_remove', { id: project.id, assignmentId: a.id }) }}">
@@ -581,89 +606,89 @@
             {% endif %}
 
             {% if canEdit %}
-                <h3 class="mb-2 mt-4 text-sm font-semibold text-ink">Affecter un collaborateur</h3>
+                <h3 class="mb-2 mt-4 text-sm font-semibold text-gray-800 dark:text-white/90">Affecter un collaborateur</h3>
                 <form method="post" action="{{ path('project_assignment_add', { id: project.id }) }}"
                       class="mt-3 max-w-[540px]">
                     <input type="hidden" name="_token" value="{{ csrf_token('project_team') }}">
                     <div class="mb-3">
-                        <label for="a-user" class="mb-1 block text-[13px] font-medium text-ink">Collaborateur (identifiant)</label>
+                        <label for="a-user" class="mb-1 block text-[13px] font-medium text-gray-800 dark:text-white/90">Collaborateur (identifiant)</label>
                         <input type="text"
-                               class="w-full rounded border border-border bg-surface px-3 py-2 text-[13px] text-body focus:border-primary focus:outline-none"
+                               class="w-full rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] px-3 py-2 text-[13px] text-gray-700 dark:text-gray-300 focus:border-brand-500 focus:outline-none"
                                id="a-user" name="userId" required>
                     </div>
                     <div class="mb-3">
-                        <label for="a-role" class="mb-1 block text-[13px] font-medium text-ink">Rôle</label>
+                        <label for="a-role" class="mb-1 block text-[13px] font-medium text-gray-800 dark:text-white/90">Rôle</label>
                         <input type="text"
-                               class="w-full rounded border border-border bg-surface px-3 py-2 text-[13px] text-body focus:border-primary focus:outline-none"
+                               class="w-full rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] px-3 py-2 text-[13px] text-gray-700 dark:text-gray-300 focus:border-brand-500 focus:outline-none"
                                id="a-role" name="role" required>
                     </div>
                     <div class="mb-3">
-                        <label for="a-days" class="mb-1 block text-[13px] font-medium text-ink">Charge prévisionnelle (jours)</label>
+                        <label for="a-days" class="mb-1 block text-[13px] font-medium text-gray-800 dark:text-white/90">Charge prévisionnelle (jours)</label>
                         <input type="number"
-                               class="w-full rounded border border-border bg-surface px-3 py-2 text-[13px] text-body focus:border-primary focus:outline-none"
+                               class="w-full rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] px-3 py-2 text-[13px] text-gray-700 dark:text-gray-300 focus:border-brand-500 focus:outline-none"
                                id="a-days" name="plannedDays" min="0" inputmode="numeric" required>
                     </div>
                     <div class="mb-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
                         <div>
-                            <label for="a-start" class="mb-1 block text-[13px] font-medium text-ink">Début (optionnel)</label>
+                            <label for="a-start" class="mb-1 block text-[13px] font-medium text-gray-800 dark:text-white/90">Début (optionnel)</label>
                             <input type="date"
-                                   class="w-full rounded border border-border bg-surface px-3 py-2 text-[13px] text-body focus:border-primary focus:outline-none"
+                                   class="w-full rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] px-3 py-2 text-[13px] text-gray-700 dark:text-gray-300 focus:border-brand-500 focus:outline-none"
                                    id="a-start" name="startDate">
                         </div>
                         <div>
-                            <label for="a-end" class="mb-1 block text-[13px] font-medium text-ink">Fin (optionnel)</label>
+                            <label for="a-end" class="mb-1 block text-[13px] font-medium text-gray-800 dark:text-white/90">Fin (optionnel)</label>
                             <input type="date"
-                                   class="w-full rounded border border-border bg-surface px-3 py-2 text-[13px] text-body focus:border-primary focus:outline-none"
+                                   class="w-full rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] px-3 py-2 text-[13px] text-gray-700 dark:text-gray-300 focus:border-brand-500 focus:outline-none"
                                    id="a-end" name="endDate">
                         </div>
                     </div>
                     <button type="submit"
-                            class="inline-flex min-h-11 items-center rounded bg-primary px-4 text-sm font-semibold text-primary-fg hover:opacity-90">
+                            class="inline-flex min-h-11 items-center rounded bg-brand-500 hover:bg-brand-600 px-4 text-sm font-semibold text-white">
                         Affecter
                     </button>
                 </form>
             {% endif %}
 
-            <h2 class="mb-3 mt-5 text-sm font-semibold text-ink">Ouvertures exceptionnelles</h2>
+            <h2 class="mb-3 mt-5 text-sm font-semibold text-gray-800 dark:text-white/90">Ouvertures exceptionnelles</h2>
             {% if openings is empty %}
-                <p class="text-muted">Aucune ouverture exceptionnelle.</p>
+                <p class="text-gray-500 dark:text-gray-400">Aucune ouverture exceptionnelle.</p>
             {% else %}
                 <ul class="mb-3 list-none p-0">
                     {% for o in openings %}
-                        <li class="border-b border-border py-2 text-sm last:border-b-0">
-                            <code class="font-mono text-primary">{{ o.userId[:8] }}</code> — semaine du {{ o.week }}
+                        <li class="border-b border-gray-200 dark:border-gray-800 py-2 text-sm last:border-b-0">
+                            <code class="font-mono text-brand-500 dark:text-brand-400">{{ o.userId[:8] }}</code> — semaine du {{ o.week }}
                             — {{ o.reason }}
-                            <span class="text-muted">(accordée par {{ o.grantedBy[:8] }})</span>
+                            <span class="text-gray-500 dark:text-gray-400">(accordée par {{ o.grantedBy[:8] }})</span>
                         </li>
                     {% endfor %}
                 </ul>
             {% endif %}
 
             {% if canEdit %}
-                <h3 class="mb-2 mt-4 text-sm font-semibold text-ink">Accorder une ouverture exceptionnelle</h3>
+                <h3 class="mb-2 mt-4 text-sm font-semibold text-gray-800 dark:text-white/90">Accorder une ouverture exceptionnelle</h3>
                 <form method="post" action="{{ path('project_opening_grant', { id: project.id }) }}"
                       class="mt-3 max-w-[540px]">
                     <input type="hidden" name="_token" value="{{ csrf_token('project_team') }}">
                     <div class="mb-3">
-                        <label for="o-user" class="mb-1 block text-[13px] font-medium text-ink">Collaborateur (identifiant)</label>
+                        <label for="o-user" class="mb-1 block text-[13px] font-medium text-gray-800 dark:text-white/90">Collaborateur (identifiant)</label>
                         <input type="text"
-                               class="w-full rounded border border-border bg-surface px-3 py-2 text-[13px] text-body focus:border-primary focus:outline-none"
+                               class="w-full rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] px-3 py-2 text-[13px] text-gray-700 dark:text-gray-300 focus:border-brand-500 focus:outline-none"
                                id="o-user" name="userId" required>
                     </div>
                     <div class="mb-3">
-                        <label for="o-week" class="mb-1 block text-[13px] font-medium text-ink">Semaine (un jour de la semaine)</label>
+                        <label for="o-week" class="mb-1 block text-[13px] font-medium text-gray-800 dark:text-white/90">Semaine (un jour de la semaine)</label>
                         <input type="date"
-                               class="w-full rounded border border-border bg-surface px-3 py-2 text-[13px] text-body focus:border-primary focus:outline-none"
+                               class="w-full rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] px-3 py-2 text-[13px] text-gray-700 dark:text-gray-300 focus:border-brand-500 focus:outline-none"
                                id="o-week" name="weekStart" required>
                     </div>
                     <div class="mb-3">
-                        <label for="o-reason" class="mb-1 block text-[13px] font-medium text-ink">Motif</label>
+                        <label for="o-reason" class="mb-1 block text-[13px] font-medium text-gray-800 dark:text-white/90">Motif</label>
                         <input type="text"
-                               class="w-full rounded border border-border bg-surface px-3 py-2 text-[13px] text-body focus:border-primary focus:outline-none"
+                               class="w-full rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] px-3 py-2 text-[13px] text-gray-700 dark:text-gray-300 focus:border-brand-500 focus:outline-none"
                                id="o-reason" name="reason" maxlength="500" required>
                     </div>
                     <button type="submit"
-                            class="inline-flex min-h-11 items-center rounded bg-primary px-4 text-sm font-semibold text-primary-fg hover:opacity-90">
+                            class="inline-flex min-h-11 items-center rounded bg-brand-500 hover:bg-brand-600 px-4 text-sm font-semibold text-white">
                         Accorder
                     </button>
                 </form>
@@ -672,143 +697,143 @@
 
         {# ── Engagements ── #}
         <twig:block name="commitments">
-            <h2 class="mb-3 text-sm font-semibold text-ink">Engagements externes</h2>
+            <h2 class="mb-3 text-sm font-semibold text-gray-800 dark:text-white/90">Engagements externes</h2>
             {% if commitments.rows is empty %}
-                <p class="text-muted">Aucun engagement externe.</p>
+                <p class="text-gray-500 dark:text-gray-400">Aucun engagement externe.</p>
             {% else %}
-                <div class="overflow-x-auto rounded-md border border-border bg-surface">
+                <div class="overflow-x-auto rounded-md border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03]">
                     <table class="w-full border-collapse text-left">
-                        <caption class="visually-hidden">Engagements externes du projet</caption>
+                        <caption class="sr-only">Engagements externes du projet</caption>
                         <thead>
-                            <tr class="bg-surface-alt">
-                                <th scope="col" class="px-4 py-3 font-semibold text-body">Type</th>
-                                <th scope="col" class="px-4 py-3 font-semibold text-body">Libellé</th>
-                                <th scope="col" class="px-4 py-3 font-semibold text-body">Fournisseur</th>
-                                <th scope="col" class="px-4 py-3 font-semibold text-body">Statut</th>
-                                <th scope="col" class="px-4 py-3 text-right font-semibold text-body">Montant</th>
+                            <tr class="bg-gray-50 dark:bg-white/[0.02]">
+                                <th scope="col" class="px-4 py-3 font-semibold text-gray-700 dark:text-gray-300">Type</th>
+                                <th scope="col" class="px-4 py-3 font-semibold text-gray-700 dark:text-gray-300">Libellé</th>
+                                <th scope="col" class="px-4 py-3 font-semibold text-gray-700 dark:text-gray-300">Fournisseur</th>
+                                <th scope="col" class="px-4 py-3 font-semibold text-gray-700 dark:text-gray-300">Statut</th>
+                                <th scope="col" class="px-4 py-3 text-right font-semibold text-gray-700 dark:text-gray-300">Montant</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for c in commitments.rows %}
-                                <tr class="border-t border-border hover:bg-surface-alt">
-                                    <td class="px-4 py-3 text-body">{{ c.type }}</td>
-                                    <td class="px-4 py-3 text-body">{{ c.label }}</td>
-                                    <td class="px-4 py-3 text-body">{{ c.supplier }}</td>
-                                    <td class="px-4 py-3 text-body">{{ c.status }}</td>
-                                    <td class="px-4 py-3 text-right text-body">{{ c.euros|number_format(0, ',', ' ') }}&nbsp;€</td>
+                                <tr class="border-t border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:bg-white/[0.02]">
+                                    <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ c.type }}</td>
+                                    <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ c.label }}</td>
+                                    <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ c.supplier }}</td>
+                                    <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ c.status }}</td>
+                                    <td class="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{{ c.euros|number_format(0, ',', ' ') }}&nbsp;€</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
-                <p class="mt-2 text-xs text-muted">
+                <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
                     Total coûts externes&nbsp;: <strong>{{ commitments.totalEuros|number_format(0, ',', ' ') }}&nbsp;€</strong>
                     <span>(marge complète avec budget de vente&nbsp;: US-033)</span>
                 </p>
             {% endif %}
 
             {% if canEdit and project.status != 'Clôturé' %}
-                <h3 class="mb-2 mt-4 text-sm font-semibold text-ink">Ajouter un engagement</h3>
+                <h3 class="mb-2 mt-4 text-sm font-semibold text-gray-800 dark:text-white/90">Ajouter un engagement</h3>
                 <form method="post" action="{{ path('project_commitment_add', { id: project.id }) }}"
                       class="mt-3 max-w-[540px]">
                     <input type="hidden" name="_token" value="{{ csrf_token('project_commitment') }}">
                     <div class="mb-3">
-                        <label for="c-type" class="mb-1 block text-[13px] font-medium text-ink">Type</label>
-                        <select class="w-full rounded border border-border bg-surface px-3 py-2 text-[13px] text-body focus:border-primary focus:outline-none"
+                        <label for="c-type" class="mb-1 block text-[13px] font-medium text-gray-800 dark:text-white/90">Type</label>
+                        <select class="w-full rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] px-3 py-2 text-[13px] text-gray-700 dark:text-gray-300 focus:border-brand-500 focus:outline-none"
                                 id="c-type" name="type">
                             {% for t in commitmentTypes %}<option value="{{ t.value }}">{{ t.label }}</option>{% endfor %}
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="c-label" class="mb-1 block text-[13px] font-medium text-ink">Libellé</label>
+                        <label for="c-label" class="mb-1 block text-[13px] font-medium text-gray-800 dark:text-white/90">Libellé</label>
                         <input type="text"
-                               class="w-full rounded border border-border bg-surface px-3 py-2 text-[13px] text-body focus:border-primary focus:outline-none"
+                               class="w-full rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] px-3 py-2 text-[13px] text-gray-700 dark:text-gray-300 focus:border-brand-500 focus:outline-none"
                                id="c-label" name="label" required>
                     </div>
                     <div class="mb-3">
-                        <label for="c-supplier" class="mb-1 block text-[13px] font-medium text-ink">Fournisseur</label>
+                        <label for="c-supplier" class="mb-1 block text-[13px] font-medium text-gray-800 dark:text-white/90">Fournisseur</label>
                         <input type="text"
-                               class="w-full rounded border border-border bg-surface px-3 py-2 text-[13px] text-body focus:border-primary focus:outline-none"
+                               class="w-full rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] px-3 py-2 text-[13px] text-gray-700 dark:text-gray-300 focus:border-brand-500 focus:outline-none"
                                id="c-supplier" name="supplier" required>
                     </div>
                     <div class="mb-3">
-                        <label for="c-amount" class="mb-1 block text-[13px] font-medium text-ink">Montant (€ HT)</label>
+                        <label for="c-amount" class="mb-1 block text-[13px] font-medium text-gray-800 dark:text-white/90">Montant (€ HT)</label>
                         <input type="number"
-                               class="w-full rounded border border-border bg-surface px-3 py-2 text-[13px] text-body focus:border-primary focus:outline-none"
+                               class="w-full rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] px-3 py-2 text-[13px] text-gray-700 dark:text-gray-300 focus:border-brand-500 focus:outline-none"
                                id="c-amount" name="amountEuros" min="1" inputmode="numeric" required>
                     </div>
                     <div class="mb-3">
-                        <label for="c-status" class="mb-1 block text-[13px] font-medium text-ink">Statut</label>
-                        <select class="w-full rounded border border-border bg-surface px-3 py-2 text-[13px] text-body focus:border-primary focus:outline-none"
+                        <label for="c-status" class="mb-1 block text-[13px] font-medium text-gray-800 dark:text-white/90">Statut</label>
+                        <select class="w-full rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] px-3 py-2 text-[13px] text-gray-700 dark:text-gray-300 focus:border-brand-500 focus:outline-none"
                                 id="c-status" name="status">
                             {% for s in commitmentStatuses %}<option value="{{ s.value }}">{{ s.label }}</option>{% endfor %}
                         </select>
                     </div>
                     <button type="submit"
-                            class="inline-flex min-h-11 items-center rounded bg-primary px-4 text-sm font-semibold text-primary-fg hover:opacity-90">
+                            class="inline-flex min-h-11 items-center rounded bg-brand-500 hover:bg-brand-600 px-4 text-sm font-semibold text-white">
                         Ajouter l'engagement
                     </button>
                 </form>
             {% elseif project.status == 'Clôturé' %}
-                <p class="text-xs text-muted">Projet clôturé : aucun nouvel engagement (RG-PRJ-5).</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Projet clôturé : aucun nouvel engagement (RG-PRJ-5).</p>
             {% endif %}
         </twig:block>
 
         {# ── Clôture ── #}
         <twig:block name="closure">
-            <h2 class="mb-3 text-sm font-semibold text-ink">Clôture opérationnelle</h2>
+            <h2 class="mb-3 text-sm font-semibold text-gray-800 dark:text-white/90">Clôture opérationnelle</h2>
             {% if closed %}
                 <p>
-                    <span class="status-badge status-badge-neutral">
+                    <span class="{{ badge_base }} {{ badge_neutral }}">
                         Clôturé{% if closedAt %} le {{ closedAt }}{% endif %}
                     </span>
                 </p>
-                <p class="mt-2 text-xs text-muted">
+                <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
                     Le projet reste consultable en lecture seule. Les imputations sont fermées,
                     sauf réouverture formelle approuvée par un administrateur.
                 </p>
 
                 {% if canEdit %}
-                    <h3 class="mb-2 mt-4 text-sm font-semibold text-ink">Demander une réouverture exceptionnelle</h3>
+                    <h3 class="mb-2 mt-4 text-sm font-semibold text-gray-800 dark:text-white/90">Demander une réouverture exceptionnelle</h3>
                     <form method="post" action="{{ path('project_reopening_request', { id: project.id }) }}"
                           class="mt-3 max-w-[540px]">
                         <input type="hidden" name="_token" value="{{ csrf_token('project_closure') }}">
                         <div class="mb-3">
-                            <label for="r-reason" class="mb-1 block text-[13px] font-medium text-ink">Motif</label>
+                            <label for="r-reason" class="mb-1 block text-[13px] font-medium text-gray-800 dark:text-white/90">Motif</label>
                             <input type="text"
-                                   class="w-full rounded border border-border bg-surface px-3 py-2 text-[13px] text-body focus:border-primary focus:outline-none"
+                                   class="w-full rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] px-3 py-2 text-[13px] text-gray-700 dark:text-gray-300 focus:border-brand-500 focus:outline-none"
                                    id="r-reason" name="reason" maxlength="500" required>
                         </div>
                         <button type="submit"
-                                class="inline-flex min-h-11 items-center rounded border border-border-strong px-4 text-sm font-semibold text-muted hover:bg-surface-alt hover:text-ink">
+                                class="inline-flex min-h-11 items-center rounded border border-gray-300 dark:border-gray-700 px-4 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:bg-white/[0.02] hover:text-gray-800 dark:text-white/90">
                             Demander la réouverture
                         </button>
                     </form>
                 {% endif %}
 
                 {% if reopenings is not empty %}
-                    <h3 class="mb-2 mt-4 text-sm font-semibold text-ink">Réouvertures</h3>
+                    <h3 class="mb-2 mt-4 text-sm font-semibold text-gray-800 dark:text-white/90">Réouvertures</h3>
                     <ul class="mb-3 list-none p-0">
                         {% for r in reopenings %}
-                            <li class="border-b border-border py-2 text-sm last:border-b-0">
-                                <code class="font-mono text-primary">{{ r.requestedBy[:8] }}</code> — {{ r.reason }} —
+                            <li class="border-b border-gray-200 dark:border-gray-800 py-2 text-sm last:border-b-0">
+                                <code class="font-mono text-brand-500 dark:text-brand-400">{{ r.requestedBy[:8] }}</code> — {{ r.reason }} —
                                 {% if r.approved %}
-                                    <span class="status-badge status-badge-success">Approuvée</span>
+                                    <span class="{{ badge_base }} bg-success-50 text-success-700 dark:bg-success-500/15 dark:text-success-400">Approuvée</span>
                                     {% if r.openUntil %}, ouverte jusqu'au {{ r.openUntil }}{% endif %}
                                 {% else %}
-                                    <span class="status-badge status-badge-neutral">En attente d'approbation</span>
+                                    <span class="{{ badge_base }} {{ badge_neutral }}">En attente d'approbation</span>
                                 {% endif %}
                                 {% if canManage and not r.approved %}
                                     <form method="post"
                                           action="{{ path('project_reopening_approve', { id: project.id, reopeningId: r.id }) }}"
                                           class="mt-2 inline-flex items-center gap-2">
                                         <input type="hidden" name="_token" value="{{ csrf_token('project_closure') }}">
-                                        <label for="ou-{{ r.id }}" class="whitespace-nowrap text-[13px] font-medium text-ink">Ouvrir jusqu'au</label>
+                                        <label for="ou-{{ r.id }}" class="whitespace-nowrap text-[13px] font-medium text-gray-800 dark:text-white/90">Ouvrir jusqu'au</label>
                                         <input type="date"
-                                               class="rounded border border-border bg-surface px-2 py-1 text-[12px] text-body focus:border-primary focus:outline-none"
+                                               class="rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] px-2 py-1 text-[12px] text-gray-700 dark:text-gray-300 focus:border-brand-500 focus:outline-none"
                                                id="ou-{{ r.id }}" name="openUntil" required>
                                         <button type="submit"
-                                                class="inline-flex min-h-9 items-center whitespace-nowrap rounded bg-success px-3 text-xs font-semibold text-white hover:opacity-90">
+                                                class="inline-flex min-h-9 items-center whitespace-nowrap rounded bg-success px-3 text-xs font-semibold text-white">
                                             Approuver (4-eyes)
                                         </button>
                                     </form>
@@ -818,24 +843,24 @@
                     </ul>
                 {% endif %}
             {% else %}
-                <p class="text-muted">Le projet n'est pas clôturé.</p>
+                <p class="text-gray-500 dark:text-gray-400">Le projet n'est pas clôturé.</p>
                 {% if canEdit %}
                     <form method="post" action="{{ path('project_close', { id: project.id }) }}"
                           class="mt-3 max-w-[540px]">
                         <input type="hidden" name="_token" value="{{ csrf_token('project_closure') }}">
-                        <p class="mb-3 text-xs text-muted">
+                        <p class="mb-3 text-xs text-gray-500 dark:text-gray-400">
                             La clôture est bloquée s'il reste des imputations non validées.
                             Les jalons non atteints et engagements non soldés nécessitent une confirmation.
                         </p>
                         <div class="mb-3 flex items-start gap-2">
                             <input type="checkbox" id="confirm-warnings" name="confirmWarnings" value="1"
                                    class="mt-0.5 h-[18px] w-[18px] flex-shrink-0 cursor-pointer">
-                            <label for="confirm-warnings" class="text-[13px] font-medium text-ink">
+                            <label for="confirm-warnings" class="text-[13px] font-medium text-gray-800 dark:text-white/90">
                                 Confirmer la clôture malgré d'éventuels éléments en cours (jalons/engagements)
                             </label>
                         </div>
                         <button type="submit"
-                                class="inline-flex min-h-11 items-center rounded bg-danger px-4 text-sm font-semibold text-white hover:opacity-90">
+                                class="inline-flex min-h-11 items-center rounded bg-danger px-4 text-sm font-semibold text-white">
                             Clôturer le projet
                         </button>
                     </form>
