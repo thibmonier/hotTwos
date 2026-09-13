@@ -4,7 +4,7 @@
 - **ID**: US-092b
 - **EPIC**: EPIC-003 (Temps & activité)
 - **Sprint**: 22
-- **Statut**: 🟢 Ready
+- **Statut**: ✅ Done
 - **Points**: 2
 - **Persona**: P2/P3 (manager / responsable équipe)
 - **Créé le**: 2026-09-12 (finition de US-092, dette S21)
@@ -59,6 +59,6 @@ THEN l'action est inopérante et un message invite à sélectionner au moins un 
 - [x] INVEST : Estimable ✓ (2 pts) / Testable ✓
 
 ## Definition of Done
-- [ ] Relance inline (sélection + POST, ≤ 3 clics) + filtre/recherche par statut
-- [ ] Tests fonctionnels (relance multi + filtre) ; WCAG AA attesté (US-093)
-- [ ] CI verte ; PR mergée
+- [x] Relance inline (sélection + POST, ≤ 3 clics) + filtre/recherche par statut
+- [x] Tests fonctionnels (relance multi + filtre) ; WCAG AA attesté (US-093)
+- [x] CI verte ; PR mergée
