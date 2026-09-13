@@ -6,61 +6,59 @@
 {% block page_title %}Validation des temps{% endblock %}
 
 {% block body %}
-    <h1 class="visually-hidden">Validation des temps</h1>
+    <h1 class="sr-only">Validation des temps</h1>
 
     {# ── En-tête de section ──────────────────────────────────────────────────── #}
-    <div class="mb-4 flex items-center justify-between">
-        <div>
-            <h2 class="m-0 text-base font-semibold text-ink">Ma responsabilité</h2>
-            <p class="m-0 text-sm text-muted">Imputations en attente de validation sur vos projets</p>
-        </div>
+    <div class="mb-5">
+        <h2 class="mb-1 text-theme-sm font-semibold text-gray-800 dark:text-white/90">Ma responsabilité</h2>
+        <p class="m-0 text-gray-500 dark:text-gray-400">Imputations en attente de validation sur vos projets.</p>
     </div>
 
     {# ── Contenu principal — contrôleur Stimulus ─────────────────────────────── #}
     <div data-controller="validation">
 
         {% if not hasProjects %}
-            <div class="rounded-md border border-border bg-surface p-4 text-muted">
+            <div class="rounded-2xl border border-gray-200 bg-white p-4 text-gray-500 shadow-theme-sm dark:border-gray-800 dark:bg-white/[0.03] dark:text-gray-400">
                 Vous n'êtes responsable d'aucun projet : aucune imputation à valider.
             </div>
         {% elseif rows is empty %}
-            <div class="flex items-center gap-2 rounded-md border border-border bg-surface p-4">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0 text-success"><path d="M20 6 9 17l-5-5"/></svg>
-                <span class="text-body">Aucune imputation en attente sur vos projets.</span>
+            <div class="flex items-center gap-2 rounded-2xl border border-gray-200 bg-white p-4 shadow-theme-sm dark:border-gray-800 dark:bg-white/[0.03]">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0 text-success-500"><path d="M20 6 9 17l-5-5"/></svg>
+                <span class="text-theme-sm text-gray-700 dark:text-gray-300">Aucune imputation en attente sur vos projets.</span>
             </div>
         {% else %}
-            <div class="rounded-md border border-border bg-surface">
+            <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-theme-sm dark:border-gray-800 dark:bg-white/[0.03]">
                 <form data-action="submit->validation#submit">
                     <div class="overflow-x-auto">
-                        <table class="w-full border-collapse text-left">
-                            <caption class="visually-hidden">Imputations en attente de validation</caption>
+                        <table class="w-full border-collapse text-left text-theme-sm">
+                            <caption class="sr-only">Imputations en attente de validation</caption>
                             <thead>
-                                <tr class="bg-surface-alt">
+                                <tr class="border-b border-gray-100 bg-gray-50 dark:border-gray-800 dark:bg-white/[0.02]">
                                     <th scope="col" class="w-11 px-4 py-3">
                                         <input type="checkbox"
-                                               class="h-4 w-4 cursor-pointer accent-primary"
+                                               class="h-4 w-4 cursor-pointer rounded border-gray-300 accent-brand-500"
                                                data-action="validation#toggleAll"
                                                aria-label="Tout sélectionner">
                                     </th>
-                                    <th scope="col" class="px-4 py-3 font-semibold text-body">Projet</th>
-                                    <th scope="col" class="px-4 py-3 font-semibold text-body">Jour</th>
-                                    <th scope="col" class="px-4 py-3 text-right font-semibold text-body">Durée</th>
+                                    <th scope="col" class="px-4 py-3 font-semibold text-gray-700 dark:text-gray-300">Projet</th>
+                                    <th scope="col" class="px-4 py-3 font-semibold text-gray-700 dark:text-gray-300">Jour</th>
+                                    <th scope="col" class="px-4 py-3 text-right font-semibold text-gray-700 dark:text-gray-300">Durée</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for row in rows %}
-                                    <tr class="border-t border-border hover:bg-surface-alt">
+                                    <tr class="border-t border-gray-100 hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-white/[0.02]">
                                         <td class="px-4 py-3">
                                             <input type="checkbox"
-                                                   class="h-4 w-4 cursor-pointer accent-primary"
+                                                   class="h-4 w-4 cursor-pointer rounded border-gray-300 accent-brand-500"
                                                    value="{{ row.id }}"
                                                    data-validation-target="entry"
                                                    aria-label="Sélectionner l'imputation {{ row.project }} {{ row.date }}">
                                         </td>
-                                        <td class="px-4 py-3 text-body">{{ row.project }}</td>
-                                        <td class="px-4 py-3 text-body">{{ row.date }}</td>
+                                        <td class="px-4 py-3 text-gray-800 dark:text-white/90">{{ row.project }}</td>
+                                        <td class="px-4 py-3 text-gray-800 dark:text-white/90">{{ row.date }}</td>
                                         {# Durée en heures (cohérence avec la saisie décimale, US-070/F3) ; domaine en minutes. #}
-                                        <td class="px-4 py-3 text-right text-body">{{ (row.minutes // 60) }}h{{ '%02d'|format(row.minutes % 60) }}</td>
+                                        <td class="px-4 py-3 text-right text-gray-800 dark:text-white/90">{{ (row.minutes // 60) }}h{{ '%02d'|format(row.minutes % 60) }}</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
@@ -68,28 +66,28 @@
                     </div>
 
                     {# ── Actions de validation ───────────────────────────────────── #}
-                    <div class="flex flex-wrap items-center gap-3 border-t border-border p-3">
+                    <div class="flex flex-wrap items-center gap-3 border-t border-gray-100 p-3 dark:border-gray-800">
                         <button type="button"
-                                class="inline-flex min-h-11 items-center rounded border border-success px-3 py-1.5 text-xs font-semibold text-success transition-colors hover:bg-success hover:text-on-status"
+                                class="inline-flex min-h-11 items-center rounded-lg bg-success-500 px-4 text-theme-sm font-semibold text-white hover:bg-success-600"
                                 data-action="validation#validate">
                             Valider la sélection
                         </button>
 
                         <div class="flex flex-1 items-center gap-2">
-                            <label for="validation-reason" class="whitespace-nowrap text-xs font-normal text-muted">
+                            <label for="validation-reason" class="whitespace-nowrap text-theme-xs font-normal text-gray-500 dark:text-gray-400">
                                 Motif de refus
                             </label>
                             <input type="text"
                                    id="validation-reason"
-                                   class="min-h-11 flex-1 rounded border border-border bg-surface px-3 py-2 text-xs text-body placeholder:text-muted focus:border-primary"
+                                   class="min-h-11 flex-1 rounded-lg border border-gray-300 bg-white px-3 text-theme-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:bg-white/[0.03] dark:text-white/90"
                                    data-validation-target="reason"
                                    placeholder="obligatoire pour refuser"
                                    aria-describedby="validation-reason-hint">
-                            <div id="validation-reason-hint" class="visually-hidden">Le motif de refus est obligatoire pour refuser une sélection.</div>
+                            <div id="validation-reason-hint" class="sr-only">Le motif de refus est obligatoire pour refuser une sélection.</div>
                         </div>
 
                         <button type="button"
-                                class="inline-flex min-h-11 items-center rounded border border-danger px-3 py-1.5 text-xs font-semibold text-danger transition-colors hover:bg-danger hover:text-on-status"
+                                class="inline-flex min-h-11 items-center rounded-lg bg-error-500 px-4 text-theme-sm font-semibold text-white hover:bg-error-600"
                                 data-action="validation#reject">
                             Refuser la sélection
                         </button>
@@ -97,7 +95,7 @@
                 </form>
             </div>
 
-            <p class="mt-2 text-xs text-muted" aria-live="polite" data-validation-target="status"></p>
+            <p class="mt-2 text-theme-xs text-gray-500 dark:text-gray-400" aria-live="polite" data-validation-target="status"></p>
         {% endif %}
 
     </div>{# /[data-controller="validation"] #}

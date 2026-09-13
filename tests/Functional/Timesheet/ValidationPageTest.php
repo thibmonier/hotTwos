@@ -67,6 +67,47 @@ final class ValidationPageTest extends WebTestCase
     }
 
     /**
+     * US-094 (CA-2) — responsable de projet(s) mais aucune imputation en attente : état vide clair.
+     */
+    public function testEmptyStateWhenNoPendingEntries(): void
+    {
+        $client = self::createClient();
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+
+        $schema = [
+            $em->getClassMetadata(Tenant::class),
+            $em->getClassMetadata(User::class),
+            $em->getClassMetadata(Role::class),
+            $em->getClassMetadata(Project::class),
+            $em->getClassMetadata(TimeEntry::class),
+            $em->getClassMetadata(AccountingPeriod::class),
+            $em->getClassMetadata(AbsenceRequest::class),
+        ];
+        $tool = new SchemaTool($em);
+        $tool->dropSchema($schema);
+        $tool->createSchema($schema);
+
+        $tenant = TenantId::generate();
+        new InitializeDefaultRoles(new DoctrineRoleRepository($em))->forTenant($tenant);
+        $chef = new User($tenant, 'marc@agence.test', new SodiumPasswordHasher()->hash('x'), ['Chef de projet']);
+        // Responsable d'un projet (hasProjects vrai) mais aucune imputation en attente.
+        $project = new Project($tenant, 'PRJ-1', 'Ma responsabilité', true, $chef->id());
+        $em->persist(new Tenant($tenant, 'Agence A'));
+        $em->persist($chef);
+        $em->persist($project);
+        $em->flush();
+
+        $client->loginUser($chef);
+        $client->request('GET', '/validation');
+
+        self::assertResponseIsSuccessful();
+        self::assertStringContainsString('Aucune imputation en attente', (string) $client->getResponse()->getContent());
+
+        $tool->dropSchema($schema);
+        $em->close();
+    }
+
+    /**
      * US-069 (T-069-05) — si un projet a disparu (course rare), la ligne affiche un libellé de repli
      * lisible plutôt que l'identifiant technique brut. Cas forcé via un stub du dépôt d'imputations.
      */

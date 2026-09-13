@@ -110,7 +110,7 @@ stories:
   US-091b: { title: "Absences — calendrier de conflits (ABS-03) + solde projeté dynamique (CA-2)", sprint: 22, status: done, points: 3 }   # EPIC-003 — mergée #138 (feature) + #139 (durcissements) ; endpoint /api/absences/impact + calendrier accessible
   US-092b: { title: "Complétude — relance inline (CPL-04) + filtre/recherche (CPL-05)", sprint: 22, status: done, points: 2 }   # EPIC-003 — finition US-092 ; SendManualReminders + POST /completude/relances (inline) + filtre/recherche Stimulus
   US-093: { title: "Qualité — WCAG axe/pa11y en CI + tests d'états saisie hebdo", sprint: 22, status: ready, points: 3 }   # dette S21 transversale (rétro) ; runner a11y sans-Node à trancher
-  US-094: { title: "PG-VLD-01 — Reskin validation des temps", sprint: 22, status: ready, points: 2 }   # EPIC-003 Should (backlog reskin)
+  US-094: { title: "PG-VLD-01 — Reskin validation des temps", sprint: 22, status: done, points: 2 }   # EPIC-003 Should ; reskin tailsfadmin de templates/timesheet/validation.html.twig (hooks Stimulus préservés, état vide couvert)
   US-095: { title: "PG-REL-01 — Reskin relances", sprint: 22, status: ready, points: 2 }   # EPIC-003 Should (backlog reskin) ; cohérence avec complétude
   # — EPIC-013 : Recensement pages cibles, parcours par persona & conception UX (créées 2026-09-09) —
   US-080: { title: "Référentiel exhaustif des pages cibles", sprint: 19, status: done, points: 5 }   # EPIC-013 — S19 ; page-inventory.md v2 validé PO, PR #116
