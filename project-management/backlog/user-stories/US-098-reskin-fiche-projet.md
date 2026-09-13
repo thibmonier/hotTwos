@@ -4,7 +4,7 @@
 - **ID**: US-098
 - **EPIC**: EPIC-002 (Projets & delivery)
 - **Sprint**: 23
-- **Statut**: 🟢 Ready
+- **Statut**: ✅ Done
 - **Points**: 3
 - **Persona**: P2 (chef de projet) — pilotage de la dérive (OBJ-2)
 - **Créé le**: 2026-10-23 (kickoff S23)

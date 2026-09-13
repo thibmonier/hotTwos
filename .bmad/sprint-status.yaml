@@ -116,7 +116,7 @@ stories:
   # — Sprint 23 : ouverture reskin EPIC-002 (Projets) + enabler a11y (créées 2026-10-23, kickoff) —
   US-096: { title: "Composant Ui:Button accessible (focus visible) — socle tailsfadmin", sprint: 23, status: done, points: 3 }   # Must ; rétro S22 ACTION-1 ; bundle v1.6.1 (#41) + hotTwos #146 (focus boutons absence/complétude/validation ; relances déjà US-095) ; migration composant → suivi S24
   US-097: { title: "PG-PRJ-01 — Reskin liste des projets", sprint: 23, status: done, points: 2 }   # Must EPIC-002 ; reskin templates/project/index.html.twig (tokens + badges + tsf:Ui:Button) + filtre/recherche Stimulus (G3)
-  US-098: { title: "PG-PRJ-02 — Reskin fiche projet (onglets + cycle de vie)", sprint: 23, status: ready, points: 3 }   # Must EPIC-002 ; reskin templates/project/show.html.twig (déjà sur Tabs) + PageHeader G4 + cycle de vie G5
+  US-098: { title: "PG-PRJ-02 — Reskin fiche projet (onglets + cycle de vie)", sprint: 23, status: done, points: 3 }   # Must EPIC-002 ; reskin tailsfadmin de show.html.twig (~330 tokens migrés + badges + repère cycle de vie G5) ; logique pilotage inchangée
   US-099: { title: "DSH-PRJ — Dashboard projets (build)", sprint: 23, status: ready, points: 5 }   # Should EPIC-002 (build) ; StatCard G1 + PageHeader G4 + alertes dérive ; réf. conception hotones + design-canvas/tailadmin-ref
   # — EPIC-013 : Recensement pages cibles, parcours par persona & conception UX (créées 2026-09-09) —
   US-080: { title: "Référentiel exhaustif des pages cibles", sprint: 19, status: done, points: 5 }   # EPIC-013 — S19 ; page-inventory.md v2 validé PO, PR #116
