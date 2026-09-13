@@ -74,6 +74,8 @@ final class CompletenessPageController extends AbstractController
 
         return $this->render('completeness/index.html.twig', [
             'team' => $team,
+            // US-092b (CPL-04) : la relance inline est réservée à MANAGE_REMINDERS.
+            'canRemind' => $this->authorizer->can($user, Permission::MANAGE_REMINDERS),
             'weeks' => array_keys($weeks),
             'rows' => $rows,
             'userDisplayNames' => $userDisplayNames,

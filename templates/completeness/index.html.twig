@@ -27,6 +27,10 @@
 
 {% block body %}
 {% import _self as ui %}
+{% set canSelect = team and canRemind %}
+<div data-controller="completeness"
+     data-completeness-token-value="{{ csrf_token('remind_completeness') }}"
+     data-completeness-url-value="{{ path('completeness_remind') }}">
     <h1 class="sr-only">Complétude de saisie</h1>
 
     {# US-092 (reco CPL-03) : StatCards de synthèse (vue équipe) pour un diagnostic < 5 s. #}
@@ -44,12 +48,12 @@
             {{ team ? 'Périmètre équipe' : 'Vos semaines' }} — 4 dernières semaines.
         </p>
         <div class="flex items-center gap-2">
-            {% if team %}
-                <a href="{{ path('reminders_page') }}"
-                   class="inline-flex min-h-9 items-center gap-2 rounded-lg bg-brand-500 px-3 text-theme-xs font-semibold text-white hover:bg-brand-600">
+            {% if canSelect %}
+                <button type="button" data-action="completeness#remind"
+                        class="inline-flex min-h-9 items-center gap-2 rounded-lg bg-brand-500 px-3 text-theme-xs font-semibold text-white hover:bg-brand-600">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 4h16v12H5.2L4 17.2z"/></svg>
-                    Relancer les retards
-                </a>
+                    Relancer la sélection
+                </button>
             {% endif %}
             <a href="{{ path('api_completeness_export') }}{{ team ? '?scope=team' : '' }}"
                class="inline-flex min-h-9 items-center rounded-lg border border-gray-200 px-3 text-theme-xs font-semibold text-gray-600 hover:bg-gray-50 dark:border-gray-800 dark:text-gray-300 dark:hover:bg-white/[0.02]">
@@ -57,6 +61,27 @@
             </a>
         </div>
     </div>
+
+    {# US-092b (CPL-05) : filtre par statut + recherche (filtrage client, sans rechargement). #}
+    {% if team %}
+        <div class="mb-3 flex flex-wrap items-center gap-2">
+            <label for="cpl-status" class="sr-only">Filtrer par statut</label>
+            <select id="cpl-status" data-completeness-target="status" data-action="completeness#filter"
+                    class="min-h-9 rounded-lg border border-gray-300 bg-white px-3 text-theme-sm text-gray-700 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:bg-white/[0.03] dark:text-gray-300">
+                <option value="">Tous les statuts</option>
+                <option value="empty_late">En retard</option>
+                <option value="partial">Partiel</option>
+                <option value="submitted">Soumis</option>
+            </select>
+            <label for="cpl-search" class="sr-only">Rechercher un collaborateur</label>
+            <input type="search" id="cpl-search" data-completeness-target="search" data-action="input->completeness#filter"
+                   placeholder="Rechercher un collaborateur…"
+                   class="min-h-9 flex-1 rounded-lg border border-gray-300 bg-white px-3 text-theme-sm text-gray-700 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:bg-white/[0.03] dark:text-gray-300">
+        </div>
+        {% if canSelect %}
+            <p class="mb-3 text-theme-sm text-gray-600 dark:text-gray-300" role="status" aria-live="polite" data-completeness-target="feedback"></p>
+        {% endif %}
+    {% endif %}
 
     <section aria-labelledby="legend-heading" class="mb-3">
         <h2 id="legend-heading" class="sr-only">Légende</h2>
@@ -78,7 +103,16 @@
                 <caption class="sr-only">Grille de complétude de saisie par collaborateur et par semaine</caption>
                 <thead>
                     <tr class="border-b border-gray-100 bg-gray-50 dark:border-gray-800 dark:bg-white/[0.02]">
-                        <th scope="col" class="sticky left-0 z-10 bg-gray-50 px-4 py-3 text-theme-sm font-semibold text-gray-700 dark:bg-[#1a2231] dark:text-gray-300">Collaborateur</th>
+                        <th scope="col" class="sticky left-0 z-10 bg-gray-50 px-4 py-3 text-theme-sm font-semibold text-gray-700 dark:bg-[#1a2231] dark:text-gray-300">
+                            {% if canSelect %}
+                                <span class="flex items-center gap-2">
+                                    <input type="checkbox" data-completeness-target="selectAll" data-action="completeness#toggleAll" aria-label="Tout sélectionner" class="h-4 w-4 rounded border-gray-300 accent-brand-500">
+                                    Collaborateur
+                                </span>
+                            {% else %}
+                                Collaborateur
+                            {% endif %}
+                        </th>
                         {% for week in weeks %}
                             <th scope="col" class="px-3 py-3 text-center text-theme-sm font-semibold text-gray-700 dark:text-gray-300" title="Semaine du {{ week|date('d/m/Y') }}">
                                 Sem. {{ week|date('W') }}
@@ -89,9 +123,27 @@
                 </thead>
                 <tbody>
                     {% for userId, cells in rows %}
-                        <tr class="border-t border-gray-100 dark:border-gray-800">
+                        {% set rowStates = [] %}
+                        {% for week in weeks %}
+                            {% set cell = cells[week] ?? null %}
+                            {% if cell %}{% set rowStates = rowStates|merge([cell.state]) %}{% endif %}
+                        {% endfor %}
+                        {% set displayName = userDisplayNames[userId]|default('Collaborateur') %}
+                        <tr class="border-t border-gray-100 dark:border-gray-800"
+                            data-completeness-target="row"
+                            data-name="{{ displayName|lower }}"
+                            data-states="{{ rowStates|join(' ') }}">
                             {# F-S5-4 : e-mail / nom d'affichage résolu ; jamais d'identifiant technique brut. #}
-                            <th scope="row" class="sticky left-0 z-10 max-w-[220px] truncate bg-white px-4 py-3 font-normal text-gray-800 dark:bg-white/[0.03] dark:text-white/90">{{ userDisplayNames[userId]|default('Collaborateur') }}</th>
+                            <th scope="row" class="sticky left-0 z-10 max-w-[220px] bg-white px-4 py-3 font-normal text-gray-800 dark:bg-white/[0.03] dark:text-white/90">
+                                {% if canSelect %}
+                                    <label class="flex items-center gap-2">
+                                        <input type="checkbox" data-completeness-target="checkbox" value="{{ userId }}" aria-label="Sélectionner {{ displayName }}" class="h-4 w-4 shrink-0 rounded border-gray-300 accent-brand-500">
+                                        <span class="truncate">{{ displayName }}</span>
+                                    </label>
+                                {% else %}
+                                    <span class="block truncate">{{ displayName }}</span>
+                                {% endif %}
+                            </th>
                             {% for week in weeks %}
                                 {% set cell = cells[week] ?? null %}
                                 <td class="px-3 py-2 text-center">
@@ -112,4 +164,5 @@
             </table>
         </div>
     {% endif %}
+</div>
 {% endblock %}

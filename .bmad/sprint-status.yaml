@@ -108,7 +108,7 @@ stories:
   US-091: { title: "PG-ABS-01 — Reskin Mes absences", sprint: 21, status: done, points: 2 }   # EPIC-003 — reskin mergé #130 ; DoD complétée par US-091b (#138/#139 : calendrier conflits ABS-03 + solde dynamique CA-2)
   US-092: { title: "PG-CPL-01 — Reskin Complétude", sprint: 21, status: done, points: 3 }   # EPIC-003 — maquette Completude ; F-S5-4 (bloquant) + F-S5-5 ; dépend US-087 (G1)
   US-091b: { title: "Absences — calendrier de conflits (ABS-03) + solde projeté dynamique (CA-2)", sprint: 22, status: done, points: 3 }   # EPIC-003 — mergée #138 (feature) + #139 (durcissements) ; endpoint /api/absences/impact + calendrier accessible
-  US-092b: { title: "Complétude — relance inline (CPL-04) + filtre/recherche (CPL-05)", sprint: 22, status: ready, points: 2 }   # EPIC-003 — finition US-092 ; réutilise reminders_update
+  US-092b: { title: "Complétude — relance inline (CPL-04) + filtre/recherche (CPL-05)", sprint: 22, status: done, points: 2 }   # EPIC-003 — finition US-092 ; SendManualReminders + POST /completude/relances (inline) + filtre/recherche Stimulus
   US-093: { title: "Qualité — WCAG axe/pa11y en CI + tests d'états saisie hebdo", sprint: 22, status: ready, points: 3 }   # dette S21 transversale (rétro) ; runner a11y sans-Node à trancher
   US-094: { title: "PG-VLD-01 — Reskin validation des temps", sprint: 22, status: ready, points: 2 }   # EPIC-003 Should (backlog reskin)
   US-095: { title: "PG-REL-01 — Reskin relances", sprint: 22, status: ready, points: 2 }   # EPIC-003 Should (backlog reskin) ; cohérence avec complétude
