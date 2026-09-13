@@ -6,25 +6,25 @@
 
 {% block body %}
 <div data-controller="reminders">
-    <h1 class="visually-hidden">Relances de saisie</h1>
-    <p class="mb-4 text-muted">
+    <h1 class="sr-only">Relances de saisie</h1>
+    <p class="mb-4 text-gray-500 dark:text-gray-400">
         Paramétrage des relances automatiques de retard de saisie, pour l'ensemble du cabinet.
     </p>
 
     {# ── Messages flash ──────────────────────────────────────────── #}
     {% for message in app.flashes('success') %}
-        <div class="flash flash-success mb-3" role="status">{{ message }}</div>
+        <div class="mb-3 rounded-lg border border-success-200 bg-success-50 px-4 py-3 text-theme-sm text-success-700 dark:border-success-500/30 dark:bg-success-500/10 dark:text-success-400" role="status">{{ message }}</div>
     {% endfor %}
     {% for message in app.flashes('error') %}
-        <div class="flash flash-error mb-3" role="alert">{{ message }}</div>
+        <div class="mb-3 rounded-lg border border-error-200 bg-error-50 px-4 py-3 text-theme-sm text-error-700 dark:border-error-500/30 dark:bg-error-500/10 dark:text-error-400" role="alert">{{ message }}</div>
     {% endfor %}
 
     {# ── Règle de relance ────────────────────────────────────────── #}
-    <section aria-labelledby="config-heading" class="mb-4 rounded-md border border-border bg-surface">
-        <div class="border-b border-border bg-surface-alt px-4 py-3">
-            <h2 id="config-heading" class="text-sm font-semibold text-ink">Règle de relance</h2>
+    <section aria-labelledby="config-heading" class="mb-5 rounded-2xl border border-gray-200 bg-white shadow-theme-sm dark:border-gray-800 dark:bg-white/[0.03]">
+        <div class="border-b border-gray-100 px-5 py-4 dark:border-gray-800">
+            <h2 id="config-heading" class="text-theme-sm font-semibold text-gray-800 dark:text-white/90">Règle de relance</h2>
         </div>
-        <div class="p-4">
+        <div class="p-5">
             <form method="post" action="{{ path('reminders_update') }}"
                   aria-labelledby="config-heading">
                 <input type="hidden" name="_token" value="{{ csrf_token('configure_reminders') }}">
@@ -32,18 +32,18 @@
                 {# Activation globale #}
                 <div class="mb-5">
                     <label class="inline-flex min-h-11 cursor-pointer items-center gap-3">
-                        <input class="h-4 w-4 rounded border-border-strong accent-primary"
+                        <input class="h-4 w-4 rounded border-gray-300 accent-brand-500"
                                type="checkbox"
                                id="active" name="active" role="switch"
                                data-reminders-target="master"
                                data-action="change->reminders#toggle"
                                aria-describedby="active-help"
                                {{ rule.active ? 'checked' : '' }}>
-                        <span class="text-sm font-semibold text-body">
+                        <span class="text-theme-sm font-semibold text-gray-800 dark:text-white/90">
                             Activer les relances automatiques
                         </span>
                     </label>
-                    <p id="active-help" class="mt-1.5 text-xs text-muted">
+                    <p id="active-help" class="mt-1.5 text-theme-xs text-gray-500 dark:text-gray-400">
                         Si désactivé, aucune relance n'est envoyée,
                         quels que soient les autres réglages.
                     </p>
@@ -51,31 +51,31 @@
 
                 {# Cadence #}
                 <fieldset class="mb-5" data-reminders-target="dependent">
-                    <legend class="mb-3 text-sm font-semibold text-ink">Cadence</legend>
+                    <legend class="mb-3 text-theme-sm font-semibold text-gray-800 dark:text-white/90">Cadence</legend>
 
                     <div class="mb-4">
-                        <label for="initialDelayDays" class="mb-1 block text-sm font-medium text-body">
+                        <label for="initialDelayDays" class="mb-1 block text-theme-sm font-medium text-gray-600 dark:text-gray-300">
                             Délai avant la première relance (jours)
                         </label>
                         <input type="number" id="initialDelayDays" name="initialDelayDays"
-                               class="block max-w-48 rounded border border-border-strong bg-surface px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-primary"
+                               class="block max-w-48 rounded-lg border border-gray-300 bg-white px-3 py-2 text-theme-sm text-gray-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:bg-white/[0.03] dark:text-white/90"
                                min="0" max="30" step="1" value="{{ rule.initialDelayDays }}"
                                inputmode="numeric" aria-describedby="delay-help" required>
-                        <p id="delay-help" class="mt-1.5 text-xs text-muted">
+                        <p id="delay-help" class="mt-1.5 text-theme-xs text-gray-500 dark:text-gray-400">
                             Jours de retard après l'échéance de complétude avant l'envoi
                             de la première relance (0 à 30).
                         </p>
                     </div>
 
                     <div class="mb-2">
-                        <label for="frequencyDays" class="mb-1 block text-sm font-medium text-body">
+                        <label for="frequencyDays" class="mb-1 block text-theme-sm font-medium text-gray-600 dark:text-gray-300">
                             Fréquence des relances suivantes (jours)
                         </label>
                         <input type="number" id="frequencyDays" name="frequencyDays"
-                               class="block max-w-48 rounded border border-border-strong bg-surface px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-primary"
+                               class="block max-w-48 rounded-lg border border-gray-300 bg-white px-3 py-2 text-theme-sm text-gray-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:bg-white/[0.03] dark:text-white/90"
                                min="1" max="30" step="1" value="{{ rule.frequencyDays }}"
                                inputmode="numeric" aria-describedby="frequency-help" required>
-                        <p id="frequency-help" class="mt-1.5 text-xs text-muted">
+                        <p id="frequency-help" class="mt-1.5 text-theme-xs text-gray-500 dark:text-gray-400">
                             Intervalle entre deux relances si le retard persiste (1 à 30).
                             Au plus une relance par jour ouvré.
                         </p>
@@ -84,14 +84,14 @@
 
                 {# Diffusion #}
                 <fieldset class="mb-5" data-reminders-target="dependent">
-                    <legend class="mb-3 text-sm font-semibold text-ink">Diffusion</legend>
+                    <legend class="mb-3 text-theme-sm font-semibold text-gray-800 dark:text-white/90">Diffusion</legend>
 
                     <div class="mb-4">
-                        <label for="channel" class="mb-1 block text-sm font-medium text-body">
+                        <label for="channel" class="mb-1 block text-theme-sm font-medium text-gray-600 dark:text-gray-300">
                             Canal de relance
                         </label>
                         <select id="channel" name="channel"
-                                class="block max-w-xs rounded border border-border-strong bg-surface px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-primary">
+                                class="block max-w-xs rounded-lg border border-gray-300 bg-white px-3 py-2 text-theme-sm text-gray-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:bg-white/[0.03] dark:text-white/90">
                             {% for value, label in channelLabels %}
                                 <option value="{{ value }}"
                                         {{ rule.channel == value ? 'selected' : '' }}>
@@ -103,23 +103,23 @@
 
                     <div class="mb-2">
                         <label class="inline-flex min-h-11 cursor-pointer items-center gap-3">
-                            <input class="h-4 w-4 rounded border-border-strong accent-primary"
+                            <input class="h-4 w-4 rounded border-gray-300 accent-brand-500"
                                    type="checkbox"
                                    id="escalationEnabled" name="escalationEnabled"
                                    aria-describedby="escalation-help"
                                    {{ rule.escalationEnabled ? 'checked' : '' }}>
-                            <span class="text-sm text-body">
+                            <span class="text-theme-sm text-gray-700 dark:text-gray-300">
                                 Escalader au responsable (N+1) si le retard persiste
                             </span>
                         </label>
-                        <p id="escalation-help" class="mt-1.5 text-xs text-muted">
+                        <p id="escalation-help" class="mt-1.5 text-theme-xs text-gray-500 dark:text-gray-400">
                             Le responsable est informé à partir de la troisième relance sans effet.
                         </p>
                     </div>
                 </fieldset>
 
                 <button type="submit"
-                        class="inline-flex min-h-11 items-center rounded bg-primary px-4 py-2.5 text-sm font-semibold text-primary-fg hover:opacity-90">
+                        class="inline-flex min-h-11 items-center rounded-lg bg-brand-500 px-4 py-2.5 text-theme-sm font-semibold text-white hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500/40">
                     Enregistrer les réglages
                 </button>
             </form>
@@ -127,31 +127,30 @@
     </section>
 
     {# ── Aperçu : qui serait relancé ─────────────────────────────── #}
-    <section aria-labelledby="preview-heading" class="mb-4 rounded-md border border-border bg-surface">
-        <div class="border-b border-border bg-surface-alt px-4 py-3">
-            <h2 id="preview-heading" class="text-sm font-semibold text-ink">Qui serait relancé maintenant</h2>
+    <section aria-labelledby="preview-heading" class="mb-5 rounded-2xl border border-gray-200 bg-white shadow-theme-sm dark:border-gray-800 dark:bg-white/[0.03]">
+        <div class="border-b border-gray-100 px-5 py-4 dark:border-gray-800">
+            <h2 id="preview-heading" class="text-theme-sm font-semibold text-gray-800 dark:text-white/90">Qui serait relancé maintenant</h2>
         </div>
         {% if not active %}
-            <div class="p-4">
-                <p class="text-muted">
+            <div class="p-5">
+                <p class="text-gray-500 dark:text-gray-400">
                     Les relances automatiques sont désactivées. Aucun aperçu n'est calculé.
                 </p>
             </div>
         {% elseif preview is empty %}
-            <div class="p-4">
-                <p class="text-muted">
+            <div class="p-5">
+                <p class="text-gray-500 dark:text-gray-400">
                     Aucun collaborateur ne serait relancé actuellement avec ces réglages.
                 </p>
             </div>
         {% else %}
-            <ul class="divide-y divide-border" aria-labelledby="preview-heading">
+            <ul class="divide-y divide-gray-100 dark:divide-gray-800" aria-labelledby="preview-heading">
                 {% for row in preview %}
-                    <li class="flex items-center gap-2 px-4 py-3
-                               {{ row.escalated ? 'border-l-2 [border-left-color:var(--color-warning)]' : '' }}">
-                        <code class="text-xs text-body">{{ row.userId[:8] }}</code>
-                        <span class="text-sm text-muted">— semaine du {{ row.week }} — relance n° {{ row.rank }}</span>
+                    <li class="flex items-center gap-2 px-5 py-3 {{ row.escalated ? 'border-l-2 border-warning-500' : '' }}">
+                        <code class="text-theme-xs text-gray-700 dark:text-gray-300">{{ row.userId[:8] }}</code>
+                        <span class="text-theme-sm text-gray-500 dark:text-gray-400">— semaine du {{ row.week }} — relance n° {{ row.rank }}</span>
                         {% if row.escalated %}
-                            <span class="status-badge status-badge-neutral ml-auto">
+                            <span class="ml-auto inline-flex items-center gap-1.5 rounded-full bg-warning-50 px-2.5 py-1 text-theme-xs font-medium text-warning-700 dark:bg-warning-500/15 dark:text-warning-400">
                                 Escaladé N+1
                             </span>
                         {% endif %}
@@ -162,44 +161,43 @@
     </section>
 
     {# ── Historique des relances ──────────────────────────────────── #}
-    <section aria-labelledby="history-heading" class="rounded-md border border-border bg-surface">
-        <div class="border-b border-border bg-surface-alt px-4 py-3">
-            <h2 id="history-heading" class="text-sm font-semibold text-ink">Historique des relances</h2>
+    <section aria-labelledby="history-heading" class="rounded-2xl border border-gray-200 bg-white shadow-theme-sm dark:border-gray-800 dark:bg-white/[0.03]">
+        <div class="border-b border-gray-100 px-5 py-4 dark:border-gray-800">
+            <h2 id="history-heading" class="text-theme-sm font-semibold text-gray-800 dark:text-white/90">Historique des relances</h2>
         </div>
         {% if history is empty %}
-            <div class="p-4">
-                <p class="text-muted">Aucune relance n'a encore été émise.</p>
+            <div class="p-5">
+                <p class="text-gray-500 dark:text-gray-400">Aucune relance n'a encore été émise.</p>
             </div>
         {% else %}
             <div class="overflow-x-auto">
-                <table class="w-full border-collapse text-left text-sm"
+                <table class="w-full border-collapse text-left text-theme-sm"
                        aria-labelledby="history-heading">
-                    <caption class="visually-hidden">
+                    <caption class="sr-only">
                         Historique des relances de saisie émises,
                         de la plus récente à la plus ancienne.
                     </caption>
                     <thead>
-                        <tr class="bg-surface-alt">
-                            <th scope="col" class="px-4 py-3 font-semibold text-body">Destinataire</th>
-                            <th scope="col" class="px-4 py-3 font-semibold text-body">Semaine</th>
-                            <th scope="col" class="px-4 py-3 font-semibold text-body">Canal</th>
-                            <th scope="col" class="px-4 py-3 font-semibold text-body">Rang</th>
-                            <th scope="col" class="px-4 py-3 font-semibold text-body">Escaladé</th>
-                            <th scope="col" class="px-4 py-3 font-semibold text-body">Date d'envoi</th>
+                        <tr class="border-b border-gray-100 bg-gray-50 dark:border-gray-800 dark:bg-white/[0.02]">
+                            <th scope="col" class="px-4 py-3 font-semibold text-gray-700 dark:text-gray-300">Destinataire</th>
+                            <th scope="col" class="px-4 py-3 font-semibold text-gray-700 dark:text-gray-300">Semaine</th>
+                            <th scope="col" class="px-4 py-3 font-semibold text-gray-700 dark:text-gray-300">Canal</th>
+                            <th scope="col" class="px-4 py-3 font-semibold text-gray-700 dark:text-gray-300">Rang</th>
+                            <th scope="col" class="px-4 py-3 font-semibold text-gray-700 dark:text-gray-300">Escaladé</th>
+                            <th scope="col" class="px-4 py-3 font-semibold text-gray-700 dark:text-gray-300">Date d'envoi</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for row in history %}
-                            <tr class="border-t border-border hover:bg-surface-alt
-                                       {{ row.escalated ? 'border-l-2 [border-left-color:var(--color-warning)]' : '' }}">
-                                <th scope="row" class="px-4 py-3 font-normal text-ink">
-                                    <code class="text-xs">{{ row.userId[:8] }}</code>
+                            <tr class="border-t border-gray-100 hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-white/[0.02] {{ row.escalated ? 'border-l-2 border-warning-500' : '' }}">
+                                <th scope="row" class="px-4 py-3 font-normal text-gray-800 dark:text-white/90">
+                                    <code class="text-theme-xs">{{ row.userId[:8] }}</code>
                                 </th>
-                                <td class="px-4 py-3 text-ink">{{ row.week }}</td>
-                                <td class="px-4 py-3 text-ink">{{ row.channel }}</td>
-                                <td class="px-4 py-3 text-ink">{{ row.rank }}</td>
-                                <td class="px-4 py-3 text-muted">{{ row.escalated ? 'Oui' : '—' }}</td>
-                                <td class="px-4 py-3 text-muted">{{ row.sentAt }}</td>
+                                <td class="px-4 py-3 text-gray-800 dark:text-white/90">{{ row.week }}</td>
+                                <td class="px-4 py-3 text-gray-800 dark:text-white/90">{{ row.channel }}</td>
+                                <td class="px-4 py-3 text-gray-800 dark:text-white/90">{{ row.rank }}</td>
+                                <td class="px-4 py-3 text-gray-500 dark:text-gray-400">{{ row.escalated ? 'Oui' : '—' }}</td>
+                                <td class="px-4 py-3 text-gray-500 dark:text-gray-400">{{ row.sentAt }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
