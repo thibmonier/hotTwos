@@ -12,6 +12,10 @@ docker compose run --rm -T app sh -lc '\
   php vendor/bin/phpstan analyse --no-progress --memory-limit=1G && \
   php vendor/bin/deptrac analyse --no-progress'
 
+# US-095/S23 T-TECH-01 (rétro S22 ACTION-3) : miroir de la CI, qui bloque sur php-cs-fixer.
+echo "▶ Style de code (php-cs-fixer, dry-run)…"
+docker compose run --rm -T -e PHP_CS_FIXER_IGNORE_ENV=1 app php vendor/bin/php-cs-fixer fix --dry-run
+
 echo "▶ Tests conteneurisés…"
 docker compose run --rm -T -e APP_ENV=test app sh -lc 'php bin/console cache:clear --env=test --no-warmup >/dev/null && php bin/phpunit -c phpunit.dist.xml'
 
