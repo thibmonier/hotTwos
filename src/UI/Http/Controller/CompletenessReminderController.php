@@ -8,6 +8,7 @@ use App\Application\Authorization\Authorizer;
 use App\Application\Reminder\SendManualReminders;
 use App\Domain\Authorization\Permission;
 use App\Domain\User\User;
+use App\Domain\User\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,6 +26,7 @@ final class CompletenessReminderController extends AbstractController
     public function __construct(
         private readonly Authorizer $authorizer,
         private readonly SendManualReminders $reminders,
+        private readonly UserRepository $users,
     ) {
     }
 
@@ -43,6 +45,9 @@ final class CompletenessReminderController extends AbstractController
             $request->request->all('userIds'),
             static fn (mixed $id): bool => is_string($id) && '' !== $id,
         ));
+        // Défense : ne conserver que des collaborateurs du tenant de l'acteur (la sélection UI ne
+        // contient que l'équipe ; on rejette des identifiants forgés, sans effet cross-tenant).
+        $userIds = array_values(array_intersect($userIds, $this->users->findIdsByTenant($user->tenantId())));
         if ([] === $userIds) {
             return $this->json(['error' => 'Sélectionnez au moins un collaborateur.'], Response::HTTP_UNPROCESSABLE_ENTITY);
         }

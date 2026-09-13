@@ -115,6 +115,17 @@ final class CompletenessReminderTest extends WebTestCase
         self::assertArrayHasKey('error', $body);
     }
 
+    public function testRemindIgnoresForeignUserIds(): void
+    {
+        // Défense : un identifiant qui n'appartient pas au tenant est écarté (aucune relance).
+        $this->login('marc@agence.test');
+        $token = $this->remindToken();
+
+        $this->client->request('POST', '/completude/relances', ['_token' => $token, 'userIds' => ['00000000-0000-7000-8000-000000000000']]);
+
+        self::assertResponseStatusCodeSame(422);
+    }
+
     public function testRemindForbiddenForNonManager(): void
     {
         $this->login('camille@agence.test');
