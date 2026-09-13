@@ -4,7 +4,7 @@
 - **ID**: US-094
 - **EPIC**: EPIC-003 (Temps & activité)
 - **Sprint**: 22
-- **Statut**: 🟢 Ready
+- **Statut**: ✅ Done
 - **Points**: 2
 - **Persona**: P2 (manager / valideur)
 - **Créé le**: 2026-09-12
@@ -58,6 +58,6 @@ THEN l'accès est refusé/masqué conformément aux voters existants
 - [x] INVEST : Estimable ✓ (2 pts) / Testable ✓
 
 ## Definition of Done
-- [ ] Écran reskinné sur tokens tailsfadmin ; logique inchangée (tests existants verts)
-- [ ] États (vide, sans-permission) couverts ; WCAG AA attesté (US-093)
-- [ ] CI verte ; PR mergée
+- [x] Écran reskinné sur tokens tailsfadmin ; logique inchangée (tests existants verts)
+- [x] États (vide, sans-permission) couverts ; WCAG AA attesté (US-093)
+- [x] CI verte ; PR mergée
