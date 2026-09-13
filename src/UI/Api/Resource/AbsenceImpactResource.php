@@ -21,6 +21,12 @@ use App\UI\Api\State\AbsenceImpactProvider;
 )]
 final class AbsenceImpactResource
 {
+    /**
+     * @param int    $businessDays     nombre de jours OUVRÉS concernés (hors week-ends/fériés/fermetures)
+     * @param float  $projectedBalance solde en JOURS après cette demande (base jours ouvrés, CA-2)
+     * @param bool   $hasConflict      la période chevauche-t-elle une fermeture ou une absence posée ?
+     * @param string $conflictMessage  libellé du conflit (affiché en texte brut côté client), ou null
+     */
     public function __construct(
         public int $businessDays = 0,
         public float $projectedBalance = 0.0,

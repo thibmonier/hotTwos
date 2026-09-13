@@ -105,9 +105,9 @@ stories:
   US-088: { title: "DSH-COLLAB — Dashboard collaborateur (build)", sprint: 21, status: done, points: 5 }   # EPIC-003 — maquette Main.dc.html ; dépend US-087 (G1/G4)
   US-089: { title: "PG-TMP-01 — Reskin saisie hebdomadaire", sprint: 21, status: done, points: 3 }   # EPIC-003 — maquettes SaisieHebdo/États/Mobile ; recos TMP1-*
   US-090: { title: "PG-TMP-02/03 — Reskin saisie du jour (mobile)", sprint: 21, status: done, points: 2 }   # EPIC-003 — maquette SaisieJour ; recos TMP2-*
-  US-091: { title: "PG-ABS-01 — Reskin Mes absences", sprint: 21, status: in-progress, points: 2 }   # EPIC-003 — reskin mergé #130 MAIS DoD incomplète (Must CA ABS-03 calendrier conflits + CA-2 solde dynamique manquants) → NON done ; reste à finir S22 (US-091b à créer)
+  US-091: { title: "PG-ABS-01 — Reskin Mes absences", sprint: 21, status: done, points: 2 }   # EPIC-003 — reskin mergé #130 ; DoD complétée par US-091b (#138/#139 : calendrier conflits ABS-03 + solde dynamique CA-2)
   US-092: { title: "PG-CPL-01 — Reskin Complétude", sprint: 21, status: done, points: 3 }   # EPIC-003 — maquette Completude ; F-S5-4 (bloquant) + F-S5-5 ; dépend US-087 (G1)
-  US-091b: { title: "Absences — calendrier de conflits (ABS-03) + solde projeté dynamique (CA-2)", sprint: 22, status: in-progress, points: 3 }   # EPIC-003 — finition US-091 (Must non livré S21) ; endpoint /api/absences/impact + calendrier accessible
+  US-091b: { title: "Absences — calendrier de conflits (ABS-03) + solde projeté dynamique (CA-2)", sprint: 22, status: done, points: 3 }   # EPIC-003 — mergée #138 (feature) + #139 (durcissements) ; endpoint /api/absences/impact + calendrier accessible
   US-092b: { title: "Complétude — relance inline (CPL-04) + filtre/recherche (CPL-05)", sprint: 22, status: ready, points: 2 }   # EPIC-003 — finition US-092 ; réutilise reminders_update
   US-093: { title: "Qualité — WCAG axe/pa11y en CI + tests d'états saisie hebdo", sprint: 22, status: ready, points: 3 }   # dette S21 transversale (rétro) ; runner a11y sans-Node à trancher
   US-094: { title: "PG-VLD-01 — Reskin validation des temps", sprint: 22, status: ready, points: 2 }   # EPIC-003 Should (backlog reskin)

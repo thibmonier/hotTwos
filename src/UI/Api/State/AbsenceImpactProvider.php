@@ -44,6 +44,11 @@ final readonly class AbsenceImpactProvider implements ProviderInterface
         if ($to < $from) {
             throw new AbsenceException('La date de fin doit être postérieure ou égale à la date de début.');
         }
+        // Borne défensive alignée sur l'invariant du domaine (AbsenceRequest::MAX_SPAN_DAYS) : évite
+        // une itération jour par jour non bornée du calculateur sur une plage démesurée.
+        if ((int) $from->diff($to)->days > 366) {
+            throw new AbsenceException('La période sélectionnée est trop longue (maximum 366 jours).');
+        }
 
         // Intervalle semi-ouvert [from, to+1[ : la borne haute est exclue par le calculateur.
         $businessDays = $this->calculator->workingDaysForUser($user->tenantId(), $user->id(), $from, $to->modify('+1 day'));

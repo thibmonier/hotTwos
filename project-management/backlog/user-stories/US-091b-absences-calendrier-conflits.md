@@ -4,7 +4,7 @@
 - **ID**: US-091b
 - **EPIC**: EPIC-003 (Temps & activité)
 - **Sprint**: 22
-- **Statut**: 🔵 In Progress
+- **Statut**: ✅ Done
 - **Points**: 3
 - **Persona**: P1 (Camille)
 - **Créé le**: 2026-09-12 (finition de US-091, dette S21)
@@ -71,4 +71,4 @@ THEN il s'affiche normalement (aucun marquage), sans erreur
 - [x] Calendrier des conflits (fériés/fermetures/absences) avec alternatives textuelles
 - [x] Solde projeté dynamique à la sélection de dates ; avertissement de conflit
 - [x] Tests fonctionnels (calendrier rendu + impact solde) ; WCAG AA attesté (US-093)
-- [ ] CI verte ; PR mergée
+- [x] CI verte ; PR mergée (#138 feature + #139 durcissements)
