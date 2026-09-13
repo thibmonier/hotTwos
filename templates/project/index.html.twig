@@ -6,6 +6,12 @@
 {% block page_title %}Projets{% endblock %}
 
 {% block topbar_actions %}
+    {% if canViewDashboard %}
+        <a href="{{ path('project_dashboard') }}"
+           class="inline-flex min-h-9 items-center gap-2 rounded-lg border border-gray-200 px-3 text-theme-xs font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-gray-800 dark:text-gray-300 dark:hover:bg-white/[0.02]">
+            Tableau de bord
+        </a>
+    {% endif %}
     {% if canCreate %}
         <twig:tsf:Ui:Button href="{{ path('project_new') }}" variant="primary" size="sm">+ Nouveau projet</twig:tsf:Ui:Button>
     {% endif %}

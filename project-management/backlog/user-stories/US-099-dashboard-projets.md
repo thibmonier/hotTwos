@@ -4,7 +4,7 @@
 - **ID**: US-099
 - **EPIC**: EPIC-002 (Projets & delivery)
 - **Sprint**: 23
-- **Statut**: 🟢 Ready
+- **Statut**: ✅ Done
 - **Points**: 5
 - **Persona**: P2 (chef de projet / manager) — point d'entrée pilotage
 - **Créé le**: 2026-10-23 (kickoff S23)

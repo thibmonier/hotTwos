@@ -99,6 +99,8 @@ final class ProjectPageController extends AbstractController
                 $this->projects->findAllByTenant($user->tenantId()),
             ),
             'canCreate' => $this->authorizer->can($user, Permission::CREATE_PROJECT),
+            // US-099 : accès au tableau de bord projets (pilotage dérive), réservé aux rôles finance.
+            'canViewDashboard' => $this->authorizer->can($user, Permission::VIEW_PROJECT_FINANCIALS),
         ]);
     }
 
