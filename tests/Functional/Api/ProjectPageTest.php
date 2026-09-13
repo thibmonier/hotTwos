@@ -123,6 +123,26 @@ final class ProjectPageTest extends WebTestCase
         self::assertStringNotContainsString('Nouveau projet', $this->client->getResponse()->getContent() ?: '');
     }
 
+    public function testProjectListShowsFilterControlsAndReskin(): void
+    {
+        // US-097 (CA-2) : la liste reskinnée expose le contrôleur de filtre + recherche.
+        $marc = $this->em->getRepository(User::class)->findOneBy(['email' => 'marc@agence.test']);
+        self::assertInstanceOf(User::class, $marc);
+        $this->em->persist(new Project($this->tenant, 'PRJ-1', 'Refonte SI', true, $marc->id()));
+        $this->em->flush();
+
+        $this->login('marc@agence.test');
+        $this->client->request('GET', '/projets');
+
+        self::assertResponseIsSuccessful();
+        $content = (string) $this->client->getResponse()->getContent();
+        self::assertStringContainsString('data-controller="projects"', $content);
+        self::assertStringContainsString('data-projects-target="status"', $content);
+        self::assertStringContainsString('data-projects-target="search"', $content);
+        self::assertStringContainsString('Refonte SI', $content);
+        self::assertStringContainsString('Nouveau projet', $content); // canCreate (chef de projet)
+    }
+
     public function testManagerCreatesProjectWithSequentialCode(): void
     {
         $this->login('marc@agence.test');

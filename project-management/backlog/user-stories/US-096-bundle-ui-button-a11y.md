@@ -4,7 +4,7 @@
 - **ID**: US-096
 - **EPIC**: EPIC-003 / transverse (enabler socle) — débloque le reskin EPIC-002
 - **Sprint**: 23
-- **Statut**: 🟢 Ready
+- **Statut**: ✅ Done
 - **Points**: 3
 - **Persona**: P2/P3 (managers) + tous (utilisateurs clavier / lecteurs d'écran)
 - **Créé le**: 2026-10-23 (kickoff S23)
