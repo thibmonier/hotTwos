@@ -4,7 +4,7 @@
 - **ID**: US-091b
 - **EPIC**: EPIC-003 (Temps & activité)
 - **Sprint**: 22
-- **Statut**: 🟢 Ready
+- **Statut**: 🔵 In Progress
 - **Points**: 3
 - **Persona**: P1 (Camille)
 - **Créé le**: 2026-09-12 (finition de US-091, dette S21)
@@ -68,7 +68,7 @@ THEN il s'affiche normalement (aucun marquage), sans erreur
 - [x] INVEST : Valuable ✓ (Must non livré S21) / Estimable ✓ (3 pts) / Testable ✓
 
 ## Definition of Done
-- [ ] Calendrier des conflits (fériés/fermetures/absences) avec alternatives textuelles
-- [ ] Solde projeté dynamique à la sélection de dates ; avertissement de conflit
-- [ ] Tests fonctionnels (calendrier rendu + impact solde) ; WCAG AA attesté (US-093)
+- [x] Calendrier des conflits (fériés/fermetures/absences) avec alternatives textuelles
+- [x] Solde projeté dynamique à la sélection de dates ; avertissement de conflit
+- [x] Tests fonctionnels (calendrier rendu + impact solde) ; WCAG AA attesté (US-093)
 - [ ] CI verte ; PR mergée
