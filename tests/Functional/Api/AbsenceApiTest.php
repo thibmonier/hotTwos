@@ -186,6 +186,16 @@ final class AbsenceApiTest extends WebTestCase
         self::assertResponseStatusCodeSame(422);
     }
 
+    public function testImpactRejectsExcessiveRange(): void
+    {
+        // Borne défensive : une plage > 366 jours est rejetée (422).
+        $this->login('camille@agence.test');
+
+        $this->client->request('GET', '/api/absences/impact?from=2026-01-01&to=2027-12-31', server: ['HTTP_ACCEPT' => 'application/json']);
+
+        self::assertResponseStatusCodeSame(422);
+    }
+
     /**
      * @return array<string, mixed>
      */

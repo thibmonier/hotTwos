@@ -142,6 +142,8 @@ final class AbsencePageController extends AbstractController
         $key = $day->format('Y-m-d');
         $number = (int) $day->format('j');
 
+        // Priorité des marquages (un jour peut cumuler plusieurs états) : absence posée > férié >
+        // fermeture > week-end > jour ouvré normal.
         if (isset($absenceDays[$key])) {
             return ['type' => 'request', 'number' => $number, 'label' => 'mon absence déjà posée'];
         }

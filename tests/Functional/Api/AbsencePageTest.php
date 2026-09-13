@@ -118,6 +118,10 @@ final class AbsencePageTest extends WebTestCase
         self::assertStringContainsString('Ma demande', $content);
         self::assertStringContainsString('Fermeture / férié', $content);
         self::assertStringContainsString('Week-end', $content);
+
+        // Structure d'accessibilité : liste de jours + alternatives portées par aria-label.
+        self::assertStringContainsString('role="list"', $content);
+        self::assertStringContainsString('aria-label="16 — férié : Saint Michel"', $content);
     }
 
     public function testCalendarRendersEmptyMonthWithoutError(): void

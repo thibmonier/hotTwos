@@ -62,7 +62,13 @@ export default class extends Controller {
     #renderImpact(data) {
         if (this.hasImpactTarget) {
             const balance = String(data.projectedBalance).replace('.', ',');
-            this.impactTarget.innerHTML = `${data.businessDays} jours ouvrés · solde après validation : <strong>${balance} j</strong>`;
+            // Construction par le DOM (textContent) plutôt qu'innerHTML : aucune interpolation HTML.
+            const strong = document.createElement('strong');
+            strong.textContent = `${balance} j`;
+            this.impactTarget.replaceChildren(
+                document.createTextNode(`${data.businessDays} jours ouvrés · solde après validation : `),
+                strong,
+            );
         }
         if (!this.hasConflictTarget) {
             return;
