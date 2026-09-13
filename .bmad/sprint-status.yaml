@@ -114,8 +114,8 @@ stories:
   US-094: { title: "PG-VLD-01 — Reskin validation des temps", sprint: 22, status: done, points: 2 }   # EPIC-003 Should ; reskin tailsfadmin de templates/timesheet/validation.html.twig (hooks Stimulus préservés, état vide couvert)
   US-095: { title: "PG-REL-01 — Reskin relances", sprint: 22, status: done, points: 2 }   # EPIC-003 Should ; reskin tailsfadmin de templates/reminder/index.html.twig (hooks reminders préservés, flash/badges/historique portés) — dernière US S22
   # — Sprint 23 : ouverture reskin EPIC-002 (Projets) + enabler a11y (créées 2026-10-23, kickoff) —
-  US-096: { title: "Composant Ui:Button accessible (focus visible) — socle tailsfadmin", sprint: 23, status: ready, points: 3 }   # Must ; rétro S22 ACTION-1 (dette a11y focus, WCAG 2.4.7) ; enabler des reskins EPIC-002 ; pattern bundle US-087
-  US-097: { title: "PG-PRJ-01 — Reskin liste des projets", sprint: 23, status: ready, points: 2 }   # Must EPIC-002 ; reskin templates/project/index.html.twig (G3 FilterBar) + tsf:Ui:Button
+  US-096: { title: "Composant Ui:Button accessible (focus visible) — socle tailsfadmin", sprint: 23, status: done, points: 3 }   # Must ; rétro S22 ACTION-1 ; bundle v1.6.1 (#41) + hotTwos #146 (focus boutons absence/complétude/validation ; relances déjà US-095) ; migration composant → suivi S24
+  US-097: { title: "PG-PRJ-01 — Reskin liste des projets", sprint: 23, status: done, points: 2 }   # Must EPIC-002 ; reskin templates/project/index.html.twig (tokens + badges + tsf:Ui:Button) + filtre/recherche Stimulus (G3)
   US-098: { title: "PG-PRJ-02 — Reskin fiche projet (onglets + cycle de vie)", sprint: 23, status: ready, points: 3 }   # Must EPIC-002 ; reskin templates/project/show.html.twig (déjà sur Tabs) + PageHeader G4 + cycle de vie G5
   US-099: { title: "DSH-PRJ — Dashboard projets (build)", sprint: 23, status: ready, points: 5 }   # Should EPIC-002 (build) ; StatCard G1 + PageHeader G4 + alertes dérive ; réf. conception hotones + design-canvas/tailadmin-ref
   # — EPIC-013 : Recensement pages cibles, parcours par persona & conception UX (créées 2026-09-09) —
