@@ -132,6 +132,29 @@ final class CompletenessPageTest extends WebTestCase
         self::assertMatchesRegularExpression('/Sem\. \d{1,2}\b/', $body);
     }
 
+    /**
+     * US-100 — le bouton de relance est rendu via le composant tsf:Ui:Button et relaie
+     * l'attribut Stimulus data-action (pass-through d'attributs, bundle v1.6.2), avec le
+     * focus visible du socle (WCAG 2.4.7). Marc (Chef de projet) a MANAGE_REMINDERS.
+     */
+    public function testRemindButtonUsesComponentWithStimulusPassThrough(): void
+    {
+        $this->login('marc@agence.test');
+
+        $this->client->request('GET', '/completude');
+
+        self::assertResponseIsSuccessful();
+        $body = (string) $this->client->getResponse()->getContent();
+        // Le composant rend un <button> (pas de href) portant le data-action relayé.
+        self::assertMatchesRegularExpression(
+            '/<button[^>]*data-action="completeness#remind"/',
+            $body,
+            'Le bouton de relance doit être rendu par tsf:Ui:Button avec data-action relayé (pass-through v1.6.2).',
+        );
+        // Focus visible du socle (WCAG 2.4.7) apporté par le composant.
+        self::assertStringContainsString('focus:ring-2', $body);
+    }
+
     private function login(string $email): void
     {
         $this->client->request('POST', '/api/login', server: ['CONTENT_TYPE' => 'application/json'], content: json_encode(['email' => $email, 'password' => 'motdepasse-solide'], JSON_THROW_ON_ERROR));
