@@ -49,11 +49,9 @@
         </p>
         <div class="flex items-center gap-2">
             {% if canSelect %}
-                <button type="button" data-action="completeness#remind"
-                        class="inline-flex min-h-9 items-center gap-2 rounded-lg bg-brand-500 px-3 text-theme-xs font-semibold text-white hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500/40">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 4h16v12H5.2L4 17.2z"/></svg>
+                <twig:tsf:Ui:Button variant="primary" size="sm" data-action="completeness#remind">
                     Relancer la sélection
-                </button>
+                </twig:tsf:Ui:Button>
             {% endif %}
             <a href="{{ path('api_completeness_export') }}{{ team ? '?scope=team' : '' }}"
                class="inline-flex min-h-9 items-center rounded-lg border border-gray-200 px-3 text-theme-xs font-semibold text-gray-600 hover:bg-gray-50 dark:border-gray-800 dark:text-gray-300 dark:hover:bg-white/[0.02]">

@@ -67,11 +67,9 @@
 
                     {# ── Actions de validation ───────────────────────────────────── #}
                     <div class="flex flex-wrap items-center gap-3 border-t border-gray-100 p-3 dark:border-gray-800">
-                        <button type="button"
-                                class="inline-flex min-h-11 items-center rounded-lg bg-success-500 px-4 text-theme-sm font-semibold text-white hover:bg-success-600 focus:outline-none focus:ring-2 focus:ring-brand-500/40"
-                                data-action="validation#validate">
+                        <twig:tsf:Ui:Button variant="success" data-action="validation#validate">
                             Valider la sélection
-                        </button>
+                        </twig:tsf:Ui:Button>
 
                         <div class="flex flex-1 items-center gap-2">
                             <label for="validation-reason" class="whitespace-nowrap text-theme-xs font-normal text-gray-500 dark:text-gray-400">
@@ -86,11 +84,9 @@
                             <div id="validation-reason-hint" class="sr-only">Le motif de refus est obligatoire pour refuser une sélection.</div>
                         </div>
 
-                        <button type="button"
-                                class="inline-flex min-h-11 items-center rounded-lg bg-error-500 px-4 text-theme-sm font-semibold text-white hover:bg-error-600 focus:outline-none focus:ring-2 focus:ring-brand-500/40"
-                                data-action="validation#reject">
+                        <twig:tsf:Ui:Button variant="danger" data-action="validation#reject">
                             Refuser la sélection
-                        </button>
+                        </twig:tsf:Ui:Button>
                     </div>
                 </form>
             </div>
