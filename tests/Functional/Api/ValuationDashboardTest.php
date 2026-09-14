@@ -114,7 +114,10 @@ final class ValuationDashboardTest extends WebTestCase
         // Avancement, fraîcheur, CA et alerte visibles.
         self::assertSelectorTextContains('h1', 'tableau de bord financier');
         $content = (string) $this->client->getResponse()->getContent();
-        self::assertStringContainsString('2 / 3 imputations valorisées', $content);
+        // US-101 (reskin) — l'avancement est porté par tsf:Ui:StatCard : valeur « 2 / 3 » + hint.
+        self::assertStringContainsString('Avancement valorisation', $content);
+        self::assertStringContainsString('2 / 3', $content);
+        self::assertStringContainsString('imputations valorisées', $content);
         self::assertStringContainsString('Mise à jour il y a', $content);
         self::assertStringContainsString('1 170,00', $content); // CA = 78000 + 39000
         self::assertStringContainsString('Valorisation incomplète', $content);
