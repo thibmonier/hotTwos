@@ -7,14 +7,19 @@
 
 {% block body %}
     {% set d = dashboard %}
-    <h1 class="visually-hidden">tableau de bord finance consolidé</h1>
+    {# H1 lecteur d'écran, attendu par les tests (sous-chaîne "tableau de bord finance consolidé"). #}
+    <h1 class="sr-only">tableau de bord finance consolidé</h1>
+
+    <twig:tsf:Layout:PageHeader
+        title="Tableau de bord finance consolidé"
+        subtitle="Marges consolidées des périodes clôturées" />
 
     {# ── Sélecteur de période ─────────────────────────────────────────────── #}
-    <form method="get" class="mb-4 flex flex-wrap items-end gap-3">
+    <form method="get" class="mb-6 flex flex-wrap items-end gap-3">
         <div>
-            <label for="period" class="mb-1 block text-xs font-medium text-muted">Période (mois clôturé)</label>
+            <label for="period" class="mb-1 block text-theme-xs font-medium text-gray-500 dark:text-gray-400">Période (mois clôturé)</label>
             <select id="period" name="period" onchange="this.form.submit()"
-                    class="min-h-10 rounded border border-border-strong bg-surface px-3 text-sm text-ink">
+                    class="min-h-10 rounded-lg border border-gray-300 bg-white px-3 text-theme-sm text-gray-700 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:bg-white/[0.03] dark:text-gray-300">
                 {% if d.availablePeriods is empty %}
                     <option>—</option>
                 {% endif %}
@@ -25,92 +30,87 @@
         </div>
         {% if d.clientFilter is not null %}
             <a href="{{ path('finance_dashboard', { period: d.period }) }}"
-               class="min-h-10 inline-flex items-center rounded border border-border-strong px-3 text-sm text-muted hover:text-ink">
-                Client&nbsp;: <strong class="mx-1 text-ink">{{ d.clientFilter }}</strong> — tous les clients ✕
+               class="inline-flex min-h-10 items-center rounded-lg border border-gray-300 px-3 text-theme-sm text-gray-500 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:text-gray-400 dark:hover:text-white/90">
+                Client&nbsp;: <strong class="mx-1 text-gray-800 dark:text-white/90">{{ d.clientFilter }}</strong> — tous les clients ✕
             </a>
         {% endif %}
-        <span class="min-h-10 inline-flex items-center rounded bg-surface-alt px-3 text-xs text-muted">Données figées (période clôturée)</span>
+        <span class="inline-flex min-h-10 items-center rounded-lg bg-gray-50 px-3 text-theme-xs text-gray-500 dark:bg-white/[0.02] dark:text-gray-400">Données figées (période clôturée)</span>
         {% if d.hasData and d.costVisible %}
-            <a href="{{ path('finance_export_fec', { period: d.period }) }}"
-               class="min-h-10 inline-flex items-center gap-2 rounded bg-primary px-3 text-sm font-semibold text-white hover:bg-primary/90">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            <twig:tsf:Ui:Button href="{{ path('finance_export_fec', { period: d.period }) }}" variant="primary" size="sm">
                 Export FEC
-            </a>
+            </twig:tsf:Ui:Button>
         {% endif %}
     </form>
 
     {% if not d.hasData %}
-        <p class="rounded border border-border bg-surface px-4 py-6 text-center text-muted">
+        <p class="rounded-2xl border border-gray-200 bg-white px-4 py-6 text-center text-theme-sm text-gray-500 shadow-theme-sm dark:border-gray-800 dark:bg-white/[0.03] dark:text-gray-400">
             Aucune marge figée pour cette période. Le tableau de bord consolide les marges des périodes
             <strong>clôturées</strong> ; une période ouverte n'apparaît pas ici (provisoire).
         </p>
     {% else %}
-        {# ── KPI ──────────────────────────────────────────────────────────── #}
-        <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-muted">Indicateurs consolidés</h2>
+        {# ── KPI (G1 — tsf:Ui:StatCard) ───────────────────────────────────── #}
+        <h2 class="mb-3 text-theme-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Indicateurs consolidés</h2>
         <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-4">
-            <div class="rounded-md border border-primary/20 bg-primary/5 p-5 shadow-sm">
-                <div class="mb-2 text-xs font-medium text-muted">Revenu retenu</div>
-                <div class="text-3xl font-semibold tabular-nums text-ink">{{ (d.totalRevenueCents / 100)|number_format(2, ',', ' ') }} €</div>
-            </div>
+            <twig:tsf:Ui:StatCard
+                label="Revenu retenu"
+                value="{{ (d.totalRevenueCents / 100)|number_format(2, ',', ' ') }} €"
+                variant="brand" />
             {% if d.costVisible %}
-                <div class="rounded-md border border-border bg-surface p-5 shadow-sm">
-                    <div class="mb-2 text-xs font-medium text-muted">Coût valorisé</div>
-                    <div class="text-2xl font-semibold tabular-nums text-ink">{{ (d.totalCostCents / 100)|number_format(2, ',', ' ') }} €</div>
-                </div>
-                <div class="rounded-md border border-border bg-surface p-5 shadow-sm">
-                    <div class="mb-2 text-xs font-medium text-muted">Marge</div>
-                    <div class="text-2xl font-semibold tabular-nums {{ d.totalMarginCents >= 0 ? 'text-success' : 'text-danger' }}">
-                        {{ (d.totalMarginCents / 100)|number_format(2, ',', ' ') }} €
-                        {% if d.totalMarginRatePercent is not null %}<span class="text-sm text-muted">({{ d.totalMarginRatePercent|number_format(1, ',', ' ') }} %)</span>{% endif %}
-                    </div>
-                </div>
-                <div class="rounded-md border border-border bg-surface p-5 shadow-sm">
-                    <div class="mb-2 text-xs font-medium text-muted">Projets en dérive</div>
-                    <div class="text-2xl font-semibold tabular-nums {{ d.driftingProjectCount > 0 ? 'text-danger' : 'text-ink' }}">
-                        {{ d.driftingProjectCount }} / {{ d.projectCount }}
-                    </div>
-                </div>
+                <twig:tsf:Ui:StatCard
+                    label="Coût valorisé"
+                    value="{{ (d.totalCostCents / 100)|number_format(2, ',', ' ') }} €" />
+                <twig:tsf:Ui:StatCard
+                    label="Marge"
+                    value="{{ (d.totalMarginCents / 100)|number_format(2, ',', ' ') }} €"
+                    variant="{{ d.totalMarginCents >= 0 ? 'success' : 'error' }}"
+                    :delta="d.totalMarginRatePercent is not null ? (d.totalMarginRatePercent|number_format(1, ',', ' ') ~ ' %') : null"
+                    :trend="d.totalMarginCents >= 0 ? 'up' : 'down'" />
+                <twig:tsf:Ui:StatCard
+                    label="Projets en dérive"
+                    value="{{ d.driftingProjectCount }} / {{ d.projectCount }}"
+                    variant="{{ d.driftingProjectCount > 0 ? 'error' : 'brand' }}" />
             {% else %}
-                <div class="rounded-md border border-border bg-surface p-5 shadow-sm sm:col-span-3">
-                    <div class="mb-2 text-xs font-medium text-muted">Projets consolidés</div>
-                    <div class="text-2xl font-semibold tabular-nums text-ink">{{ d.projectCount }}</div>
-                    <p class="mt-1 text-xs text-muted">Coût, marge et dérive réservés aux rôles habilités (finance/direction).</p>
+                <div class="sm:col-span-3">
+                    <twig:tsf:Ui:StatCard
+                        label="Projets consolidés"
+                        value="{{ d.projectCount }}"
+                        hint="Coût, marge et dérive réservés aux rôles habilités (finance/direction)." />
                 </div>
             {% endif %}
         </div>
 
         {% if d.hasPartial %}
-            <p class="mb-4 text-sm text-warning" role="status">⚠ Certaines marges sont partielles (valorisation incomplète).</p>
+            <p class="mb-4 text-theme-sm text-warning-600 dark:text-warning-400" role="status">⚠ Certaines marges sont partielles (valorisation incomplète).</p>
         {% endif %}
 
         {# ── Ventilation par client ───────────────────────────────────────── #}
-        <h2 class="mb-3 text-sm font-semibold text-ink">Ventilation par client</h2>
-        <div class="mb-6 overflow-x-auto">
-            <table class="w-full border-collapse text-sm">
+        <h2 class="mb-3 text-theme-sm font-semibold text-gray-800 dark:text-white/90">Ventilation par client</h2>
+        <div class="mb-6 overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-theme-sm dark:border-gray-800 dark:bg-white/[0.03]">
+            <table class="w-full border-collapse text-left text-theme-sm">
                 <thead>
-                    <tr class="border-b-2 border-border text-left text-xs uppercase text-muted">
-                        <th scope="col" class="py-2 pr-4">Client</th>
-                        <th scope="col" class="py-2 pr-4 text-right">Projets</th>
-                        <th scope="col" class="py-2 pr-4 text-right">Revenu retenu</th>
+                    <tr class="border-b border-gray-100 bg-gray-50 text-theme-xs uppercase dark:border-gray-800 dark:bg-white/[0.02]">
+                        <th scope="col" class="px-4 py-3 font-semibold text-gray-700 dark:text-gray-300">Client</th>
+                        <th scope="col" class="px-4 py-3 text-right font-semibold text-gray-700 dark:text-gray-300">Projets</th>
+                        <th scope="col" class="px-4 py-3 text-right font-semibold text-gray-700 dark:text-gray-300">Revenu retenu</th>
                         {% if d.costVisible %}
-                            <th scope="col" class="py-2 pr-4 text-right">Coût chargé</th>
-                            <th scope="col" class="py-2 text-right">Marge</th>
+                            <th scope="col" class="px-4 py-3 text-right font-semibold text-gray-700 dark:text-gray-300">Coût chargé</th>
+                            <th scope="col" class="px-4 py-3 text-right font-semibold text-gray-700 dark:text-gray-300">Marge</th>
                         {% endif %}
                     </tr>
                 </thead>
                 <tbody>
                     {% for c in d.byClient %}
-                        <tr class="border-b border-border">
-                            <th scope="row" class="py-2 pr-4 font-medium text-ink">
-                                <a class="text-primary hover:underline" href="{{ path('finance_dashboard', { period: d.period, client: c.clientName }) }}">{{ c.clientName }}</a>
+                        <tr class="border-t border-gray-100 hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-white/[0.02]">
+                            <th scope="row" class="px-4 py-3 font-medium text-gray-800 dark:text-white/90">
+                                <a class="font-semibold text-brand-500 hover:underline dark:text-brand-400" href="{{ path('finance_dashboard', { period: d.period, client: c.clientName }) }}">{{ c.clientName }}</a>
                             </th>
-                            <td class="py-2 pr-4 text-right tabular-nums">{{ c.projectCount }}</td>
-                            <td class="py-2 pr-4 text-right tabular-nums">{{ (c.revenueCents / 100)|number_format(2, ',', ' ') }} €</td>
+                            <td class="px-4 py-3 text-right tabular-nums text-gray-600 dark:text-gray-300">{{ c.projectCount }}</td>
+                            <td class="px-4 py-3 text-right tabular-nums text-gray-800 dark:text-white/90">{{ (c.revenueCents / 100)|number_format(2, ',', ' ') }} €</td>
                             {% if d.costVisible %}
-                                <td class="py-2 pr-4 text-right tabular-nums">{{ (c.costCents / 100)|number_format(2, ',', ' ') }} €</td>
-                                <td class="py-2 text-right tabular-nums {{ c.marginCents >= 0 ? 'text-success' : 'text-danger' }}">
+                                <td class="px-4 py-3 text-right tabular-nums text-gray-600 dark:text-gray-300">{{ (c.costCents / 100)|number_format(2, ',', ' ') }} €</td>
+                                <td class="px-4 py-3 text-right tabular-nums font-medium {{ c.marginCents >= 0 ? 'text-success-600 dark:text-success-500' : 'text-error-600 dark:text-error-500' }}">
                                     {{ (c.marginCents / 100)|number_format(2, ',', ' ') }} €
-                                    {% if c.marginRatePercent is not null %}<span class="text-muted">({{ c.marginRatePercent|number_format(1, ',', ' ') }} %)</span>{% endif %}
+                                    {% if c.marginRatePercent is not null %}<span class="font-normal text-gray-500 dark:text-gray-400">({{ c.marginRatePercent|number_format(1, ',', ' ') }} %)</span>{% endif %}
                                 </td>
                             {% endif %}
                         </tr>
@@ -120,34 +120,34 @@
         </div>
 
         {# ── Ventilation par projet ───────────────────────────────────────── #}
-        <h2 class="mb-3 text-sm font-semibold text-ink">Ventilation par projet</h2>
-        <div class="overflow-x-auto">
-            <table class="w-full border-collapse text-sm">
+        <h2 class="mb-3 text-theme-sm font-semibold text-gray-800 dark:text-white/90">Ventilation par projet</h2>
+        <div class="overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-theme-sm dark:border-gray-800 dark:bg-white/[0.03]">
+            <table class="w-full border-collapse text-left text-theme-sm">
                 <thead>
-                    <tr class="border-b-2 border-border text-left text-xs uppercase text-muted">
-                        <th scope="col" class="py-2 pr-4">Projet</th>
-                        <th scope="col" class="py-2 pr-4">Client</th>
-                        <th scope="col" class="py-2 pr-4 text-right">Revenu retenu</th>
+                    <tr class="border-b border-gray-100 bg-gray-50 text-theme-xs uppercase dark:border-gray-800 dark:bg-white/[0.02]">
+                        <th scope="col" class="px-4 py-3 font-semibold text-gray-700 dark:text-gray-300">Projet</th>
+                        <th scope="col" class="px-4 py-3 font-semibold text-gray-700 dark:text-gray-300">Client</th>
+                        <th scope="col" class="px-4 py-3 text-right font-semibold text-gray-700 dark:text-gray-300">Revenu retenu</th>
                         {% if d.costVisible %}
-                            <th scope="col" class="py-2 pr-4 text-right">Coût chargé</th>
-                            <th scope="col" class="py-2 text-right">Marge</th>
+                            <th scope="col" class="px-4 py-3 text-right font-semibold text-gray-700 dark:text-gray-300">Coût chargé</th>
+                            <th scope="col" class="px-4 py-3 text-right font-semibold text-gray-700 dark:text-gray-300">Marge</th>
                         {% endif %}
                     </tr>
                 </thead>
                 <tbody>
                     {% for p in d.byProject %}
-                        <tr class="border-b border-border">
-                            <th scope="row" class="py-2 pr-4 font-medium text-ink">
+                        <tr class="border-t border-gray-100 hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-white/[0.02]">
+                            <th scope="row" class="px-4 py-3 font-medium text-gray-800 dark:text-white/90">
                                 {{ p.projectName }}
-                                {% if p.partial %}<span class="ml-1 rounded bg-warning/15 px-1.5 py-0.5 text-xs text-warning">partielle</span>{% endif %}
+                                {% if p.partial %}<span class="ml-1 inline-flex items-center rounded-full bg-warning-50 px-2 py-0.5 text-theme-xs font-medium text-warning-700 dark:bg-warning-500/15 dark:text-warning-400">partielle</span>{% endif %}
                             </th>
-                            <td class="py-2 pr-4 text-muted">{{ p.clientName }}</td>
-                            <td class="py-2 pr-4 text-right tabular-nums">{{ (p.revenueCents / 100)|number_format(2, ',', ' ') }} €</td>
+                            <td class="px-4 py-3 text-gray-500 dark:text-gray-400">{{ p.clientName }}</td>
+                            <td class="px-4 py-3 text-right tabular-nums text-gray-800 dark:text-white/90">{{ (p.revenueCents / 100)|number_format(2, ',', ' ') }} €</td>
                             {% if d.costVisible %}
-                                <td class="py-2 pr-4 text-right tabular-nums">{{ (p.costCents / 100)|number_format(2, ',', ' ') }} €</td>
-                                <td class="py-2 text-right tabular-nums {{ p.marginCents >= 0 ? 'text-success' : 'text-danger' }}">
+                                <td class="px-4 py-3 text-right tabular-nums text-gray-600 dark:text-gray-300">{{ (p.costCents / 100)|number_format(2, ',', ' ') }} €</td>
+                                <td class="px-4 py-3 text-right tabular-nums font-medium {{ p.marginCents >= 0 ? 'text-success-600 dark:text-success-500' : 'text-error-600 dark:text-error-500' }}">
                                     {{ (p.marginCents / 100)|number_format(2, ',', ' ') }} €
-                                    {% if p.marginRatePercent is not null %}<span class="text-muted">({{ p.marginRatePercent|number_format(1, ',', ' ') }} %)</span>{% endif %}
+                                    {% if p.marginRatePercent is not null %}<span class="font-normal text-gray-500 dark:text-gray-400">({{ p.marginRatePercent|number_format(1, ',', ' ') }} %)</span>{% endif %}
                                 </td>
                             {% endif %}
                         </tr>
