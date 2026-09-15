@@ -88,6 +88,10 @@ final class PeriodAdminTest extends WebTestCase
         $crawler = $this->client->request('GET', '/administration/periodes');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('h1', 'Périodes comptables');
+        // US-106 — reskin socle tailsfadmin : tokens (focus brand-500) et bouton via tsf:Ui:Button.
+        $html = (string) $this->client->getResponse()->getContent();
+        self::assertStringContainsString('focus:ring-brand-500', $html);
+        self::assertStringNotContainsString('bg-danger px-4', $html);
 
         $form = $crawler->selectButton('Clôturer la période')->form();
         $form['period'] = '2026-08';
