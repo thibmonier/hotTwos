@@ -81,6 +81,27 @@ final class ClientPageTest extends WebTestCase
         self::assertSame('ACME Tourisme', $clients[0]->name());
     }
 
+    /**
+     * US-103 — la liste est reskinnée sur le socle : recherche (G3) via le contrôleur Stimulus
+     * `clients` (lignes filtrables data-search) et bouton de création via tsf:Ui:Button (focus visible).
+     */
+    public function testListShowsSearchFilterAndComponentButton(): void
+    {
+        $this->em->persist(new Client($this->tenant, 'ACME Tourisme', '123456789'));
+        $this->em->flush();
+
+        $this->login('admin@agence.test');
+        $this->client->request('GET', '/clients');
+
+        self::assertResponseIsSuccessful();
+        $html = (string) $this->client->getResponse()->getContent();
+        self::assertStringContainsString('data-controller="clients"', $html);
+        self::assertStringContainsString('data-clients-target="search"', $html);
+        self::assertStringContainsString('data-search="acme tourisme 123456789"', $html);
+        // Bouton « Créer » via le composant socle (focus visible WCAG 2.4.7).
+        self::assertStringContainsString('focus:ring-2', $html);
+    }
+
     public function testCollaboratorIsForbidden(): void
     {
         $this->login('camille@agence.test');
