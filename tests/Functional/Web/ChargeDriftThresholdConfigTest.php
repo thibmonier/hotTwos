@@ -108,6 +108,22 @@ final class ChargeDriftThresholdConfigTest extends WebTestCase
         parent::tearDown();
     }
 
+    /**
+     * US-105 — la page de config est reskinnée sur le socle tailsfadmin :
+     * tokens (focus brand-500) et bouton d'action porté par tsf:Ui:Button (focus visible 2.4.7),
+     * sans résidu des anciens tokens de surface.
+     */
+    public function testChargeDriftConfigIsReskinnedOnSocle(): void
+    {
+        $this->login('admin@agence.test');
+        $this->client->request('GET', '/finance/config-derive-charge');
+
+        self::assertResponseIsSuccessful();
+        $html = (string) $this->client->getResponse()->getContent();
+        self::assertStringContainsString('focus:ring-brand-500', $html);
+        self::assertStringNotContainsString('bg-primary px-4', $html);
+    }
+
     public function testAdminConfiguresPerTypeThresholds(): void
     {
         $this->login('admin@agence.test');
