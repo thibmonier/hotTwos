@@ -1,7 +1,7 @@
 # Task Board — Sprint 25 (Paramétrage EPIC-005 + harmonisation solde absences)
 
 > Sprint Goal : solder le paramétrage finance sur le socle (profils/taux, configs, périodes) + harmoniser le solde d'absences en jours ouvrés.
-> Mis à jour : 2026-11-20 (DÉCOMPOSÉ — 21 tâches, ~34h). Validation PO au planning J1.
+> Mis à jour : 2026-12-04 (CLÔTURÉ ✅ — 4/4 US, 11/11 pts, `goal_met: true`). Review + rétro #163.
 
 ## Légende
 🔲 À faire · 🔄 En cours · 👀 Review · ✅ Done · 🚫 Bloqué
@@ -53,9 +53,10 @@
 | — | — | — | — |
 
 ## Métriques
-- **Tâches** : 21 total | 0 terminées (0 %)
-- **Heures** : ~34h estimées | 0h consommées | ~34h restantes
-- **Points** : 11 engagés (Must 9 + Should 2)
+- **Tâches** : 21 total | 21 terminées (100 %)
+- **Points** : 11 engagés | **11 livrés** (Must 9 + Should 2) — DoD stricte
+- **US** : 4 / 4 livrées et mergées (#158, #159, #160, #161 ; statuts #162)
+- **Qualité** : `make ci` vert (cs · rector · phpstan max · deptrac 0 violation · 724 tests) ; ADR-0024 (US-107)
 
 ## Séquencement
 1. **US-104** (profils & taux) — patron finance déjà rodé (S24).
