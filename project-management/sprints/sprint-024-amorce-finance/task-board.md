@@ -1,7 +1,7 @@
 # Task Board — Sprint 24 (Amorce EPIC-005 finance + suite EPIC-002 clients + enabler bouton)
 
 > Sprint Goal : amorce finance (valorisation + pilotage financier) + suite EPIC-002 (clients) + bouton pleinement adoptable.
-> Mis à jour : 2026-11-09 (DÉCOMPOSÉ — 23 tâches, ~36,5h). Validation PO au planning J1.
+> Mis à jour : 2026-11-20 (CLÔTURÉ ✅ — 4/4 US, 11/11 pts, `goal_met: true`). Review + rétro #156.
 
 ## Légende
 🔲 À faire · 🔄 En cours · 👀 Review · ✅ Done · 🚫 Bloqué
@@ -55,9 +55,10 @@
 | — | — | — | — |
 
 ## Métriques
-- **Tâches** : 23 total | 0 terminées (0 %)
-- **Heures** : ~36,5h estimées | 0h consommées | ~36,5h restantes
-- **Points** : 11 engagés (Must 9 + Should 2)
+- **Tâches** : 23 total | 23 terminées (100 %)
+- **Points** : 11 engagés | **11 livrés** (Must 9 + Should 2) — DoD stricte
+- **US** : 4 / 4 livrées et mergées (#152, #153, #154, #155) + release bundle v1.6.2
+- **Qualité** : `make ci` vert (cs · rector · phpstan max · deptrac 0 violation · 721 tests)
 
 ## Séquencement
 1. **US-100** (enabler) — bundle → release/bump → migration → tests/a11y.
