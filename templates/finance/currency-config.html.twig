@@ -5,61 +5,67 @@
 {% block page_title %}Devises &amp; taux de change{% endblock %}
 
 {% block body %}
-    <h1 class="visually-hidden">Configuration des devises</h1>
+    <h1 class="sr-only">Configuration des devises</h1>
 
-    <section class="mb-6 max-w-md rounded-md border border-border bg-surface p-4 shadow-sm">
-        <h2 class="mb-1 text-base font-semibold text-ink">Devise de référence</h2>
-        <p class="mb-3 text-sm text-muted">Tous les montants sont consolidés dans cette devise. Actuelle : <strong>{{ reference }}</strong>.</p>
+    <twig:tsf:Layout:PageHeader
+        title="Devises &amp; taux de change"
+        subtitle="Devise de référence de consolidation et taux de change datés" />
+
+    <section class="mb-6 max-w-md rounded-2xl border border-gray-200 bg-white p-4 shadow-theme-sm dark:border-gray-800 dark:bg-white/[0.03]">
+        <h2 class="mb-1 text-theme-sm font-semibold text-gray-800 dark:text-white/90">Devise de référence</h2>
+        <p class="mb-3 text-theme-sm text-gray-500 dark:text-gray-400">Tous les montants sont consolidés dans cette devise. Actuelle : <strong class="text-gray-800 dark:text-white/90">{{ reference }}</strong>.</p>
         <form method="post" action="{{ path('currency_config_reference') }}" class="flex items-end gap-2">
             <input type="hidden" name="_token" value="{{ csrf_token('currency_config') }}">
-            <label class="text-[13px] font-medium text-ink">Devise
-                <select name="code" class="ml-1 min-h-10 rounded border border-border bg-surface px-2 text-sm text-body">
+            <label class="text-theme-xs font-medium text-gray-700 dark:text-gray-300">Devise
+                <select name="code" class="ml-1 min-h-10 rounded-lg border border-gray-300 bg-white px-2 text-theme-sm text-gray-700 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:bg-white/[0.03] dark:text-gray-300">
                     {% for c in currencies %}<option value="{{ c }}" {{ c == reference ? 'selected' : '' }}>{{ c }}</option>{% endfor %}
                 </select>
             </label>
-            <button type="submit" class="min-h-10 rounded bg-primary px-4 text-sm font-semibold text-primary-fg hover:opacity-90">Définir</button>
+            <twig:tsf:Ui:Button type="submit" variant="primary">Définir</twig:tsf:Ui:Button>
         </form>
     </section>
 
-    <section class="max-w-2xl rounded-md border border-border bg-surface p-4 shadow-sm">
-        <h2 class="mb-1 text-base font-semibold text-ink">Taux de change vers {{ reference }}</h2>
-        <p class="mb-3 text-xs text-muted">1 unité de la devise = X {{ reference }}, à partir de la date d'effet.</p>
+    <section class="max-w-2xl rounded-2xl border border-gray-200 bg-white p-4 shadow-theme-sm dark:border-gray-800 dark:bg-white/[0.03]">
+        <h2 class="mb-1 text-theme-sm font-semibold text-gray-800 dark:text-white/90">Taux de change vers {{ reference }}</h2>
+        <p class="mb-3 text-theme-xs text-gray-500 dark:text-gray-400">1 unité de la devise = X {{ reference }}, à partir de la date d'effet.</p>
 
         {% if rates is empty %}
-            <p class="mb-3 text-sm text-muted">Aucun taux de change défini.</p>
+            <p class="mb-3 text-theme-sm text-gray-500 dark:text-gray-400">Aucun taux de change défini.</p>
         {% else %}
-            <table class="mb-4 w-full border-collapse text-sm">
-                <thead>
-                    <tr class="border-b border-border text-left text-xs uppercase text-muted">
-                        <th class="py-2 pr-4">Devise</th><th class="py-2 pr-4">À partir du</th><th class="py-2 text-right">Taux</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for r in rates %}
-                        <tr class="border-b border-border last:border-b-0">
-                            <td class="py-2 pr-4 font-medium text-ink">{{ r.code }}</td>
-                            <td class="py-2 pr-4 text-body">{{ r.from }}</td>
-                            <td class="py-2 text-right tabular-nums text-body">{{ r.rate }}</td>
+            <div class="mb-4 overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800">
+                <table class="w-full border-collapse text-left text-theme-sm">
+                    <thead>
+                        <tr class="border-b border-gray-100 bg-gray-50 text-theme-xs uppercase dark:border-gray-800 dark:bg-white/[0.02]">
+                            <th class="px-4 py-3 font-semibold text-gray-700 dark:text-gray-300">Devise</th><th class="px-4 py-3 font-semibold text-gray-700 dark:text-gray-300">À partir du</th><th class="px-4 py-3 text-right font-semibold text-gray-700 dark:text-gray-300">Taux</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {% for r in rates %}
+                            <tr class="border-t border-gray-100 last:border-b-0 dark:border-gray-800">
+                                <td class="px-4 py-3 font-medium text-gray-800 dark:text-white/90">{{ r.code }}</td>
+                                <td class="px-4 py-3 text-gray-600 dark:text-gray-300">{{ r.from }}</td>
+                                <td class="px-4 py-3 text-right tabular-nums text-gray-800 dark:text-white/90">{{ r.rate }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         {% endif %}
 
         <form method="post" action="{{ path('currency_config_rate') }}" class="flex flex-wrap items-end gap-2">
             <input type="hidden" name="_token" value="{{ csrf_token('currency_config') }}">
-            <label class="text-[13px] font-medium text-ink">Devise
-                <select name="code" class="ml-1 min-h-10 rounded border border-border bg-surface px-2 text-sm text-body">
+            <label class="text-theme-xs font-medium text-gray-700 dark:text-gray-300">Devise
+                <select name="code" class="ml-1 min-h-10 rounded-lg border border-gray-300 bg-white px-2 text-theme-sm text-gray-700 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:bg-white/[0.03] dark:text-gray-300">
                     {% for c in currencies|filter(c => c != reference) %}<option value="{{ c }}">{{ c }}</option>{% endfor %}
                 </select>
             </label>
-            <label class="text-[13px] font-medium text-ink">Date d'effet
-                <input type="date" name="from" required class="ml-1 min-h-10 rounded border border-border bg-surface px-2 text-sm text-body">
+            <label class="text-theme-xs font-medium text-gray-700 dark:text-gray-300">Date d'effet
+                <input type="date" name="from" required class="ml-1 min-h-10 rounded-lg border border-gray-300 bg-white px-2 text-theme-sm text-gray-700 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:bg-white/[0.03] dark:text-gray-300">
             </label>
-            <label class="text-[13px] font-medium text-ink">Taux (→ {{ reference }})
-                <input type="number" name="rate" step="0.001" min="0.001" required class="ml-1 w-28 min-h-10 rounded border border-border bg-surface px-2 text-sm text-body">
+            <label class="text-theme-xs font-medium text-gray-700 dark:text-gray-300">Taux (→ {{ reference }})
+                <input type="number" name="rate" step="0.001" min="0.001" required class="ml-1 min-h-10 w-28 rounded-lg border border-gray-300 bg-white px-2 text-theme-sm text-gray-700 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:bg-white/[0.03] dark:text-gray-300">
             </label>
-            <button type="submit" class="min-h-10 rounded bg-primary px-4 text-sm font-semibold text-primary-fg hover:opacity-90">Enregistrer le taux</button>
+            <twig:tsf:Ui:Button type="submit" variant="primary">Enregistrer le taux</twig:tsf:Ui:Button>
         </form>
     </section>
 {% endblock %}
