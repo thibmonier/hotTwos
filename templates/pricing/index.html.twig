@@ -6,70 +6,86 @@
 {% block page_title %}Profils de tarification{% endblock %}
 
 {% block body %}
-    <h1 class="visually-hidden">Profils de tarification</h1>
+    <h1 class="sr-only">Profils de tarification</h1>
+
+    <twig:tsf:Layout:PageHeader
+        title="Profils de tarification"
+        subtitle="Profils, coûts et taux de vente — paramétrage de la valorisation" />
 
     {% for label, messages in app.flashes %}
         {% for message in messages %}
-            <div class="flash flash-{{ label == 'error' ? 'error' : label }}"
+            <div class="mb-4 rounded-lg border px-4 py-3 text-theme-sm {{ label == 'error'
+                    ? 'border-error-200 bg-error-50 text-error-700 dark:border-error-500/30 dark:bg-error-500/15 dark:text-error-400'
+                    : 'border-success-200 bg-success-50 text-success-700 dark:border-success-500/30 dark:bg-success-500/15 dark:text-success-400' }}"
                  role="{{ label == 'error' ? 'alert' : 'status' }}">{{ message }}</div>
         {% endfor %}
     {% endfor %}
 
+    {# ── KPI (G1 — tsf:Ui:StatCard) ───────────────────────────────────────── #}
+    <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <twig:tsf:Ui:StatCard
+            label="Profils"
+            value="{{ rows|length }}"
+            variant="brand" />
+        <twig:tsf:Ui:StatCard
+            label="Profils actifs"
+            value="{{ rows|filter(r => r.active)|length }}" />
+        <twig:tsf:Ui:StatCard
+            label="Collaborateurs affectables"
+            value="{{ collaborators|length }}"
+            hint="Un collaborateur et un profil actif sont requis pour une affectation." />
+    </div>
+
     {# Affecter un collaborateur à un profil (US-060 T-060-02) — POST-Redirect-Get + CSRF #}
     <section aria-labelledby="assign-profile-heading" class="mb-6">
-        <h2 id="assign-profile-heading" class="mb-3 text-base font-semibold text-ink">Affecter un collaborateur à un profil</h2>
-        <div class="rounded-md border border-border bg-surface shadow-sm">
-            <div class="p-4">
-                {% if collaborators is empty or rows is empty %}
-                    <p class="text-muted">Un collaborateur et un profil actif sont requis pour créer une affectation.</p>
-                {% else %}
-                    <form method="post" action="{{ path('pricing_assign') }}">
-                        <input type="hidden" name="_token" value="{{ csrf_token('pricing_assign') }}">
+        <h2 id="assign-profile-heading" class="mb-3 text-theme-sm font-semibold text-gray-800 dark:text-white/90">Affecter un collaborateur à un profil</h2>
+        <div class="rounded-2xl border border-gray-200 bg-white p-4 shadow-theme-sm dark:border-gray-800 dark:bg-white/[0.03]">
+            {% if collaborators is empty or rows is empty %}
+                <p class="text-theme-sm text-gray-500 dark:text-gray-400">Un collaborateur et un profil actif sont requis pour créer une affectation.</p>
+            {% else %}
+                <form method="post" action="{{ path('pricing_assign') }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('pricing_assign') }}">
 
-                        <div class="mb-4">
-                            <label for="assign-user" class="mb-1 block text-xs font-medium text-body">Collaborateur</label>
-                            <select id="assign-user" name="userId" required
-                                    class="w-full max-w-md rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-focus">
-                                {% for id, name in collaborators %}
-                                    <option value="{{ id }}">{{ name }}</option>
-                                {% endfor %}
-                            </select>
+                    <div class="mb-4">
+                        <label for="assign-user" class="mb-1 block text-theme-xs font-medium text-gray-700 dark:text-gray-300">Collaborateur</label>
+                        <select id="assign-user" name="userId" required
+                                class="min-h-10 w-full max-w-md rounded-lg border border-gray-300 bg-white px-3 text-theme-sm text-gray-700 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:bg-white/[0.03] dark:text-gray-300">
+                            {% for id, name in collaborators %}
+                                <option value="{{ id }}">{{ name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="assign-profile" class="mb-1 block text-theme-xs font-medium text-gray-700 dark:text-gray-300">Profil</label>
+                        <select id="assign-profile" name="profileId" required
+                                class="min-h-10 w-full max-w-md rounded-lg border border-gray-300 bg-white px-3 text-theme-sm text-gray-700 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:bg-white/[0.03] dark:text-gray-300">
+                            {% for row in rows %}
+                                {% if row.active %}
+                                    <option value="{{ row.id }}">{{ row.name }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-4 flex flex-wrap gap-4">
+                        <div class="min-w-[180px] flex-1">
+                            <label for="assign-from" class="mb-1 block text-theme-xs font-medium text-gray-700 dark:text-gray-300">À partir du</label>
+                            <input type="date" id="assign-from" name="effectiveFrom" required
+                                   class="min-h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-theme-sm text-gray-700 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:bg-white/[0.03] dark:text-gray-300">
                         </div>
-
-                        <div class="mb-4">
-                            <label for="assign-profile" class="mb-1 block text-xs font-medium text-body">Profil</label>
-                            <select id="assign-profile" name="profileId" required
-                                    class="w-full max-w-md rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-focus">
-                                {% for row in rows %}
-                                    {% if row.active %}
-                                        <option value="{{ row.id }}">{{ row.name }}</option>
-                                    {% endif %}
-                                {% endfor %}
-                            </select>
+                        <div class="min-w-[180px] flex-1">
+                            <label for="assign-to" class="mb-1 block text-theme-xs font-medium text-gray-700 dark:text-gray-300">
+                                Jusqu'au <span class="font-normal text-gray-500 dark:text-gray-400">(optionnel)</span>
+                            </label>
+                            <input type="date" id="assign-to" name="effectiveTo"
+                                   class="min-h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-theme-sm text-gray-700 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:bg-white/[0.03] dark:text-gray-300">
                         </div>
+                    </div>
 
-                        <div class="mb-4 flex flex-wrap gap-4">
-                            <div class="flex-1 min-w-[180px]">
-                                <label for="assign-from" class="mb-1 block text-xs font-medium text-body">À partir du</label>
-                                <input type="date" id="assign-from" name="effectiveFrom" required
-                                       class="w-full rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-focus">
-                            </div>
-                            <div class="flex-1 min-w-[180px]">
-                                <label for="assign-to" class="mb-1 block text-xs font-medium text-body">
-                                    Jusqu'au <span class="font-normal text-muted">(optionnel)</span>
-                                </label>
-                                <input type="date" id="assign-to" name="effectiveTo"
-                                       class="w-full rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-focus">
-                            </div>
-                        </div>
-
-                        <button type="submit"
-                                class="inline-flex min-h-9 items-center rounded bg-primary px-4 text-xs font-semibold text-primary-fg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1">
-                            Affecter le collaborateur
-                        </button>
-                    </form>
-                {% endif %}
-            </div>
+                    <twig:tsf:Ui:Button type="submit" variant="primary">Affecter le collaborateur</twig:tsf:Ui:Button>
+                </form>
+            {% endif %}
         </div>
     </section>
 
@@ -77,38 +93,38 @@
 
         {# Liste des profils #}
         <section aria-labelledby="profiles-heading" class="mb-6">
-            <h2 id="profiles-heading" class="mb-3 text-base font-semibold text-ink">Profils</h2>
+            <h2 id="profiles-heading" class="mb-3 text-theme-sm font-semibold text-gray-800 dark:text-white/90">Profils</h2>
 
             {% if rows is empty %}
-                <p class="text-muted">Aucun profil pour l'instant. Créez le premier ci-dessous.</p>
+                <p class="text-theme-sm text-gray-500 dark:text-gray-400">Aucun profil pour l'instant. Créez le premier ci-dessous.</p>
             {% else %}
-                <div class="rounded-md border border-border bg-surface shadow-sm">
+                <div class="rounded-2xl border border-gray-200 bg-white shadow-theme-sm dark:border-gray-800 dark:bg-white/[0.03]">
                     <ul role="list">
                         {% for row in rows %}
-                            <li class="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3 last:border-b-0">
-                                <span class="{{ row.active ? 'font-medium text-ink' : 'italic text-muted' }}">
+                            <li class="flex flex-wrap items-center justify-between gap-2 border-b border-gray-100 px-4 py-3 last:border-b-0 dark:border-gray-800">
+                                <span class="{{ row.active ? 'font-medium text-gray-800 dark:text-white/90' : 'italic text-gray-500 dark:text-gray-400' }}">
                                     {{ row.name }}
-                                    <em class="font-normal text-muted not-italic">({{ row.mode }})</em>
+                                    <em class="not-italic font-normal text-gray-500 dark:text-gray-400">({{ row.mode }})</em>
                                     {% if not row.active %}
-                                        <span class="status-badge status-badge-neutral ml-1">Désactivé</span>
+                                        <span class="ml-1 inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-theme-xs font-medium text-gray-600 dark:bg-white/[0.06] dark:text-gray-300">Désactivé</span>
                                     {% endif %}
                                 </span>
                                 <span class="flex gap-1">
-                                    <button type="button"
-                                            class="inline-flex min-h-9 items-center rounded border border-border-strong px-3 text-xs font-semibold text-muted hover:bg-surface-alt hover:text-ink focus:outline-none focus:ring-2 focus:ring-focus"
-                                            data-action="pricing#showHistory"
-                                            data-profile-id="{{ row.id }}"
-                                            aria-label="Voir l'historique tarifaire de {{ row.name }}">
+                                    <twig:tsf:Ui:Button
+                                        variant="secondary"
+                                        data-action="pricing#showHistory"
+                                        data-profile-id="{{ row.id }}"
+                                        aria-label="Voir l'historique tarifaire de {{ row.name }}">
                                         Historique
-                                    </button>
+                                    </twig:tsf:Ui:Button>
                                     {% if row.active %}
-                                        <button type="button"
-                                                class="inline-flex min-h-9 items-center rounded border border-border-strong px-3 text-xs font-semibold text-muted hover:bg-surface-alt hover:text-ink focus:outline-none focus:ring-2 focus:ring-focus"
-                                                data-action="pricing#deactivate"
-                                                data-profile-id="{{ row.id }}"
-                                                aria-label="Désactiver le profil {{ row.name }}">
+                                        <twig:tsf:Ui:Button
+                                            variant="secondary"
+                                            data-action="pricing#deactivate"
+                                            data-profile-id="{{ row.id }}"
+                                            aria-label="Désactiver le profil {{ row.name }}">
                                             Désactiver
-                                        </button>
+                                        </twig:tsf:Ui:Button>
                                     {% endif %}
                                 </span>
                             </li>
@@ -120,119 +136,109 @@
 
         {# Ajouter un profil #}
         <section aria-labelledby="create-profile-heading" class="mb-6">
-            <h2 id="create-profile-heading" class="mb-3 text-base font-semibold text-ink">Ajouter un profil</h2>
-            <div class="rounded-md border border-border bg-surface shadow-sm">
-                <div class="p-4">
-                    <form data-action="submit->pricing#createProfile">
-                        <div class="mb-4">
-                            <label for="pricing-profile-name" class="mb-1 block text-xs font-medium text-body">Nom</label>
-                            <input type="text" id="pricing-profile-name" required
-                                   data-pricing-target="profileName"
-                                   placeholder="ex. Développeur senior"
-                                   class="w-full max-w-md rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-focus">
-                        </div>
-                        <div class="mb-4">
-                            <label for="pricing-profile-mode" class="mb-1 block text-xs font-medium text-body">Mode de calcul du coût</label>
-                            <select id="pricing-profile-mode"
-                                    data-pricing-target="profileMode"
-                                    class="w-full max-w-md rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-focus">
-                                <option value="direct">Direct</option>
-                                <option value="loaded">Chargé</option>
-                                <option value="full">Complet</option>
-                            </select>
-                        </div>
-                        <button type="submit"
-                                class="inline-flex min-h-9 items-center rounded bg-primary px-4 text-xs font-semibold text-primary-fg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1">
-                            Créer le profil
-                        </button>
-                    </form>
-                </div>
+            <h2 id="create-profile-heading" class="mb-3 text-theme-sm font-semibold text-gray-800 dark:text-white/90">Ajouter un profil</h2>
+            <div class="rounded-2xl border border-gray-200 bg-white p-4 shadow-theme-sm dark:border-gray-800 dark:bg-white/[0.03]">
+                <form data-action="submit->pricing#createProfile">
+                    <div class="mb-4">
+                        <label for="pricing-profile-name" class="mb-1 block text-theme-xs font-medium text-gray-700 dark:text-gray-300">Nom</label>
+                        <input type="text" id="pricing-profile-name" required
+                               data-pricing-target="profileName"
+                               placeholder="ex. Développeur senior"
+                               class="min-h-10 w-full max-w-md rounded-lg border border-gray-300 bg-white px-3 text-theme-sm text-gray-700 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:bg-white/[0.03] dark:text-gray-300">
+                    </div>
+                    <div class="mb-4">
+                        <label for="pricing-profile-mode" class="mb-1 block text-theme-xs font-medium text-gray-700 dark:text-gray-300">Mode de calcul du coût</label>
+                        <select id="pricing-profile-mode"
+                                data-pricing-target="profileMode"
+                                class="min-h-10 w-full max-w-md rounded-lg border border-gray-300 bg-white px-3 text-theme-sm text-gray-700 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:bg-white/[0.03] dark:text-gray-300">
+                            <option value="direct">Direct</option>
+                            <option value="loaded">Chargé</option>
+                            <option value="full">Complet</option>
+                        </select>
+                    </div>
+                    <twig:tsf:Ui:Button type="submit" variant="primary">Créer le profil</twig:tsf:Ui:Button>
+                </form>
             </div>
         </section>
 
         {# Définir un tarif #}
         <section aria-labelledby="define-rate-heading" class="mb-6">
-            <h2 id="define-rate-heading" class="mb-3 text-base font-semibold text-ink">Définir un tarif</h2>
-            <div class="rounded-md border border-border bg-surface shadow-sm">
-                <div class="p-4">
-                    <form data-action="submit->pricing#defineRate">
-                        <div class="mb-4">
-                            <label for="pricing-rate-profile" class="mb-1 block text-xs font-medium text-body">Profil</label>
-                            <select id="pricing-rate-profile" required
-                                    data-pricing-target="rateProfile"
-                                    class="w-full max-w-md rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-focus">
-                                {% for row in rows %}
-                                    <option value="{{ row.id }}">{{ row.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
+            <h2 id="define-rate-heading" class="mb-3 text-theme-sm font-semibold text-gray-800 dark:text-white/90">Définir un tarif</h2>
+            <div class="rounded-2xl border border-gray-200 bg-white p-4 shadow-theme-sm dark:border-gray-800 dark:bg-white/[0.03]">
+                <form data-action="submit->pricing#defineRate">
+                    <div class="mb-4">
+                        <label for="pricing-rate-profile" class="mb-1 block text-theme-xs font-medium text-gray-700 dark:text-gray-300">Profil</label>
+                        <select id="pricing-rate-profile" required
+                                data-pricing-target="rateProfile"
+                                class="min-h-10 w-full max-w-md rounded-lg border border-gray-300 bg-white px-3 text-theme-sm text-gray-700 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:bg-white/[0.03] dark:text-gray-300">
+                            {% for row in rows %}
+                                <option value="{{ row.id }}">{{ row.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-                        <div class="mb-4 flex flex-wrap gap-4">
-                            <div class="flex-1 min-w-[180px]">
-                                <label for="pricing-rate-from" class="mb-1 block text-xs font-medium text-body">À partir du</label>
-                                <input type="date" id="pricing-rate-from" required
-                                       data-pricing-target="rateFrom"
-                                       class="w-full rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-focus">
-                            </div>
-                            <div class="flex-1 min-w-[180px]">
-                                <label for="pricing-rate-to" class="mb-1 block text-xs font-medium text-body">
-                                    Jusqu'au <span class="font-normal text-muted">(optionnel)</span>
-                                </label>
-                                <input type="date" id="pricing-rate-to"
-                                       data-pricing-target="rateTo"
-                                       class="w-full rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-focus">
-                            </div>
+                    <div class="mb-4 flex flex-wrap gap-4">
+                        <div class="min-w-[180px] flex-1">
+                            <label for="pricing-rate-from" class="mb-1 block text-theme-xs font-medium text-gray-700 dark:text-gray-300">À partir du</label>
+                            <input type="date" id="pricing-rate-from" required
+                                   data-pricing-target="rateFrom"
+                                   class="min-h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-theme-sm text-gray-700 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:bg-white/[0.03] dark:text-gray-300">
                         </div>
-
-                        <div class="mb-4 flex flex-wrap gap-4">
-                            <div class="flex-1 min-w-[180px]">
-                                <label for="pricing-rate-cost" class="mb-1 block text-xs font-medium text-body">
-                                    Coût de revient <span class="font-normal text-muted">(centimes)</span>
-                                </label>
-                                <input type="number" id="pricing-rate-cost" min="1" required
-                                       data-pricing-target="rateCost"
-                                       class="w-full rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-focus">
-                            </div>
-                            <div class="flex-1 min-w-[180px]">
-                                <label for="pricing-rate-selling" class="mb-1 block text-xs font-medium text-body">
-                                    Taux de vente <span class="font-normal text-muted">(centimes)</span>
-                                </label>
-                                <input type="number" id="pricing-rate-selling" min="1" required
-                                       data-pricing-target="rateSelling"
-                                       class="w-full rounded border border-border-strong bg-surface px-3 py-2 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-focus">
-                            </div>
-                        </div>
-
-                        <div class="mb-4 flex items-start gap-2">
-                            <input type="checkbox" id="pricing-rate-confirm"
-                                   data-pricing-target="rateConfirm"
-                                   class="mt-0.5 h-4 w-4 rounded border-border-strong text-primary focus:ring-focus">
-                            <label for="pricing-rate-confirm" class="text-xs text-body">
-                                Confirmer une saisie rétroactive
+                        <div class="min-w-[180px] flex-1">
+                            <label for="pricing-rate-to" class="mb-1 block text-theme-xs font-medium text-gray-700 dark:text-gray-300">
+                                Jusqu'au <span class="font-normal text-gray-500 dark:text-gray-400">(optionnel)</span>
                             </label>
+                            <input type="date" id="pricing-rate-to"
+                                   data-pricing-target="rateTo"
+                                   class="min-h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-theme-sm text-gray-700 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:bg-white/[0.03] dark:text-gray-300">
                         </div>
+                    </div>
 
-                        <button type="submit"
-                                class="inline-flex min-h-9 items-center rounded bg-primary px-4 text-xs font-semibold text-primary-fg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1">
-                            Enregistrer le tarif
-                        </button>
-                    </form>
-                </div>
+                    <div class="mb-4 flex flex-wrap gap-4">
+                        <div class="min-w-[180px] flex-1">
+                            <label for="pricing-rate-cost" class="mb-1 block text-theme-xs font-medium text-gray-700 dark:text-gray-300">
+                                Coût de revient <span class="font-normal text-gray-500 dark:text-gray-400">(centimes)</span>
+                            </label>
+                            <input type="number" id="pricing-rate-cost" min="1" required
+                                   data-pricing-target="rateCost"
+                                   class="min-h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-theme-sm text-gray-700 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:bg-white/[0.03] dark:text-gray-300">
+                        </div>
+                        <div class="min-w-[180px] flex-1">
+                            <label for="pricing-rate-selling" class="mb-1 block text-theme-xs font-medium text-gray-700 dark:text-gray-300">
+                                Taux de vente <span class="font-normal text-gray-500 dark:text-gray-400">(centimes)</span>
+                            </label>
+                            <input type="number" id="pricing-rate-selling" min="1" required
+                                   data-pricing-target="rateSelling"
+                                   class="min-h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-theme-sm text-gray-700 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:bg-white/[0.03] dark:text-gray-300">
+                        </div>
+                    </div>
+
+                    <div class="mb-4 flex items-start gap-2">
+                        <input type="checkbox" id="pricing-rate-confirm"
+                               data-pricing-target="rateConfirm"
+                               class="mt-0.5 h-4 w-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500/40 dark:border-gray-700">
+                        <label for="pricing-rate-confirm" class="text-theme-sm text-gray-700 dark:text-gray-300">
+                            Confirmer une saisie rétroactive
+                        </label>
+                    </div>
+
+                    <twig:tsf:Ui:Button type="submit" variant="primary">Enregistrer le tarif</twig:tsf:Ui:Button>
+                </form>
             </div>
         </section>
 
         {# Historique tarifaire #}
         <section aria-labelledby="history-heading" class="mb-6">
-            <h2 id="history-heading" class="mb-3 text-base font-semibold text-ink">Historique tarifaire</h2>
-            <div class="overflow-x-auto rounded-md border border-border bg-surface shadow-sm">
-                <table class="w-full border-collapse text-left">
-                    <caption class="visually-hidden">Historique des tarifs par profil</caption>
+            <h2 id="history-heading" class="mb-3 text-theme-sm font-semibold text-gray-800 dark:text-white/90">Historique tarifaire</h2>
+            <div class="overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-theme-sm dark:border-gray-800 dark:bg-white/[0.03]">
+                <table class="w-full border-collapse text-left text-theme-sm">
+                    <caption class="sr-only">Historique des tarifs par profil</caption>
                     <thead>
-                        <tr class="bg-surface-alt">
-                            <th scope="col" class="px-4 py-3 font-semibold text-body">À partir du</th>
-                            <th scope="col" class="px-4 py-3 font-semibold text-body">Jusqu'au</th>
-                            <th scope="col" class="px-4 py-3 font-semibold text-body">Coût (cts)</th>
-                            <th scope="col" class="px-4 py-3 font-semibold text-body">Vente (cts)</th>
+                        <tr class="border-b border-gray-100 bg-gray-50 text-theme-xs uppercase dark:border-gray-800 dark:bg-white/[0.02]">
+                            <th scope="col" class="px-4 py-3 font-semibold text-gray-700 dark:text-gray-300">À partir du</th>
+                            <th scope="col" class="px-4 py-3 font-semibold text-gray-700 dark:text-gray-300">Jusqu'au</th>
+                            <th scope="col" class="px-4 py-3 text-right font-semibold text-gray-700 dark:text-gray-300">Coût (cts)</th>
+                            <th scope="col" class="px-4 py-3 text-right font-semibold text-gray-700 dark:text-gray-300">Vente (cts)</th>
                         </tr>
                     </thead>
                     <tbody data-pricing-target="history"></tbody>
@@ -240,28 +246,28 @@
             </div>
         </section>
 
-        <p class="text-xs text-muted" aria-live="polite" data-pricing-target="status"></p>
+        <p class="text-theme-xs text-gray-500 dark:text-gray-400" aria-live="polite" data-pricing-target="status"></p>
     </div>
 
     {# ── Surcharges de taux de vente (US-015, EF-REF-19) : client / projet, priorité projet > client > profil ── #}
-    <section aria-labelledby="selling-rate-heading" class="mt-6 rounded-md border border-border bg-surface p-4 shadow-sm">
-        <h2 id="selling-rate-heading" class="mb-1 text-base font-semibold text-ink">Surcharges de taux de vente</h2>
-        <p class="mb-3 text-xs text-muted">Un taux client ou projet prime sur le taux du profil (priorité projet &gt; client &gt; profil).</p>
+    <section aria-labelledby="selling-rate-heading" class="mt-6 rounded-2xl border border-gray-200 bg-white p-4 shadow-theme-sm dark:border-gray-800 dark:bg-white/[0.03]">
+        <h2 id="selling-rate-heading" class="mb-1 text-theme-sm font-semibold text-gray-800 dark:text-white/90">Surcharges de taux de vente</h2>
+        <p class="mb-3 text-theme-xs text-gray-500 dark:text-gray-400">Un taux client ou projet prime sur le taux du profil (priorité projet &gt; client &gt; profil).</p>
         <form method="post" action="{{ path('pricing_selling_rate_define') }}" class="flex flex-wrap items-end gap-3">
             <input type="hidden" name="_token" value="{{ csrf_token('selling_rate') }}">
-            <label class="text-[13px] font-medium text-ink">Profil
-                <select name="profileId" required class="ml-1 min-h-10 rounded border border-border bg-surface px-2 text-sm text-body">
+            <label class="text-theme-xs font-medium text-gray-700 dark:text-gray-300">Profil
+                <select name="profileId" required class="ml-1 min-h-10 rounded-lg border border-gray-300 bg-white px-2 text-theme-sm text-gray-700 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:bg-white/[0.03] dark:text-gray-300">
                     {% for r in rows %}<option value="{{ r.id }}">{{ r.name }}</option>{% endfor %}
                 </select>
             </label>
-            <label class="text-[13px] font-medium text-ink">Niveau
-                <select name="scope" required class="ml-1 min-h-10 rounded border border-border bg-surface px-2 text-sm text-body">
+            <label class="text-theme-xs font-medium text-gray-700 dark:text-gray-300">Niveau
+                <select name="scope" required class="ml-1 min-h-10 rounded-lg border border-gray-300 bg-white px-2 text-theme-sm text-gray-700 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:bg-white/[0.03] dark:text-gray-300">
                     <option value="client">Client</option>
                     <option value="project">Projet</option>
                 </select>
             </label>
-            <label class="text-[13px] font-medium text-ink">Cible (client ou projet)
-                <select name="scopeRefId" required class="ml-1 min-h-10 rounded border border-border bg-surface px-2 text-sm text-body">
+            <label class="text-theme-xs font-medium text-gray-700 dark:text-gray-300">Cible (client ou projet)
+                <select name="scopeRefId" required class="ml-1 min-h-10 rounded-lg border border-gray-300 bg-white px-2 text-theme-sm text-gray-700 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:bg-white/[0.03] dark:text-gray-300">
                     <optgroup label="Clients">
                         {% for c in clients %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}
                     </optgroup>
@@ -270,16 +276,16 @@
                     </optgroup>
                 </select>
             </label>
-            <label class="text-[13px] font-medium text-ink">Date d'effet
-                <input type="date" name="from" required class="ml-1 min-h-10 rounded border border-border bg-surface px-2 text-sm text-body">
+            <label class="text-theme-xs font-medium text-gray-700 dark:text-gray-300">Date d'effet
+                <input type="date" name="from" required class="ml-1 min-h-10 rounded-lg border border-gray-300 bg-white px-2 text-theme-sm text-gray-700 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:bg-white/[0.03] dark:text-gray-300">
             </label>
-            <label class="text-[13px] font-medium text-ink">Taux de vente (€/j)
-                <input type="number" name="sellingEuros" min="1" required class="ml-1 w-28 min-h-10 rounded border border-border bg-surface px-2 text-sm text-body">
+            <label class="text-theme-xs font-medium text-gray-700 dark:text-gray-300">Taux de vente (€/j)
+                <input type="number" name="sellingEuros" min="1" required class="ml-1 min-h-10 w-28 rounded-lg border border-gray-300 bg-white px-2 text-theme-sm text-gray-700 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:border-gray-700 dark:bg-white/[0.03] dark:text-gray-300">
             </label>
-            <label class="text-[12px] text-muted">
-                <input type="checkbox" name="confirmRetroactive" value="1"> Confirmer si rétroactif
+            <label class="text-theme-xs text-gray-500 dark:text-gray-400">
+                <input type="checkbox" name="confirmRetroactive" value="1" class="mr-1 h-4 w-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500/40 dark:border-gray-700"> Confirmer si rétroactif
             </label>
-            <button type="submit" class="min-h-10 rounded bg-primary px-4 text-sm font-semibold text-primary-fg hover:opacity-90">Enregistrer le taux</button>
+            <twig:tsf:Ui:Button type="submit" variant="primary">Enregistrer le taux</twig:tsf:Ui:Button>
         </form>
     </section>
 {% endblock %}
