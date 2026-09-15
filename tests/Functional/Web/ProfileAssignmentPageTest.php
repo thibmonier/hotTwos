@@ -98,6 +98,26 @@ final class ProfileAssignmentPageTest extends WebTestCase
         self::assertStringContainsString('Affecter un collaborateur', (string) $this->client->getResponse()->getContent());
     }
 
+    /**
+     * US-104 — la page Profils & taux est reskinnée sur le socle tailsfadmin :
+     * PageHeader, tokens (focus brand-500) et boutons câblés Stimulus portés par tsf:Ui:Button
+     * (pass-through des attributs data-action + focus visible WCAG 2.4.7).
+     */
+    public function testProfilesPageIsReskinnedOnSocle(): void
+    {
+        $this->login('admin@agence.test');
+        $this->client->request('GET', '/profils', server: ['HTTP_ACCEPT' => 'text/html']);
+
+        self::assertResponseIsSuccessful();
+        $html = (string) $this->client->getResponse()->getContent();
+        // Tokens tailsfadmin (focus visible via le socle).
+        self::assertStringContainsString('focus:ring-brand-500', $html);
+        // Le bouton « Historique » (câblé Stimulus) relaie son data-action via le composant.
+        self::assertStringContainsString('data-action="pricing#showHistory"', $html);
+        // Pas de résidu des anciens tokens de surface.
+        self::assertStringNotContainsString('bg-primary px-4', $html);
+    }
+
     public function testAdminAssignsCollaboratorToProfile(): void
     {
         $this->login('admin@agence.test');
