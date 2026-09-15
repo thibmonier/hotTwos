@@ -91,6 +91,7 @@ final class AbsenceApiTest extends WebTestCase
     {
         $this->login('camille@agence.test');
 
+        // Mar 2026-09-01 → Sam 2026-09-05 : 5 jours calendaires, 4 jours ouvrés (le samedi ne décompte pas — US-107).
         $this->postJson('/api/absences', ['typeId' => $this->typeId, 'startDate' => '2026-09-01', 'endDate' => '2026-09-05']);
         self::assertResponseStatusCodeSame(201);
 
@@ -101,8 +102,8 @@ final class AbsenceApiTest extends WebTestCase
         $this->client->request('GET', '/api/absences/balance', server: ['HTTP_ACCEPT' => 'application/json']);
         self::assertResponseIsSuccessful();
         $balance = $this->decodeObject();
-        self::assertSame(5.0, $balance['pending'] ?? null);
-        self::assertSame(20.0, $balance['projectedBalance'] ?? null);
+        self::assertSame(4.0, $balance['pending'] ?? null);            // jours ouvrés (US-107)
+        self::assertSame(21.0, $balance['projectedBalance'] ?? null);  // 25 acquis − 4 en attente
     }
 
     public function testManagerDecidesButCollaboratorCannot(): void

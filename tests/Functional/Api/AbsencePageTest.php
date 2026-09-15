@@ -8,6 +8,7 @@ use App\Domain\Absence\AbsenceRequest;
 use App\Domain\Absence\AbsenceType;
 use App\Domain\Calendar\ClosurePeriod;
 use App\Domain\Calendar\Holiday;
+use App\Domain\Calendar\WorkSchedule;
 use App\Domain\Tenant\Tenant;
 use App\Domain\Tenant\TenantId;
 use App\Domain\User\User;
@@ -49,6 +50,8 @@ final class AbsencePageTest extends WebTestCase
             $this->em->getClassMetadata(AbsenceValidationCircuit::class),
             $this->em->getClassMetadata(Holiday::class),
             $this->em->getClassMetadata(ClosurePeriod::class),
+            // US-107 : le solde interroge WorkingDaysCalculator (régime du collaborateur).
+            $this->em->getClassMetadata(WorkSchedule::class),
         ];
         $tool = new SchemaTool($this->em);
         $tool->dropSchema($this->schema);
