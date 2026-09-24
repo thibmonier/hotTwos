@@ -179,6 +179,13 @@ Genere un rapport recapitulatif avec :
 - Corrections reussies / echouees / ignorees
 - Tests de regression generes
 - Commits effectues (si `--auto-commit`)
+- **Coût en tokens de la correction** (issues corrigées) :
+  ```bash
+  # Fenêtre = début du run de fix → maintenant
+  python3 .claude/scripts/token-report.py --window <session-id>
+  # Ou, si les corrections sont sur des branches fix/* :
+  python3 .claude/scripts/token-report.py --fixes
+  ```
 
 ## Etat de Progression (fix-state.yaml)
 

@@ -59,6 +59,20 @@ Genere des rapports detailles a partir des donnees de session QA Recette. Suppor
 └─────────────────────────────────────────┘
 ```
 
+### 2bis. Coût en tokens du run (issues remontées)
+
+Ajouter au rapport une section **coût en tokens** de la session de recette (= coût
+de remontée des issues). L'id de session `REC-YYYYMMDD-HHMMSS` encode l'heure de
+début ; la fin est l'heure courante (ou le `last_modified` de `state.yaml`) :
+
+```bash
+# Coût du run de recette qui a produit les findings
+python3 .claude/scripts/token-report.py --window <session-id>
+```
+
+Coller le bloc « 🔎 Coût sur la fenêtre » sous le résumé des métriques. Pour le coût
+de **correction** associé, voir `/qa:fix` et `/token:report --fixes`.
+
 ### 3. Mode Comparaison (--compare)
 
 Compare deux sessions :
