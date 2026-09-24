@@ -1,0 +1,24 @@
+# token-ledger — coût en tokens agrégé par sprint (append-only).
+# Écrit par /workflow:review et /workflow:retro ; NE PAS régénérer via sync-backlog.
+# Séparé de sprint-status.yaml (qui est régénéré git-wins).
+# Volumes en tokens ; usd_est indicatif (cf. .bmad/token-pricing.yaml).
+
+sprints:
+  sprint-024:
+    output_tokens: 468603
+    thinking_tokens: 270330
+    cache_write_tokens: 1219499
+    cache_read_tokens: 138232682
+    input_tokens: 926
+    assistant_msgs: 464
+    usd_est: 265.37
+    recorded_at: "2026-09-24"
+  sprint-025:
+    output_tokens: 219842
+    thinking_tokens: 63555
+    cache_write_tokens: 362116
+    cache_read_tokens: 76589090
+    input_tokens: 470
+    assistant_msgs: 235
+    usd_est: 138.17
+    recorded_at: "2026-09-24"

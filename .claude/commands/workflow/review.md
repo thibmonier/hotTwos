@@ -28,6 +28,12 @@ gh pr list --state merged --search "merged:YYYY-MM-DD..YYYY-MM-DD"
 
 # Issues fermées
 gh issue list --state closed --search "closed:YYYY-MM-DD..YYYY-MM-DD"
+
+# Coût en tokens du sprint (ventilé par US ; résidu main via --all)
+python3 .claude/scripts/token-report.py --sprint {N}
+
+# Coût des issues corrigées du sprint (branches fix/*)
+python3 .claude/scripts/token-report.py --fixes --sprint {N}
 ```
 
 ### Étape 2 : Analyser le Sprint Backlog
@@ -264,6 +270,13 @@ Durée totale : 2h
 | Livré | Y pts |
 | Vélocité | Y pts |
 | Taux | Z% |
+
+### 💸 Coût en tokens
+
+<!-- Coller la sortie de : python3 .claude/scripts/token-report.py --sprint {N} -->
+<!-- Ventilation par US + total sprint. Coût USD indicatif (abonnement). -->
+
+<!-- Issues corrigées : python3 .claude/scripts/token-report.py --fixes --sprint {N} -->
 
 ## Feedback Stakeholders
 
