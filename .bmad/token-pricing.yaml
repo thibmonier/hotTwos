@@ -1,0 +1,16 @@
+# Tarifs de conversion tokens → coût, pour token-report (.claude/scripts/token-report.py).
+#
+# ⚠️ Le coût USD est INDICATIF. Si l'usage est inclus dans un abonnement (Max/Team),
+#    il ne représente PAS une dépense réelle : lire d'abord les volumes de tokens.
+#    Mettre show_usd à false pour masquer entièrement la colonne coût.
+#
+# Valeurs par défaut : Claude Opus 4.8 (USD par million de tokens). À ajuster selon
+# le modèle réellement utilisé et la grille tarifaire en vigueur.
+
+currency: "USD"
+show_usd: true
+
+input: 15.0         # tokens d'entrée non cachés
+output: 75.0        # tokens de sortie (inclut le thinking)
+cache_write: 18.75  # écriture de cache (cache_creation_input_tokens)
+cache_read: 1.50    # lecture de cache (cache_read_input_tokens)

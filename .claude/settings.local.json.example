@@ -1,0 +1,18 @@
+{
+  "//": "Exemple OPT-IN : coût en tokens commenté automatiquement sur chaque PR créée.",
+  "//activation": "Fusionner le bloc 'hooks' ci-dessous dans votre .claude/settings.local.json (les hooks de settings.local se cumulent avec ceux de settings.json). Le hook est non bloquant et idempotent.",
+  "//desactivation": "Retirer le bloc pour désactiver. Le hook ne poste que si .claude/scripts/token-report.py, gh et une PR de la branche courante existent.",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/pr-token-cost.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

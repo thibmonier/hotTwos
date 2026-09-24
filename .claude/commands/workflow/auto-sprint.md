@@ -119,8 +119,14 @@ Prendre **directement le rôle de conducteur `/team:sprint`** (ne **pas** instan
 
 1. Commiter l'implémentation avec les **Conventional Commits** (atomique par story dans la mesure du possible).
 2. Pousser la branche feature.
-3. Ouvrir une PR en **brouillon** contre `--base` via `gh pr create` (titre + corps résumant l'objectif
-   du sprint, les stories livrées et l'état de la DoD).
+3. Calculer le **coût en tokens de la branche** :
+   `python3 .claude/scripts/token-report.py --pr <branche-feature>`.
+4. Ouvrir une PR en **brouillon** contre `--base` via `gh pr create` (titre + corps résumant l'objectif
+   du sprint, les stories livrées et l'état de la DoD), en **incluant dans le corps le bloc « 💸 Coût en tokens »**
+   produit à l'étape 3.
+
+> Si le hook opt-in `pr-token-cost.sh` est activé (voir `.claude/settings.local.json.example`), le coût est
+> **aussi** posté automatiquement en commentaire de la PR — l'étape 3 reste utile pour l'avoir dans le corps.
 
 ### Phase 6 — Surveillance CI (inline + boucle de correction automatique)
 

@@ -297,6 +297,15 @@ Votes : ●●●
 
 **Solution proposée** : {Solution}
 
+## 💸 Coût & efficacité du sprint
+
+<!-- python3 .claude/scripts/token-report.py --sprint {N} -->
+<!-- Économies RTK complémentaires : rtk gain -->
+
+- Coût total (tokens) : {output/thinking/cache} — ~{usd} USD indicatif
+- Poste le plus coûteux : {US-XXX}
+- Piste d'efficacité pour le prochain sprint : {observation}
+
 ## Actions
 
 ### Action 1 : {Améliorer la communication}
