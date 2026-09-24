@@ -56,3 +56,7 @@ coverage.xml
 
 # Override Docker local (contient APP_SECRET de dev — jamais commité, cf. rétro S15)
 compose.override.yaml
+
+# Caches Python (ex. scripts .claude/scripts)
+__pycache__/
+*.pyc
